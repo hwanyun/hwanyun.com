@@ -1,0 +1,124 @@
+---
+import { getCollection } from "astro:content"
+
+const { filter = "", current = "works" } = Astro.props
+
+const WIDTH = { "1col": "w-1col", "2col": "w-2col", "3col": "w-3col" }
+
+let works = await getCollection("works", ({ data }) => !data.draft)
+if (filter) works = works.filter((w) => w.data.category === filter)
+works.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
+
+const nav = [
+  { label: "Works", href: "/", key: "works" },
+  { label: "Sound", href: "/sound", key: "sound" },
+  { label: "Bio", href: "/cv", key: "bio" },
+  { label: "Contact", href: "/contact", key: "contact" },
+]
+---
+
+<div id="index">
+  <!-- 메뉴 = 그리드 첫 칸 (레퍼런스 방식) -->
+  <div class="cell menu">
+    <div class="name"><a href="/">HWANYUN</a></div>
+    {
+      nav.map((n) => (
+        <a href={n.href} class={current === n.key ? "current" : ""}>
+          {n.label}
+        </a>
+      ))
+    }
+    <input id="search" type="search" placeholder="Search" autocomplete="off" />
+  </div>
+
+  {
+    works.map((w) => (
+      <a
+        class={`cell ${WIDTH[w.data.size]} card`}
+        href={`/works/${w.slug}`}
+        data-search={`${w.data.title} ${w.data.year} ${w.data.medium}`.toLowerCase()}
+      >
+        {w.data.thumb ? (
+          <img src={w.data.thumb} alt={w.data.title} />
+        ) : (
+          <div class="ph" />
+        )}
+        <div class="cap">
+          {w.data.title}
+          {w.data.year ? ` (${w.data.year})` : ""}
+        </div>
+      </a>
+    ))
+  }
+  <div id="noresult" hidden>No results.</div>
+  <div style="clear:both"></div>
+</div>
+
+<script is:inline>
+  ;(function () {
+    var input = document.getElementById("search")
+    if (!input) return
+    var cards = Array.prototype.slice.call(document.querySelectorAll(".card"))
+    var none = document.getElementById("noresult")
+    function apply() {
+      var q = input.value.trim().toLowerCase()
+      var shown = 0
+      cards.forEach(function (c) {
+        var hit = !q || (c.getAttribute("data-search") || "").indexOf(q) !== -1
+        c.style.display = hit ? "" : "none"
+        if (hit) shown++
+      })
+      if (none) none.hidden = shown !== 0
+    }
+    input.addEventListener("input", apply)
+  })()
+</script>
+
+<style>
+  #index { padding: 0; position: relative; z-index: 1; }
+  .cell { float: left; margin: 40px 0 0 32px; font-size: 0; }
+  .cell.w-1col { width: var(--w-1col); }
+  .cell.w-2col { width: var(--w-2col); }
+  .cell.w-3col { width: var(--w-3col); }
+
+  .menu { width: 140px; font-size: 18px; line-height: 1.5; }
+  .menu .name { font-weight: 500; margin-bottom: 12px; }
+  .menu a { display: block; }
+  .menu a:hover { border-bottom: 1px solid var(--hover); width: fit-content; }
+  .menu a.current { border-bottom: 1px solid #000; width: fit-content; }
+  .menu #search {
+    display: block;
+    width: 120px;
+    margin-top: 14px;
+    padding: 2px 0;
+    border: 0;
+    border-bottom: 1px solid #000;
+    font: inherit;
+    font-size: 15px;
+    background: transparent;
+    outline: none;
+    border-radius: 0;
+    -webkit-appearance: none;
+  }
+  .menu #search::placeholder { color: #000; }
+  .menu #search:focus { border-bottom-color: var(--hover); }
+
+  #noresult { clear: both; font-size: 15px; margin: 20px 0 0 10px; color: #888; }
+
+  .card img,
+  .card .ph { width: 100%; display: block; }
+  .card .ph { background: #ececec; padding-bottom: 75%; }
+  .card .cap { font-size: 15px; line-height: 1.35; margin: 4px 0 0; }
+  .card:hover .cap { color: var(--hover); }
+
+  @media (max-width: 700px) {
+    .cell,
+    .cell.w-1col,
+    .cell.w-2col,
+    .cell.w-3col {
+      float: none;
+      width: auto;
+      margin: 28px 16px 0;
+    }
+  }
+</style>

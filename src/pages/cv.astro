@@ -1,0 +1,57 @@
+---
+import Base from "../layouts/Base.astro"
+import BioNav from "../components/BioNav.astro"
+import cv from "../data/cv.json"
+---
+
+<Base title="HWANYUN — CV" current="bio">
+  <article class="page">
+    <BioNav active="cv" />
+
+    <div class="cv">
+      {
+        cv.sections.map((sec) => (
+          <section class="cv-section">
+            <h2 class="cv-title">{sec.title}</h2>
+            {sec.items.map((it) => (
+              <div class="row">
+                <div class="year">{it.year}</div>
+                <div class="text">{it.text}</div>
+              </div>
+            ))}
+          </section>
+        ))
+      }
+    </div>
+  </article>
+
+  <style>
+    .page {
+      margin-left: 170px;
+      max-width: 820px;
+      padding: 10px 20px 80px;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+    .cv-section { margin: 0 0 34px; }
+    .cv-title {
+      font-size: 15px;
+      font-weight: 500;
+      margin: 0 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #000;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 16px;
+      padding: 4px 0;
+    }
+    .year { color: #555; white-space: nowrap; }
+    .text { }
+    @media (max-width: 700px) {
+      .page { margin-left: 0; }
+      .row { grid-template-columns: 80px 1fr; gap: 10px; }
+    }
+  </style>
+</Base>

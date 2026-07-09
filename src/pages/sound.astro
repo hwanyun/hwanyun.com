@@ -1,0 +1,166 @@
+---
+import { getCollection } from "astro:content"
+import Base from "../layouts/Base.astro"
+
+let sounds = await getCollection("sounds", ({ data }) => !data.draft)
+sounds.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
+
+const WIDTH = { "1col": "w-1col", "2col": "w-2col", "3col": "w-3col" }
+
+// SoundCloud 자동재생 플레이어 URL (클릭 시 삽입)
+function scEmbed(url: string): string {
+  const params = new URLSearchParams({
+    url,
+    color: "#000000",
+    auto_play: "true",
+    hide_related: "true",
+    show_comments: "false",
+    show_user: "true",
+    show_reposts: "false",
+    show_teaser: "false",
+    visual: "true",
+  })
+  return `https://w.soundcloud.com/player/?${params.toString()}`
+}
+
+const nav = [
+  { label: "Works", href: "/", key: "works" },
+  { label: "Sound", href: "/sound", key: "sound" },
+  { label: "Bio", href: "/cv", key: "bio" },
+  { label: "Contact", href: "/contact", key: "contact" },
+]
+---
+
+<Base title="HWANYUN — Sound" current="sound">
+  <nav slot="menu"></nav>
+
+  <div id="index">
+    <div class="cell menu">
+      <div class="name"><a href="/">HWANYUN</a></div>
+      {
+        nav.map((n) => (
+          <a href={n.href} class={n.key === "sound" ? "current" : ""}>
+            {n.label}
+          </a>
+        ))
+      }
+    </div>
+
+    {
+      sounds.map((s) => (
+        <div
+          class={`cell ${WIDTH[s.data.size]} scard`}
+          data-embed={scEmbed(s.data.url)}
+          role="button"
+          tabindex="0"
+        >
+          <div class="media">
+            {s.data.cover ? (
+              <img src={s.data.cover} alt={s.data.title} />
+            ) : (
+              <div class="ph" />
+            )}
+            <span class="play" aria-hidden="true">▶</span>
+          </div>
+          <div class="cap">
+            {s.data.title}
+            {s.data.year ? ` (${s.data.year})` : ""}
+          </div>
+        </div>
+      ))
+    }
+    {sounds.length === 0 && <p class="empty">아직 등록된 사운드 작업이 없습니다.</p>}
+    <div style="clear:both"></div>
+  </div>
+
+  <script is:inline>
+    ;(function () {
+      var cards = Array.prototype.slice.call(document.querySelectorAll(".scard"))
+      cards.forEach(function (card) {
+        var media = card.querySelector(".media")
+        var original = media.innerHTML
+        function play() {
+          if (card.classList.contains("playing")) return
+          // 다른 카드 정지 → 커버 복원
+          cards.forEach(function (o) {
+            if (o !== card && o.classList.contains("playing")) {
+              o.classList.remove("playing")
+              o.querySelector(".media").innerHTML = o._orig
+            }
+          })
+          card._orig = original
+          var h = media.offsetHeight // 레이아웃 흔들림 방지: 커버 높이 유지
+          var f = document.createElement("iframe")
+          f.className = "sc"
+          f.setAttribute("scrolling", "no")
+          f.setAttribute("frameborder", "no")
+          f.setAttribute("allow", "autoplay")
+          f.style.height = h + "px"
+          f.src = card.getAttribute("data-embed")
+          media.innerHTML = ""
+          media.appendChild(f)
+          card.classList.add("playing")
+        }
+        card.addEventListener("click", play)
+        card.addEventListener("keydown", function (e) {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault()
+            play()
+          }
+        })
+      })
+    })()
+  </script>
+
+  <style>
+    #index { padding: 0; }
+    .cell { float: left; margin: 40px 0 0 32px; font-size: 0; }
+    .cell.w-1col { width: var(--w-1col); }
+    .cell.w-2col { width: var(--w-2col); }
+    .cell.w-3col { width: var(--w-3col); }
+
+    .menu { width: 140px; font-size: 18px; line-height: 1.5; }
+    .menu .name { font-weight: 500; margin-bottom: 12px; }
+    .menu a { display: block; }
+    .menu a:hover { border-bottom: 1px solid var(--hover); width: fit-content; }
+    .menu a.current { border-bottom: 1px solid #000; width: fit-content; }
+
+    .scard { cursor: pointer; }
+    .media { position: relative; width: 100%; line-height: 0; }
+    .media img { width: 100%; display: block; }
+    .media .ph { width: 100%; padding-bottom: 75%; background: #ececec; }
+    .media .sc { width: 100%; display: block; border: 0; }
+    .media .play {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.55);
+      color: #fff;
+      font-size: 16px;
+      line-height: 44px;
+      text-align: center;
+      padding-left: 3px;
+    }
+    .scard:hover .play { background: rgba(0, 0, 0, 0.8); }
+    .scard.playing .play { display: none; }
+
+    .cap { font-size: 15px; line-height: 1.35; margin: 4px 0 0; }
+    .scard:hover .cap { color: var(--hover); }
+    .empty { font-size: 15px; color: #888; margin: 10px; clear: both; }
+
+    @media (max-width: 700px) {
+      .cell,
+      .cell.w-1col,
+      .cell.w-2col,
+      .cell.w-3col {
+        float: none;
+        width: auto;
+        margin: 28px 16px 0;
+      }
+    }
+  </style>
+</Base>

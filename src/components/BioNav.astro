@@ -1,0 +1,20 @@
+---
+const { active = "about" } = Astro.props
+---
+
+<nav class="bionav">
+  <a href="/cv" class={active === "cv" ? "on" : ""}>CV</a>
+  <a href="/about" class={active === "about" ? "on" : ""}>About</a>
+</nav>
+
+<style>
+  .bionav {
+    display: flex;
+    gap: 18px;
+    margin: 0 0 28px;
+    font-size: 15px;
+  }
+  .bionav a { color: #000; }
+  .bionav a:hover { border-bottom: 1px solid var(--hover); }
+  .bionav a.on { border-bottom: 1px solid #000; }
+</style>

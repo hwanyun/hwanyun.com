@@ -1,0 +1,86 @@
+---
+const { title = "HWANYUN", current = "" } = Astro.props
+const nav = [
+  { label: "Works", href: "/", key: "works" },
+  { label: "Sound", href: "/sound", key: "sound" },
+  { label: "Bio", href: "/cv", key: "bio" },
+  { label: "Contact", href: "/contact", key: "contact" },
+]
+---
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;500&display=swap"
+      rel="stylesheet"
+    />
+    <slot name="head" />
+  </head>
+  <body>
+    <slot name="menu">
+      <nav class="menu">
+        <div class="name"><a href="/">HWANYUN</a></div>
+        {
+          nav.map((n) => (
+            <a href={n.href} class={current === n.key ? "current" : ""}>
+              {n.label}
+            </a>
+          ))
+        }
+      </nav>
+    </slot>
+    <slot />
+    <footer>COPYRIGHT © HWANYUN. All rights reserved.</footer>
+
+    <style is:global>
+      :root {
+        --w-1col: 220px;
+        --w-2col: 380px;
+        --w-3col: 540px;
+        --gap: 10px;
+        --hover: #00f;
+      }
+      * { box-sizing: border-box; }
+      html, body { overflow-x: hidden; }
+      body {
+        font-family: "Noto Sans KR", sans-serif;
+        font-weight: 300;
+        font-size: 18px;
+        line-height: 1.35;
+        color: #000;
+        background: #fff;
+        margin: 0;
+        padding: 0;
+        word-break: keep-all;
+      }
+      a { color: #000; text-decoration: none; }
+      a:hover { color: var(--hover); }
+
+      .menu {
+        float: left;
+        width: 140px;
+        margin: 10px 0 0 10px;
+        line-height: 1.5;
+      }
+      .menu .name { font-weight: 500; margin-bottom: 12px; }
+      .menu a { display: block; }
+      .menu a:hover { border-bottom: 1px solid var(--hover); width: fit-content; }
+      .menu a.current { border-bottom: 1px solid #000; width: fit-content; }
+
+      footer {
+        clear: both;
+        padding: 60px 10px 30px;
+        font-size: 13px;
+        color: #888;
+      }
+
+      @media (max-width: 700px) {
+        .menu { float: none; width: auto; padding: 0 10px; }
+      }
+    </style>
+  </body>
+</html>

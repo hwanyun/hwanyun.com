@@ -1,0 +1,107 @@
+# Sveltia CMS 설정 — 관리자 화면(/admin)의 폼을 정의한다.
+# 배포 후 GitHub 저장소 정보를 채우세요.
+
+backend:
+  name: github
+  repo: OWNER/REPO # 예: hwanyun/hwanyun-site  ← 실제 저장소로 변경
+  branch: main
+
+# 로컬에서 관리자 화면 테스트 시 아래 주석 해제 + `npx @sveltia/cms proxy` 실행
+# local_backend: true
+
+media_folder: "public/images" # 업로드 이미지 저장 위치 (저장소 루트 = site 폴더 기준)
+public_folder: "/images" # 사이트에서 참조되는 경로
+
+locale: ko
+
+collections:
+  - name: works
+    label: "작품 (Works)"
+    label_singular: "작품"
+    folder: "src/content/works"
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    format: frontmatter
+    sortable_fields: [order, title, year]
+    fields:
+      - { name: title, label: "제목", widget: string }
+      - { name: year, label: "연도", widget: string, required: false }
+      - { name: medium, label: "매체 표기", widget: string, required: false }
+      - name: size
+        label: "카드 크기"
+        widget: select
+        options:
+          - { label: "작게 (1col · 220px)", value: "1col" }
+          - { label: "보통 (2col · 380px)", value: "2col" }
+          - { label: "크게 (3col · 540px)", value: "3col" }
+        default: "2col"
+      - name: category
+        label: "카테고리"
+        widget: select
+        options:
+          - { label: "Work", value: "work" }
+          - { label: "Sound", value: "sound" }
+        default: "work"
+      - { name: order, label: "순서 (작을수록 앞)", widget: number, value_type: int, default: 100 }
+      - { name: thumb, label: "홈 썸네일", widget: image, required: false }
+      - { name: textEn, label: "설명 (영문)", widget: text, required: false }
+      - { name: textKr, label: "설명 (국문)", widget: text, required: false }
+      - name: media
+        label: "세부 이미지 · 영상"
+        label_singular: "미디어"
+        widget: list
+        required: false
+        summary: "{{fields.type}} · {{fields.width}}"
+        fields:
+          - name: type
+            label: "종류"
+            widget: select
+            options:
+              - { label: "이미지", value: image }
+              - { label: "영상", value: video }
+            default: image
+          - { name: src, label: "이미지 업로드 / 영상 URL(YouTube·Vimeo·mp4)", widget: string }
+          - name: width
+            label: "폭"
+            widget: select
+            options:
+              - { label: "전체폭", value: full }
+              - { label: "반폭", value: half }
+              - { label: "1/3폭", value: third }
+            default: full
+          - name: ratio
+            label: "영상 비율 (영상만)"
+            widget: select
+            required: false
+            options: ["16:9", "4:3", "1:1", "21:9"]
+            default: "16:9"
+          - { name: caption, label: "캡션", widget: string, required: false }
+      - { name: draft, label: "비공개(초안)", widget: boolean, default: false }
+      - { name: body, label: "추가 설명 (마크다운)", widget: markdown, required: false }
+
+  - name: sounds
+    label: "사운드 (Sound)"
+    label_singular: "사운드"
+    folder: "src/content/sounds"
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    format: frontmatter
+    sortable_fields: [order, title, year]
+    fields:
+      - { name: title, label: "제목", widget: string }
+      - { name: year, label: "연도", widget: string, required: false }
+      - { name: url, label: "SoundCloud 주소", widget: string, hint: "트랙/셋 페이지 URL을 그대로 붙여넣기 (클릭 시 자동재생)" }
+      - { name: cover, label: "커버 이미지", widget: image, required: false }
+      - name: size
+        label: "카드 크기"
+        widget: select
+        options:
+          - { label: "작게 (1col · 220px)", value: "1col" }
+          - { label: "보통 (2col · 380px)", value: "2col" }
+          - { label: "크게 (3col · 540px)", value: "3col" }
+        default: "2col"
+      - { name: order, label: "순서 (작을수록 앞)", widget: number, value_type: int, default: 100 }
+      - { name: draft, label: "비공개(초안)", widget: boolean, default: false }
+      - { name: body, label: "설명", widget: markdown, required: false }

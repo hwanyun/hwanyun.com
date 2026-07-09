@@ -1,0 +1,32 @@
+---
+import Base from "../layouts/Base.astro"
+---
+
+<Base title="HWANYUN — Contact" current="contact">
+  <article class="page">
+    <h1>Contact</h1>
+    <ul class="links">
+      <li><span>Email</span> <a href="mailto:hello@hwanyun.com">hello@hwanyun.com</a></li>
+      <li><span>Instagram</span> <a href="https://instagram.com/" target="_blank" rel="noopener">@hwanyun</a></li>
+    </ul>
+    <p class="note">(연락처는 이 페이지에서 수정하세요.)</p>
+  </article>
+
+  <style>
+    .page {
+      margin-left: 170px;
+      max-width: 640px;
+      padding: 10px 20px 80px;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    .page h1 { font-size: 18px; font-weight: 500; margin: 0 0 24px; }
+    .links { list-style: none; padding: 0; margin: 0 0 24px; }
+    .links li { display: flex; gap: 16px; padding: 4px 0; }
+    .links span { width: 90px; color: #555; }
+    .note { font-size: 13px; color: #999; }
+    @media (max-width: 700px) {
+      .page { margin-left: 0; }
+    }
+  </style>
+</Base>

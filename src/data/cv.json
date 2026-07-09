@@ -1,0 +1,57 @@
+{
+  "name": "HWANYUN",
+  "note": "⚠️ 연도-내용 짝은 기존 사이트에서 자동 추출해 정확하지 않을 수 있음. 확인 후 수정하세요. 항목 추가는 각 section의 items 배열에 {year, text} 추가.",
+  "sections": [
+    {
+      "title": "Education",
+      "items": [
+        { "year": "2008 – 2009", "text": "International Foundation Certificate in Music, Goldsmiths, University of London, UK" },
+        { "year": "2010 – 2013", "text": "BMus (Hons) Music, Goldsmiths, University of London, UK" }
+      ]
+    },
+    {
+      "title": "Professional Development",
+      "items": [
+        { "year": "2026 – Present", "text": "New Content Academy Program, Korea Creative Content Agency (KOCCA), Seoul, South Korea." },
+        { "year": "2026", "text": "Certificate in Stage Lighting Control Workshop Using TouchDesigner, ACC Professional Capacity Building Program, National Asia Culture Center (ACC), Gwangju, South Korea." },
+        { "year": "2023", "text": "Certificate in Exploring Artificial Intelligence as an Artistic Creation Tool Workshop, ACC Professional Capacity Building Program, National Asia Culture Center (ACC), Gwangju, South Korea." }
+      ]
+    },
+    {
+      "title": "Exhibitions — Solo",
+      "items": [
+        { "year": "2018", "text": "Three Pieces, GlogauAIR Studio 13, Berlin, Germany." },
+        { "year": "2017", "text": "Intuition, Listhús Gallery, Ægisgötu 10, 625 Ólafsfirði, Iceland." }
+      ]
+    },
+    {
+      "title": "Exhibitions — Group",
+      "items": [
+        { "year": "2022", "text": "공존 Coexistence, Interactive installation, HWANYUN, Bosagol Art Hall, Bucheon, South Korea." },
+        { "year": "2018", "text": "We've Opened, HWANYUN & Hanna Celli, GlogauAIR Gallery, Berlin, Germany." },
+        { "year": "2018", "text": "Conductive Circles, VJing & 3D mapping by Kalma Lab, GlogauAIR, Berlin, Germany." },
+        { "year": "2018", "text": "SHOWCASE PROJECT: We've Opened, Hanna Celli & HWANYUN, GlogauAIR Showcase, Berlin, Germany." },
+        { "year": "2016", "text": "Dress-scape — The Voice of Stripes / Fedora-exile, Darwin Building, Kensington, London, UK." },
+        { "year": "2015", "text": "Fedora-exile, Gwangju Student Independence Movement Memorial Hall, Gwangju, South Korea." },
+        { "year": "2015", "text": "The Poetics of Knowledge: The Sound of Fashion (Work in progress show, Fashion and Textiles Research), Royal College of Art, Kensington, London, UK." },
+        { "year": "2014", "text": "Fedora-exile with Jinjo Ma, Deoksugung Palace, Seoul, South Korea." }
+      ]
+    },
+    {
+      "title": "Director / Art Direction",
+      "items": [
+        { "year": "2026", "text": "비정형의 회로 Atypical Circuit, Generative and interactive media installation, HWANYUN, Yeoksam 1 Culture Center Gallery, Seoul, South Korea." },
+        { "year": "2022", "text": "전시회 공존 Coexistence, 예술감독 (Art Director), Bosagol Art Hall, Bucheon, South Korea." },
+        { "year": "2022", "text": "Concert 마음으로 보는 오선지 (사단법인 시각장애인연합회), Art supervisor & visual creation, Bosagol Art Hall, Bucheon, South Korea." },
+        { "year": "2023", "text": "Festival 한마음축제 (부천시장애인연합회), Art supervisor & visual creation, Bucheon City Hall, Bucheon, South Korea." }
+      ]
+    },
+    {
+      "title": "Sound",
+      "items": [
+        { "year": "2016", "text": "해양수산부 TV 광고음악, TV ad music for Ministry of Oceans and Fisheries, South Korea." },
+        { "year": "2015", "text": "Vogue Italia and Emaar present a new scouting project, Spring/Summer 2016 at Vogue." }
+      ]
+    }
+  ]
+}

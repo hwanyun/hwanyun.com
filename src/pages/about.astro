@@ -1,0 +1,68 @@
+---
+import Base from "../layouts/Base.astro"
+import BioNav from "../components/BioNav.astro"
+---
+
+<Base title="HWANYUN — About" current="bio">
+  <article class="page">
+    <BioNav active="about" />
+
+    <section>
+      <h2>Artist's Statement</h2>
+      <p>
+        As I navigate the complexities of contemporary society, I am deeply
+        engaged in exploring the interplay of senses and crafting a novel
+        artistic entity through the interactions between sound and vision. My
+        experiments, occurring at the confluence of nature and technology, are
+        forging a new realm of art that surpasses the confines of traditional
+        forms. This approach has been profoundly exhibited in my exhibitions
+        'Three Pieces' in Berlin and 'Intuition' in Iceland.
+      </p>
+      <p>
+        In 'Three Pieces: Untitled 2', I endeavoured to connect with the
+        audience through a subtle visual language crafted from repetitive
+        actions. Through this process, the audience is elevated from mere
+        spectators to active participants in the artistic creation. 'Three
+        Pieces: Untitled 1' features an interactive sound and visual
+        installation utilising sensors, polycarbonate, copper, and wires,
+        enabling the audience to uncover hidden dimensions by physically
+        interacting with the artwork. The tactile engagement of the audience is
+        translated through algorithmic composition into diverse visual patterns,
+        subsequently projected onto bespoke 3D polycarbonate structures.
+      </p>
+      <p>
+        These experiences allow the audience to directly perceive the potential
+        for technology to transcend its role as a mere tool and become a conduit
+        for artistic expression. This bridging of the divide between technology
+        and art affords each viewer a bespoke artistic experience, aiding them
+        in discovering their own unique insights through the artwork and forging
+        new connections with the world in which we reside. Art transcends
+        technological advancements to re-establish a fundamental connection with
+        nature. Through this bond, we seek a richer and more meaningful
+        existence. This artistic pursuit is a continually evolving journey, on
+        which I eagerly anticipate growing, learning, and evolving alongside my
+        peers.
+      </p>
+      <p class="sign">HWANYUN</p>
+    </section>
+  </article>
+
+  <style>
+    .page {
+      margin-left: 170px;
+      max-width: 680px;
+      padding: 10px 20px 80px;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    .page h2 { font-size: 15px; font-weight: 500; margin: 0 0 10px; }
+    .page section { margin: 0 0 40px; }
+    .page p { margin: 0 0 1em; }
+    .page .sign,
+    .page .tags { font-weight: 500; letter-spacing: 0.02em; }
+    .page .tags { color: #555; }
+    @media (max-width: 700px) {
+      .page { margin-left: 0; }
+    }
+  </style>
+</Base>
