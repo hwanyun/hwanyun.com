@@ -3,7 +3,7 @@
 
 backend:
   name: github
-  repo: OWNER/REPO # 예: hwanyun/hwanyun-site  ← 실제 저장소로 변경
+  repo: hwanyun/hwanyun.com
   branch: main
 
 # 로컬에서 관리자 화면 테스트 시 아래 주석 해제 + `npx @sveltia/cms proxy` 실행
