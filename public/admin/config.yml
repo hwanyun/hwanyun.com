@@ -74,7 +74,7 @@ collections:
             label: "영상 비율 (영상만)"
             widget: select
             required: false
-            options: ["16:9", "4:3", "1:1", "21:9"]
+            options: ["16:9", "4:3", "1:1", "21:9", "9:16"]
             default: "16:9"
           - { name: caption, label: "캡션", widget: string, required: false }
       - { name: draft, label: "비공개(초안)", widget: boolean, default: false }

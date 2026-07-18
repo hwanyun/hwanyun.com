@@ -75,7 +75,20 @@ const nav = [
 
   <script is:inline>
     ;(function () {
+      // 카드 순서를 랜덤으로 섞기 (메뉴 칸은 첫 자리 유지)
+      var index = document.getElementById("index")
+      var clearEl = index ? index.querySelector('div[style*="clear"]') : null
       var cards = Array.prototype.slice.call(document.querySelectorAll(".scard"))
+      for (var i = cards.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1))
+        var t = cards[i]; cards[i] = cards[j]; cards[j] = t
+      }
+      cards.forEach(function (c) {
+        if (clearEl) index.insertBefore(c, clearEl)
+        else index.appendChild(c)
+      })
+      if (index) index.classList.add("shuffled")
+
       cards.forEach(function (card) {
         var media = card.querySelector(".media")
         var original = media.innerHTML
@@ -125,7 +138,8 @@ const nav = [
     .menu a:hover { border-bottom: 1px solid var(--hover); width: fit-content; }
     .menu a.current { border-bottom: 1px solid #000; width: fit-content; }
 
-    .scard { cursor: pointer; }
+    .scard { cursor: pointer; opacity: 0; }
+    #index.shuffled .scard { opacity: 1; transition: opacity 0.25s ease; }
     .media { position: relative; width: 100%; line-height: 0; }
     .media img { width: 100%; display: block; }
     .media .ph { width: 100%; padding-bottom: 75%; background: #ececec; }

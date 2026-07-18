@@ -1,7 +1,7 @@
 ---
 title: "Inspiration from Iceland"
 year: ""
-medium: "Research / residency, Listhús"
+medium: "Research / residency; Listhús"
 size: 1col
 category: work
 order: 12

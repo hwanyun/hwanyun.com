@@ -23,7 +23,7 @@ const works = defineCollection({
           type: z.enum(["image", "video"]).default("image"),
           src: z.string(), // 이미지 경로 또는 영상 URL(YouTube/Vimeo/mp4)
           width: z.enum(["full", "half", "third"]).default("full"),
-          ratio: z.enum(["16:9", "4:3", "1:1", "21:9"]).default("16:9"), // 영상 비율
+          ratio: z.enum(["16:9", "4:3", "1:1", "21:9", "9:16"]).default("16:9"), // 영상 비율
           caption: z.string().optional().default(""),
         })
       )
