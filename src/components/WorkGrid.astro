@@ -38,11 +38,14 @@ const nav = [
         href={`/works/${w.slug}`}
         data-search={`${w.data.title} ${w.data.year} ${w.data.medium}`.toLowerCase()}
       >
-        {w.data.thumb ? (
-          <img src={w.data.thumb} alt={w.data.title} />
-        ) : (
-          <div class="ph" />
-        )}
+        <div class="thumb" style={w.data.thumb ? `--bg:url(${w.data.thumb})` : ""}>
+          {w.data.thumb ? (
+            <img src={w.data.thumb} alt={w.data.title} />
+          ) : (
+            <div class="ph" />
+          )}
+          <span class="scan" aria-hidden="true"></span>
+        </div>
         <div class="cap">
           {w.data.title}
           {w.data.year ? ` (${w.data.year})` : ""}
@@ -105,9 +108,54 @@ const nav = [
 
   #noresult { clear: both; font-size: 15px; margin: 20px 0 0 10px; color: #888; }
 
+  .card .thumb { position: relative; line-height: 0; overflow: hidden; }
   .card img,
   .card .ph { width: 100%; display: block; }
   .card .ph { background: #ececec; padding-bottom: 75%; }
+
+  /* 마우스 오버 시 글리치(RGB 채널 분리 + 스캔라인) — 데이터 느낌 */
+  .card .thumb::before,
+  .card .thumb::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--bg) center / cover no-repeat;
+    mix-blend-mode: screen;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .card .thumb::before { filter: sepia(1) saturate(9) hue-rotate(-55deg); }  /* red channel */
+  .card .thumb::after  { filter: sepia(1) saturate(9) hue-rotate(150deg); }  /* cyan channel */
+
+  .card .scan {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px);
+    mix-blend-mode: multiply;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+  }
+
+  .card:hover .thumb::before { opacity: 0.55; animation: glitchR 0.45s steps(2, end) infinite; }
+  .card:hover .thumb::after  { opacity: 0.55; animation: glitchB 0.45s steps(2, end) infinite; }
+  .card:hover .scan { opacity: 1; }
+
+  @keyframes glitchR {
+    0%   { transform: translate(-3px, 0); clip-path: inset(0 0 55% 0); }
+    50%  { transform: translate(-2px, 0); clip-path: inset(45% 0 20% 0); }
+    100% { transform: translate(-4px, 0); clip-path: inset(70% 0 0 0); }
+  }
+  @keyframes glitchB {
+    0%   { transform: translate(3px, 0); clip-path: inset(60% 0 10% 0); }
+    50%  { transform: translate(2px, 0); clip-path: inset(15% 0 50% 0); }
+    100% { transform: translate(4px, 0); clip-path: inset(0 0 65% 0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .card:hover .thumb::before,
+    .card:hover .thumb::after { animation: none; }
+  }
+
   .card .cap { font-size: 15px; line-height: 1.35; margin: 4px 0 0; }
   .card:hover .cap { color: var(--hover); }
 
