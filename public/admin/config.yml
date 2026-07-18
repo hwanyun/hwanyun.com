@@ -77,6 +77,16 @@ collections:
             options: ["16:9", "4:3", "1:1", "21:9", "9:16"]
             default: "16:9"
           - { name: caption, label: "캡션", widget: string, required: false }
+      - name: sponsors
+        label: "전시 협력·후원 (Sponsors)"
+        label_singular: "협력기관"
+        widget: list
+        required: false
+        summary: "{{fields.name}}"
+        fields:
+          - { name: name, label: "기관명", widget: string }
+          - { name: logo, label: "로고 이미지", widget: image }
+          - { name: url, label: "웹사이트 URL", widget: string, required: false }
       - { name: draft, label: "비공개(초안)", widget: boolean, default: false }
       - { name: body, label: "추가 설명 (마크다운)", widget: markdown, required: false }
 

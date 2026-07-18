@@ -30,6 +30,18 @@ const works = defineCollection({
       .optional()
       .default([]),
 
+    // 전시 협력·후원 기관 로고 (작품 갤러리와 분리된 크레딧 섹션)
+    sponsors: z
+      .array(
+        z.object({
+          name: z.string(),
+          logo: z.string(),
+          url: z.string().optional().default(""),
+        })
+      )
+      .optional()
+      .default([]),
+
     draft: z.boolean().optional().default(false),
   }),
 })
