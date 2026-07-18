@@ -5,8 +5,8 @@
     {
       "title": "Education",
       "items": [
-        { "year": "2008 – 2009", "text": "International Foundation Certificate in Music, Goldsmiths, University of London, UK" },
-        { "year": "2010 – 2013", "text": "BMus (Hons) Music, Goldsmiths, University of London, UK" }
+        { "year": "2010 – 2013", "text": "BMus (Hons) Music, Goldsmiths, University of London, UK" },
+        { "year": "2008 – 2009", "text": "International Foundation Certificate in Music, Goldsmiths, University of London, UK" }
       ]
     },
     {
@@ -27,6 +27,7 @@
     {
       "title": "Exhibitions — Group",
       "items": [
+        { "year": "2026", "text": "비정형의 회로 Atypical Circuit, Generative and interactive media installation, HWANYUN, Yeoksam 1 Culture Center Gallery, Seoul, South Korea." },
         { "year": "2022", "text": "공존 Coexistence, Interactive installation, HWANYUN, Bosagol Art Hall, Bucheon, South Korea." },
         { "year": "2018", "text": "We've Opened, HWANYUN & Hanna Celli, GlogauAIR Gallery, Berlin, Germany." },
         { "year": "2018", "text": "Conductive Circles, VJing & 3D mapping by Kalma Lab, GlogauAIR, Berlin, Germany." },
@@ -40,10 +41,9 @@
     {
       "title": "Director / Art Direction",
       "items": [
-        { "year": "2026", "text": "비정형의 회로 Atypical Circuit, Generative and interactive media installation, HWANYUN, Yeoksam 1 Culture Center Gallery, Seoul, South Korea." },
+        { "year": "2023", "text": "Festival 한마음축제 (부천시장애인연합회), Art supervisor & visual creation, Bucheon City Hall, Bucheon, South Korea." },
         { "year": "2022", "text": "전시회 공존 Coexistence, 예술감독 (Art Director), Bosagol Art Hall, Bucheon, South Korea." },
-        { "year": "2022", "text": "Concert 마음으로 보는 오선지 (사단법인 시각장애인연합회), Art supervisor & visual creation, Bosagol Art Hall, Bucheon, South Korea." },
-        { "year": "2023", "text": "Festival 한마음축제 (부천시장애인연합회), Art supervisor & visual creation, Bucheon City Hall, Bucheon, South Korea." }
+        { "year": "2022", "text": "Concert 마음으로 보는 오선지 (사단법인 시각장애인연합회), Art supervisor & visual creation, Bosagol Art Hall, Bucheon, South Korea." }
       ]
     },
     {
