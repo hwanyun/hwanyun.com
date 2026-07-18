@@ -25,7 +25,9 @@ thumb: "/images/coexistence/01.jpg"
 media:
   - { type: image, src: "/images/coexistence/01.jpg", width: full }
   - { type: image, src: "/images/coexistence/02.jpg", width: half }
+  - { type: video, src: "/videos/coexistence-2.mp4", width: half, ratio: "9:16", caption: "Live performance documentation" }
   - { type: image, src: "/images/coexistence/03.webp", width: full }
+  - { type: video, src: "/videos/coexistence-1.mp4", width: full, ratio: "16:9", caption: "Live performance documentation" }
   - { type: image, src: "/images/coexistence/04.webp", width: full }
 sponsors:
   - { name: "경기도 (Gyeonggi-do)", logo: "/images/coexistence/sponsors/gyeonggi-do.png" }
