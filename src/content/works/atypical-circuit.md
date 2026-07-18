@@ -23,7 +23,9 @@ textKr: |
   오작동을 보여주는 것을 넘어, 관찰자인 우리 자신 또한 이 견고한 구조를 교란하는 '노이즈의 일부'로서
   깊숙이 관여하고 있음을 자각하게 합니다.
 media:
+  - { type: image, src: "/images/atypical-circuit/05.jpg", width: half }
   - { type: video, src: "/videos/atypical-circuit.mp4", width: half, ratio: "9:16" }
+  - { type: video, src: "/videos/atypical-circuit-2.mp4", width: half, ratio: "9:16" }
   - { type: image, src: "/images/atypical-circuit/01.jpg", width: half }
   - { type: image, src: "/images/atypical-circuit/03.jpg", width: half }
   - { type: image, src: "/images/atypical-circuit/02.png", width: third }
