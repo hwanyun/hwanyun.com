@@ -26,9 +26,9 @@ media:
   - { type: image, src: "/images/atypical-circuit/05.jpg", width: half }
   - { type: video, src: "/videos/atypical-circuit.mp4", width: half, ratio: "9:16" }
   - { type: video, src: "/videos/atypical-circuit-2.mp4", width: half, ratio: "9:16" }
-  - { type: image, src: "/images/atypical-circuit/01.jpg", width: half }
   - { type: image, src: "/images/atypical-circuit/03.jpg", width: half }
+  - { type: image, src: "/images/atypical-circuit/01.jpg", width: half, caption: "Generative visual pattern" }
+  - { type: image, src: "/images/atypical-circuit/04.png", width: half, caption: "Generative visual pattern" }
   - { type: image, src: "/images/atypical-circuit/02.png", width: third }
-  - { type: image, src: "/images/atypical-circuit/04.png", width: half }
 draft: false
 ---

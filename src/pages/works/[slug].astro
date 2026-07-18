@@ -44,18 +44,41 @@ const bigTitle = (data.title || "").toUpperCase()
 const ghostLine = Array(8).fill(bigTitle).join(" · ")
 const ghostRows = Array.from({ length: 7 })
 
-// 폭 합을 누적해 각 블록이 "행의 마지막"인지 판정 → 행 끝 블록은 우측 마진 제거
+// 아트디렉션 레이아웃: 미디어를 행으로 묶되,
+// 꽉 차는 행은 양끝 정렬로 공간을 채우고, 덜 찬 행은 좌/우 교차 정렬로 비대칭 여백을 만든다.
 const FRAC: Record<string, number> = { full: 1, half: 0.5, third: 1 / 3 }
-const rowEnd: boolean[] = []
-let acc = 0
-media.forEach((m, i) => {
-  const f = FRAC[m.width] ?? 1
-  if (acc + f > 1.001) acc = 0 // 새 행 시작
-  acc += f
-  const next = media[i + 1]
-  const nf = next ? (FRAC[next.width] ?? 1) : 0
-  rowEnd[i] = !next || acc + nf > 1.001 || acc > 0.999
-})
+type Row = { items: typeof media; align: "fill" | "left" | "right" }
+const rows: Row[] = []
+{
+  let cur: typeof media = []
+  let sum = 0
+  const flush = () => {
+    if (!cur.length) return
+    rows.push({ items: cur, align: "fill" })
+    cur = []
+    sum = 0
+  }
+  for (const m of media) {
+    const f = FRAC[m.width] ?? 1
+    if (cur.length && sum + f > 1.02) flush()
+    cur.push(m)
+    sum += f
+  }
+  flush()
+  // 정렬 주석: 꽉 찬 행은 fill, 덜 찬 행은 좌/우 번갈아
+  let toggle = 0
+  for (const r of rows) {
+    const s = r.items.reduce((a, m) => a + (FRAC[m.width] ?? 1), 0)
+    const full = s > 0.95 && r.items.length > 1
+    const singleFull = r.items.length === 1 && (FRAC[r.items[0].width] ?? 1) >= 0.99
+    if (full || singleFull) {
+      r.align = "fill"
+    } else {
+      r.align = toggle % 2 === 0 ? "left" : "right"
+      toggle++
+    }
+  }
+}
 
 // 설명 텍스트: 빈 줄은 문단 구분, 문단 안 줄바꿈은 공백으로 이어 자연스럽게 흐르게
 function toParagraphs(text: string): string {
@@ -105,41 +128,38 @@ function toParagraphs(text: string): string {
         )
       }
       {
-        media.map((m, i) => {
-          const cls = `block w-${m.width}${rowEnd[i] ? " row-end" : ""}`
-          if (m.type === "video") {
-            const v = embedURL(m.src)
-            return (
-              <figure class={cls}>
-                <div class="video" style={`aspect-ratio:${ratioValue[m.ratio] || "16 / 9"}`}>
-                  {v.kind === "iframe" ? (
-                    <iframe src={v.src} allowfullscreen frameborder="0" loading="lazy" />
-                  ) : (
-                    <video src={v.src} controls playsinline />
-                  )}
-                </div>
-                {m.caption && <figcaption>{m.caption}</figcaption>}
-              </figure>
-            )
-          }
-          return (
-            <figure class={cls}>
-              <img src={m.src} alt={m.caption || data.title} loading="lazy" />
-              {m.caption && <figcaption>{m.caption}</figcaption>}
-            </figure>
-          )
-        })
+        rows.map((row) => (
+          <div class={`mrow ${row.align}`}>
+            {row.items.map((m) =>
+              m.type === "video" ? (
+                <figure class={`block w-${m.width}`}>
+                  <div class="video" style={`aspect-ratio:${ratioValue[m.ratio] || "16 / 9"}`}>
+                    {embedURL(m.src).kind === "iframe" ? (
+                      <iframe src={embedURL(m.src).src} allowfullscreen frameborder="0" loading="lazy" />
+                    ) : (
+                      <video src={embedURL(m.src).src} controls playsinline />
+                    )}
+                  </div>
+                  {m.caption && <figcaption>{m.caption}</figcaption>}
+                </figure>
+              ) : (
+                <figure class={`block w-${m.width}`}>
+                  <img src={m.src} alt={m.caption || data.title} loading="lazy" />
+                  {m.caption && <figcaption>{m.caption}</figcaption>}
+                </figure>
+              )
+            )}
+          </div>
+        ))
       }
       {
         media.length === 0 && (
-          <>
-            <figure class="block w-full"><div class="ph" style="padding-bottom:56%"></div></figure>
-            <figure class="block w-half"><div class="ph" style="padding-bottom:75%"></div></figure>
-            <figure class="block w-half"><div class="ph" style="padding-bottom:75%"></div></figure>
-          </>
+          <div class="mrow fill">
+            <figure class="block w-half"><div class="ph" style="padding-bottom:130%"></div></figure>
+            <figure class="block w-half"><div class="ph" style="padding-bottom:130%"></div></figure>
+          </div>
         )
       }
-      <div style="clear:both"></div>
     </div>
   </div>
 
@@ -236,10 +256,22 @@ function toParagraphs(text: string): string {
       .ghost-row { transform: none !important; }
     }
 
-    .block { float: left; margin: 0 16px 22px 0; position: relative; z-index: 1; }
-    .block.w-full { width: 540px; }
-    .block.w-half { width: 380px; }
-    .block.w-third { width: 220px; }
+    /* 아트디렉션 행: 꽉 찬 행은 양끝, 덜 찬 행은 좌/우로 몰아 비대칭 여백 */
+    .mrow {
+      display: flex;
+      align-items: flex-start;
+      gap: 3%;
+      margin: 0 0 26px;
+      position: relative;
+      z-index: 1;
+    }
+    .mrow.fill { justify-content: space-between; }
+    .mrow.left { justify-content: flex-start; }
+    .mrow.right { justify-content: flex-end; }
+    .block { position: relative; }
+    .block.w-full { width: 100%; }
+    .block.w-half { width: 48.5%; }
+    .block.w-third { width: 31.5%; }
     .block img { display: block; width: 100%; }
     .block .ph { background: #ececec; height: 0; }
     figure { margin: 0; }
@@ -260,10 +292,11 @@ function toParagraphs(text: string): string {
     @media (max-width: 700px) {
       #entry { width: calc(100% - 20px); margin-left: 10px; }
       .textcols .col { width: 100%; margin-right: 0; float: none; }
+      .mrow { flex-direction: column; gap: 16px; }
       .block,
       .block.w-full,
       .block.w-half,
-      .block.w-third { width: 100%; margin-right: 0; float: none; }
+      .block.w-third { width: 100%; }
     }
   </style>
 </Base>
