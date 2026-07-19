@@ -24,6 +24,16 @@ textKr: |
   이 프로젝트는 공공의 예술이 누구를 위한 것인지, 그리고 전시가 낯선 사람들과 함께 앉도록 초대하는 일이 될 때 무엇이 발생하는지를 질문한다. 《WE'VE OPENED》에서 도시는 배경이 아니라 바라보고, 듣고, 때로는 안으로 들어오는 참여자이다.
 media:
   - { type: image, src: "/images/weve-opened/01.jpg", width: full, caption: "WE'VE OPENED at GlogauAIR, Berlin" }
+  - { type: image, src: "/images/weve-opened/02.jpeg", width: half, caption: "HWANYUN's interactive table in use" }
+  - { type: image, src: "/images/weve-opened/03.jpg", width: half, caption: "A visitor engaging with the table" }
+  - { type: image, src: "/images/weve-opened/04.jpg", width: full, caption: "The interactive table and dining-room installation" }
+  - { type: image, src: "/images/weve-opened/05.jpg", width: half, caption: "Table Mat Mock-Up and Hannah Celli's painting" }
+  - { type: image, src: "/images/weve-opened/06.jpeg", width: half, caption: "Works prepared for the showcase" }
+  - { type: image, src: "/images/weve-opened/07.jpeg", width: full, caption: "Installation view" }
+  - { type: image, src: "/images/weve-opened/08.jpeg", width: half, caption: "Installation view with a visitor" }
+  - { type: image, src: "/images/weve-opened/09.jpeg", width: half, caption: "Listening at the interactive table" }
+  - { type: image, src: "/images/weve-opened/10.jpeg", width: half, caption: "Visitors engaging with the work" }
+  - { type: image, src: "/images/weve-opened/11.jpeg", width: half, caption: "The shared meal and gathering" }
   - { type: image, src: "/images/weve-opened/invitation.jpg", width: half, caption: "Invitation for the pop-up kitchen and restaurant" }
 draft: false
 ---
