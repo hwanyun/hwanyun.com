@@ -21,6 +21,14 @@ const works = defineCollection({
     // 세부 페이지 텍스트 (레퍼런스처럼 EN/KR 2단)
     textEn: z.string().optional().default(""),
     textKr: z.string().optional().default(""),
+    // 작품을 이해하는 데 필요한 공정·용어의 짧은 보충 설명
+    processNote: z
+      .object({
+        label: z.string().optional().default("Process note"),
+        textEn: z.string().optional().default(""),
+        textKr: z.string().optional().default(""),
+      })
+      .optional(),
     // 작품이 선보인 전시 정보 — 후원 크레딧과 분리해 표기
     exhibition: z
       .object({

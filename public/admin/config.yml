@@ -47,6 +47,14 @@ collections:
       - { name: thumb, label: "홈 썸네일", widget: image, required: false }
       - { name: textEn, label: "설명 (영문)", widget: text, required: false }
       - { name: textKr, label: "설명 (국문)", widget: text, required: false }
+      - name: processNote
+        label: "공정 · 용어 보충 설명 (Process Note)"
+        widget: object
+        required: false
+        fields:
+          - { name: label, label: "라벨", widget: string, required: false, default: "Process Note" }
+          - { name: textEn, label: "설명 (영문)", widget: text, required: false }
+          - { name: textKr, label: "설명 (국문)", widget: text, required: false }
       - name: externalLinks
         label: "인터뷰 · 읽을거리 (Further Reading)"
         label_singular: "외부 링크"

@@ -148,6 +148,18 @@ function toParagraphs(text: string): string {
     <!-- 마크다운 본문(선택) -->
     <div class="desc"><Content /></div>
 
+    {
+      data.processNote && (data.processNote.textEn || data.processNote.textKr) && (
+        <aside class="process-note" aria-label={data.processNote.label}>
+          <div class="process-note-label">{data.processNote.label}</div>
+          <div class="process-note-cols">
+            {data.processNote.textEn && <p>{data.processNote.textEn}</p>}
+            {data.processNote.textKr && <p lang="ko">{data.processNote.textKr}</p>}
+          </div>
+        </aside>
+      )
+    }
+
     <!-- 미디어: 대표·보조·디테일 자료를 12열 위계로 편집 -->
     <div class="media">
       {
@@ -322,6 +334,23 @@ function toParagraphs(text: string): string {
 
     .desc { font-size: 16px; font-weight: 400; line-height: 1.8; max-width: 640px; margin: 0 0 30px; }
     .desc :global(p) { margin: 0 0 1em; }
+    .process-note {
+      clear: both;
+      max-width: 900px;
+      margin: 0 0 42px;
+      padding-top: 12px;
+      border-top: 1px solid #ddd;
+      color: #777;
+    }
+    .process-note-label {
+      margin-bottom: 10px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #999;
+    }
+    .process-note-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+    .process-note p { margin: 0; font-size: 14px; line-height: 1.7; }
 
     /* 미디어 — 홈 그리드처럼 220/380/540 크기가 여백 있게 흐름 */
     .media {
@@ -466,6 +495,7 @@ function toParagraphs(text: string): string {
     @media (max-width: 700px) {
       #entry { width: calc(100% - 20px); margin-left: 10px; }
       .textcols .col { width: 100%; margin-right: 0; float: none; }
+      .process-note-cols { grid-template-columns: 1fr; gap: 10px; }
       .block,
       .block.hero,
       .block.wide,
