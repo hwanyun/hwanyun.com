@@ -19,7 +19,7 @@
 
 - www.hwanyun.com은 이 작업의 실제 최신 배포본을 확인하는 기준이 아니라 참고용이다.
 - Cloudflare Pages의 Preview URL은 배포마다 바뀔 수 있으므로, 과거 URL을 재사용하지 말고 위 절차로 다시 확인한다.
-- 이 문서를 작성한 시점의 배포 커밋은 cc5c87c이며, Cloudflare Pages 상태는 성공이었다.
+- 이 문서에는 특정 배포 커밋이나 URL을 고정해 적지 않는다. 매 릴리스마다 최신 `main` 커밋의 Cloudflare Pages 상태와 연결된 URL을 확인한다.
 
 ## 콘텐츠 데이터 위치
 

@@ -80,12 +80,17 @@ draft: false
 | `ratio` | `16:9` `4:3` `1:1` `21:9` | **영상 비율** — 고르면 화면에 맞게 자동 크기 |
 | `caption` | 텍스트 | 캡션(선택) |
 
-## 배포 (무료, Netlify 예시)
-1. 이 폴더를 GitHub 저장소로 push
-2. Netlify에서 저장소 연결 → Build command `npm run build`, Publish dir `dist`
-3. `public/admin/config.yml`의 `repo: OWNER/REPO`를 실제 저장소로 수정
-4. GitHub OAuth 앱 연결 (관리자 로그인용) — Netlify/Sveltia 문서 참고
-5. 커스텀 도메인 `www.hwanyun.com` 연결 → `astro.config.mjs`의 `site`도 맞추기
+## 배포 — Cloudflare Pages
+
+이 사이트의 라이브 배포는 **Cloudflare Pages**가 담당한다. Netlify 안내는 더 이상 적용되지 않는다.
+
+1. 작업 중인 변경은 `draft`에 모은다.
+2. 검토가 필요할 때만 `review/<topic>` 브랜치로 Pages 미리보기를 만든다.
+3. HWANYUN의 명시적 라이브 승인 후에만 `main`에 병합한다. `main`이 프로덕션을 배포한다.
+4. 배포 전에는 `npm run build`와 Cloudflare Billing 사용량을 확인한다.
+5. 배포 후에는 최신 `main` 커밋과 연결된 Pages URL에서 페이지와 미디어를 검수한다.
+
+대용량 영상과 비용 안전 규칙은 [CLOUDFLARE_R2_MIGRATION.md](./CLOUDFLARE_R2_MIGRATION.md), 실무 절차는 [AGENTS.md](./AGENTS.md)를 기준으로 한다.
 
 ## 관리자 로컬 테스트
 `public/admin/config.yml`에서 `local_backend: true` 주석 해제 후:
