@@ -28,6 +28,7 @@ media:
   - { type: video, src: "/videos/coexistence-2.mp4", width: half, ratio: "9:16", caption: "Live performance documentation" }
   - { type: image, src: "/images/coexistence/03.webp", width: full }
   - { type: video, src: "/videos/coexistence-1.mp4", width: full, ratio: "16:9", caption: "Live performance documentation" }
+  - { type: video, src: "/videos/coexistence-3.mp4", width: half, ratio: "9:16", caption: "Live performance documentation" }
 sponsors:
   - { name: "경기도 (Gyeonggi-do)", logo: "/images/coexistence/sponsors/gyeonggi-do.png" }
   - { name: "판타지아 부천 (Fantasia Bucheon)", logo: "/images/coexistence/sponsors/fantasia-bucheon.png" }
