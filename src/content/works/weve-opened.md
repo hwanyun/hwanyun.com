@@ -25,7 +25,6 @@ textKr: |
 media:
   - { type: image, src: "/images/weve-opened/01.jpg", width: full, caption: "WE'VE OPENED at GlogauAIR, Berlin" }
   - { type: image, src: "/images/weve-opened/02.jpeg", width: half, caption: "HWANYUN's interactive table in use" }
-  - { type: image, src: "/images/weve-opened/03.jpg", width: half, caption: "A visitor engaging with the table" }
   - { type: image, src: "/images/weve-opened/04.jpg", width: full, caption: "The interactive table and dining-room installation" }
   - { type: image, src: "/images/weve-opened/05.jpg", width: half, caption: "Table Mat Mock-Up and Hannah Celli's painting" }
   - { type: image, src: "/images/weve-opened/06.jpeg", width: half, caption: "Works prepared for the showcase" }
