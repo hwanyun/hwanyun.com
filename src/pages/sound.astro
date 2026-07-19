@@ -22,6 +22,7 @@ const releases = (id: string) => {
 
 <Base title="HWANYUN — Sound" current="sound">
   <video id="listening-backdrop" muted loop playsinline aria-hidden="true"></video>
+  <div id="backdrop-title" aria-live="polite"></div>
   <main id="sound-archive">
     <header class="archive-head">
       <p class="eyebrow">HWANYUN / LISTENING ARCHIVE</p>
@@ -86,6 +87,7 @@ const releases = (id: string) => {
     const pause = bar.querySelector(".pause")
     const stop = bar.querySelector(".stop")
     const backdrop = document.getElementById("listening-backdrop")
+    const backdropTitle = document.getElementById("backdrop-title")
     let activeButton = null
     const formatTime = (value) => {
       if (!Number.isFinite(value)) return "0:00"
@@ -99,7 +101,7 @@ const releases = (id: string) => {
       button.setAttribute("aria-label", row.dataset.title + (state === "playing" ? " 일시정지" : " 재생"))
     }
     const resetActive = () => { setButton(activeButton, "stopped"); activeButton = null }
-    const clearBackdrop = () => { backdrop.pause(); backdrop.removeAttribute("src"); document.body.classList.remove("has-backdrop") }
+    const clearBackdrop = () => { backdrop.pause(); backdrop.removeAttribute("src"); backdropTitle.textContent = ""; document.body.classList.remove("has-backdrop") }
     document.querySelectorAll(".track-control[data-audio]").forEach((button) => button.addEventListener("click", () => {
       if (activeButton === button) {
         if (player.paused) player.play(); else player.pause()
@@ -112,6 +114,7 @@ const releases = (id: string) => {
       if (button.dataset.backdrop) {
         backdrop.src = button.dataset.backdrop
         backdrop.play()
+        backdropTitle.textContent = button.closest(".track").dataset.title
         document.body.classList.add("has-backdrop")
       }
       player.play()
@@ -143,6 +146,8 @@ const releases = (id: string) => {
   <style>
     #listening-backdrop { position: fixed; z-index: 0; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; pointer-events: none; filter: brightness(.42) saturate(.75); transition: opacity .7s ease; }
     :global(body.has-backdrop) #listening-backdrop { opacity: 1; }
+    #backdrop-title { position: fixed; z-index: 2; left: 50%; top: 50%; width: min(88vw, 780px); transform: translate(-50%, -50%); color: #fff; font-size: clamp(24px, 4vw, 52px); font-weight: 300; line-height: 1.12; text-align: center; text-shadow: 0 2px 20px rgba(0,0,0,.45); opacity: 0; pointer-events: none; transition: opacity .45s ease; }
+    :global(body.has-backdrop) #backdrop-title { opacity: 1; }
     #sound-archive { position: relative; z-index: 1; width: calc(100% - 190px); max-width: 1060px; margin: 10px 0 100px 170px; transition: color .4s ease; }
     .archive-head { max-width: 650px; margin-bottom: 84px; }
     .eyebrow, .section h2, .number, .release-count, .track span:last-child { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #888; }
@@ -181,6 +186,7 @@ const releases = (id: string) => {
     .progress { grid-column: 1 / -1; height: 2px; background: #4a4a4a; }
     .progress span { display: block; width: 0; height: 100%; background: #fff; transition: width .1s linear; }
     :global(body.has-backdrop) #sound-archive { color: #fff; text-shadow: 0 1px 12px rgba(0,0,0,.35); }
+    :global(body.has-backdrop) #sound-archive, :global(body.has-backdrop) .menu, :global(body.has-backdrop) footer { opacity: 0; pointer-events: none; }
     :global(body.has-backdrop) .section-head, :global(body.has-backdrop) .release { border-color: rgba(255,255,255,.48); }
     :global(body.has-backdrop) .section h2, :global(body.has-backdrop) .section-head p, :global(body.has-backdrop) .release-count, :global(body.has-backdrop) .number, :global(body.has-backdrop) .track, :global(body.has-backdrop) .track-meta, :global(body.has-backdrop) .moving-tag { color: rgba(255,255,255,.78); }
     :global(body.has-backdrop) .track.is-playing, :global(body.has-backdrop) summary strong { color: #fff; }
