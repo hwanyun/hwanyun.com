@@ -112,11 +112,22 @@ function toParagraphs(text: string): string {
           {media[0].type === "video" ? (
             <figure class={`block is-video ${defaultLayout(media[0], 0)} ${media[0].align ? `align-${media[0].align}` : ""}`}>
               <div class="video" style={`aspect-ratio:${ratioValue[media[0].ratio] || "16 / 9"}`}>
-                {embedURL(media[0].src).kind === "iframe" ? (
-                  <iframe src={embedURL(media[0].src).src} allowfullscreen frameborder="0" loading="lazy" />
-                ) : (
-                  <video src={embedURL(media[0].src).src} controls playsinline />
-                )}
+                <button
+                  class="video-trigger"
+                  type="button"
+                  data-video-src={embedURL(media[0].src).src}
+                  data-video-kind={embedURL(media[0].src).kind}
+                  data-video-ratio={ratioValue[media[0].ratio] || "16 / 9"}
+                  data-video-title={media[0].caption || data.title}
+                  aria-label={`Play ${media[0].caption || data.title}`}
+                >
+                  {embedURL(media[0].src).kind === "iframe" ? (
+                    <span class="video-preview video-preview--embed" aria-hidden="true">VIDEO</span>
+                  ) : (
+                    <video class="video-preview" src={embedURL(media[0].src).src} muted playsinline preload="metadata" aria-hidden="true" />
+                  )}
+                  <span class="video-play" aria-hidden="true"><span></span></span>
+                </button>
               </div>
               {media[0].caption && <figcaption>{media[0].caption}</figcaption>}
               {(media[0].noteEn || media[0].noteKr) && (
@@ -166,11 +177,22 @@ function toParagraphs(text: string): string {
           m.type === "video" ? (
             <figure class={`block is-video ${defaultLayout(m, index)} ${m.align ? `align-${m.align}` : ""}`}>
               <div class="video" style={`aspect-ratio:${ratioValue[m.ratio] || "16 / 9"}`}>
-                {embedURL(m.src).kind === "iframe" ? (
-                  <iframe src={embedURL(m.src).src} allowfullscreen frameborder="0" loading="lazy" />
-                ) : (
-                  <video src={embedURL(m.src).src} controls playsinline />
-                )}
+                <button
+                  class="video-trigger"
+                  type="button"
+                  data-video-src={embedURL(m.src).src}
+                  data-video-kind={embedURL(m.src).kind}
+                  data-video-ratio={ratioValue[m.ratio] || "16 / 9"}
+                  data-video-title={m.caption || data.title}
+                  aria-label={`Play ${m.caption || data.title}`}
+                >
+                  {embedURL(m.src).kind === "iframe" ? (
+                    <span class="video-preview video-preview--embed" aria-hidden="true">VIDEO</span>
+                  ) : (
+                    <video class="video-preview" src={embedURL(m.src).src} muted playsinline preload="metadata" aria-hidden="true" />
+                  )}
+                  <span class="video-play" aria-hidden="true"><span></span></span>
+                </button>
               </div>
               {m.caption && <figcaption>{m.caption}</figcaption>}
               {(m.noteEn || m.noteKr) && (
@@ -271,6 +293,93 @@ function toParagraphs(text: string): string {
       )
     }
   </div>
+
+  <div id="video-lightbox" class="video-lightbox" hidden aria-hidden="true">
+    <div class="video-lightbox-backdrop" data-video-close></div>
+    <section class="video-dialog" role="dialog" aria-modal="true" aria-labelledby="video-lightbox-title">
+      <div class="video-dialog-header">
+        <p id="video-lightbox-title"></p>
+        <button class="video-close" type="button" data-video-close aria-label="Close video">×</button>
+      </div>
+      <div id="video-lightbox-frame"></div>
+    </section>
+  </div>
+
+  <script>
+    const initVideoLightbox = () => {
+      const lightbox = document.querySelector<HTMLDivElement>("#video-lightbox")
+      const frame = document.querySelector<HTMLDivElement>("#video-lightbox-frame")
+      const title = document.querySelector<HTMLParagraphElement>("#video-lightbox-title")
+      let lastTrigger: HTMLButtonElement | null = null
+
+    const closeVideo = () => {
+      if (!lightbox || !frame) return
+      const video = frame.querySelector("video")
+      if (video) {
+        video.pause()
+        video.removeAttribute("src")
+        video.load()
+      }
+      frame.replaceChildren()
+      lightbox.hidden = true
+      lightbox.setAttribute("aria-hidden", "true")
+      document.body.classList.remove("video-open")
+      lastTrigger?.focus()
+    }
+
+    const openVideo = (trigger: HTMLButtonElement) => {
+      if (!lightbox || !frame || !title) return
+      const { videoSrc, videoKind, videoRatio, videoTitle } = trigger.dataset
+      if (!videoSrc) return
+
+      lastTrigger = trigger
+      title.textContent = videoTitle || "Video"
+      const playerFrame = document.createElement("div")
+      playerFrame.className = "video-lightbox-frame"
+
+      if (videoKind === "file") {
+        playerFrame.classList.add("is-file")
+        const video = document.createElement("video")
+        video.src = videoSrc
+        video.controls = true
+        video.autoplay = true
+        video.playsInline = true
+        playerFrame.append(video)
+      } else {
+        playerFrame.style.aspectRatio = videoRatio || "16 / 9"
+        const iframe = document.createElement("iframe")
+        iframe.src = `${videoSrc}${videoSrc.includes("?") ? "&" : "?"}autoplay=1`
+        iframe.allow = "autoplay; fullscreen; picture-in-picture"
+        iframe.allowFullscreen = true
+        iframe.title = videoTitle || "Video"
+        playerFrame.append(iframe)
+      }
+
+      frame.replaceChildren(playerFrame)
+      lightbox.hidden = false
+      lightbox.setAttribute("aria-hidden", "false")
+      document.body.classList.add("video-open")
+      lightbox.querySelector<HTMLButtonElement>(".video-close")?.focus()
+    }
+
+      document.querySelectorAll<HTMLButtonElement>(".video-trigger").forEach((trigger) => {
+        trigger.addEventListener("click", () => openVideo(trigger))
+      })
+      lightbox?.querySelectorAll<HTMLElement>("[data-video-close]").forEach((control) => {
+        control.addEventListener("click", closeVideo)
+      })
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && lightbox && !lightbox.hidden) closeVideo()
+      })
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initVideoLightbox, { once: true })
+    } else {
+      initVideoLightbox()
+    }
+  </script>
 
   <style>
     /* 레퍼런스: 메뉴 170px 옆, 본문 최대 1100px */
@@ -393,17 +502,105 @@ function toParagraphs(text: string): string {
     .media-note-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
     .media-note p { margin: 0; font-size: 14px; line-height: 1.7; }
 
-    /* 영상: 비율에 맞춰 자동 크기 */
+    /* 영상: 첫 장면은 그리드에 남기고, 재생은 집중형 뷰어에서 연다. */
     .video { position: relative; width: 100%; background: #000; }
-    .video iframe,
-    .video video {
+    .video-trigger {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
+      padding: 0;
       border: 0;
-      display: block;
+      background: #000;
+      cursor: pointer;
+      overflow: hidden;
     }
+    .video-preview {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      opacity: .9;
+      transition: opacity .22s ease, transform .35s ease;
+    }
+    .video-preview--embed {
+      display: grid;
+      place-items: center;
+      color: #777;
+      font-size: 11px;
+      letter-spacing: .14em;
+    }
+    .video-trigger:hover .video-preview,
+    .video-trigger:focus-visible .video-preview { opacity: .65; transform: scale(1.015); }
+    .video-trigger:focus-visible { outline: 1px solid #fff; outline-offset: 3px; }
+    .video-play {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 50px;
+      height: 50px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, .9);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: transform .22s ease, background .22s ease;
+    }
+    .video-play span {
+      width: 0;
+      height: 0;
+      margin-left: 3px;
+      border-top: 6px solid transparent;
+      border-bottom: 6px solid transparent;
+      border-left: 9px solid #fff;
+    }
+    .video-trigger:hover .video-play,
+    .video-trigger:focus-visible .video-play { background: rgba(0, 0, 0, .42); transform: translate(-50%, -50%) scale(1.08); }
+    .video-lightbox {
+      position: fixed;
+      z-index: 1000;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 28px;
+    }
+    .video-lightbox[hidden] { display: none; }
+    .video-lightbox-backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, .94); }
+    .video-dialog { position: relative; width: min(100%, 1180px); color: #fff; }
+    .video-dialog-header { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin: 0 0 12px; }
+    .video-dialog-header p { margin: 0; font-size: 13px; color: rgba(255, 255, 255, .72); }
+    .video-close {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: #fff;
+      font-size: 29px;
+      font-weight: 200;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .video-close:focus-visible { outline: 1px solid #fff; outline-offset: 2px; }
+    .video-lightbox-frame { position: relative; width: 100%; max-height: calc(100vh - 110px); background: #000; }
+    .video-lightbox-frame iframe,
+    .video-lightbox-frame video {
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+    .video-lightbox-frame.is-file video {
+      position: relative;
+      height: auto;
+      max-height: calc(100vh - 110px);
+      object-fit: contain;
+    }
+    :global(body.video-open) { overflow: hidden; }
 
     /* 전시 맥락과 후원 크레딧은 작품 갤러리와 분리해 표기 */
     .exhibition-credit {
@@ -492,6 +689,8 @@ function toParagraphs(text: string): string {
       .block.detail,
       .block.portrait { grid-column: 1 / -1; }
       .media { gap: 18px; }
+      .video-lightbox { padding: 16px; }
+      .video-dialog-header { margin-bottom: 8px; }
     }
   </style>
 </Base>
