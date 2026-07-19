@@ -1,6 +1,6 @@
 # Cloudflare Pages + R2 migration guide
 
-This repository is an Astro static portfolio site for HWANYUN. GitHub (`main`) is the source of truth. Claude Code should follow this document when adding media or maintaining deployment.
+This repository is an Astro static portfolio site for HWANYUN. GitHub is the source of truth: use `draft` for cross-device work, `review/*` only for review previews, and `main` only for approved production releases. Claude Code should follow this document when adding media or maintaining deployment.
 
 > [!IMPORTANT]
 > ## Cost-safety rule — notify before any free allowance is exceeded
@@ -48,15 +48,18 @@ Replace only the `src` values for the two large videos in the relevant Markdown 
 
 Do not remove the local MP4 files until the R2 URLs have been tested in a Cloudflare Pages preview. After verification, the local copies may be removed in a separate commit to keep the Git repository smaller.
 
-## Normal workflow
+## Normal workflow — batch releases across multiple computers
 
-1. Add or edit files locally.
-2. Check Cloudflare Usage/Billing and apply the cost-safety rule above.
-3. Run `npm run build` and check the generated `dist/` output.
-4. Confirm every file in `public/` is under 25 MiB; large videos belong in R2.
-5. Commit and push to `main`.
-6. Cloudflare Pages automatically builds a preview and then production from `main`.
-7. Verify the page and all media URLs before considering the change complete.
+1. Start by syncing the `draft` branch on the current computer. Commit and push ordinary work to `draft`, never directly to `main`.
+2. `draft` is intentionally excluded from Cloudflare Pages automatic deployments. It is for safe GitHub synchronization across computers and does **not** spend a Pages build.
+3. Check Cloudflare Usage/Billing and apply the cost-safety rule above before a review or production deployment.
+4. Run `npm run build` locally and check the generated `dist/` output. Confirm every file in `public/` is under 25 MiB; large videos belong in R2.
+5. When HWANYUN asks to review a batch, create or update a `review/<topic>` branch from `draft`. Only `review/*` branches receive a Cloudflare Pages preview deployment. Share that preview URL and wait for approval.
+6. When HWANYUN says to deploy live, merge the approved batch into `main`. `main` is the only branch that automatically updates the live site.
+7. Verify the production page and all media URLs before considering the release complete.
+
+> [!IMPORTANT]
+> Every Cloudflare Pages preview and production build counts toward the monthly Pages build allowance. Never create a review branch or deploy merely for an intermediate edit. Batch changes first, then use one preview build and one final production build. Warn HWANYUN at 80% of the allowance and pause before any free allowance is exceeded.
 
 ## Media checklist for Claude Code
 
