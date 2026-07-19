@@ -34,5 +34,7 @@ media:
   - { type: image, src: "/images/weve-opened/10.jpeg", width: full, caption: "Visitors engaging with the work" }
   - { type: image, src: "/images/weve-opened/11.jpeg", width: half, caption: "The shared meal and gathering" }
   - { type: image, src: "/images/weve-opened/invitation.jpg", width: half, caption: "Invitation for the pop-up kitchen and restaurant" }
+sponsors:
+  - { name: "GlogauAIR Berlin", logo: "/images/conductive-circles/sponsors/glogauair-berlin.png" }
 draft: false
 ---
