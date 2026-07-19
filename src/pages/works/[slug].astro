@@ -222,6 +222,22 @@ function toParagraphs(text: string): string {
     }
 
     {
+      data.externalLinks && data.externalLinks.length > 0 && (
+        <section class="external-links" aria-label="Further reading">
+          <div class="external-links-label">Further Reading</div>
+          <div class="external-links-list">
+            {data.externalLinks.map((link) => (
+              <a href={link.url} target="_blank" rel="noopener">
+                <span>{link.title}</span>
+                <span aria-hidden="true">↗</span>
+              </a>
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    {
       data.sponsors && data.sponsors.length > 0 && (
         <div class="sponsors">
           <div class="sponsors-label">Exhibition Sponsors</div>
@@ -392,6 +408,25 @@ function toParagraphs(text: string): string {
     .related-sounds-list a { display: inline-flex; gap: 8px; align-items: baseline; color: #333; font-size: 15px; }
     .related-sounds-list a span:last-child { font-size: 12px; color: #999; }
     .related-sounds-list a:hover, .related-sounds-list a:hover span:last-child { color: var(--hover); }
+    .external-links {
+      clear: both;
+      position: relative;
+      z-index: 1;
+      margin: 26px 0 0;
+      padding-top: 24px;
+      border-top: 1px solid #ddd;
+    }
+    .external-links-label {
+      margin-bottom: 13px;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #999;
+    }
+    .external-links-list { display: flex; flex-wrap: wrap; gap: 9px 24px; }
+    .external-links-list a { display: inline-flex; gap: 8px; align-items: baseline; color: #333; font-size: 15px; }
+    .external-links-list a span:last-child { font-size: 12px; color: #999; }
+    .external-links-list a:hover, .external-links-list a:hover span:last-child { color: var(--hover); }
     .exhibition-label,
     .sponsors-label {
       font-size: 12px;

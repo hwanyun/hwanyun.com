@@ -47,6 +47,15 @@ collections:
       - { name: thumb, label: "홈 썸네일", widget: image, required: false }
       - { name: textEn, label: "설명 (영문)", widget: text, required: false }
       - { name: textKr, label: "설명 (국문)", widget: text, required: false }
+      - name: externalLinks
+        label: "인터뷰 · 읽을거리 (Further Reading)"
+        label_singular: "외부 링크"
+        widget: list
+        required: false
+        summary: "{{fields.title}}"
+        fields:
+          - { name: title, label: "제목", widget: string }
+          - { name: url, label: "URL", widget: string }
       - name: series
         label: "연작 연결 (Series)"
         widget: object

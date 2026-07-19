@@ -31,6 +31,17 @@ const works = defineCollection({
         year: z.string().optional().default(""),
       })
       .optional(),
+    // 인터뷰·비평 등 작품 맥락을 확장하는 외부 읽을거리
+    externalLinks: z
+      .array(
+        z.object({
+          label: z.string().optional().default("Further reading"),
+          title: z.string(),
+          url: z.string(),
+        })
+      )
+      .optional()
+      .default([]),
     // 대표 영상·이미지를 설명문보다 먼저 보여야 하는 작품에 사용
     mediaFirst: z.boolean().optional().default(false),
 

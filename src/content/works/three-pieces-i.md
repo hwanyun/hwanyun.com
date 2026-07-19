@@ -22,6 +22,9 @@ textKr: |
   관객이 전시 공간에서 만드는 소리는 센서에 감지되어 색과 점멸의 변화로 번역되고, 벽면의 폴리카보네이트 작업 위에 투사된다. 테이블 위의 구리 표면에 가해진 접촉은 작곡된 사운드를 호출한다. 이 새로운 음향 층은 다시 공간의 소리와 섞여 시각적 반응을 증폭시키고, 설치 전체에 더 큰 빛의 파동을 발생시킨다.
 
   작품은 관객을 완결된 설치 앞의 외부 관찰자로 두지 않는다. 관객의 존재가 있어야만 회로가 작동한다. 목소리는 신호가 되고, 접촉은 전달의 행위가 되며, 두 설치 작업은 서로에게 반응하기 시작한다. 이때 작품은 몸, 물질, 사운드, 빛이 잠시 형성하는 하나의 생태로 나타난다.
+externalLinks:
+  - title: "Meet the Artist: Hwan Yun"
+    url: "https://glogauair.net/activity/meet-the-artist-hwan-yun/"
 media:
   - { type: image, src: "/images/three-pieces-i/02.jpg", width: full, layout: hero, caption: "Installation view" }
   - { type: image, src: "/images/three-pieces-i/01.jpg", width: full, layout: wide, align: right, caption: "Copper interface and projected light" }
