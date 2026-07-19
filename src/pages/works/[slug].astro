@@ -151,7 +151,6 @@ function toParagraphs(text: string): string {
     {
       data.processNote && (data.processNote.textEn || data.processNote.textKr) && (
         <aside class="process-note" aria-label={data.processNote.label}>
-          <div class="process-note-label">{data.processNote.label}</div>
           <div class="process-note-cols">
             {data.processNote.textEn && <p>{data.processNote.textEn}</p>}
             {data.processNote.textKr && <p lang="ko">{data.processNote.textKr}</p>}
@@ -336,21 +335,11 @@ function toParagraphs(text: string): string {
     .desc :global(p) { margin: 0 0 1em; }
     .process-note {
       clear: both;
-      max-width: 900px;
-      margin: 0 0 42px;
-      padding-top: 12px;
-      border-top: 1px solid #ddd;
-      color: #777;
-    }
-    .process-note-label {
-      margin-bottom: 10px;
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      margin: -4px 0 42px;
       color: #999;
     }
-    .process-note-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
-    .process-note p { margin: 0; font-size: 14px; line-height: 1.7; }
+    .process-note-cols { display: grid; grid-template-columns: 46.5% 46.5%; column-gap: 3%; }
+    .process-note p { margin: 0; font-size: 14px; line-height: 1.75; }
 
     /* 미디어 — 홈 그리드처럼 220/380/540 크기가 여백 있게 흐름 */
     .media {
