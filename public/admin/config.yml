@@ -110,7 +110,17 @@ collections:
     fields:
       - { name: title, label: "제목", widget: string }
       - { name: year, label: "연도", widget: string, required: false }
-      - { name: url, label: "SoundCloud 주소", widget: string, hint: "트랙/셋 페이지 URL을 그대로 붙여넣기 (클릭 시 자동재생)" }
+      - { name: audio, label: "오디오 파일 URL", widget: string, required: false, hint: "R2 또는 /audio 경로의 mp3·m4a·wav URL. 사이트 자체 플레이어가 직접 재생합니다." }
+      - { name: url, label: "기존 SoundCloud 주소 (기록용)", widget: string, required: false, hint: "사이트에는 노출되지 않습니다." }
+      - name: section
+        label: "아카이브 구분"
+        widget: select
+        options:
+          - { label: "Sound Works", value: works }
+          - { label: "Scores & Collaborations", value: scores }
+          - { label: "Studies & Archive", value: archive }
+        default: archive
+      - { name: project, label: "작업 묶음", widget: string, required: false, hint: "같은 작업의 여러 버전을 묶는 제목" }
       - { name: cover, label: "커버 이미지", widget: image, required: false }
       - name: size
         label: "카드 크기"

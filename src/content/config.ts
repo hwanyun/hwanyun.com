@@ -69,13 +69,16 @@ const works = defineCollection({
   }),
 })
 
-// 사운드 컬렉션 — SoundCloud 링크 기반 실제 사운드 작업
+// 사운드 컬렉션 — 자체 재생 가능한 사운드 아카이브
 const sounds = defineCollection({
   type: "content",
   schema: z.object({
     title: z.string(),
     year: z.string().optional().default(""),
-    url: z.string(), // SoundCloud 트랙/셋 URL
+    url: z.string().optional().default(""), // 기존 SoundCloud 기록 보존용 — 페이지에서는 사용하지 않음
+    audio: z.string().optional().default(""), // R2 또는 public/의 직접 재생 가능한 오디오 파일
+    section: z.enum(["works", "scores", "archive"]).default("archive"),
+    project: z.string().optional().default(""), // 여러 버전을 하나의 작업으로 묶는 제목
     cover: z.string().optional().default(""), // 그리드 커버 이미지
     size: z.enum(["1col", "2col", "3col"]).default("2col"), // 그리드 카드 폭
     order: z.number().default(0),
