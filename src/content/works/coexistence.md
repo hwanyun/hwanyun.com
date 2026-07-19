@@ -23,16 +23,16 @@ textKr: |
   〈공존: Coexistence〉은 함께 존재한다는 것이 단순히 같은 장소에 있는 일이 아니라, 서로의 감각에 반응하고 자신의 방식을 조금씩 조정해가는 일임을 말한다. 보이는 것과 들리는 것, 감지되는 것과 드러나는 것 사이의 관계를 통해, 함께 있음의 의미를 하나의 살아 있는 감각적 경험으로 제안한다.
 thumb: "/images/coexistence/coexistence-thumbnail.png"
 media:
-  - { type: image, src: "/images/coexistence/01.jpg", width: full }
-  - { type: image, src: "/images/coexistence/02.jpg", width: half }
-  - { type: video, src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/videos/coexistence-3.mp4", width: half, ratio: "9:16", caption: "Live performance documentation" }
-  - { type: video, src: "/videos/coexistence-1.mp4", width: full, ratio: "16:9", caption: "Live performance documentation" }
-  - { type: video, src: "/videos/coexistence-2.mp4", width: half, ratio: "9:16", caption: "Live performance documentation" }
-  - { type: image, src: "/images/coexistence/05.jpeg", width: half, caption: "A visitor engaging with the interactive projection" }
-  - { type: image, src: "/images/coexistence/06.jpeg", width: half, caption: "A visitor engaging with the interactive projection" }
-  - { type: image, src: "/images/coexistence/07.jpeg", width: half, caption: "Visitors engaging with the interactive projection" }
-  - { type: image, src: "/images/coexistence/08.jpeg", width: half, caption: "Live violin performance in the exhibition" }
-  - { type: image, src: "/images/coexistence/09.jpeg", width: full, caption: "Live performance and interactive installation" }
+  - { type: image, src: "/images/coexistence/01.jpg", width: full, layout: hero }
+  - { type: image, src: "/images/coexistence/02.jpg", width: half, layout: wide, align: right }
+  - { type: video, src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/videos/coexistence-3.mp4", width: half, layout: portrait, align: left, ratio: "9:16", caption: "Live performance documentation" }
+  - { type: video, src: "/videos/coexistence-1.mp4", width: full, layout: wide, align: left, ratio: "16:9", caption: "Live performance documentation" }
+  - { type: video, src: "/videos/coexistence-2.mp4", width: half, layout: portrait, align: right, ratio: "9:16", caption: "Live performance documentation" }
+  - { type: image, src: "/images/coexistence/05.jpeg", width: half, layout: standard, caption: "A visitor engaging with the interactive projection" }
+  - { type: image, src: "/images/coexistence/06.jpeg", width: half, layout: detail, caption: "A visitor engaging with the interactive projection" }
+  - { type: image, src: "/images/coexistence/07.jpeg", width: half, layout: standard, align: right, caption: "Visitors engaging with the interactive projection" }
+  - { type: image, src: "/images/coexistence/08.jpeg", width: half, layout: portrait, align: left, caption: "Live violin performance in the exhibition" }
+  - { type: image, src: "/images/coexistence/09.jpeg", width: full, layout: wide, align: right, caption: "Live performance and interactive installation" }
 sponsors:
   - { name: "경기도 (Gyeonggi-do)", logo: "/images/coexistence/sponsors/gyeonggi-do.png" }
   - { name: "판타지아 부천 (Fantasia Bucheon)", logo: "/images/coexistence/sponsors/fantasia-bucheon.png" }

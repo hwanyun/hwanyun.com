@@ -42,45 +42,15 @@ const mediumParts = (data.medium || "")
   .map((s) => s.trim())
   .filter(Boolean)
 
-// 배경 고스트 타이틀 (미디어 뒤에서 스크롤에 따라 드리프트)
-const bigTitle = (data.title || "").toUpperCase()
-const ghostLine = Array(8).fill(bigTitle).join(" · ")
-const ghostRows = Array.from({ length: 7 })
-
-// 아트디렉션 레이아웃: 미디어를 행으로 묶되,
-// 꽉 차는 행은 양끝 정렬로 공간을 채우고, 덜 찬 행은 좌/우 교차 정렬로 비대칭 여백을 만든다.
-const FRAC: Record<string, number> = { full: 1, half: 0.5, third: 1 / 3 }
-type Row = { items: typeof media; align: "fill" | "left" | "right" }
-const rows: Row[] = []
-{
-  let cur: typeof media = []
-  let sum = 0
-  const flush = () => {
-    if (!cur.length) return
-    rows.push({ items: cur, align: "fill" })
-    cur = []
-    sum = 0
-  }
-  for (const m of media) {
-    const f = FRAC[m.width] ?? 1
-    if (cur.length && sum + f > 1.02) flush()
-    cur.push(m)
-    sum += f
-  }
-  flush()
-  // 정렬 주석: 꽉 찬 행은 fill, 덜 찬 행은 좌/우 번갈아
-  let toggle = 0
-  for (const r of rows) {
-    const s = r.items.reduce((a, m) => a + (FRAC[m.width] ?? 1), 0)
-    const full = s > 0.95 && r.items.length > 1
-    const singleFull = r.items.length === 1 && (FRAC[r.items[0].width] ?? 1) >= 0.99
-    if (full || singleFull) {
-      r.align = "fill"
-    } else {
-      r.align = toggle % 2 === 0 ? "left" : "right"
-      toggle++
-    }
-  }
+const defaultLayout = (m: (typeof media)[number], index: number) => {
+  // 공통 편집 규칙: 첫 장은 대표 이미지, full은 주요 기록,
+  // third·세로 영상은 보조/디테일로 읽히게 한다.
+  if (m.layout) return m.layout
+  if (index === 0) return "hero"
+  if (m.type === "video" && m.ratio === "9:16") return "portrait"
+  if (m.width === "full") return "wide"
+  if (m.width === "third") return "detail"
+  return "standard"
 }
 
 // 설명 텍스트: 빈 줄은 문단 구분, 문단 안 줄바꿈은 공백으로 이어 자연스럽게 흐르게
@@ -117,50 +87,35 @@ function toParagraphs(text: string): string {
     <!-- 마크다운 본문(선택) -->
     <div class="desc"><Content /></div>
 
-    <!-- 미디어: 이미지/영상을 폭을 달리하며 흐름 -->
+    <!-- 미디어: 대표·보조·디테일 자료를 12열 위계로 편집 -->
     <div class="media">
       {
-        bigTitle && (
-          <div class="ghost" aria-hidden="true">
-            {ghostRows.map((_, r) => (
-              <div class="ghost-row" data-dir={r % 2 === 0 ? 1 : -1}>
-                {ghostLine}
+        media.map((m, index) =>
+          m.type === "video" ? (
+            <figure class={`block is-video ${defaultLayout(m, index)} ${m.align ? `align-${m.align}` : ""}`}>
+              <div class="video" style={`aspect-ratio:${ratioValue[m.ratio] || "16 / 9"}`}>
+                {embedURL(m.src).kind === "iframe" ? (
+                  <iframe src={embedURL(m.src).src} allowfullscreen frameborder="0" loading="lazy" />
+                ) : (
+                  <video src={embedURL(m.src).src} controls playsinline />
+                )}
               </div>
-            ))}
-          </div>
+              {m.caption && <figcaption>{m.caption}</figcaption>}
+            </figure>
+          ) : (
+            <figure class={`block ${defaultLayout(m, index)} ${m.align ? `align-${m.align}` : ""}`}>
+              <img src={m.src} alt={m.caption || data.title} loading="lazy" />
+              {m.caption && <figcaption>{m.caption}</figcaption>}
+            </figure>
+          )
         )
       }
       {
-        rows.map((row) => (
-          <div class={`mrow ${row.align}`}>
-            {row.items.map((m) =>
-              m.type === "video" ? (
-                <figure class={`block w-${m.width}`}>
-                  <div class="video" style={`aspect-ratio:${ratioValue[m.ratio] || "16 / 9"}`}>
-                    {embedURL(m.src).kind === "iframe" ? (
-                      <iframe src={embedURL(m.src).src} allowfullscreen frameborder="0" loading="lazy" />
-                    ) : (
-                      <video src={embedURL(m.src).src} controls playsinline />
-                    )}
-                  </div>
-                  {m.caption && <figcaption>{m.caption}</figcaption>}
-                </figure>
-              ) : (
-                <figure class={`block w-${m.width}`}>
-                  <img src={m.src} alt={m.caption || data.title} loading="lazy" />
-                  {m.caption && <figcaption>{m.caption}</figcaption>}
-                </figure>
-              )
-            )}
-          </div>
-        ))
-      }
-      {
         media.length === 0 && (
-          <div class="mrow fill">
-            <figure class="block w-half"><div class="ph" style="padding-bottom:130%"></div></figure>
-            <figure class="block w-half"><div class="ph" style="padding-bottom:130%"></div></figure>
-          </div>
+          <>
+            <figure class="block standard"><div class="ph" style="padding-bottom:130%"></div></figure>
+            <figure class="block standard align-right"><div class="ph" style="padding-bottom:130%"></div></figure>
+          </>
         )
       }
     </div>
@@ -186,31 +141,6 @@ function toParagraphs(text: string): string {
       )
     }
   </div>
-
-  <script is:inline>
-    ;(function () {
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
-      var rows = document.querySelectorAll(".ghost-row")
-      var media = document.querySelector(".media")
-      if (!rows.length || !media) return
-      var ticking = false
-      function update() {
-        var p = window.innerHeight - media.getBoundingClientRect().top
-        for (var i = 0; i < rows.length; i++) {
-          var dir = parseFloat(rows[i].getAttribute("data-dir")) || 1
-          var speed = 0.14 + (i % 3) * 0.05
-          rows[i].style.transform = "translateX(" + p * speed * dir * -1 + "px)"
-        }
-        ticking = false
-      }
-      function onScroll() {
-        if (!ticking) { window.requestAnimationFrame(update); ticking = true }
-      }
-      window.addEventListener("scroll", onScroll, { passive: true })
-      window.addEventListener("resize", onScroll)
-      update()
-    })()
-  </script>
 
   <style>
     /* 레퍼런스: 메뉴 170px 옆, 본문 최대 1100px */
@@ -252,50 +182,31 @@ function toParagraphs(text: string): string {
     .desc :global(p) { margin: 0 0 1em; }
 
     /* 미디어 — 홈 그리드처럼 220/380/540 크기가 여백 있게 흐름 */
-    .media { clear: both; position: relative; }
-
-    /* 배경 고스트 타이틀 (여백 사이로 은은히 비치며 스크롤에 드리프트) */
-    .ghost {
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 20px 0;
-      pointer-events: none;
-    }
-    .ghost-row {
-      white-space: nowrap;
-      text-align: center;
-      font-size: clamp(64px, 12vw, 150px);
-      font-weight: 300;
-      letter-spacing: -0.02em;
-      line-height: 1;
-      color: rgba(0, 0, 0, 0.09);
-      will-change: transform;
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .ghost-row { transform: none !important; }
+    .media {
+      clear: both;
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 30px 12px;
+      align-items: start;
     }
 
-    /* 아트디렉션 행: 꽉 찬 행은 양끝, 덜 찬 행은 좌/우로 몰아 비대칭 여백 */
-    .mrow {
-      display: flex;
-      align-items: flex-start;
-      gap: 3%;
-      margin: 0 0 26px;
-      position: relative;
-      z-index: 1;
-    }
-    .mrow.fill { justify-content: space-between; }
-    .mrow.left { justify-content: flex-start; }
-    .mrow.right { justify-content: flex-end; }
-    .block { position: relative; }
-    .block.w-full { width: 100%; }
-    .block.w-half { width: 48.5%; }
-    .block.w-third { width: 31.5%; }
+    /* 12열 그리드: 자료의 역할과 여백을 함께 조절한다. */
+    .block { position: relative; grid-column: span 5; }
+    .block.hero { grid-column: 1 / span 9; }
+    .block.wide { grid-column: span 7; }
+    .block.standard { grid-column: span 5; }
+    .block.detail,
+    .block.portrait { grid-column: span 4; }
+    .block.hero.align-left { grid-column: 1 / span 9; }
+    .block.hero.align-right { grid-column: 4 / span 9; }
+    .block.wide.align-left { grid-column: 1 / span 7; }
+    .block.wide.align-right { grid-column: 6 / span 7; }
+    .block.standard.align-left { grid-column: 1 / span 5; }
+    .block.standard.align-right { grid-column: 8 / span 5; }
+    .block.detail.align-left,
+    .block.portrait.align-left { grid-column: 1 / span 4; }
+    .block.detail.align-right,
+    .block.portrait.align-right { grid-column: 9 / span 4; }
     .block img { display: block; width: 100%; }
     .block .ph { background: #ececec; height: 0; }
     figure { margin: 0; }
@@ -347,11 +258,13 @@ function toParagraphs(text: string): string {
     @media (max-width: 700px) {
       #entry { width: calc(100% - 20px); margin-left: 10px; }
       .textcols .col { width: 100%; margin-right: 0; float: none; }
-      .mrow { flex-direction: column; gap: 16px; }
       .block,
-      .block.w-full,
-      .block.w-half,
-      .block.w-third { width: 100%; }
+      .block.hero,
+      .block.wide,
+      .block.standard,
+      .block.detail,
+      .block.portrait { grid-column: 1 / -1; }
+      .media { gap: 18px; }
     }
   </style>
 </Base>

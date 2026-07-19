@@ -16,16 +16,16 @@ textKr: |
 
   전도성 수성 페인트인 전기 페인트는 전통 한지 위에 적용되어 반응하는 형상을 만들고, Arduino와 Raspberry Pi에 연결되어 터치와 근접에 민감한 센서로 작동한다. 한지 특유의 질감은 자연을 만지는 감각을 작품 속으로 전달하기 위해 선택한 물질적 수단이다. 아이슬란드에서 직접 채집한 사운드는 작가의 작곡 안으로 들어오며, 관객의 손이 표면 위를 움직일 때 거리와 움직임에 따라 활성화된다. 작품은 작가가 느낀 그곳을 다시 들려주는 대신, 관객의 손끝에 반응하며 그곳의 조용한 밀도를 새롭게 감각하게 한다.
 media:
-  - { type: image, src: "/images/intuition-i/01.jpg", width: full }
-  - { type: image, src: "/images/intuition-i/02.jpg", width: half }
-  - { type: video, src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/intuition-i-01.mp4", width: half, ratio: "16:9", caption: "Interactive sound installation documentation" }
-  - { type: image, src: "/images/intuition-i/03.jpg", width: full }
-  - { type: image, src: "/images/intuition-i/04.jpg", width: half }
-  - { type: video, src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/intuition-i-02.mov", width: half, ratio: "9:16", caption: "Touch interaction documentation" }
-  - { type: image, src: "/images/intuition-i/05.jpg", width: full }
-  - { type: image, src: "/images/intuition-i/06.jpg", width: full }
-  - { type: video, src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/intuition-i-03.mp4", width: full, ratio: "16:9", caption: "Interactive sound installation documentation" }
-  - { type: image, src: "/images/intuition-i/07.jpg", width: half }
+  - { type: image, src: "/images/intuition-i/01.jpg", width: full, layout: hero }
+  - { type: image, src: "/images/intuition-i/02.jpg", width: half, layout: wide, align: right }
+  - { type: video, src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/intuition-i-01.mp4", width: half, layout: standard, align: left, ratio: "16:9", caption: "Interactive sound installation documentation" }
+  - { type: image, src: "/images/intuition-i/03.jpg", width: full, layout: wide, align: left }
+  - { type: image, src: "/images/intuition-i/04.jpg", width: half, layout: standard, align: right }
+  - { type: video, src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/intuition-i-02.mov", width: half, layout: portrait, align: left, ratio: "9:16", caption: "Touch interaction documentation" }
+  - { type: image, src: "/images/intuition-i/05.jpg", width: full, layout: wide, align: right }
+  - { type: image, src: "/images/intuition-i/06.jpg", width: full, layout: detail, align: left }
+  - { type: video, src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/intuition-i-03.mp4", width: full, layout: wide, align: left, ratio: "16:9", caption: "Interactive sound installation documentation" }
+  - { type: image, src: "/images/intuition-i/07.jpg", width: half, layout: detail, align: right }
 sponsors:
   - { name: "Listhús", logo: "/images/intuition-i/sponsors/listhus.webp", url: "https://www.listhus.is/" }
 ---
