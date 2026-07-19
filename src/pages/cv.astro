@@ -48,7 +48,11 @@ import cv from "../data/cv.json"
       gap: 16px;
       padding: 4px 0;
     }
-    .year { color: #555; white-space: nowrap; }
+    .year {
+      color: #555;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
     .text { }
     @media (max-width: 700px) {
       .page { margin-left: 0; }

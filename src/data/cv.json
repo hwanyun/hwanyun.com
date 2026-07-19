@@ -47,10 +47,26 @@
       ]
     },
     {
-      "title": "Sound",
+      "title": "Sounds",
       "items": [
         { "year": "2016", "text": "해양수산부 TV 광고음악, TV ad music for Ministry of Oceans and Fisheries, South Korea." },
-        { "year": "2015", "text": "Vogue Italia and Emaar present a new scouting project, Spring/Summer 2016 at Vogue." }
+        { "year": "2015", "text": "Vogue Italia and Emaar present a new scouting project, Spring/Summer 2016 at Vogue Fashion Dubai — catwalk music, The Dubai Mall, Dubai, United Arab Emirates." },
+        { "year": "2015", "text": "London Fashion Week — On|Off SS16, The Vinyl Factory, Marshall Street, London, UK." },
+        { "year": "2015", "text": "London Fashion Week — Fashion Scout AW15/16, Freemasons' Hall, London, UK." }
+      ]
+    },
+    {
+      "title": "Residency",
+      "items": [
+        { "year": "2018", "text": "GlogauAIR, Glogauerstrasse 16, 10999 Berlin, Germany." },
+        { "year": "2017", "text": "Listhús, Ægisgötu 10, 625 Ólafsfirði, Iceland." }
+      ]
+    },
+    {
+      "title": "Funds",
+      "items": [
+        { "year": "2018", "text": "Recipient of Arts Council Korea Arts Fund, Korea." },
+        { "year": "2015", "text": "Korean Artist Welfare Foundation, Korea." }
       ]
     }
   ]

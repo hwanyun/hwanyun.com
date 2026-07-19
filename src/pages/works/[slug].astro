@@ -173,11 +173,11 @@ function toParagraphs(text: string): string {
             {data.sponsors.map((s) =>
               s.url ? (
                 <a href={s.url} target="_blank" rel="noopener" class="sponsor">
-                  <img src={s.logo} alt={s.name} loading="lazy" />
+                  {s.logo ? <img src={s.logo} alt={s.name} loading="lazy" /> : <span class="sponsor-name">{s.name}</span>}
                 </a>
               ) : (
                 <span class="sponsor">
-                  <img src={s.logo} alt={s.name} loading="lazy" />
+                  {s.logo ? <img src={s.logo} alt={s.name} loading="lazy" /> : <span class="sponsor-name">{s.name}</span>}
                 </span>
               )
             )}
@@ -336,6 +336,7 @@ function toParagraphs(text: string): string {
       gap: 32px;
     }
     .sponsor { display: inline-flex; align-items: center; }
+    .sponsor-name { font-size: 16px; color: #333; }
     .sponsor img {
       max-height: 40px;
       max-width: 140px;
