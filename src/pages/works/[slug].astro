@@ -78,6 +78,15 @@ function toParagraphs(text: string): string {
       )
     }
 
+    {
+      data.series && (
+        <a class="series-link" href={data.series.href}>
+          <span>Part of the series</span>
+          {data.series.label}
+        </a>
+      )
+    }
+
     <!-- EN / KR 2단 텍스트 — 글자가 없어도 항상 2단 (레퍼런스 구조) -->
     <div class="textcols">
       <div class="col" set:html={toParagraphs(data.textEn)} />
@@ -160,6 +169,23 @@ function toParagraphs(text: string): string {
     .meta { font-size: 18px; font-weight: 400; line-height: 1.6; color: #555; margin: 0 0 34px; }
     .meta .medium-type { display: block; color: #111; }
     .meta .medium-materials { display: block; margin-top: 8px; font-size: 16px; color: #777; }
+    .series-link {
+      display: inline-flex;
+      flex-direction: column;
+      gap: 2px;
+      margin: -14px 0 30px;
+      font-size: 14px;
+      line-height: 1.4;
+      color: #333;
+    }
+    .series-link span {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #999;
+    }
+    .series-link:hover { color: var(--hover); }
+    .series-link:hover span { color: var(--hover); }
 
     /* EN/KR 2단 — 본문 가독성만 개선(두께 400 / 16px / 넓은 줄간격) */
     .textcols::after { content: ""; display: block; clear: both; }

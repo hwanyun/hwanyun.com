@@ -7,6 +7,12 @@ const works = defineCollection({
     title: z.string(),
     year: z.string().optional().default(""),
     medium: z.string().optional().default(""),
+    series: z
+      .object({
+        label: z.string(),
+        href: z.string(),
+      })
+      .optional(),
     size: z.enum(["1col", "2col", "3col"]).default("2col"),
     category: z.enum(["work", "sound"]).default("work"),
     order: z.number().default(0),

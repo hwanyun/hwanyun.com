@@ -2,6 +2,9 @@
 title: "Intuition: Untitled II"
 year: "2017"
 medium: "Sculpture (34\"); ABS filament, 3D pen"
+series:
+  label: "Intuition: Untitled I"
+  href: "/works/intuition-i/"
 size: 1col
 category: work
 order: 6
