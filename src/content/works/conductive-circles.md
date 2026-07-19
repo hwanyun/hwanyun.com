@@ -5,7 +5,7 @@ medium: "Interactive sound & visual installation; copper, 3D mapping"
 size: 2col
 category: work
 order: 3
-thumb: "/images/conductive-circles/01.jpg"
+thumb: "/images/conductive-circles/home.png"
 textEn: |
   Presenting the outcome of a 4-day KalmaLab workshop at GlogauAIR, Berlin,
   participants were introduced to the live performance possibilities of
