@@ -1,6 +1,6 @@
 ---
 title: "The voice of stripes"
-year: ""
+year: "2016"
 medium: "Sound installation; ultrasonic/vibration speakers, polyvinyl, soundtrack player"
 size: 2col
 category: sound

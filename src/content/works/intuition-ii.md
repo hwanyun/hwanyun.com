@@ -1,6 +1,6 @@
 ---
 title: "Intuition: Untitled II"
-year: ""
+year: "2017"
 medium: "Sculpture (34\"); sensors, copper, wires, speakers"
 size: 1col
 category: sound

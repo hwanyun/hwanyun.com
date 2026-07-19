@@ -10,7 +10,7 @@ if (filter) works = works.filter((w) => w.data.category === filter)
 works.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
 
 const nav = [
-  { label: "Works", href: "/", key: "works" },
+  { label: "Works", href: "/works", key: "works" },
   { label: "Sound", href: "/sound", key: "sound" },
   { label: "Bio", href: "/cv", key: "bio" },
   { label: "Contact", href: "/contact", key: "contact" },

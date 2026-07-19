@@ -1,6 +1,6 @@
 ---
 title: "fedora - exile"
-year: ""
+year: "2014"
 medium: "Video installation"
 size: 2col
 category: work
