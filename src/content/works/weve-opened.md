@@ -5,7 +5,7 @@ medium: "Installation; copper, electric wire, plastic film"
 size: 2col
 category: work
 order: 10
-thumb: ""
+thumb: "/images/weve-opened/01.jpg"
 gallery: []
 video: ""
 draft: false
