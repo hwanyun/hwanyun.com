@@ -190,6 +190,8 @@ function toParagraphs(text: string): string {
       }
     </div>
 
+    <div class="post-gallery-divider" aria-hidden="true"></div>
+
     {
       relatedSounds.length > 0 && (
         <section class="related-sounds" aria-labelledby="related-sounds-title">
@@ -330,6 +332,11 @@ function toParagraphs(text: string): string {
       align-items: start;
     }
     .media--lead { margin: 0 0 42px; }
+    .post-gallery-divider {
+      clear: both;
+      margin: 72px 0 0;
+      border-top: 1px solid #ddd;
+    }
 
     /* 12열 그리드: 자료의 역할과 여백을 함께 조절한다. */
     .block { position: relative; grid-column: span 5; }
@@ -385,17 +392,15 @@ function toParagraphs(text: string): string {
       clear: both;
       position: relative;
       z-index: 1;
-      margin: 10px 0 0;
-      padding-top: 24px;
-      border-top: 1px solid #ddd;
+      margin: 26px 0 0;
+      padding-top: 0;
     }
     .related-sounds {
       clear: both;
       position: relative;
       z-index: 1;
-      margin: 38px 0 0;
-      padding-top: 24px;
-      border-top: 1px solid #ddd;
+      margin: 24px 0 0;
+      padding-top: 0;
     }
     .related-sounds-label {
       margin-bottom: 13px;
@@ -413,8 +418,7 @@ function toParagraphs(text: string): string {
       position: relative;
       z-index: 1;
       margin: 26px 0 0;
-      padding-top: 24px;
-      border-top: 1px solid #ddd;
+      padding-top: 0;
     }
     .external-links-label {
       margin-bottom: 13px;
