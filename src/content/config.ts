@@ -21,6 +21,16 @@ const works = defineCollection({
     // 세부 페이지 텍스트 (레퍼런스처럼 EN/KR 2단)
     textEn: z.string().optional().default(""),
     textKr: z.string().optional().default(""),
+    // 작품이 선보인 전시 정보 — 후원 크레딧과 분리해 표기
+    exhibition: z
+      .object({
+        label: z.string().optional().default("Presented as part of"),
+        titleEn: z.string().optional().default(""),
+        titleKr: z.string().optional().default(""),
+        venue: z.string().optional().default(""),
+        year: z.string().optional().default(""),
+      })
+      .optional(),
     // 대표 영상·이미지를 설명문보다 먼저 보여야 하는 작품에 사용
     mediaFirst: z.boolean().optional().default(false),
 

@@ -173,6 +173,21 @@ function toParagraphs(text: string): string {
     </div>
 
     {
+      data.exhibition && (
+        <div class="exhibition-credit">
+          {data.exhibition.label && <div class="exhibition-label">{data.exhibition.label}</div>}
+          <div class="exhibition-title">
+            {data.exhibition.titleEn && <span>{data.exhibition.titleEn}</span>}
+            {data.exhibition.titleKr && <span lang="ko">{data.exhibition.titleKr}</span>}
+          </div>
+          {(data.exhibition.venue || data.exhibition.year) && (
+            <div class="exhibition-meta">{[data.exhibition.venue, data.exhibition.year].filter(Boolean).join(", ")}</div>
+          )}
+        </div>
+      )
+    }
+
+    {
       data.sponsors && data.sponsors.length > 0 && (
         <div class="sponsors">
           <div class="sponsors-label">Exhibition Sponsors</div>
@@ -309,21 +324,31 @@ function toParagraphs(text: string): string {
       display: block;
     }
 
-    /* 전시 협력·후원 크레딧 — 작품 갤러리와 분리된 로고 스트립 */
-    .sponsors {
+    /* 전시 맥락과 후원 크레딧은 작품 갤러리와 분리해 표기 */
+    .exhibition-credit {
       clear: both;
       position: relative;
       z-index: 1;
-      margin: 10px 0 40px;
+      margin: 10px 0 0;
       padding-top: 24px;
       border-top: 1px solid #ddd;
     }
+    .exhibition-label,
     .sponsors-label {
       font-size: 12px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: #999;
       margin-bottom: 16px;
+    }
+    .exhibition-title { display: flex; flex-wrap: wrap; gap: 0 10px; font-size: 16px; color: #333; }
+    .exhibition-title span + span::before { content: "·"; margin-right: 10px; color: #aaa; }
+    .exhibition-meta { margin-top: 6px; font-size: 14px; color: #777; }
+    .sponsors {
+      clear: both;
+      position: relative;
+      z-index: 1;
+      margin: 26px 0 40px;
     }
     .sponsors-row {
       display: flex;
