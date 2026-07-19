@@ -46,10 +46,10 @@ const releases = (id: string) => {
                 </summary>
                 <ol class="tracklist">
                   {release.tracks.map((sound) => (
-                    <li class="track">
+                    <li class="track" data-title={sound.data.title}>
                       <span>{sound.data.title}</span>
                       {sound.data.year && <span>{sound.data.year}</span>}
-                      {sound.data.audio && <button class="play" type="button" data-audio={sound.data.audio}>Play</button>}
+                      {sound.data.audio && <button class="track-control" type="button" data-audio={sound.data.audio} aria-label={`${sound.data.title} 재생`}><span aria-hidden="true"></span></button>}
                     </li>
                   ))}
                 </ol>
@@ -62,22 +62,61 @@ const releases = (id: string) => {
   </main>
 
   <audio id="archive-player" preload="metadata"></audio>
-  <div id="player-bar" hidden><span class="now-playing"></span><button type="button" class="pause">Pause</button></div>
+  <div id="player-bar" hidden>
+    <div class="player-track"><span class="now-playing"></span><span class="player-time">0:00 / 0:00</span></div>
+    <div class="player-actions">
+      <button type="button" class="pause" aria-label="일시정지"><span aria-hidden="true"></span></button>
+      <button type="button" class="stop" aria-label="정지"><span aria-hidden="true"></span></button>
+    </div>
+    <div class="progress" role="progressbar" aria-label="재생 진행" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
+  </div>
 
   <script is:inline>
     const player = document.getElementById("archive-player")
     const bar = document.getElementById("player-bar")
     const now = bar.querySelector(".now-playing")
+    const time = bar.querySelector(".player-time")
+    const progress = bar.querySelector(".progress")
+    const progressFill = progress.querySelector("span")
     const pause = bar.querySelector(".pause")
-    document.querySelectorAll(".play[data-audio]").forEach((button) => button.addEventListener("click", () => {
+    const stop = bar.querySelector(".stop")
+    let activeButton = null
+    const formatTime = (value) => {
+      if (!Number.isFinite(value)) return "0:00"
+      return Math.floor(value / 60) + ":" + String(Math.floor(value % 60)).padStart(2, "0")
+    }
+    const setButton = (button, state) => {
+      if (!button) return
+      const row = button.closest(".track")
+      row.classList.toggle("is-playing", state === "playing")
+      row.classList.toggle("is-paused", state === "paused")
+      button.setAttribute("aria-label", row.dataset.title + (state === "playing" ? " 일시정지" : " 재생"))
+    }
+    const resetActive = () => { setButton(activeButton, "stopped"); activeButton = null }
+    document.querySelectorAll(".track-control[data-audio]").forEach((button) => button.addEventListener("click", () => {
+      if (activeButton === button) {
+        if (player.paused) player.play(); else player.pause()
+        return
+      }
+      resetActive()
+      activeButton = button
       player.src = button.dataset.audio
       player.play()
-      now.textContent = button.parentElement.querySelector("span").textContent
+      now.textContent = button.closest(".track").dataset.title
       bar.hidden = false
     }))
     pause.addEventListener("click", () => player.paused ? player.play() : player.pause())
-    player.addEventListener("play", () => pause.textContent = "Pause")
-    player.addEventListener("pause", () => pause.textContent = "Play")
+    stop.addEventListener("click", () => { player.pause(); player.currentTime = 0; resetActive(); bar.hidden = true })
+    player.addEventListener("loadedmetadata", () => time.textContent = formatTime(player.currentTime) + " / " + formatTime(player.duration))
+    player.addEventListener("timeupdate", () => {
+      const ratio = player.duration ? player.currentTime / player.duration : 0
+      progressFill.style.width = (ratio * 100) + "%"
+      progress.setAttribute("aria-valuenow", String(Math.round(ratio * 100)))
+      time.textContent = formatTime(player.currentTime) + " / " + formatTime(player.duration)
+    })
+    player.addEventListener("play", () => { setButton(activeButton, "playing"); pause.classList.add("is-playing"); pause.setAttribute("aria-label", "일시정지") })
+    player.addEventListener("pause", () => { if (player.currentTime) setButton(activeButton, "paused"); pause.classList.remove("is-playing"); pause.setAttribute("aria-label", "재생") })
+    player.addEventListener("ended", () => { resetActive(); pause.classList.remove("is-playing"); progressFill.style.width = "0%" })
   </script>
 
   <style>
@@ -98,11 +137,22 @@ const releases = (id: string) => {
     .expand { text-align: right; font-size: 20px; font-weight: 300; line-height: .7; }
     details[open] .expand { transform: rotate(45deg); }
     .tracklist { padding: 0 36px 14px 64px; }
-    .track { display: grid; grid-template-columns: minmax(0,1fr) auto 42px; gap: 20px; align-items: baseline; padding: 6px 0; font-size: 14px; color: #666; }
-    .play { border: 0; padding: 0; background: none; color: inherit; font: inherit; cursor: pointer; }
-    .play:hover { color: var(--hover); }
-    #player-bar { position: fixed; z-index: 5; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between; gap: 20px; padding: 14px 18px; background: #111; color: #fff; font-size: 14px; }
-    #player-bar button { border: 0; background: none; color: inherit; font: inherit; cursor: pointer; }
+    .track { display: grid; grid-template-columns: minmax(0,1fr) auto 26px; gap: 20px; align-items: center; padding: 7px 0; font-size: 14px; color: #666; }
+    .track.is-playing { color: #111; }
+    .track-control, .player-actions button { display: grid; place-items: center; border: 1px solid currentColor; border-radius: 50%; background: transparent; color: currentColor; cursor: pointer; }
+    .track-control { width: 22px; height: 22px; padding: 0; }
+    .track-control span, .pause span { display: block; width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 7px solid currentColor; margin-left: 2px; }
+    .track.is-playing .track-control span, .pause.is-playing span { width: 7px; height: 9px; border: 0; border-left: 2px solid currentColor; border-right: 2px solid currentColor; margin-left: 0; }
+    .track-control:hover { color: var(--hover); }
+    #player-bar { position: fixed; z-index: 5; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: minmax(180px, 1fr) auto; gap: 12px 24px; padding: 13px 18px 10px; background: #111; color: #fff; font-size: 14px; }
+    .player-track { display: flex; gap: 14px; min-width: 0; }
+    .now-playing { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .player-time { color: #aaa; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .player-actions { display: flex; gap: 8px; }
+    .player-actions button { width: 28px; height: 28px; color: #fff; padding: 0; }
+    .stop span { width: 8px; height: 8px; background: currentColor; }
+    .progress { grid-column: 1 / -1; height: 2px; background: #4a4a4a; }
+    .progress span { display: block; width: 0; height: 100%; background: #fff; transition: width .1s linear; }
     @media (max-width: 700px) { #sound-archive { width: auto; margin: 24px 16px 80px; } .archive-head { margin-bottom: 54px; } .section-head { display: block; } .section-head p { margin-top: 8px; } summary { grid-template-columns: 34px minmax(0,1fr) 18px; } .release-count { display: none; } .tracklist { padding-left: 34px; } }
   </style>
 </Base>
