@@ -31,7 +31,7 @@ media:
   - { type: image, src: "/images/weve-opened/07.jpeg", width: full, caption: "Installation view" }
   - { type: image, src: "/images/weve-opened/08.jpeg", width: half, caption: "Installation view with a visitor" }
   - { type: image, src: "/images/weve-opened/09.jpeg", width: half, caption: "Listening at the interactive table" }
-  - { type: image, src: "/images/weve-opened/10.jpeg", width: half, caption: "Visitors engaging with the work" }
+  - { type: image, src: "/images/weve-opened/10.jpeg", width: full, caption: "Visitors engaging with the work" }
   - { type: image, src: "/images/weve-opened/11.jpeg", width: half, caption: "The shared meal and gathering" }
   - { type: image, src: "/images/weve-opened/invitation.jpg", width: half, caption: "Invitation for the pop-up kitchen and restaurant" }
 draft: false
