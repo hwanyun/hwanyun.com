@@ -11,6 +11,12 @@ const { work } = Astro.props
 const { data } = work
 const { Content } = await work.render()
 const yr = data.year ? ` (${data.year})` : ""
+const allWorks = await getCollection("works", ({ data }) => !data.draft)
+const seriesWorks = data.series
+  ? allWorks
+      .filter((item) => item.data.series?.id === data.series?.id)
+      .sort((a, b) => a.data.order - b.data.order)
+  : []
 
 // 영상 URL을 임베드 가능한 형태로 정규화 (YouTube/Vimeo는 일반 링크를 붙여도 됨)
 function embedURL(url: string): { kind: "iframe" | "file"; src: string } {
@@ -80,11 +86,19 @@ function toParagraphs(text: string): string {
     }
 
     {
-      data.series && (
-        <a class="series-link" href={data.series.href}>
+      data.series && seriesWorks.length > 1 && (
+        <nav class="series-link" aria-label={`${data.series.label} series`}>
           <span>Part of the series</span>
-          {data.series.label}
-        </a>
+          <div class="series-members">
+            {seriesWorks.map((item) =>
+              item.slug === work.slug ? (
+                <span class="series-current" aria-current="page">{item.data.title}</span>
+              ) : (
+                <a href={`/works/${item.slug}/`}>{item.data.title}</a>
+              )
+            )}
+          </div>
+        </nav>
       )
     }
 
@@ -242,8 +256,14 @@ function toParagraphs(text: string): string {
       text-transform: uppercase;
       color: #999;
     }
-    .series-link:hover { color: var(--hover); }
-    .series-link:hover span { color: var(--hover); }
+    .series-members { display: flex; flex-wrap: wrap; gap: 0 10px; }
+    .series-members a,
+    .series-current { color: #333; }
+    .series-members a + a::before,
+    .series-members a + .series-current::before,
+    .series-current + a::before { content: "·"; margin-right: 10px; color: #aaa; }
+    .series-members a:hover { color: var(--hover); }
+    .series-link:hover > span { color: var(--hover); }
 
     /* EN/KR 2단 — 본문 가독성만 개선(두께 400 / 16px / 넓은 줄간격) */
     .textcols::after { content: ""; display: block; clear: both; }

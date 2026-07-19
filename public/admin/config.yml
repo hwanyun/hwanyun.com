@@ -47,6 +47,14 @@ collections:
       - { name: thumb, label: "홈 썸네일", widget: image, required: false }
       - { name: textEn, label: "설명 (영문)", widget: text, required: false }
       - { name: textKr, label: "설명 (국문)", widget: text, required: false }
+      - name: series
+        label: "연작 연결 (Series)"
+        widget: object
+        required: false
+        hint: "같은 연작의 모든 작품에 동일한 연작 ID와 연작명을 입력하면 작품 페이지에서 자동으로 서로 연결됩니다."
+        fields:
+          - { name: id, label: "연작 ID", widget: string, hint: "영문 소문자·하이픈 사용. 예: intuition-untitled" }
+          - { name: label, label: "연작명", widget: string, hint: "예: Intuition: Untitled" }
       - name: media
         label: "세부 이미지 · 영상"
         label_singular: "미디어"

@@ -5,6 +5,9 @@ medium: "Sculpture; ABS filament, 3D pen, wood, fabric"
 size: 1col
 category: work
 order: 8
+series:
+  id: "three-pieces-untitled"
+  label: "Three Pieces: Untitled"
 draft: false
 thumb: "/images/three-pieces-ii/04.jpg"
 media:

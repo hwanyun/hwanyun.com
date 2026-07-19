@@ -67,8 +67,11 @@ draft: false
 | `order` | 홈 배치 순서 |
 | `thumb` | 홈 썸네일 (없으면 회색 박스) |
 | `textEn` / `textKr` | 세부 페이지 상단 EN/KR 2단 텍스트 |
+| `series` | 연작 연결. 같은 연작의 모든 작품에 동일한 `id`, `label`을 입력하면 상호 링크가 자동 생성됨 |
 | `media` | 세부 페이지 이미지·영상 블록 (아래 참고) |
 | `draft` | true면 사이트에서 숨김 |
+
+연작 연결의 세부 기준과 새 작품 추가 방법은 [SERIES_GUIDE.md](./SERIES_GUIDE.md)를 따른다.
 
 ### media 블록
 레퍼런스처럼 이미지·영상을 폭을 달리하며 편집적으로 배치한다.

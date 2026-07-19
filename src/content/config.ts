@@ -9,8 +9,8 @@ const works = defineCollection({
     medium: z.string().optional().default(""),
     series: z
       .object({
+        id: z.string(),
         label: z.string(),
-        href: z.string(),
       })
       .optional(),
     size: z.enum(["1col", "2col", "3col"]).default("2col"),

@@ -5,6 +5,9 @@ medium: "Cyan-photography; paper"
 size: 1col
 category: work
 order: 9
+series:
+  id: "three-pieces-untitled"
+  label: "Three Pieces: Untitled"
 draft: false
 thumb: "/images/three-pieces-iii/03.png"
 media:

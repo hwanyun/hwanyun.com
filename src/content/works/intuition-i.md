@@ -5,6 +5,9 @@ medium: "Interactive sound installation; Electric paint, hanji - traditional Kor
 size: 2col
 category: sound
 order: 5
+series:
+  id: "intuition-untitled"
+  label: "Intuition: Untitled"
 draft: false
 thumb: "/images/intuition-i/thumbnail.png"
 textEn: |

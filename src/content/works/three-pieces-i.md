@@ -5,6 +5,9 @@ medium: "Interactive sound/visual installation; sensors, polycarbonate, copper, 
 size: 2col
 category: work
 order: 7
+series:
+  id: "three-pieces-untitled"
+  label: "Three Pieces: Untitled"
 draft: false
 thumb: "/images/three-pieces-i/01.jpg"
 media:
