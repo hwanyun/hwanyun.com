@@ -121,6 +121,7 @@ collections:
           - { label: "Studies & Archive", value: archive }
         default: archive
       - { name: project, label: "작업 묶음", widget: string, required: false, hint: "같은 작업의 여러 버전을 묶는 제목" }
+      - { name: works, label: "연결 작품 슬러그", widget: list, required: false, hint: "예: the-voice-of-stripes. 연결된 작품 페이지에 이 트랙이 표시됩니다." }
       - { name: cover, label: "커버 이미지", widget: image, required: false }
       - name: size
         label: "카드 크기"

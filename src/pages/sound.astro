@@ -21,6 +21,7 @@ const releases = (id: string) => {
 ---
 
 <Base title="HWANYUN — Sound" current="sound">
+  <video id="listening-backdrop" muted loop playsinline aria-hidden="true"></video>
   <main id="sound-archive">
     <header class="archive-head">
       <p class="eyebrow">HWANYUN / LISTENING ARCHIVE</p>
@@ -42,14 +43,18 @@ const releases = (id: string) => {
                   <span class="number">{String(index + 1).padStart(2, "0")}</span>
                   <strong>{release.title}</strong>
                   <span class="release-count">{release.tracks.length} {release.tracks.length === 1 ? "recording" : "recordings"}</span>
+                  <span class={`moving-tag ${release.tracks.some((sound) => sound.data.backdrop) ? "" : "is-empty"}`}>Moving image</span>
                   <span class="expand" aria-hidden="true">+</span>
                 </summary>
                 <ol class="tracklist">
                   {release.tracks.map((sound) => (
-                    <li class="track" data-title={sound.data.title}>
+                    <li id={`sound-${sound.slug}`} class="track" data-title={sound.data.title}>
                       <span>{sound.data.title}</span>
-                      {sound.data.year && <span>{sound.data.year}</span>}
-                      {sound.data.audio && <button class="track-control" type="button" data-audio={sound.data.audio} aria-label={`${sound.data.title} 재생`}><span aria-hidden="true"></span></button>}
+                      <span class="track-meta">
+                        {sound.data.year && <span>{sound.data.year}</span>}
+                        {sound.data.backdrop && <span class="moving-tag">Audio + moving image</span>}
+                      </span>
+                      {sound.data.audio && <button class="track-control" type="button" data-audio={sound.data.audio} data-backdrop={sound.data.backdrop} aria-label={`${sound.data.title} 재생`}><span aria-hidden="true"></span></button>}
                     </li>
                   ))}
                 </ol>
@@ -80,6 +85,7 @@ const releases = (id: string) => {
     const progressFill = progress.querySelector("span")
     const pause = bar.querySelector(".pause")
     const stop = bar.querySelector(".stop")
+    const backdrop = document.getElementById("listening-backdrop")
     let activeButton = null
     const formatTime = (value) => {
       if (!Number.isFinite(value)) return "0:00"
@@ -93,6 +99,7 @@ const releases = (id: string) => {
       button.setAttribute("aria-label", row.dataset.title + (state === "playing" ? " 일시정지" : " 재생"))
     }
     const resetActive = () => { setButton(activeButton, "stopped"); activeButton = null }
+    const clearBackdrop = () => { backdrop.pause(); backdrop.removeAttribute("src"); document.body.classList.remove("has-backdrop") }
     document.querySelectorAll(".track-control[data-audio]").forEach((button) => button.addEventListener("click", () => {
       if (activeButton === button) {
         if (player.paused) player.play(); else player.pause()
@@ -101,12 +108,18 @@ const releases = (id: string) => {
       resetActive()
       activeButton = button
       player.src = button.dataset.audio
+      clearBackdrop()
+      if (button.dataset.backdrop) {
+        backdrop.src = button.dataset.backdrop
+        backdrop.play()
+        document.body.classList.add("has-backdrop")
+      }
       player.play()
       now.textContent = button.closest(".track").dataset.title
       bar.hidden = false
     }))
     pause.addEventListener("click", () => player.paused ? player.play() : player.pause())
-    stop.addEventListener("click", () => { player.pause(); player.currentTime = 0; resetActive(); bar.hidden = true })
+    stop.addEventListener("click", () => { player.pause(); player.currentTime = 0; resetActive(); clearBackdrop(); bar.hidden = true })
     player.addEventListener("loadedmetadata", () => time.textContent = formatTime(player.currentTime) + " / " + formatTime(player.duration))
     player.addEventListener("timeupdate", () => {
       const ratio = player.duration ? player.currentTime / player.duration : 0
@@ -116,11 +129,21 @@ const releases = (id: string) => {
     })
     player.addEventListener("play", () => { setButton(activeButton, "playing"); pause.classList.add("is-playing"); pause.setAttribute("aria-label", "일시정지") })
     player.addEventListener("pause", () => { if (player.currentTime) setButton(activeButton, "paused"); pause.classList.remove("is-playing"); pause.setAttribute("aria-label", "재생") })
-    player.addEventListener("ended", () => { resetActive(); pause.classList.remove("is-playing"); progressFill.style.width = "0%" })
+    player.addEventListener("ended", () => { resetActive(); clearBackdrop(); pause.classList.remove("is-playing"); progressFill.style.width = "0%" })
+    if (location.hash) {
+      const target = document.querySelector(location.hash)
+      if (target) {
+        const release = target.closest("details")
+        if (release) release.open = true
+        target.scrollIntoView({ block: "center" })
+      }
+    }
   </script>
 
   <style>
-    #sound-archive { width: calc(100% - 190px); max-width: 1060px; margin: 10px 0 100px 170px; }
+    #listening-backdrop { position: fixed; z-index: 0; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; pointer-events: none; filter: brightness(.42) saturate(.75); transition: opacity .7s ease; }
+    :global(body.has-backdrop) #listening-backdrop { opacity: 1; }
+    #sound-archive { position: relative; z-index: 1; width: calc(100% - 190px); max-width: 1060px; margin: 10px 0 100px 170px; transition: color .4s ease; }
     .archive-head { max-width: 650px; margin-bottom: 84px; }
     .eyebrow, .section h2, .number, .release-count, .track span:last-child { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #888; }
     h1 { margin: 8px 0 16px; font-weight: 300; font-size: 38px; }
@@ -131,13 +154,17 @@ const releases = (id: string) => {
     .section-head p { margin: 0; font-size: 14px; color: #666; }
     .release-list, .tracklist { list-style: none; padding: 0; margin: 0; }
     .release { border-bottom: 1px solid #ddd; }
-    summary { display: grid; grid-template-columns: 52px minmax(0,1fr) 110px 24px; gap: 12px; align-items: baseline; padding: 16px 0; cursor: pointer; list-style: none; }
+    summary { display: grid; grid-template-columns: 52px minmax(0,1fr) auto auto 24px; gap: 12px; align-items: baseline; padding: 16px 0; cursor: pointer; list-style: none; }
     summary::-webkit-details-marker { display: none; }
     summary strong { font-weight: 400; }
     .expand { text-align: right; font-size: 20px; font-weight: 300; line-height: .7; }
     details[open] .expand { transform: rotate(45deg); }
     .tracklist { padding: 0 36px 14px 64px; }
-    .track { display: grid; grid-template-columns: minmax(0,1fr) auto 26px; gap: 20px; align-items: center; padding: 7px 0; font-size: 14px; color: #666; }
+    .track { display: grid; grid-template-columns: minmax(0,1fr) minmax(130px, 220px) 26px; gap: 14px; align-items: center; padding: 7px 0; font-size: 14px; color: #666; }
+    .track-meta { display: flex; justify-content: flex-end; align-items: center; gap: 12px; min-width: 0; }
+    .moving-tag { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; letter-spacing: .08em; line-height: 1; text-transform: uppercase; color: #777; white-space: nowrap; }
+    .moving-tag.is-empty { visibility: hidden; }
+    .moving-tag::before { content: ""; width: 10px; height: 7px; border: 1px solid currentColor; background: linear-gradient(90deg, currentColor 0 1px, transparent 1px 3px, currentColor 3px 4px, transparent 4px 6px, currentColor 6px 7px, transparent 7px 9px, currentColor 9px); opacity: .8; }
     .track.is-playing { color: #111; }
     .track-control, .player-actions button { display: grid; place-items: center; border: 1px solid currentColor; border-radius: 50%; background: transparent; color: currentColor; cursor: pointer; }
     .track-control { width: 22px; height: 22px; padding: 0; }
@@ -153,6 +180,10 @@ const releases = (id: string) => {
     .stop span { width: 8px; height: 8px; background: currentColor; }
     .progress { grid-column: 1 / -1; height: 2px; background: #4a4a4a; }
     .progress span { display: block; width: 0; height: 100%; background: #fff; transition: width .1s linear; }
-    @media (max-width: 700px) { #sound-archive { width: auto; margin: 24px 16px 80px; } .archive-head { margin-bottom: 54px; } .section-head { display: block; } .section-head p { margin-top: 8px; } summary { grid-template-columns: 34px minmax(0,1fr) 18px; } .release-count { display: none; } .tracklist { padding-left: 34px; } }
+    :global(body.has-backdrop) #sound-archive { color: #fff; text-shadow: 0 1px 12px rgba(0,0,0,.35); }
+    :global(body.has-backdrop) .section-head, :global(body.has-backdrop) .release { border-color: rgba(255,255,255,.48); }
+    :global(body.has-backdrop) .section h2, :global(body.has-backdrop) .section-head p, :global(body.has-backdrop) .release-count, :global(body.has-backdrop) .number, :global(body.has-backdrop) .track, :global(body.has-backdrop) .track-meta, :global(body.has-backdrop) .moving-tag { color: rgba(255,255,255,.78); }
+    :global(body.has-backdrop) .track.is-playing, :global(body.has-backdrop) summary strong { color: #fff; }
+    @media (max-width: 700px) { #sound-archive { width: auto; margin: 24px 16px 80px; } .archive-head { margin-bottom: 54px; } .section-head { display: block; } .section-head p { margin-top: 8px; } summary { grid-template-columns: 34px minmax(0,1fr) auto 18px; } .release-count { display: none; } .track { grid-template-columns: minmax(0,1fr) auto 26px; } .track .moving-tag { display: none; } .tracklist { padding-left: 34px; } }
   </style>
 </Base>

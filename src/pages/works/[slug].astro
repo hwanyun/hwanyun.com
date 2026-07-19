@@ -12,11 +12,15 @@ const { data } = work
 const { Content } = await work.render()
 const yr = data.year ? ` (${data.year})` : ""
 const allWorks = await getCollection("works", ({ data }) => !data.draft)
+const allSounds = await getCollection("sounds", ({ data }) => !data.draft)
 const seriesWorks = data.series
   ? allWorks
       .filter((item) => item.data.series?.id === data.series?.id)
       .sort((a, b) => a.data.order - b.data.order)
   : []
+const relatedSounds = allSounds
+  .filter((sound) => sound.data.works.includes(work.slug))
+  .sort((a, b) => a.data.order - b.data.order)
 
 // 영상 URL을 임베드 가능한 형태로 정규화 (YouTube/Vimeo는 일반 링크를 붙여도 됨)
 function embedURL(url: string): { kind: "iframe" | "file"; src: string } {
@@ -187,6 +191,22 @@ function toParagraphs(text: string): string {
     </div>
 
     {
+      relatedSounds.length > 0 && (
+        <section class="related-sounds" aria-labelledby="related-sounds-title">
+          <div id="related-sounds-title" class="related-sounds-label">Related sound recordings</div>
+          <div class="related-sounds-list">
+            {relatedSounds.map((sound) => (
+              <a href={`/sound/#sound-${sound.slug}`}>
+                <span>{sound.data.title}</span>
+                <span aria-hidden="true">↗</span>
+              </a>
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    {
       data.exhibition && (
         <div class="exhibition-credit">
           {data.exhibition.label && <div class="exhibition-label">{data.exhibition.label}</div>}
@@ -353,6 +373,25 @@ function toParagraphs(text: string): string {
       padding-top: 24px;
       border-top: 1px solid #ddd;
     }
+    .related-sounds {
+      clear: both;
+      position: relative;
+      z-index: 1;
+      margin: 38px 0 0;
+      padding-top: 24px;
+      border-top: 1px solid #ddd;
+    }
+    .related-sounds-label {
+      margin-bottom: 13px;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #999;
+    }
+    .related-sounds-list { display: flex; flex-wrap: wrap; gap: 9px 24px; }
+    .related-sounds-list a { display: inline-flex; gap: 8px; align-items: baseline; color: #333; font-size: 15px; }
+    .related-sounds-list a span:last-child { font-size: 12px; color: #999; }
+    .related-sounds-list a:hover, .related-sounds-list a:hover span:last-child { color: var(--hover); }
     .exhibition-label,
     .sponsors-label {
       font-size: 12px;

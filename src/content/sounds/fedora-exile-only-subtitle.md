@@ -7,5 +7,6 @@ size: 2col
 order: 8
 section: works
 project: "Fedora – Exile"
+works: ["fedora-exile"]
 draft: false
 ---

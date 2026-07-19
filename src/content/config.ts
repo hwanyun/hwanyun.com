@@ -79,6 +79,8 @@ const sounds = defineCollection({
     audio: z.string().optional().default(""), // R2 또는 public/의 직접 재생 가능한 오디오 파일
     section: z.enum(["works", "scores", "archive"]).default("archive"),
     project: z.string().optional().default(""), // 여러 버전을 하나의 작업으로 묶는 제목
+    works: z.array(z.string()).optional().default([]), // 연결할 작품 slug
+    backdrop: z.string().optional().default(""), // 해당 트랙 재생 시 보여 줄 배경 영상
     cover: z.string().optional().default(""), // 그리드 커버 이미지
     size: z.enum(["1col", "2col", "3col"]).default("2col"), // 그리드 카드 폭
     order: z.number().default(0),
