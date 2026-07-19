@@ -34,6 +34,7 @@ const ratioValue: Record<string, string> = {
 }
 
 const media = data.media ?? []
+const galleryMedia = data.mediaFirst ? media.slice(1) : media
 const hasText = data.textEn || data.textKr
 
 // 매체 표기: ";" 기준으로 종류 / 재료 분리 → 종류 한 줄, 재료 아래 줄
@@ -87,6 +88,39 @@ function toParagraphs(text: string): string {
       )
     }
 
+    {
+      data.mediaFirst && media[0] && (
+        <div class="media media--lead">
+          {media[0].type === "video" ? (
+            <figure class={`block is-video ${defaultLayout(media[0], 0)} ${media[0].align ? `align-${media[0].align}` : ""}`}>
+              <div class="video" style={`aspect-ratio:${ratioValue[media[0].ratio] || "16 / 9"}`}>
+                {embedURL(media[0].src).kind === "iframe" ? (
+                  <iframe src={embedURL(media[0].src).src} allowfullscreen frameborder="0" loading="lazy" />
+                ) : (
+                  <video src={embedURL(media[0].src).src} controls playsinline />
+                )}
+              </div>
+              {media[0].caption && <figcaption>{media[0].caption}</figcaption>}
+              {(media[0].noteEn || media[0].noteKr) && (
+                <div class="media-note">
+                  {media[0].noteLabel && <div class="media-note-label">{media[0].noteLabel}</div>}
+                  <div class="media-note-cols">
+                    <p>{media[0].noteEn}</p>
+                    <p>{media[0].noteKr}</p>
+                  </div>
+                </div>
+              )}
+            </figure>
+          ) : (
+            <figure class={`block ${defaultLayout(media[0], 0)} ${media[0].align ? `align-${media[0].align}` : ""}`}>
+              <img src={media[0].src} alt={media[0].caption || data.title} loading="lazy" />
+              {media[0].caption && <figcaption>{media[0].caption}</figcaption>}
+            </figure>
+          )}
+        </div>
+      )
+    }
+
     <!-- EN / KR 2단 텍스트 — 글자가 없어도 항상 2단 (레퍼런스 구조) -->
     <div class="textcols">
       <div class="col" set:html={toParagraphs(data.textEn)} />
@@ -99,7 +133,7 @@ function toParagraphs(text: string): string {
     <!-- 미디어: 대표·보조·디테일 자료를 12열 위계로 편집 -->
     <div class="media">
       {
-        media.map((m, index) =>
+        galleryMedia.map((m, index) =>
           m.type === "video" ? (
             <figure class={`block is-video ${defaultLayout(m, index)} ${m.align ? `align-${m.align}` : ""}`}>
               <div class="video" style={`aspect-ratio:${ratioValue[m.ratio] || "16 / 9"}`}>
@@ -110,6 +144,15 @@ function toParagraphs(text: string): string {
                 )}
               </div>
               {m.caption && <figcaption>{m.caption}</figcaption>}
+              {(m.noteEn || m.noteKr) && (
+                <div class="media-note">
+                  {m.noteLabel && <div class="media-note-label">{m.noteLabel}</div>}
+                  <div class="media-note-cols">
+                    <p>{m.noteEn}</p>
+                    <p>{m.noteKr}</p>
+                  </div>
+                </div>
+              )}
             </figure>
           ) : (
             <figure class={`block ${defaultLayout(m, index)} ${m.align ? `align-${m.align}` : ""}`}>
@@ -215,6 +258,7 @@ function toParagraphs(text: string): string {
       gap: 30px 12px;
       align-items: start;
     }
+    .media--lead { margin: 0 0 42px; }
 
     /* 12열 그리드: 자료의 역할과 여백을 함께 조절한다. */
     .block { position: relative; grid-column: span 5; }
@@ -237,6 +281,21 @@ function toParagraphs(text: string): string {
     .block .ph { background: #ececec; height: 0; }
     figure { margin: 0; }
     figcaption { font-size: 13px; color: #555; margin-top: 4px; }
+    .media-note {
+      margin-top: 18px;
+      padding-top: 12px;
+      border-top: 1px solid #d8d8d8;
+      color: #555;
+    }
+    .media-note-label {
+      margin-bottom: 10px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #999;
+    }
+    .media-note-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+    .media-note p { margin: 0; font-size: 14px; line-height: 1.7; }
 
     /* 영상: 비율에 맞춰 자동 크기 */
     .video { position: relative; width: 100%; background: #000; }

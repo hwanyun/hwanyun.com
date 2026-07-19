@@ -21,6 +21,8 @@ const works = defineCollection({
     // 세부 페이지 텍스트 (레퍼런스처럼 EN/KR 2단)
     textEn: z.string().optional().default(""),
     textKr: z.string().optional().default(""),
+    // 대표 영상·이미지를 설명문보다 먼저 보여야 하는 작품에 사용
+    mediaFirst: z.boolean().optional().default(false),
 
     // 세부 페이지 미디어 — 이미지/영상을 순서대로, 폭을 골라 배치
     media: z
@@ -33,6 +35,9 @@ const works = defineCollection({
           align: z.enum(["left", "right"]).optional(),
           ratio: z.enum(["16:9", "4:3", "1:1", "21:9", "9:16"]).default("16:9"), // 영상 비율
           caption: z.string().optional().default(""),
+          noteLabel: z.string().optional().default(""),
+          noteEn: z.string().optional().default(""),
+          noteKr: z.string().optional().default(""),
         })
       )
       .optional()
