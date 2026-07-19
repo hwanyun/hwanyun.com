@@ -215,10 +215,10 @@ function toParagraphs(text: string): string {
           <div class="exhibition-title">
             {data.exhibition.titleEn && <span>{data.exhibition.titleEn}</span>}
             {data.exhibition.titleKr && <span lang="ko">{data.exhibition.titleKr}</span>}
+            {(data.exhibition.venue || data.exhibition.year) && (
+              <span class="exhibition-meta">{[data.exhibition.venue, data.exhibition.year].filter(Boolean).join(", ")}</span>
+            )}
           </div>
-          {(data.exhibition.venue || data.exhibition.year) && (
-            <div class="exhibition-meta">{[data.exhibition.venue, data.exhibition.year].filter(Boolean).join(", ")}</div>
-          )}
         </div>
       )
     }
@@ -439,9 +439,9 @@ function toParagraphs(text: string): string {
       color: #999;
       margin-bottom: 16px;
     }
-    .exhibition-title { display: flex; flex-wrap: wrap; gap: 0 10px; font-size: 16px; color: #333; }
+    .exhibition-title { display: flex; flex-wrap: wrap; gap: 0 10px; font-size: 16px; color: #555; }
     .exhibition-title span + span::before { content: "·"; margin-right: 10px; color: #aaa; }
-    .exhibition-meta { margin-top: 6px; font-size: 14px; color: #777; }
+    .exhibition-meta { font: inherit; color: inherit; }
     .sponsors {
       clear: both;
       position: relative;
