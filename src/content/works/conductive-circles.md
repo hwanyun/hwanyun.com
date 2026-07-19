@@ -18,6 +18,7 @@ textKr: |
   퍼포먼스의 가능성을 탐구했다. 구리 구조물은 전도성 트리거가 되어, 터치에
   반응하는 프로젝션 비주얼 회로로 실시간 매핑된다.
 media:
+  - { type: video, src: "/videos/conductive-circles-intro.mp4", width: full, ratio: "4:3" }
   - { type: image, src: "/images/conductive-circles/01.jpg", width: half }
   - { type: video, src: "/videos/conductive-circles-1.mp4", width: half, ratio: "9:16" }
   - { type: image, src: "/images/conductive-circles/02.jpg", width: full }
