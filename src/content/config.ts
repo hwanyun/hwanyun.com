@@ -63,6 +63,7 @@ const works = defineCollection({
           layout: z.enum(["hero", "wide", "standard", "detail", "portrait"]).optional(),
           align: z.enum(["left", "right"]).optional(),
           ratio: z.enum(["16:9", "4:3", "1:1", "21:9", "9:16"]).default("16:9"), // 영상 비율
+          span: z.number().optional(), // 사진 모듈 그리드에서 차지할 칸 수(1~3). 없으면 비율로 자동
           caption: z.string().optional().default(""),
           noteLabel: z.string().optional().default(""),
           noteEn: z.string().optional().default(""),

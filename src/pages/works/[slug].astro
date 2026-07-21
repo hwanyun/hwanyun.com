@@ -42,10 +42,24 @@ const ratioValue: Record<string, string> = {
   "21:9": "21 / 9",
   "9:16": "9 / 16",
 }
+// 종횡비 숫자값 — justified 행에서 flex-grow(폭 배분)에 사용
+const ratioNum: Record<string, number> = {
+  "16:9": 16 / 9,
+  "4:3": 4 / 3,
+  "1:1": 1,
+  "21:9": 21 / 9,
+  "9:16": 9 / 16,
+}
 
 const media = data.media ?? []
 const galleryMedia = data.mediaFirst ? media.slice(1) : media
 const hasText = data.textEn || data.textKr
+
+// 미디어 층위 분리: 움직이는 이미지(영상)를 앞·크게, 스틸(사진)은 아래 갤러리로
+const videoMedia = galleryMedia.filter((m) => m.type === "video")
+const stillMedia = galleryMedia.filter((m) => m.type !== "video")
+// 세로 영상(9:16)은 나란히 묶고, 가로 영상은 풀와이드로
+const isPortrait = (m: (typeof media)[number]) => m.ratio === "9:16"
 
 // 매체 표기: ";" 기준으로 종류 / 재료 분리 → 종류 한 줄, 재료 아래 줄
 const mediumParts = (data.medium || "")
@@ -159,12 +173,20 @@ function toParagraphs(text: string): string {
       )
     }
 
-    <!-- 미디어: 대표·보조·디테일 자료를 12열 위계로 편집 -->
-    <div class="media">
-      {
-        galleryMedia.map((m, index) =>
-          m.type === "video" ? (
-            <figure class={`block is-video ${defaultLayout(m, index)} ${m.align ? `align-${m.align}` : ""}`}>
+    <!-- 영상 층: 움직이는 이미지가 작품의 본체 → 앞·크게 -->
+    {
+      videoMedia.length > 0 && (
+        <div class="layer-label">Video</div>
+      )
+    }
+    {
+      videoMedia.length > 0 && (
+        <div class="media-videos">
+          {videoMedia.map((m) => (
+            <figure
+              class="block is-video"
+              style={`flex-grow:${ratioNum[m.ratio] || 16 / 9};flex-basis:0`}
+            >
               <div class="video" style={`aspect-ratio:${ratioValue[m.ratio] || "16 / 9"}`}>
                 {embedURL(m.src).kind === "iframe" ? (
                   <iframe src={embedURL(m.src).src} allowfullscreen frameborder="0" loading="lazy" />
@@ -183,23 +205,37 @@ function toParagraphs(text: string): string {
                 </div>
               )}
             </figure>
-          ) : (
-            <figure class={`block ${defaultLayout(m, index)} ${m.align ? `align-${m.align}` : ""}`}>
+          ))}
+        </div>
+      )
+    }
+
+    <!-- 사진 층: 스틸 기록을 건축 모듈 그리드로 -->
+    {
+      stillMedia.length > 0 && (
+        <div class="layer-label">Images</div>
+      )
+    }
+    {
+      stillMedia.length > 0 && (
+        <div class="media-stills">
+          {stillMedia.map((m) => (
+            <figure class="block" data-span={m.span ? String(m.span) : undefined}>
               <img src={m.src} alt={m.caption || data.title} loading="lazy" />
               {m.caption && <figcaption>{m.caption}</figcaption>}
             </figure>
-          )
-        )
-      }
-      {
-        media.length === 0 && (
-          <>
-            <figure class="block standard"><div class="ph" style="padding-bottom:130%"></div></figure>
-            <figure class="block standard align-right"><div class="ph" style="padding-bottom:130%"></div></figure>
-          </>
-        )
-      }
-    </div>
+          ))}
+        </div>
+      )
+    }
+
+    {
+      media.length === 0 && (
+        <div class="media-stills">
+          <figure class="block"><div class="ph" style="padding-bottom:120%" /></figure>
+        </div>
+      )
+    }
 
     <div class="post-gallery-divider" aria-hidden="true"></div>
 
@@ -271,6 +307,246 @@ function toParagraphs(text: string): string {
       )
     }
   </div>
+
+  <!-- 포커스 모드(밝은 라이트박스): 미디어 클릭 시 중앙에 크게 -->
+  <div id="focus" class="focus" hidden>
+    <button class="focus-close" aria-label="Close">×</button>
+    <div class="focus-stage"></div>
+    <div class="focus-cap"></div>
+  </div>
+
+  <script is:inline>
+    ;(function () {
+      var overlay = document.getElementById("focus")
+      if (!overlay) return
+      var stage = overlay.querySelector(".focus-stage")
+      var cap = overlay.querySelector(".focus-cap")
+      var closeBtn = overlay.querySelector(".focus-close")
+      var figures = Array.prototype.slice.call(document.querySelectorAll("#entry .block"))
+
+      function openFig(fig) {
+        var media = fig.querySelector("img, .video")
+        if (!media) return
+        var clone = media.cloneNode(true)
+        // 파일 영상은 컨트롤+자동재생, 임베드는 autoplay 파라미터 부여
+        var vid = clone.tagName === "VIDEO" ? clone : clone.querySelector && clone.querySelector("video")
+        if (vid) {
+          vid.setAttribute("controls", "")
+          vid.setAttribute("autoplay", "")
+        }
+        var ifr = clone.querySelector && clone.querySelector("iframe")
+        if (ifr) {
+          var s = ifr.getAttribute("src") || ""
+          ifr.setAttribute("src", s + (s.indexOf("?") > -1 ? "&" : "?") + "autoplay=1")
+        }
+        stage.innerHTML = ""
+        stage.appendChild(clone)
+        var fc = fig.querySelector("figcaption")
+        cap.textContent = fc ? fc.textContent : ""
+        cap.style.display = fc ? "" : "none"
+        overlay.hidden = false
+        requestAnimationFrame(function () {
+          overlay.classList.add("open")
+        })
+        document.body.style.overflow = "hidden"
+      }
+      function close() {
+        overlay.classList.remove("open")
+        document.body.style.overflow = ""
+        setTimeout(function () {
+          overlay.hidden = true
+          stage.innerHTML = "" // 영상 정지
+        }, 280)
+      }
+
+      figures.forEach(function (fig) {
+        var btn = document.createElement("button")
+        btn.className = "focus-open"
+        btn.setAttribute("aria-label", "Enlarge")
+        btn.innerHTML = "&#10530;" // ⤢
+        btn.addEventListener("click", function (e) {
+          e.stopPropagation()
+          openFig(fig)
+        })
+        fig.appendChild(btn)
+        if (!fig.classList.contains("is-video")) {
+          var img = fig.querySelector("img")
+          if (img) {
+            img.style.cursor = "zoom-in"
+            img.addEventListener("click", function () {
+              openFig(fig)
+            })
+          }
+        }
+      })
+      closeBtn.addEventListener("click", close)
+      overlay.addEventListener("click", function (e) {
+        if (e.target === overlay || e.target === stage) close()
+      })
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && !overlay.hidden) close()
+      })
+    })()
+  </script>
+
+  <script is:inline>
+    /* 사진 갤러리: 홈과 같은 BSP 패킹 + hover-expand (콘텐츠 폭 안 직사각형, 데스크톱 전용) */
+    ;(function () {
+      var grid = document.querySelector(".media-stills")
+      if (!grid) return
+      var tiles = Array.prototype.slice.call(grid.querySelectorAll(".block"))
+      if (!tiles.length) return
+      var SHARE = 0.42
+      function desktop() {
+        return window.matchMedia("(min-width: 701px)").matches
+      }
+      var leaves = tiles.map(function (el) {
+        return { el: el, base: 1, w: 0 }
+      })
+      function build(arr) {
+        if (arr.length === 1) return { leaf: arr[0] }
+        var tot = 0
+        arr.forEach(function (l) {
+          tot += l.base
+        })
+        var acc = 0,
+          i = 0
+        for (i = 0; i < arr.length - 1; i++) {
+          acc += arr[i].base
+          if (acc >= tot / 2) {
+            i++
+            break
+          }
+        }
+        if (i < 1) i = 1
+        if (i > arr.length - 1) i = arr.length - 1
+        return { a: build(arr.slice(0, i)), b: build(arr.slice(i)), dir: null }
+      }
+      function wsum(n) {
+        return n.leaf ? n.leaf.w : wsum(n.a) + wsum(n.b)
+      }
+      function place(n, x, y, w, h) {
+        if (n.leaf) {
+          var s = n.leaf.el.style
+          s.left = x + "%"
+          s.top = y + "%"
+          s.width = w + "%"
+          s.height = h + "%"
+          return
+        }
+        if (n.dir === null) n.dir = w >= h ? "h" : "v"
+        var wa = wsum(n.a),
+          wb = wsum(n.b),
+          t = wa + wb || 1
+        if (n.dir === "h") {
+          var ww = (w * wa) / t
+          place(n.a, x, y, ww, h)
+          place(n.b, x + ww, y, w - ww, h)
+        } else {
+          var hh = (h * wa) / t
+          place(n.a, x, y, w, hh)
+          place(n.b, x, y + hh, w, h - hh)
+        }
+      }
+      var tree = null
+      function clearInline() {
+        tiles.forEach(function (el) {
+          el.style.left = el.style.top = el.style.width = el.style.height = ""
+        })
+      }
+      function rebuild() {
+        if (!desktop()) {
+          clearInline()
+          tree = null
+          return
+        }
+        leaves.forEach(function (l) {
+          l.w = l.base
+        })
+        tree = build(leaves)
+        place(tree, 0, 0, 100, 100)
+      }
+      // 기본 배치(%) 저장 — hover 해제 시 정확히 복귀하기 위함
+      function captureBase() {
+        leaves.forEach(function (l) {
+          l.baseLeft = l.el.style.left
+          l.baseTop = l.el.style.top
+          l.baseWidth = l.el.style.width
+          l.baseHeight = l.el.style.height
+        })
+      }
+
+      // hover 시: 면적은 키우되, 타일 모양을 그 사진의 실제 비율에 맞춰 길쭉하게 →
+      // object-fit:cover라도 잘리는 부분 없이 전체 이미지가 보임 (레터박스 없음)
+      function growTile(l) {
+        if (!desktop()) return
+        var gridRect = grid.getBoundingClientRect()
+        var tileRect = l.el.getBoundingClientRect()
+        var cx = tileRect.left + tileRect.width / 2 - gridRect.left
+        var cy = tileRect.top + tileRect.height / 2 - gridRect.top
+        var img = l.el.querySelector("img")
+        var ar =
+          img && img.naturalWidth && img.naturalHeight
+            ? img.naturalWidth / img.naturalHeight
+            : tileRect.width / tileRect.height
+        var targetArea = gridRect.width * gridRect.height * SHARE
+        var h = Math.sqrt(targetArea / ar)
+        var w = h * ar
+        var maxW = gridRect.width * 0.96
+        var maxH = gridRect.height * 0.96
+        if (w > maxW) {
+          w = maxW
+          h = w / ar
+        }
+        if (h > maxH) {
+          h = maxH
+          w = h * ar
+        }
+        var left = cx - w / 2
+        var top = cy - h / 2
+        if (left < 0) left = 0
+        if (top < 0) top = 0
+        if (left + w > gridRect.width) left = gridRect.width - w
+        if (top + h > gridRect.height) top = gridRect.height - h
+        l.el.style.zIndex = 5
+        l.el.style.left = left + "px"
+        l.el.style.top = top + "px"
+        l.el.style.width = w + "px"
+        l.el.style.height = h + "px"
+      }
+      function shrinkTile(l) {
+        l.el.style.zIndex = ""
+        l.el.style.left = l.baseLeft
+        l.el.style.top = l.baseTop
+        l.el.style.width = l.baseWidth
+        l.el.style.height = l.baseHeight
+      }
+      leaves.forEach(function (l) {
+        l.el.addEventListener("mouseenter", function () {
+          growTile(l)
+        })
+        l.el.addEventListener("mouseleave", function () {
+          shrinkTile(l)
+        })
+      })
+      var rt
+      window.addEventListener("resize", function () {
+        clearTimeout(rt)
+        rt = setTimeout(function () {
+          rebuild()
+          captureBase()
+        }, 150)
+      })
+      rebuild()
+      captureBase()
+      requestAnimationFrame(function () {
+        grid.classList.add("ready")
+        requestAnimationFrame(function () {
+          grid.classList.add("animate")
+        })
+      })
+    })()
+  </script>
 
   <style>
     /* 레퍼런스: 메뉴 170px 옆, 본문 최대 1100px */
@@ -350,6 +626,87 @@ function toParagraphs(text: string): string {
       align-items: start;
     }
     .media--lead { margin: 0 0 42px; }
+
+    /* 층 구분 라벨 — 스폰서 라벨 형식(회색 소문자) + 가로선 */
+    .layer-label {
+      clear: both;
+      margin: 48px 0 18px;
+      padding-top: 11px;
+      border-top: 1px solid #ccc;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #999;
+    }
+
+    /* 영상 층: 가로+세로를 높이 맞춰 한 행에 (justified) — flex-grow는 종횡비 비례 */
+    .media-videos {
+      clear: both;
+      margin: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .media-videos .block { min-width: 180px; }
+
+    /* 사진 층 — 기본(모바일 폴백): 세로 스택, 자르지 않음 */
+    .media-stills { clear: both; margin: 0; }
+    .media-stills .block { margin: 0 0 24px; }
+    .media-stills .block:last-child { margin-bottom: 0; }
+    .media-stills .block img { display: block; width: 100%; height: auto; }
+    .media-stills figcaption { margin-top: 8px; font-size: 13px; color: #666; }
+
+    /* 데스크톱: 홈과 같은 hover-expand 패킹 그리드 — 콘텐츠 폭 안 직사각형.
+       hover로 커져도 object-fit:contain + 중립 배경이라 이미지가 잘리지 않고 전체가 보임. */
+    @media (min-width: 701px) {
+      .media-stills {
+        position: relative;
+        margin-top: 0;
+        width: 100%;
+        height: min(70vh, 640px);
+      }
+      .media-stills .block {
+        position: absolute;
+        margin: 0;
+        overflow: hidden;
+        border: 2px solid #fff;
+        background: #f2f2f2;
+        opacity: 0;
+      }
+      .media-stills.ready .block { opacity: 1; transition: opacity 0.4s ease; }
+      .media-stills.animate .block {
+        transition:
+          left 0.5s cubic-bezier(0.22, 0.61, 0.36, 1),
+          top 0.5s cubic-bezier(0.22, 0.61, 0.36, 1),
+          width 0.5s cubic-bezier(0.22, 0.61, 0.36, 1),
+          height 0.5s cubic-bezier(0.22, 0.61, 0.36, 1),
+          opacity 0.4s ease;
+      }
+      .media-stills .block img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* 항상 꽉 채움 — hover 시 타일이 사진 비율에 맞게 길쭉해져서 잘림 없이 전체가 보임(JS) */
+      }
+      .media-stills figcaption {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: 0;
+        padding: 22px 12px 9px;
+        color: #fff;
+        font-size: 13px;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+      }
+      .media-stills .block:hover figcaption { opacity: 1; }
+    }
+
     .post-gallery-divider {
       clear: both;
       margin: 72px 0 0;
@@ -392,6 +749,81 @@ function toParagraphs(text: string): string {
     }
     .media-note-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
     .media-note p { margin: 0; font-size: 14px; line-height: 1.7; }
+
+    /* 미디어 확대 버튼 (hover 시 노출) — JS 생성 요소라 :global 필요 */
+    .block :global(.focus-open) {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      z-index: 2;
+      width: 34px;
+      height: 34px;
+      border: 0;
+      border-radius: 0;
+      background: rgba(255, 255, 255, 0.86);
+      color: #111;
+      font-size: 15px;
+      line-height: 1;
+      cursor: zoom-in;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .block:hover :global(.focus-open) { opacity: 1; }
+
+    /* 포커스 모드 — 밝은 배경(흰 반투명 + 블러), 미디어만 중앙에 크게 */
+    .focus {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 4vh 4vw;
+      background: rgba(246, 246, 246, 0.8);
+      -webkit-backdrop-filter: blur(9px);
+      backdrop-filter: blur(9px);
+      opacity: 0;
+      transition: opacity 0.28s ease;
+    }
+    .focus.open { opacity: 1; }
+    .focus[hidden] { display: none; }
+    .focus-stage {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 92vw;
+    }
+    .focus-stage img {
+      max-width: 92vw;
+      max-height: 82vh;
+      width: auto;
+      height: auto;
+      display: block;
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.16);
+    }
+    .focus-stage .video {
+      height: 82vh;
+      width: auto;
+      max-width: 92vw;
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.16);
+    }
+    .focus-cap { font-size: 14px; color: #444; text-align: center; }
+    .focus-close {
+      position: fixed;
+      top: 16px;
+      right: 22px;
+      width: 40px;
+      height: 40px;
+      font-size: 30px;
+      line-height: 1;
+      background: none;
+      border: 0;
+      color: #111;
+      cursor: pointer;
+    }
+    .focus-close:hover { color: var(--hover); }
 
     /* 영상: 비율에 맞춰 자동 크기 */
     .video { position: relative; width: 100%; background: #000; }
@@ -492,6 +924,8 @@ function toParagraphs(text: string): string {
       .block.detail,
       .block.portrait { grid-column: 1 / -1; }
       .media { gap: 18px; }
+      .block :global(.focus-open) { opacity: 0.9; }
+      .focus-stage .video { height: auto; width: 92vw; max-height: 82vh; }
     }
   </style>
 </Base>
