@@ -148,7 +148,7 @@ const releases = (id: string) => {
     :global(body.has-backdrop) #listening-backdrop { opacity: 1; }
     #backdrop-title { position: fixed; z-index: 2; left: 50%; top: 50%; width: min(88vw, 780px); transform: translate(-50%, -50%); color: #fff; font-size: clamp(24px, 4vw, 52px); font-weight: 300; line-height: 1.12; text-align: center; text-shadow: 0 2px 20px rgba(0,0,0,.45); opacity: 0; pointer-events: none; transition: opacity .45s ease; }
     :global(body.has-backdrop) #backdrop-title { opacity: 1; }
-    #sound-archive { position: relative; z-index: 1; width: calc(100% - 190px); max-width: 1060px; margin: 10px 0 100px 170px; transition: color .4s ease; }
+    #sound-archive { position: relative; z-index: 1; width: calc(100% - 190px); max-width: var(--content-w); margin: 10px 0 100px 170px; transition: color .4s ease; }
     .archive-head { max-width: 650px; margin-bottom: 84px; }
     .eyebrow, .section h2, .number, .release-count, .track span:last-child { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #888; }
     h1 { margin: 8px 0 16px; font-weight: 300; font-size: 38px; }
