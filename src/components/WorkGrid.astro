@@ -45,6 +45,7 @@ const nav = [
           <div class="thumb">
             {w.data.thumb ? <img src={w.data.thumb} alt={w.data.title} /> : <div class="ph" />}
           </div>
+          <span class="scrim" aria-hidden="true" />
           <div class="cap">
             <span class="t">{w.data.title}</span>
             {w.data.year ? <span class="y"> ({w.data.year})</span> : ""}
@@ -181,7 +182,7 @@ const nav = [
         if (hit) shown++
       })
       if (none) none.hidden = shown !== 0
-      rebuild()
+      syncMode()
     }
     if (input) input.addEventListener("input", apply)
 
@@ -196,14 +197,67 @@ const nav = [
       relayout(null)
     })
 
+    /* ---- 모바일: 스크롤 포커스 ----
+       화면 중앙에 가까운 타일일수록 선명·확대, 벗어날수록 어두워짐.
+       리플로우를 피하려고 슬롯 높이는 고정하고 transform/스크림/캡션만 조절. */
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    function clearMobileStyles() {
+      tiles.forEach(function (el) {
+        var img = el.querySelector("img")
+        if (img) img.style.transform = ""
+        var s = el.querySelector(".scrim")
+        if (s) s.style.opacity = ""
+        var cap = el.querySelector(".cap")
+        if (cap) cap.style.opacity = ""
+      })
+    }
+    function mobileFrame() {
+      mTicking = false
+      if (desktop()) return
+      var vh = window.innerHeight || 1
+      var cy = vh / 2
+      tiles.forEach(function (el) {
+        if (el.style.display === "none") return
+        var r = el.getBoundingClientRect()
+        if (r.height === 0) return
+        var tc = r.top + r.height / 2
+        var rel = (tc - cy) / vh // -0.5(위) ~ 0.5(아래)
+        var t = Math.max(0, 1 - Math.abs(tc - cy) / (vh * 0.62)) // 0~1, 중앙=1
+        var img = el.querySelector("img")
+        if (img) {
+          img.style.transform = reduce
+            ? ""
+            : "translateY(" + rel * -18 + "px) scale(" + (1.06 + t * 0.07) + ")"
+        }
+        var s = el.querySelector(".scrim")
+        if (s) s.style.opacity = String((1 - t) * 0.6)
+        var cap = el.querySelector(".cap")
+        if (cap) cap.style.opacity = String(0.15 + t * 0.85)
+      })
+    }
+    var mTicking = false
+    function onScroll() {
+      if (!mTicking) {
+        mTicking = true
+        requestAnimationFrame(mobileFrame)
+      }
+    }
+    window.addEventListener("scroll", onScroll, { passive: true })
+
+    function syncMode() {
+      rebuild() // 데스크톱=트리맵 배치 / 모바일=인라인 위치 해제
+      if (desktop()) clearMobileStyles()
+      else mobileFrame()
+    }
+
     var rt
     window.addEventListener("resize", function () {
       clearTimeout(rt)
-      rt = setTimeout(rebuild, 150)
+      rt = setTimeout(syncMode, 150)
     })
 
     // 초기화: 위치 잡고 → 페이드인 → 전환 활성화
-    rebuild()
+    syncMode()
     requestAnimationFrame(function () {
       c.classList.add("ready")
       requestAnimationFrame(function () {
@@ -294,6 +348,11 @@ const nav = [
     opacity: 0.85;
   }
 
+  /* 스크롤 포커스용 스크림 — 모바일에서만 사용 */
+  .scrim {
+    display: none;
+  }
+
   /* 메뉴 = 좌상단 고정 오버레이 */
   .home-menu {
     position: absolute;
@@ -359,6 +418,8 @@ const nav = [
   }
 
   /* 모바일: 패킹 해제하고 세로 블록으로 폴백 */
+  /* 모바일: 스크롤 포커스 — 전체폭 고정 슬롯이 세로로 흐르고,
+     화면 중앙 타일이 선명·확대(JS), 벗어난 타일은 스크림으로 어두워짐 */
   @media (max-width: 700px) {
     #packed {
       height: auto;
@@ -373,41 +434,63 @@ const nav = [
       bottom: auto;
     }
     .tile {
-      position: static !important;
+      position: relative !important;
       opacity: 1 !important;
-      width: auto !important;
-      height: auto !important;
+      width: 100% !important;
+      height: 68svh !important;
       border: 0;
-      margin: 24px 16px 0;
+      margin: 0;
+      overflow: hidden;
+      background: #000;
     }
     .card {
-      position: relative;
-      color: #000;
+      display: block;
+      color: #fff;
     }
-    .card .thumb {
-      position: relative;
-      inset: auto;
+    .card .thumb,
+    .card .ph {
+      position: absolute;
+      inset: 0;
     }
     .card img {
-      height: auto;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform-origin: center;
+      will-change: transform;
     }
     .card .ph {
-      position: relative;
-      inset: auto;
-      padding-bottom: 66%;
+      padding-bottom: 0;
+      background: #1a1a1a;
+    }
+    /* 어둡게 덮는 스크림 (JS가 opacity 조절, 중앙=투명) */
+    .scrim {
+      display: block;
+      position: absolute;
+      inset: 0;
+      background: #000;
+      opacity: 0.45;
+      pointer-events: none;
     }
     .card .cap {
-      position: static;
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 40px 18px 20px;
+      font-size: 17px;
+      color: #fff;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.66), rgba(0, 0, 0, 0));
       opacity: 1;
-      padding: 4px 0 0;
-      color: #000;
-      background: none;
-      font-size: 16px;
     }
     .home-menu {
       position: static;
       width: auto;
-      padding: 12px 16px 4px;
+      padding: 14px 18px 16px;
+    }
+    #noresult {
+      position: static;
+      padding: 40px 0;
     }
     :global(footer) {
       display: block;
