@@ -204,7 +204,10 @@ const nav = [
     function clearMobileStyles() {
       tiles.forEach(function (el) {
         var img = el.querySelector("img")
-        if (img) img.style.transform = ""
+        if (img) {
+          img.style.transform = ""
+          img.style.filter = ""
+        }
         var s = el.querySelector(".scrim")
         if (s) s.style.opacity = ""
         var cap = el.querySelector(".cap")
@@ -228,9 +231,11 @@ const nav = [
           img.style.transform = reduce
             ? ""
             : "translateY(" + rel * -18 + "px) scale(" + (1.06 + t * 0.07) + ")"
+          // 중앙일수록 밝게(최대 1.1), 벗어날수록 살짝 어둡게(0.94)
+          img.style.filter = "brightness(" + (0.94 + t * 0.16) + ")"
         }
         var s = el.querySelector(".scrim")
-        if (s) s.style.opacity = String((1 - t) * 0.6)
+        if (s) s.style.opacity = String((1 - t) * 0.72)
         var cap = el.querySelector(".cap")
         if (cap) cap.style.opacity = String(0.15 + t * 0.85)
       })
@@ -432,6 +437,7 @@ const nav = [
       right: auto;
       top: auto;
       bottom: auto;
+      margin-top: 28px; /* 상단 메뉴와 첫 썸네일 사이 간격 */
     }
     .tile {
       position: relative !important;
