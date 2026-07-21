@@ -120,7 +120,11 @@ const nav = [
   .card .ph { width: 100%; display: block; }
   .card .ph { background: #ececec; padding-bottom: 75%; }
 
-  /* 마우스 오버 시 글리치(RGB 채널 분리 + 스캔라인) — 데이터 느낌 */
+  /* 기본은 통일된 흑백 → 마우스 오버 시 원래 컬러로 (데이터가 디코딩되듯) */
+  .card img { filter: grayscale(1); transition: filter 0.35s ease; }
+  .card:hover img { filter: grayscale(0); }
+
+  /* RGB 채널 분리 레이어 — hover 진입 시 잠깐 어긋났다가 사라져 깨끗한 컬러로 정착 */
   .card .thumb::before,
   .card .thumb::after {
     content: "";
@@ -131,36 +135,57 @@ const nav = [
     opacity: 0;
     pointer-events: none;
   }
-  .card .thumb::before { filter: sepia(1) saturate(9) hue-rotate(-55deg); }  /* red channel */
-  .card .thumb::after  { filter: sepia(1) saturate(9) hue-rotate(150deg); }  /* cyan channel */
+  .card .thumb::before { filter: sepia(1) saturate(6) hue-rotate(-55deg); }  /* red-ish 채널 */
+  .card .thumb::after  { filter: sepia(1) saturate(6) hue-rotate(150deg); }  /* cyan-ish 채널 */
+  .card:hover .thumb::before { animation: decodeR 0.5s steps(3, end) 1 both; }
+  .card:hover .thumb::after  { animation: decodeB 0.5s steps(3, end) 1 both; }
 
+  /* 스캔라인 — hover 동안 은은히 유지되어 신호/데이터 질감 */
   .card .scan {
     position: absolute;
     inset: 0;
-    background: repeating-linear-gradient(rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px);
+    background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.16) 0 1px, transparent 1px 3px);
     mix-blend-mode: multiply;
     opacity: 0;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.25s ease;
     pointer-events: none;
   }
-
-  .card:hover .thumb::before { opacity: 0.55; animation: glitchR 0.45s steps(2, end) infinite; }
-  .card:hover .thumb::after  { opacity: 0.55; animation: glitchB 0.45s steps(2, end) infinite; }
   .card:hover .scan { opacity: 1; }
 
-  @keyframes glitchR {
-    0%   { transform: translate(-3px, 0); clip-path: inset(0 0 55% 0); }
-    50%  { transform: translate(-2px, 0); clip-path: inset(45% 0 20% 0); }
-    100% { transform: translate(-4px, 0); clip-path: inset(70% 0 0 0); }
+  /* 상단 → 하단으로 한 번 훑고 지나가는 애시드 라임 스캔 라인 (데이터 읽어들이는 느낌) */
+  .card .scan::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -16%;
+    height: 16%;
+    background: linear-gradient(to bottom, rgba(198, 255, 0, 0), rgba(198, 255, 0, 0.45), rgba(198, 255, 0, 0));
+    opacity: 0;
+    pointer-events: none;
   }
-  @keyframes glitchB {
-    0%   { transform: translate(3px, 0); clip-path: inset(60% 0 10% 0); }
-    50%  { transform: translate(2px, 0); clip-path: inset(15% 0 50% 0); }
-    100% { transform: translate(4px, 0); clip-path: inset(0 0 65% 0); }
+  .card:hover .scan::after { animation: sweep 0.7s ease-out 1 both; }
+
+  @keyframes decodeR {
+    0%   { opacity: 0.6;  transform: translateX(-6px); clip-path: inset(0 0 66% 0); }
+    33%  { opacity: 0.5;  transform: translateX(4px);  clip-path: inset(40% 0 30% 0); }
+    66%  { opacity: 0.35; transform: translateX(-2px); clip-path: inset(72% 0 0 0); }
+    100% { opacity: 0;    transform: translateX(0);    clip-path: inset(0 0 0 0); }
+  }
+  @keyframes decodeB {
+    0%   { opacity: 0.6;  transform: translateX(6px);  clip-path: inset(60% 0 12% 0); }
+    33%  { opacity: 0.5;  transform: translateX(-4px); clip-path: inset(12% 0 55% 0); }
+    66%  { opacity: 0.35; transform: translateX(2px);  clip-path: inset(0 0 74% 0); }
+    100% { opacity: 0;    transform: translateX(0);    clip-path: inset(0 0 0 0); }
+  }
+  @keyframes sweep {
+    0%   { opacity: 0.9; top: -16%; }
+    100% { opacity: 0;   top: 100%; }
   }
   @media (prefers-reduced-motion: reduce) {
     .card:hover .thumb::before,
-    .card:hover .thumb::after { animation: none; }
+    .card:hover .thumb::after,
+    .card:hover .scan::after { animation: none; }
   }
 
   .card .cap { font-size: 16px; line-height: 1.3; margin: 4px 0 0; }
