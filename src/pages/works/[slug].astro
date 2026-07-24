@@ -21,6 +21,7 @@ const seriesWorks = data.series
 const relatedSounds = allSounds
   .filter((sound) => sound.data.works.includes(work.slug))
   .sort((a, b) => a.data.order - b.data.order)
+const isMediaPrototype = work.slug === "atypical-circuit"
 
 // 영상 URL을 임베드 가능한 형태로 정규화 (YouTube/Vimeo는 일반 링크를 붙여도 됨)
 function embedURL(url: string): { kind: "iframe" | "file"; src: string } {
@@ -89,7 +90,7 @@ function toParagraphs(text: string): string {
 ---
 
 <Base title={`HWANYUN — ${data.title}`}>
-  <div id="entry">
+  <div id="entry" data-media-prototype={isMediaPrototype ? "true" : undefined}>
     <div class="entry_title">{data.title}{yr}</div>
 
     {
@@ -176,23 +177,24 @@ function toParagraphs(text: string): string {
     <!-- 영상 층: 움직이는 이미지가 작품의 본체 → 앞·크게 -->
     {
       videoMedia.length > 0 && (
-        <div class="layer-label">Video</div>
+        <div class={`layer-label ${isMediaPrototype ? "media-reveal" : ""}`}>Video</div>
       )
     }
     {
       videoMedia.length > 0 && (
-        <div class="media-videos">
+        <div class={`media-videos ${isMediaPrototype ? "media-reveal" : ""}`}>
           {videoMedia.map((m) => (
             <figure
               class="block is-video"
               style={`flex-grow:${ratioNum[m.ratio] || 16 / 9};flex-basis:0`}
             >
-              <div class="video" style={`aspect-ratio:${ratioValue[m.ratio] || "16 / 9"}`}>
+              <div class={`video ${isMediaPrototype ? "video-preview" : ""}`} style={`aspect-ratio:${ratioValue[m.ratio] || "16 / 9"}`}>
                 {embedURL(m.src).kind === "iframe" ? (
-                  <iframe src={embedURL(m.src).src} allowfullscreen frameborder="0" loading="lazy" />
+                  <iframe src={embedURL(m.src).src} allowfullscreen frameborder="0" loading="lazy" tabindex={isMediaPrototype ? "-1" : undefined} />
                 ) : (
-                  <video src={embedURL(m.src).src} controls playsinline />
+                  <video src={embedURL(m.src).src} controls={!isMediaPrototype} preload={isMediaPrototype ? "metadata" : undefined} muted={isMediaPrototype} playsinline />
                 )}
+                {isMediaPrototype && <button class="video-play" type="button" aria-label={`Play ${m.caption || data.title}`}><span aria-hidden="true"></span></button>}
               </div>
               {m.caption && <figcaption>{m.caption}</figcaption>}
               {(m.noteEn || m.noteKr) && (
@@ -213,12 +215,12 @@ function toParagraphs(text: string): string {
     <!-- 사진 층: 스틸 기록을 건축 모듈 그리드로 -->
     {
       stillMedia.length > 0 && (
-        <div class="layer-label">Images</div>
+        <div class={`layer-label ${isMediaPrototype ? "media-reveal" : ""}`}>Images</div>
       )
     }
     {
       stillMedia.length > 0 && (
-        <div class="media-stills">
+        <div class={`media-stills ${isMediaPrototype ? "media-reveal" : ""}`}>
           {stillMedia.map((m) => (
             <figure class="block" data-span={m.span ? String(m.span) : undefined}>
               <img src={m.src} alt={m.caption || data.title} loading="lazy" />
@@ -328,6 +330,8 @@ function toParagraphs(text: string): string {
         var media = fig.querySelector("img, .video")
         if (!media) return
         var clone = media.cloneNode(true)
+        var previewButton = clone.querySelector && clone.querySelector(".video-play")
+        if (previewButton) previewButton.remove()
         // 파일 영상은 컨트롤+자동재생, 임베드는 autoplay 파라미터 부여
         var vid = clone.tagName === "VIDEO" ? clone : clone.querySelector && clone.querySelector("video")
         if (vid) {
@@ -345,6 +349,7 @@ function toParagraphs(text: string): string {
         cap.textContent = fc ? fc.textContent : ""
         cap.style.display = fc ? "" : "none"
         overlay.hidden = false
+        overlay.classList.toggle("video-focus", fig.classList.contains("is-video"))
         requestAnimationFrame(function () {
           overlay.classList.add("open")
         })
@@ -352,6 +357,7 @@ function toParagraphs(text: string): string {
       }
       function close() {
         overlay.classList.remove("open")
+        overlay.classList.remove("video-focus")
         document.body.style.overflow = ""
         setTimeout(function () {
           overlay.hidden = true
@@ -360,6 +366,14 @@ function toParagraphs(text: string): string {
       }
 
       figures.forEach(function (fig) {
+        var videoPlay = fig.querySelector(".video-play")
+        if (videoPlay) {
+          videoPlay.addEventListener("click", function (e) {
+            e.stopPropagation()
+            openFig(fig)
+          })
+          return
+        }
         var btn = document.createElement("button")
         btn.className = "focus-open"
         btn.setAttribute("aria-label", "Enlarge")
@@ -386,6 +400,31 @@ function toParagraphs(text: string): string {
       document.addEventListener("keydown", function (e) {
         if (e.key === "Escape" && !overlay.hidden) close()
       })
+
+      document.querySelectorAll(".video-preview video").forEach(function (video) {
+        video.addEventListener("loadedmetadata", function () {
+          if (video.duration > 0.12) video.currentTime = 0.12
+        }, { once: true })
+      })
+    })()
+  </script>
+
+  <script is:inline>
+    ;(function () {
+      var targets = document.querySelectorAll("#entry[data-media-prototype='true'] .media-reveal")
+      if (!targets.length) return
+      if (!('IntersectionObserver' in window)) {
+        targets.forEach(function (target) { target.classList.add("is-visible") })
+        return
+      }
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return
+          entry.target.classList.add("is-visible")
+          observer.unobserve(entry.target)
+        })
+      }, { threshold: 0.12, rootMargin: "0px 0px -7%" })
+      targets.forEach(function (target) { observer.observe(target) })
     })()
   </script>
 
@@ -580,6 +619,15 @@ function toParagraphs(text: string): string {
     }
     .media-videos .block { min-width: 180px; }
 
+    /* 〈Atypical Circuit〉 시범: 텍스트 다음의 미디어가 스크롤에 맞춰 한 번만 드러남 */
+    .media-reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      filter: blur(7px);
+      transition: opacity 0.72s ease, transform 0.72s cubic-bezier(0.22, 0.61, 0.36, 1), filter 0.72s ease;
+    }
+    .media-reveal.is-visible { opacity: 1; transform: none; filter: none; }
+
     /* 사진 층 — 기본(모바일 폴백): 세로 스택, 자르지 않음 */
     .media-stills { clear: both; margin: 0; }
     .media-stills .block { margin: 0 0 24px; }
@@ -702,7 +750,50 @@ function toParagraphs(text: string): string {
     }
     .block:hover :global(.focus-open) { opacity: 1; }
 
-    /* 포커스 모드 — 밝은 배경(흰 반투명 + 블러), 미디어만 중앙에 크게 */
+    /* 영상 포스터: 첫 프레임 위의 중앙 Play → 클릭 후 몰입형 재생 모드 */
+    .video-preview { overflow: hidden; }
+    .video-preview::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.32));
+    }
+    .video-preview video,
+    .video-preview iframe { pointer-events: none; }
+    .video-play {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      z-index: 2;
+      display: grid;
+      width: 58px;
+      height: 58px;
+      padding: 0;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 50%;
+      background: rgba(8, 8, 10, 0.32);
+      color: #fff;
+      cursor: pointer;
+      transform: translate(-50%, -50%);
+      transition: background 0.25s ease, transform 0.25s ease;
+    }
+    .video-play span {
+      width: 0;
+      height: 0;
+      margin-left: 3px;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-left: 12px solid currentColor;
+    }
+    .video-preview:hover .video-play {
+      background: #fff;
+      color: #111;
+      transform: translate(-50%, -50%) scale(1.08);
+    }
+
+    /* 포커스 모드 — 사진은 밝게, 영상은 어둡게 */
     .focus {
       position: fixed;
       inset: 0;
@@ -756,6 +847,10 @@ function toParagraphs(text: string): string {
       cursor: pointer;
     }
     .focus-close:hover { color: var(--hover); }
+    .focus.video-focus { background: rgba(7, 8, 10, 0.96); }
+    .focus.video-focus .focus-close,
+    .focus.video-focus .focus-cap { color: #f7f7f3; }
+    .focus.video-focus .focus-stage .video { box-shadow: none; }
 
     /* 영상: 비율에 맞춰 자동 크기 */
     .video { position: relative; width: 100%; background: #000; }
@@ -858,6 +953,11 @@ function toParagraphs(text: string): string {
       .media { gap: 18px; }
       .block :global(.focus-open) { opacity: 0.9; }
       .focus-stage .video { height: auto; width: 92vw; max-height: 82vh; }
+      .video-play { width: 52px; height: 52px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .media-reveal { transition: none; transform: none; filter: none; }
     }
   </style>
 </Base>

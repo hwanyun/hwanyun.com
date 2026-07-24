@@ -38,7 +38,21 @@ const nav = [
       </nav>
     </slot>
     <slot />
+    <div class="cursor-dot" aria-hidden="true"></div>
     <footer>COPYRIGHT © 2014 HWANYUN. All rights reserved.</footer>
+
+    <script is:inline>
+      ;(function () {
+        if (!window.matchMedia("(pointer: fine)").matches) return
+        var dot = document.querySelector(".cursor-dot")
+        if (!dot) return
+        window.addEventListener("pointermove", function (event) {
+          dot.style.transform = "translate3d(" + event.clientX + "px," + event.clientY + "px,0) translate(-50%,-50%)"
+          dot.classList.add("is-visible")
+        })
+        document.addEventListener("mouseleave", function () { dot.classList.remove("is-visible") })
+      })()
+    </script>
 
     <style is:global>
       :root {
@@ -68,6 +82,27 @@ const nav = [
       }
       a { color: #000; text-decoration: none; }
       a:hover { color: var(--hover); }
+
+      .cursor-dot { display: none; }
+      @media (pointer: fine) {
+        html, body, a, button, input, textarea, select, video, iframe { cursor: none !important; }
+        .cursor-dot {
+          position: fixed;
+          top: 0;
+          left: 0;
+          z-index: 100;
+          display: block;
+          width: 14px;
+          height: 14px;
+          border-radius: 50%;
+          background: #fff;
+          mix-blend-mode: difference;
+          pointer-events: none;
+          opacity: 0;
+          transition: opacity 0.18s ease;
+        }
+        .cursor-dot.is-visible { opacity: 1; }
+      }
 
       .menu {
         float: left;
