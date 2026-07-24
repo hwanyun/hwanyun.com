@@ -21,7 +21,7 @@ const seriesWorks = data.series
 const relatedSounds = allSounds
   .filter((sound) => sound.data.works.includes(work.slug))
   .sort((a, b) => a.data.order - b.data.order)
-const isMediaPrototype = work.slug === "atypical-circuit"
+const useImmersiveMedia = work.slug !== "fedora-exile"
 
 // 영상 URL을 임베드 가능한 형태로 정규화 (YouTube/Vimeo는 일반 링크를 붙여도 됨)
 function embedURL(url: string): { kind: "iframe" | "file"; src: string } {
@@ -53,7 +53,7 @@ const ratioNum: Record<string, number> = {
 }
 
 const media = data.media ?? []
-const galleryMedia = data.mediaFirst ? media.slice(1) : media
+const galleryMedia = data.mediaFirst && !useImmersiveMedia ? media.slice(1) : media
 const hasText = data.textEn || data.textKr
 
 // 미디어 층위 분리: 움직이는 이미지(영상)를 앞·크게, 스틸(사진)은 아래 갤러리로
@@ -90,7 +90,7 @@ function toParagraphs(text: string): string {
 ---
 
 <Base title={`HWANYUN — ${data.title}`}>
-  <div id="entry" data-media-prototype={isMediaPrototype ? "true" : undefined}>
+  <div id="entry" data-media-prototype={useImmersiveMedia ? "true" : undefined}>
     <div class="entry_title">{data.title}{yr}</div>
 
     {
@@ -122,7 +122,7 @@ function toParagraphs(text: string): string {
     }
 
     {
-      data.mediaFirst && media[0] && (
+      data.mediaFirst && !useImmersiveMedia && media[0] && (
         <div class="media media--lead">
           {media[0].type === "video" ? (
             <figure class={`block is-video ${defaultLayout(media[0], 0)} ${media[0].align ? `align-${media[0].align}` : ""}`}>
@@ -177,24 +177,24 @@ function toParagraphs(text: string): string {
     <!-- 영상 층: 움직이는 이미지가 작품의 본체 → 앞·크게 -->
     {
       videoMedia.length > 0 && (
-        <div class={`layer-label ${isMediaPrototype ? "media-reveal" : ""}`}>Video</div>
+        <div class={`layer-label ${useImmersiveMedia ? "media-reveal" : ""}`}>Video</div>
       )
     }
     {
       videoMedia.length > 0 && (
-        <div class={`media-videos ${isMediaPrototype ? "media-reveal" : ""}`}>
+        <div class={`media-videos ${useImmersiveMedia ? "media-reveal" : ""}`}>
           {videoMedia.map((m) => (
             <figure
               class="block is-video"
               style={`flex-grow:${ratioNum[m.ratio] || 16 / 9};flex-basis:0`}
             >
-              <div class={`video ${isMediaPrototype ? "video-preview" : ""}`} style={`aspect-ratio:${ratioValue[m.ratio] || "16 / 9"}`}>
+              <div class={`video ${useImmersiveMedia ? "video-preview" : ""}`} style={`aspect-ratio:${ratioValue[m.ratio] || "16 / 9"}`}>
                 {embedURL(m.src).kind === "iframe" ? (
-                  <iframe src={embedURL(m.src).src} allowfullscreen frameborder="0" loading="lazy" tabindex={isMediaPrototype ? "-1" : undefined} />
+                  <iframe src={embedURL(m.src).src} allowfullscreen frameborder="0" loading="lazy" tabindex={useImmersiveMedia ? "-1" : undefined} />
                 ) : (
-                  <video src={embedURL(m.src).src} controls={!isMediaPrototype} preload={isMediaPrototype ? "metadata" : undefined} muted={isMediaPrototype} playsinline />
+                  <video src={embedURL(m.src).src} controls={!useImmersiveMedia} preload={useImmersiveMedia ? "metadata" : undefined} muted={useImmersiveMedia} playsinline />
                 )}
-                {isMediaPrototype && <button class="video-play" type="button" aria-label={`Play ${m.caption || data.title}`}><span aria-hidden="true"></span></button>}
+                {useImmersiveMedia && <button class="video-play" type="button" aria-label={`Play ${m.caption || data.title}`}><span aria-hidden="true"></span></button>}
               </div>
               {m.caption && <figcaption>{m.caption}</figcaption>}
               {(m.noteEn || m.noteKr) && (
@@ -215,12 +215,12 @@ function toParagraphs(text: string): string {
     <!-- 사진 층: 스틸 기록을 건축 모듈 그리드로 -->
     {
       stillMedia.length > 0 && (
-        <div class={`layer-label ${isMediaPrototype ? "media-reveal" : ""}`}>Images</div>
+        <div class={`layer-label ${useImmersiveMedia ? "media-reveal" : ""}`}>Images</div>
       )
     }
     {
       stillMedia.length > 0 && (
-        <div class={`media-stills ${isMediaPrototype ? "media-reveal" : ""}`}>
+        <div class={`media-stills ${useImmersiveMedia ? "media-reveal" : ""}`}>
           {stillMedia.map((m) => (
             <figure class="block" data-span={m.span ? String(m.span) : undefined}>
               <img src={m.src} alt={m.caption || data.title} loading="lazy" />
@@ -619,7 +619,7 @@ function toParagraphs(text: string): string {
     }
     .media-videos .block { min-width: 180px; }
 
-    /* 〈Atypical Circuit〉 시범: 텍스트 다음의 미디어가 스크롤에 맞춰 한 번만 드러남 */
+    /* 작품 상세 공통: 텍스트 다음의 미디어가 스크롤에 맞춰 한 번만 드러남 */
     .media-reveal {
       opacity: 0;
       transform: translateY(18px);
