@@ -313,6 +313,8 @@ function toParagraphs(text: string): string {
   <!-- 포커스 모드(밝은 라이트박스): 미디어 클릭 시 중앙에 크게 -->
   <div id="focus" class="focus" hidden>
     <button class="focus-close" aria-label="Close">×</button>
+    <button class="focus-nav focus-prev" aria-label="Previous image">←</button>
+    <button class="focus-nav focus-next" aria-label="Next image">→</button>
     <div class="focus-stage"></div>
     <div class="focus-cap"></div>
   </div>
@@ -325,6 +327,10 @@ function toParagraphs(text: string): string {
       var cap = overlay.querySelector(".focus-cap")
       var closeBtn = overlay.querySelector(".focus-close")
       var figures = Array.prototype.slice.call(document.querySelectorAll("#entry .block"))
+      var imageFigures = figures.filter(function (fig) { return !fig.classList.contains("is-video") })
+      var previousBtn = overlay.querySelector(".focus-prev")
+      var nextBtn = overlay.querySelector(".focus-next")
+      var activeImageIndex = -1
 
       function openFig(fig) {
         var media = fig.querySelector("img, .video")
@@ -358,6 +364,8 @@ function toParagraphs(text: string): string {
         var fc = fig.querySelector("figcaption")
         cap.textContent = fc ? fc.textContent : ""
         cap.style.display = fc ? "" : "none"
+        activeImageIndex = imageFigures.indexOf(fig)
+        overlay.classList.toggle("has-gallery-nav", activeImageIndex > -1 && imageFigures.length > 1)
         overlay.hidden = false
         overlay.classList.toggle("video-focus", fig.classList.contains("is-video"))
         requestAnimationFrame(function () {
@@ -368,6 +376,8 @@ function toParagraphs(text: string): string {
       function close() {
         overlay.classList.remove("open")
         overlay.classList.remove("video-focus")
+        overlay.classList.remove("has-gallery-nav")
+        activeImageIndex = -1
         document.body.style.overflow = ""
         setTimeout(function () {
           overlay.hidden = true
@@ -404,11 +414,23 @@ function toParagraphs(text: string): string {
         }
       })
       closeBtn.addEventListener("click", close)
+      previousBtn.addEventListener("click", function (e) {
+        e.stopPropagation()
+        if (activeImageIndex < 0) return
+        openFig(imageFigures[(activeImageIndex - 1 + imageFigures.length) % imageFigures.length])
+      })
+      nextBtn.addEventListener("click", function (e) {
+        e.stopPropagation()
+        if (activeImageIndex < 0) return
+        openFig(imageFigures[(activeImageIndex + 1) % imageFigures.length])
+      })
       overlay.addEventListener("click", function (e) {
         if (e.target === overlay || e.target === stage) close()
       })
       document.addEventListener("keydown", function (e) {
         if (e.key === "Escape" && !overlay.hidden) close()
+        if (e.key === "ArrowLeft" && !overlay.hidden && activeImageIndex > -1) previousBtn.click()
+        if (e.key === "ArrowRight" && !overlay.hidden && activeImageIndex > -1) nextBtn.click()
       })
 
       document.querySelectorAll(".video-preview video").forEach(function (video) {
@@ -857,6 +879,30 @@ function toParagraphs(text: string): string {
       cursor: pointer;
     }
     .focus-close:hover { color: var(--hover); }
+    .focus-nav {
+      position: fixed;
+      top: 50%;
+      z-index: 2;
+      display: none;
+      width: 54px;
+      height: 54px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: #111;
+      font-size: 32px;
+      font-weight: 300;
+      line-height: 1;
+      cursor: pointer;
+      transform: translateY(-50%);
+      transition: color 0.2s ease, transform 0.2s ease;
+    }
+    .focus.has-gallery-nav .focus-nav { display: block; }
+    .focus-prev { left: 18px; }
+    .focus-next { right: 18px; }
+    .focus-nav:hover { color: var(--hover); }
+    .focus-prev:hover { transform: translate(-4px, -50%); }
+    .focus-next:hover { transform: translate(4px, -50%); }
     .focus.video-focus { background: rgba(7, 8, 10, 0.96); }
     .focus.video-focus .focus-close,
     .focus.video-focus .focus-cap { color: #f7f7f3; }
@@ -964,6 +1010,9 @@ function toParagraphs(text: string): string {
       .block :global(.focus-open) { opacity: 0.9; }
       .focus-stage .video { height: auto; width: 92vw; max-height: 82vh; }
       .video-play { width: 52px; height: 52px; }
+      .focus-nav { width: 42px; height: 42px; font-size: 27px; }
+      .focus-prev { left: 4px; }
+      .focus-next { right: 4px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
