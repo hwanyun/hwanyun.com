@@ -128,7 +128,7 @@ function toParagraphs(text: string): string {
             <figure class={`block is-video ${defaultLayout(media[0], 0)} ${media[0].align ? `align-${media[0].align}` : ""}`}>
               <div class="video" style={`aspect-ratio:${ratioValue[media[0].ratio] || "16 / 9"}`}>
                 {embedURL(media[0].src).kind === "iframe" ? (
-                  <iframe src={embedURL(media[0].src).src} allowfullscreen frameborder="0" loading="lazy" />
+                  <iframe src={embedURL(media[0].src).src} allow="autoplay; fullscreen; picture-in-picture" allowfullscreen frameborder="0" loading="lazy" />
                 ) : (
                   <video src={embedURL(media[0].src).src} controls playsinline />
                 )}
@@ -190,7 +190,7 @@ function toParagraphs(text: string): string {
             >
               <div class={`video ${useImmersiveMedia ? "video-preview" : ""}`} style={`aspect-ratio:${ratioValue[m.ratio] || "16 / 9"}`}>
                 {embedURL(m.src).kind === "iframe" ? (
-                  <iframe src={embedURL(m.src).src} allowfullscreen frameborder="0" loading="lazy" tabindex={useImmersiveMedia ? "-1" : undefined} />
+                  <iframe src={embedURL(m.src).src} allow="autoplay; fullscreen; picture-in-picture" allowfullscreen frameborder="0" loading="lazy" tabindex={useImmersiveMedia ? "-1" : undefined} />
                 ) : (
                   <video src={embedURL(m.src).src} controls={!useImmersiveMedia} preload={useImmersiveMedia ? "metadata" : undefined} muted={useImmersiveMedia} playsinline />
                 )}
@@ -337,14 +337,24 @@ function toParagraphs(text: string): string {
         if (vid) {
           vid.setAttribute("controls", "")
           vid.setAttribute("autoplay", "")
+          vid.muted = false
+          vid.removeAttribute("muted")
         }
         var ifr = clone.querySelector && clone.querySelector("iframe")
         if (ifr) {
           var s = ifr.getAttribute("src") || ""
-          ifr.setAttribute("src", s + (s.indexOf("?") > -1 ? "&" : "?") + "autoplay=1")
+          ifr.setAttribute("src", s + (s.indexOf("?") > -1 ? "&" : "?") + "autoplay=1&muted=1")
         }
         stage.innerHTML = ""
         stage.appendChild(clone)
+        if (vid) {
+          vid.play().catch(function () {
+            // Safari는 소리가 있는 자동재생을 거부할 수 있다. 이때는 즉시 음소거 재생으로 전환한다.
+            vid.muted = true
+            vid.setAttribute("muted", "")
+            vid.play().catch(function () {})
+          })
+        }
         var fc = fig.querySelector("figcaption")
         cap.textContent = fc ? fc.textContent : ""
         cap.style.display = fc ? "" : "none"
