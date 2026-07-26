@@ -90,7 +90,7 @@ function toParagraphs(text: string): string {
 ---
 
 <Base title={`HWANYUN — ${data.title}`}>
-  <div id="entry" data-media-prototype={useImmersiveMedia ? "true" : undefined} data-language="ko">
+  <div id="entry" data-media-prototype={useImmersiveMedia ? "true" : undefined} data-language="en">
     <div class="entry_title">{data.title}{yr}</div>
 
     {
@@ -155,8 +155,8 @@ function toParagraphs(text: string): string {
     }
 
     <div class="work-language-switch" role="group" aria-label="Description language">
-      <button type="button" data-language-choice="en" aria-pressed="false">EN</button>
-      <button type="button" data-language-choice="ko" aria-pressed="true">KO</button>
+      <button type="button" data-language-choice="en" aria-pressed="true">EN</button>
+      <button type="button" data-language-choice="ko" aria-pressed="false">KO</button>
     </div>
 
     <!-- 데스크톱은 EN/KR 병기, 모바일은 언어 전환으로 한 언어만 읽는다. -->

@@ -84,6 +84,13 @@ workMenu.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
           toggle.setAttribute("aria-expanded", String(isOpen))
           toggle.setAttribute("aria-label", isOpen ? "Close navigation" : "Open navigation")
         })
+        document.addEventListener("pointerdown", function (event) {
+          if (!menu.classList.contains("is-open") || menu.contains(event.target)) return
+          menu.classList.remove("is-open", "works-open")
+          toggle.setAttribute("aria-expanded", "false")
+          var workLink = menu.querySelector(".works-toggle")
+          if (workLink) workLink.setAttribute("aria-expanded", "false")
+        })
         if (window.location.hash === "#menu-works") {
           menu.classList.add("is-open", "works-open")
           toggle.setAttribute("aria-expanded", "true")
