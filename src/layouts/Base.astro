@@ -9,7 +9,11 @@ const nav = [
   { label: "Contact", href: "/contact", key: "contact" },
 ]
 const workMenu = await getCollection("works", ({ data }) => !data.draft)
-workMenu.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
+const sortYear = (year: string) => Math.max(...(year.match(/\d{4}/g) ?? ["0"]).map(Number))
+workMenu.sort((a, b) => {
+  const byYear = sortYear(b.data.year) - sortYear(a.data.year)
+  return byYear || (a.data.order ?? 0) - (b.data.order ?? 0)
+})
 ---
 
 <!doctype html>
@@ -84,17 +88,25 @@ workMenu.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
           toggle.setAttribute("aria-expanded", String(isOpen))
           toggle.setAttribute("aria-label", isOpen ? "Close navigation" : "Open navigation")
         })
+        var workLink = menu.querySelector(".works-toggle")
+        if (workLink) {
+          workLink.addEventListener("click", function (event) {
+            var onWorksArchive = window.location.pathname === "/works" || window.location.pathname === "/works/"
+            if (!onWorksArchive) return
+            event.preventDefault()
+            var isWorksOpen = menu.classList.toggle("works-open")
+            workLink.setAttribute("aria-expanded", String(isWorksOpen))
+          })
+        }
         document.addEventListener("pointerdown", function (event) {
           if (!menu.classList.contains("is-open") || menu.contains(event.target)) return
           menu.classList.remove("is-open", "works-open")
           toggle.setAttribute("aria-expanded", "false")
-          var workLink = menu.querySelector(".works-toggle")
           if (workLink) workLink.setAttribute("aria-expanded", "false")
         })
         if (window.location.hash === "#menu-works") {
           menu.classList.add("is-open", "works-open")
           toggle.setAttribute("aria-expanded", "true")
-          var workLink = menu.querySelector(".works-toggle")
           if (workLink) workLink.setAttribute("aria-expanded", "true")
         }
       })()
