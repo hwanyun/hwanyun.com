@@ -90,7 +90,7 @@ function toParagraphs(text: string): string {
 ---
 
 <Base title={`HWANYUN — ${data.title}`}>
-  <div id="entry" data-media-prototype={useImmersiveMedia ? "true" : undefined}>
+  <div id="entry" data-media-prototype={useImmersiveMedia ? "true" : undefined} data-language="ko">
     <div class="entry_title">{data.title}{yr}</div>
 
     {
@@ -138,8 +138,8 @@ function toParagraphs(text: string): string {
                 <div class="media-note">
                   {media[0].noteLabel && <div class="media-note-label">{media[0].noteLabel}</div>}
                   <div class="media-note-cols">
-                    <p>{media[0].noteEn}</p>
-                    <p>{media[0].noteKr}</p>
+                    <p data-language-content="en">{media[0].noteEn}</p>
+                    <p data-language-content="ko" lang="ko">{media[0].noteKr}</p>
                   </div>
                 </div>
               )}
@@ -154,10 +154,15 @@ function toParagraphs(text: string): string {
       )
     }
 
-    <!-- EN / KR 2단 텍스트 — 글자가 없어도 항상 2단 (레퍼런스 구조) -->
+    <div class="work-language-switch" role="group" aria-label="Description language">
+      <button type="button" data-language-choice="en" aria-pressed="false">EN</button>
+      <button type="button" data-language-choice="ko" aria-pressed="true">KO</button>
+    </div>
+
+    <!-- 데스크톱은 EN/KR 병기, 모바일은 언어 전환으로 한 언어만 읽는다. -->
     <div class="textcols">
-      <div class="col" set:html={toParagraphs(data.textEn)} />
-      <div class="col kr" set:html={toParagraphs(data.textKr)} />
+      <div class="col" data-language-content="en" lang="en" set:html={toParagraphs(data.textEn)} />
+      <div class="col kr" data-language-content="ko" lang="ko" set:html={toParagraphs(data.textKr)} />
     </div>
 
     <!-- 마크다운 본문(선택) -->
@@ -167,8 +172,8 @@ function toParagraphs(text: string): string {
       data.processNote && (data.processNote.textEn || data.processNote.textKr) && (
         <aside class="process-note" aria-label={data.processNote.label}>
           <div class="process-note-cols">
-            {data.processNote.textEn && <p>{data.processNote.textEn}</p>}
-            {data.processNote.textKr && <p lang="ko">{data.processNote.textKr}</p>}
+            {data.processNote.textEn && <p data-language-content="en">{data.processNote.textEn}</p>}
+            {data.processNote.textKr && <p data-language-content="ko" lang="ko">{data.processNote.textKr}</p>}
           </div>
         </aside>
       )
@@ -201,8 +206,8 @@ function toParagraphs(text: string): string {
                 <div class="media-note">
                   {m.noteLabel && <div class="media-note-label">{m.noteLabel}</div>}
                   <div class="media-note-cols">
-                    <p>{m.noteEn}</p>
-                    <p>{m.noteKr}</p>
+                    <p data-language-content="en">{m.noteEn}</p>
+                    <p data-language-content="ko" lang="ko">{m.noteKr}</p>
                   </div>
                 </div>
               )}
@@ -262,8 +267,8 @@ function toParagraphs(text: string): string {
         <div class="exhibition-credit">
           {data.exhibition.label && <div class="exhibition-label">{data.exhibition.label}</div>}
           <div class="exhibition-title">
-            {data.exhibition.titleEn && <span>{data.exhibition.titleEn}</span>}
-            {data.exhibition.titleKr && <span lang="ko">{data.exhibition.titleKr}</span>}
+            {data.exhibition.titleEn && <span data-language-content="en">{data.exhibition.titleEn}</span>}
+            {data.exhibition.titleKr && <span data-language-content="ko" lang="ko">{data.exhibition.titleKr}</span>}
             {(data.exhibition.venue || data.exhibition.year) && (
               <span class="exhibition-meta">{[data.exhibition.venue, data.exhibition.year].filter(Boolean).join(", ")}</span>
             )}
@@ -552,6 +557,25 @@ function toParagraphs(text: string): string {
     })()
   </script>
 
+  <script is:inline>
+    ;(function () {
+      var entry = document.getElementById("entry")
+      if (!entry) return
+      var buttons = Array.prototype.slice.call(entry.querySelectorAll("[data-language-choice]"))
+      if (!buttons.length) return
+      buttons.forEach(function (button) {
+        button.addEventListener("click", function () {
+          var language = button.getAttribute("data-language-choice")
+          if (!language) return
+          entry.setAttribute("data-language", language)
+          buttons.forEach(function (item) {
+            item.setAttribute("aria-pressed", String(item === button))
+          })
+        })
+      })
+    })()
+  </script>
+
   <style>
     /* 레퍼런스: 메뉴 170px 옆, 본문 최대 1100px */
     #entry {
@@ -610,6 +634,7 @@ function toParagraphs(text: string): string {
     .textcols .col.kr { line-height: 1.85; }
     .textcols .col p { margin: 0 0 1em; }
     .textcols .col p:last-child { margin-bottom: 0; }
+    .work-language-switch { display: none; }
 
     .desc { font-size: 16px; font-weight: 400; line-height: 1.8; max-width: 640px; margin: 0 0 30px; }
     .desc :global(p) { margin: 0 0 1em; }
@@ -1000,22 +1025,87 @@ function toParagraphs(text: string): string {
     }
 
     @media (max-width: 700px) {
-      #entry { width: calc(100% - 20px); margin-left: 10px; }
-      .textcols .col { width: 100%; margin-right: 0; float: none; }
+      #entry {
+        width: calc(100% - 32px);
+        margin: 24px 16px 0;
+      }
+      .entry_title {
+        font-size: clamp(25px, 7vw, 32px);
+        line-height: 1.22;
+        margin-bottom: 15px;
+      }
+      .meta {
+        margin-bottom: 24px;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+      .meta .medium-materials { margin-top: 5px; font-size: 13px; line-height: 1.55; }
+      .series-link { margin: -5px 0 24px; font-size: 13px; }
+      .work-language-switch {
+        display: inline-flex;
+        gap: 4px;
+        margin: 0 0 12px;
+        border: 1px solid #c8c8c8;
+      }
+      .work-language-switch button {
+        min-width: 38px;
+        padding: 6px 8px;
+        border: 0;
+        border-radius: 0;
+        color: #777;
+        background: transparent;
+        font: 500 11px/1 var(--sans);
+        letter-spacing: .08em;
+      }
+      .work-language-switch button[aria-pressed="true"] { color: #fff; background: #111; }
+      .textcols .col {
+        width: 100%;
+        margin: 0 0 26px;
+        padding-top: 10px;
+        float: none;
+        font-size: 15px;
+        line-height: 1.78;
+      }
+      .textcols .col.kr { line-height: 1.85; }
+      #entry[data-language="en"] [data-language-content="ko"],
+      #entry[data-language="ko"] [data-language-content="en"] { display: none; }
+      .desc { margin-bottom: 26px; font-size: 15px; line-height: 1.78; }
+      .process-note { margin: -2px 0 32px; }
       .process-note-cols { grid-template-columns: 1fr; gap: 10px; }
+      .process-note p { font-size: 13px; line-height: 1.7; }
+      .media--lead { margin-bottom: 32px; }
+      .layer-label { margin: 36px 0 14px; padding-top: 9px; font-size: 10px; }
       .block,
       .block.hero,
       .block.wide,
       .block.standard,
       .block.detail,
       .block.portrait { grid-column: 1 / -1; }
-      .media { gap: 18px; }
+      .media { gap: 16px; }
+      .media-videos { gap: 12px; }
+      .media-videos .block { min-width: 0; }
+      .media-stills .block { margin-bottom: 16px; }
+      figcaption, .media-stills figcaption { margin-top: 6px; font-size: 11px; line-height: 1.45; }
+      .media-note { margin-top: 13px; padding-top: 9px; }
+      .media-note-cols { grid-template-columns: 1fr; gap: 8px; }
+      .media-note p { font-size: 13px; line-height: 1.65; }
       .block :global(.focus-open) { opacity: 0.9; }
       .focus-stage .video { height: auto; width: 92vw; max-height: 82vh; }
       .video-play { width: 52px; height: 52px; }
       .focus-nav { width: 42px; height: 42px; font-size: 27px; }
       .focus-prev { left: 4px; }
       .focus-next { right: 4px; }
+      .post-gallery-divider { margin-top: 48px; }
+      .related-sounds, .external-links, .exhibition-credit { margin-top: 22px; }
+      .related-sounds-label, .external-links-label, .exhibition-label, .sponsors-label { margin-bottom: 10px; font-size: 10px; }
+      .related-sounds-list, .external-links-list { display: grid; gap: 9px; }
+      .related-sounds-list a, .external-links-list a { justify-content: space-between; font-size: 13px; }
+      .exhibition-title { font-size: 14px; line-height: 1.6; }
+      .exhibition-title span + span::before { content: none; }
+      .exhibition-meta { width: 100%; color: #777; }
+      .sponsors { margin-top: 22px; }
+      .sponsors-row { gap: 20px; }
+      .sponsor-name { font-size: 14px; }
     }
 
     @media (prefers-reduced-motion: reduce) {

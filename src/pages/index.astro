@@ -6,7 +6,7 @@ import WorkGrid from "../components/WorkGrid.astro"
 <Base title="HWANYUN">
   <nav slot="menu" class="home-hero-menu" id="home-hero-menu">
     <div class="name"><a href="/">HWANYUN</a></div>
-    <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="home-hero-menu">
+    <button class="menu-hamburger" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="home-hero-menu">
       <span></span><span></span><span></span>
     </button>
     <a href="/works">Works</a>
@@ -162,7 +162,7 @@ import WorkGrid from "../components/WorkGrid.astro"
   <script is:inline>
     ;(function () {
       var menu = document.getElementById("home-hero-menu")
-      var toggle = menu && menu.querySelector(".menu-toggle")
+      var toggle = menu && menu.querySelector(".menu-hamburger")
       if (!menu || !toggle) return
       toggle.addEventListener("click", function () {
         var isOpen = menu.classList.toggle("is-open")
@@ -205,15 +205,11 @@ import WorkGrid from "../components/WorkGrid.astro"
       .home-hero-menu .name { grid-column: 1; grid-row: 1; align-self: center; font-size: 16px; font-weight: 500; }
       .home-hero-menu a { display: none; color: inherit; }
       .home-hero-menu .name a { display: block; }
-      .home-hero-menu .menu-toggle {
-        display: inline-flex;
+      .home-hero-menu .menu-hamburger {
+        display: block;
         grid-column: 2;
         grid-row: 1;
-        align-items: center;
-        justify-content: center;
         justify-self: end;
-        flex-direction: column;
-        gap: 5px;
         width: 28px;
         height: 24px;
         padding: 0;
@@ -221,7 +217,8 @@ import WorkGrid from "../components/WorkGrid.astro"
         color: inherit;
         background: transparent;
       }
-      .home-hero-menu .menu-toggle span { display: block; width: 22px; height: 1px; background: currentColor; }
+      .home-hero-menu .menu-hamburger span { display: none; }
+      .home-hero-menu .menu-hamburger::after { content: "☰"; display: block; color: currentColor; font-size: 19px; font-weight: 500; line-height: 24px; }
       .home-hero-menu.is-open {
         padding-bottom: 22px;
         color: #000;
