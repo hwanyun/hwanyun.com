@@ -70,7 +70,13 @@ const { data, korean = false } = Astro.props
     font-variant-numeric: tabular-nums;
   }
   @media (max-width: 700px) {
-    .page { margin: 0; }
-    .row { grid-template-columns: 80px 1fr; gap: 10px; }
+    .page { margin: 0; padding: 0 16px 64px; font-size: 15px; line-height: 1.65; }
+    .bionav { margin-bottom: 26px; }
+    .language-switch { margin-bottom: 28px; font-size: 12px; }
+    .cv-section { margin-bottom: 30px; }
+    .cv-title { margin-bottom: 8px; padding-bottom: 7px; font-size: 16px; }
+    .row { grid-template-columns: 1fr; gap: 2px; padding: 8px 0 10px; }
+    .year { font-size: 12px; line-height: 1.35; color: #888; }
+    .text { font-size: 15px; line-height: 1.65; }
   }
 </style>
