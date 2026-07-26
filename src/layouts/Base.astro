@@ -108,6 +108,8 @@ workMenu.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
         --gap: 10px;
         /* 카테고리 간 본문 폭 통일 (Works/Sound/Bio) */
         --content-w: 900px;
+        /* 데스크톱에서는 작가명과 본문을 분리하는 공통 헤더 여백 */
+        --desktop-header-clearance: 82px;
         --hover: #00f;
         --sans: "Noto Sans KR", sans-serif;
       }
@@ -151,9 +153,12 @@ workMenu.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
       }
 
       .menu {
-        float: left;
+        position: absolute;
+        z-index: 20;
+        top: 10px;
+        left: 10px;
         width: 140px;
-        margin: 10px 0 0 10px;
+        margin: 0;
         line-height: 1.5;
       }
       .menu-hamburger { display: none; }
@@ -178,6 +183,8 @@ workMenu.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
           display: grid;
           grid-template-columns: 1fr auto;
           width: 100%;
+          top: auto;
+          left: auto;
           margin: 0;
           min-height: 58px;
           padding: 18px 18px;

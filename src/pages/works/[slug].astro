@@ -579,10 +579,9 @@ function toParagraphs(text: string): string {
   <style>
     /* 레퍼런스: 메뉴 170px 옆, 본문 최대 1100px */
     #entry {
-      width: calc(100% - 170px);
+      width: calc(100% - 210px);
       max-width: 1100px;
-      float: left;
-      margin: 10px 0 0 0;
+      margin: var(--desktop-header-clearance) 40px 100px 170px;
       position: relative;
     }
     .entry_title {

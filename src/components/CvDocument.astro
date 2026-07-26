@@ -31,9 +31,9 @@ const { data, korean = false } = Astro.props
 
 <style>
   .page {
-    margin-left: 170px;
+    margin: var(--desktop-header-clearance) 40px 100px 170px;
     max-width: var(--content-w);
-    padding: 10px 20px 80px;
+    padding: 0;
     font-size: 16px;
     font-weight: 400;
     line-height: 1.65;
@@ -70,7 +70,7 @@ const { data, korean = false } = Astro.props
     font-variant-numeric: tabular-nums;
   }
   @media (max-width: 700px) {
-    .page { margin-left: 0; }
+    .page { margin: 0; }
     .row { grid-template-columns: 80px 1fr; gap: 10px; }
   }
 </style>

@@ -13,9 +13,9 @@ import Base from "../layouts/Base.astro"
 
   <style>
     .page {
-      margin-left: 170px;
+      margin: var(--desktop-header-clearance) 40px 100px 170px;
       max-width: 640px;
-      padding: 10px 20px 80px;
+      padding: 0;
       font-size: 16px;
       font-weight: 400;
       line-height: 1.7;
@@ -26,7 +26,7 @@ import Base from "../layouts/Base.astro"
     .links span { width: 90px; color: #555; }
     .note { font-size: 13px; color: #999; }
     @media (max-width: 700px) {
-      .page { margin-left: 0; }
+      .page { margin: 0; }
     }
   </style>
 </Base>
