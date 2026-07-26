@@ -33,6 +33,13 @@ import Base from "../layouts/Base.astro"
     .links a.active { color:#000; background:#fff59d55; transform: translateX(2px); }
     #mascot-canvas { position: fixed; inset: 0; z-index: 2; pointer-events: none; }
     #mascot-canvas.grab { cursor: grab; } #mascot-canvas.grabbing { cursor: grabbing; }
+    :global(body > footer) {
+      position: fixed;
+      z-index: 3;
+      left: 10px;
+      bottom: 30px;
+      padding: 0;
+    }
     @media (max-width: 700px) { .page { margin: 0 16px; } }
   </style>
 
@@ -99,8 +106,21 @@ import Base from "../layouts/Base.astro"
     const setAttentive = () => { mode = "attentive"; fadeTo("idle"); };
     const setWalking = () => { if (mode !== "walking") { mode = "walking"; fadeTo(actions.walk ? "walk" : "idle"); } };
     const updateTarget = () => { target.set(Math.max(-STAGEX, Math.min(STAGEX, ptr.x*STAGEX)), 0, 0); };
-    const presentEl = (el) => { presenting = { el, target: new THREE.Vector3(0,0,0), face: new THREE.Vector3(-STAGEX,0,0), arrived: false }; };
-    document.querySelectorAll(".links a").forEach(a => a.addEventListener("pointerenter", () => { if (!dragging && noticed) presentEl(a); }));
+    const presentEl = (el) => {
+      if (dragging || !avatar) return;
+      const rect = el.getBoundingClientRect();
+      const x = ((rect.left + rect.width * 0.5) / innerWidth) * 2 - 1;
+      const destination = Math.max(-STAGEX, Math.min(STAGEX, x * STAGEX));
+      noticed = true; waving = false; gesturing = false;
+      setAttentive();
+      presenting = {
+        el,
+        target: new THREE.Vector3(destination, 0, 0),
+        face: new THREE.Vector3(destination - STAGEX, 0, 0),
+        arrived: false,
+      };
+    };
+    document.querySelectorAll(".links a").forEach(a => a.addEventListener("pointerenter", () => presentEl(a)));
     function firstNotice() { if (noticed) return; noticed = true;
       if (actions.wave) { waving = true; fadeTo("wave", true); const d = actions.wave.getClip().duration*1000; setTimeout(() => { waving = false; setAttentive(); }, d); } else setAttentive(); }
     addEventListener("pointermove", e => { ptr.x = (e.clientX/innerWidth)*2-1; ptr.y = -(e.clientY/innerHeight)*2+1;
