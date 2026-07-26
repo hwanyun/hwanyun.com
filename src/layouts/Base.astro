@@ -2,6 +2,8 @@
 import { getCollection } from "astro:content"
 
 const { title = "HWANYUN", current = "" } = Astro.props
+const canonicalUrl = new URL(Astro.url.pathname, "https://www.hwanyun.com").href
+const shareImage = "https://www.hwanyun.com/images/social/hwanyun-share-preview.png"
 const nav = [
   { label: "Works", href: "/works", key: "works" },
   { label: "Sound", href: "/sound", key: "sound" },
@@ -23,6 +25,19 @@ workMenu.sort((a, b) => {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0a0b0d" />
     <title>{title}</title>
+    <meta name="description" content="HWANYUN — sound, installation, and interactive media." />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="HWANYUN" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content="Sound, installation, and interactive media." />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={shareImage} />
+    <meta property="og:image:alt" content="HWANYUN particle sphere" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content="Sound, installation, and interactive media." />
+    <meta name="twitter:image" content={shareImage} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
