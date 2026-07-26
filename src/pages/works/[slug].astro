@@ -470,8 +470,7 @@ function toParagraphs(text: string): string {
   </script>
 
   <script is:inline>
-    /* 사진 갤러리: 각 사진이 자기 비율 그대로의 직사각형 타일 → 행으로 폭을 꽉 채움(justified).
-       resting에서 잘림 0. hover 시 그 타일이 크게 떠오름(전체 그대로). 데스크톱 전용. */
+    /* 이전 justified 갤러리의 inline 좌표를 제거한다. 수평 트랙은 CSS가 담당한다. */
     ;(function () {
       var grid = document.querySelector(".media-stills")
       if (!grid) return
@@ -480,7 +479,7 @@ function toParagraphs(text: string): string {
       var GAP = 14
       var TARGET = 320 // 목표 행 높이(px) — 사진 비율에 따라 폭이 정해짐
       function desktop() {
-        return window.matchMedia("(min-width: 701px)").matches
+        return false
       }
       function arOf(fig) {
         var img = fig.querySelector("img")
@@ -571,6 +570,50 @@ function toParagraphs(text: string): string {
         if (!img) return
         if (img.complete) classify(fig)
         else img.addEventListener("load", function () { classify(fig) }, { once: true })
+      })
+    })()
+  </script>
+
+  <script is:inline>
+    ;(function () {
+      /* 데스크톱에서 트랙을 직접 끌 수 있게 하되, 드래그 뒤에는 확대 클릭을 막는다. */
+      document.querySelectorAll(".media-videos, .media-stills").forEach(function (track) {
+        var startX = 0
+        var startScroll = 0
+        var moved = false
+        function isMouse(event) { return event.pointerType === "mouse" }
+        track.addEventListener("pointerdown", function (event) {
+          if (!isMouse(event)) return
+          startX = event.clientX
+          startScroll = track.scrollLeft
+          moved = false
+          track.setPointerCapture(event.pointerId)
+        })
+        track.addEventListener("pointermove", function (event) {
+          if (!isMouse(event) || !track.hasPointerCapture(event.pointerId)) return
+          var distance = event.clientX - startX
+          if (Math.abs(distance) > 4) {
+            moved = true
+            track.classList.add("is-dragging")
+            track.scrollLeft = startScroll - distance
+          }
+        })
+        function finish(event) {
+          if (!isMouse(event) || !track.hasPointerCapture(event.pointerId)) return
+          track.releasePointerCapture(event.pointerId)
+          track.classList.remove("is-dragging")
+          if (moved) {
+            track.dataset.dragged = "true"
+            setTimeout(function () { delete track.dataset.dragged }, 0)
+          }
+        }
+        track.addEventListener("pointerup", finish)
+        track.addEventListener("pointercancel", finish)
+        track.addEventListener("click", function (event) {
+          if (track.dataset.dragged !== "true") return
+          event.preventDefault()
+          event.stopPropagation()
+        }, true)
       })
     })()
   </script>
@@ -685,16 +728,36 @@ function toParagraphs(text: string): string {
       color: #999;
     }
 
-    /* 영상 층: 가로+세로를 높이 맞춰 한 행에 (justified) — flex-grow는 종횡비 비례 */
-    .media-videos {
+    /* 영상·사진 모두 하나의 수평 아카이브로 읽는다.
+       트랙패드, 가로 스크롤, 마우스 드래그를 지원하고 전체 화면은 선택할 때만 연다. */
+    .media-videos,
+    .media-stills {
       clear: both;
-      margin: 0;
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       gap: 14px;
-      align-items: flex-start;
+      margin: 0;
+      padding: 0 0 12px;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-behavior: smooth;
+      scroll-snap-type: x proximity;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      cursor: grab;
     }
-    .media-videos .block { min-width: 180px; }
+    .media-videos::-webkit-scrollbar,
+    .media-stills::-webkit-scrollbar { display: none; }
+    .media-videos.is-dragging,
+    .media-stills.is-dragging { cursor: grabbing; }
+    .media-videos .block {
+      flex: 0 0 clamp(320px, 42vw, 480px) !important;
+      min-width: 0;
+      margin: 0;
+      scroll-snap-align: start;
+      scroll-snap-stop: normal;
+    }
+    .media-videos .block[data-ratio="9:16"] { flex-basis: clamp(190px, 21vw, 250px) !important; }
 
     /* 작품 상세 공통: 텍스트 다음의 미디어가 스크롤에 맞춰 한 번만 드러남 */
     .media-reveal {
@@ -705,10 +768,17 @@ function toParagraphs(text: string): string {
     }
     .media-reveal.is-visible { opacity: 1; transform: none; filter: none; }
 
-    /* 사진 층 — 기본(모바일 폴백): 세로 스택, 자르지 않음 */
-    .media-stills { clear: both; margin: 0; }
-    .media-stills .block { margin: 0 0 24px; }
-    .media-stills .block:last-child { margin-bottom: 0; }
+    /* 사진 카드 — 원본 비율을 유지한 미리보기. */
+    .media-stills .block {
+      position: relative;
+      flex: 0 0 clamp(300px, 31vw, 380px);
+      min-width: 0;
+      margin: 0;
+      scroll-snap-align: start;
+      scroll-snap-stop: normal;
+      cursor: zoom-in;
+    }
+    .media-stills .block.is-portrait { flex-basis: clamp(190px, 21vw, 250px); }
     .media-stills .block img { display: block; width: 100%; height: auto; }
     .media-stills figcaption { margin-top: 8px; font-size: 13px; color: #666; }
 
@@ -762,6 +832,45 @@ function toParagraphs(text: string): string {
         pointer-events: none;
       }
       .media-stills .block:hover figcaption { opacity: 1; }
+    }
+
+    /* 기존 justified 갤러리를 수평 트랙으로 대체한다. */
+    @media (min-width: 701px) {
+      .media-stills {
+        position: relative;
+        width: auto;
+        height: auto !important;
+        overflow-x: auto;
+      }
+      .media-stills .block,
+      .media-stills.ready .block {
+        position: relative;
+        flex: 0 0 clamp(300px, 31vw, 380px);
+        height: auto !important;
+        margin: 0;
+        overflow: visible;
+        background: transparent;
+        opacity: 1;
+        transform: none;
+        box-shadow: none;
+      }
+      .media-stills .block.is-portrait { flex-basis: clamp(190px, 21vw, 250px); }
+      .media-stills .block img {
+        position: relative;
+        inset: auto;
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+      }
+      .media-stills .block:hover { transform: none; box-shadow: none; }
+      .media-stills figcaption {
+        position: static;
+        margin-top: 8px;
+        padding: 0;
+        color: #666;
+        background: none;
+        opacity: 1;
+      }
     }
 
     .post-gallery-divider {
