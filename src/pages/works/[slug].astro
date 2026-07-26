@@ -32,7 +32,7 @@ function embedURL(url: string): { kind: "iframe" | "file"; src: string } {
     const hash = vm[2] ? `?h=${vm[2]}` : ""
     return { kind: "iframe", src: `https://player.vimeo.com/video/${vm[1]}${hash}` }
   }
-  if (/\.(mp4|webm|mov)(\?.*)?$/i.test(url)) return { kind: "file", src: url }
+  if (/\.(mp4|webm|mov|m4v)(\?.*)?$/i.test(url)) return { kind: "file", src: url }
   return { kind: "iframe", src: url } // 이미 embed URL이면 그대로
 }
 

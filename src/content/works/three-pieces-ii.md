@@ -27,6 +27,7 @@ textKr: |
 
   작업은 관객의 시선을 하나의 형상에 고정하지 않는다. 서로 얽힌 선과 빈틈, 그 사이에 드리운 그림자는 보는 이마다 다른 연상과 생각을 불러낸다. 누군가는 풍경을, 누군가는 몸이나 생명체의 흔적을 발견할 수 있지만, 그 형상은 끝내 하나의 이름으로 정리되지 않는다. 감각이 해석보다 먼저 작동하는 이 순간, 작품은 관객 각자의 직관 속에서 열려 있고 계속해서 새로운 모습으로 만들어진다.
 media:
+  - { type: video, src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/videos/three-pieces-ii.m4v", width: half, layout: portrait, ratio: "9:16", caption: "Video documentation" }
   - { type: image, src: "/images/three-pieces-ii/01.jpg", width: full, layout: hero, caption: "Installation view" }
   - { type: image, src: "/images/three-pieces-ii/07.jpg", width: half, layout: portrait, align: right, caption: "View through the hanging drawing" }
   - { type: image, src: "/images/three-pieces-ii/04.jpg", width: full, layout: wide, align: left, caption: "Detail of the ABS-filament drawing" }
