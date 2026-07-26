@@ -90,7 +90,7 @@ import Base from "../layouts/Base.astro"
     let dragging = false, noticed = false, waving = false, gesturing = false, presenting = null;
 
     // ▼ 튜닝: FILL 낮추면 캐릭터가 작아짐(전신 여유). STAGEX 비율은 좌우 이동 범위.
-    const FILL = matchMedia("(max-width: 700px)").matches ? 0.18 : 0.22;
+    const FILL = matchMedia("(max-width: 700px)").matches ? 0.38 : 0.55;
 
     new GLTFLoader().load("/mascot/character.glb", (gltf) => {
       model = gltf.scene;
@@ -141,6 +141,7 @@ import Base from "../layouts/Base.astro"
     function firstNotice() { if (noticed) return; noticed = true;
       if (actions.wave) { waving = true; fadeTo("wave", true); const d = actions.wave.getClip().duration*1000; setTimeout(() => { waving = false; setAttentive(); }, d); } else setAttentive(); }
     addEventListener("pointermove", e => { ptr.x = (e.clientX/innerWidth)*2-1; ptr.y = -(e.clientY/innerHeight)*2+1;
+      updateTarget();
       if (model && !noticed && !reduce) firstNotice();
       if (model && !dragging) { raycaster.setFromCamera(ptr, camera); const over = raycaster.intersectObjects(modelMeshes, true).length > 0; canvas.style.pointerEvents = over ? "auto" : "none"; canvas.classList.toggle("grab", over); } }, { passive: true });
     addEventListener("pointerdown", () => { if (!model) return; raycaster.setFromCamera(ptr, camera);
@@ -166,7 +167,7 @@ import Base from "../layouts/Base.astro"
       if (model && avatar) { const pos = avatar.position;
         if (dragging) { updateTarget(); pos.x += (target.x-pos.x)*0.35; faceTowards(target); }
         else if (!waving && !gesturing && noticed && !reduce) {
-          const goal = presenting ? presenting.target : home; const dist = Math.abs(goal.x-pos.x); const stopAt = (presenting ? 0.14 : 0.24)*STAGEX;
+          const goal = presenting ? presenting.target : target; const dist = Math.abs(goal.x-pos.x); const stopAt = (presenting ? 0.14 : 0.10)*STAGEX;
           if (dist > stopAt) { setWalking(); tmpDir.set(goal.x-pos.x,0,0).normalize(); pos.x += tmpDir.x*dist*dt*2.4; faceTowards(goal); }
           else if (presenting && !presenting.arrived) { presenting.arrived = true; presenting.el.classList.add("active");
             const gest = actions.thumbsup ? "thumbsup" : (actions.wave ? "wave" : null);
