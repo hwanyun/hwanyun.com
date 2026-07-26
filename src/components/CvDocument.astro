@@ -69,13 +69,6 @@ const { data, korean = false } = Astro.props
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
   }
-  @media (min-width: 701px) {
-    .cv-title {
-      width: calc(100% + var(--desktop-rule-bleed));
-      margin-left: calc(-1 * var(--desktop-rule-bleed));
-      padding-left: var(--desktop-rule-bleed);
-    }
-  }
   @media (max-width: 700px) {
     .page { margin: 0; }
     .row { grid-template-columns: 80px 1fr; gap: 10px; }
