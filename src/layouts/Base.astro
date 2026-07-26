@@ -41,7 +41,7 @@ workMenu.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
               {n.key === "works" ? (
                 <>
                   <a href={n.href} class={`menu-works-link ${current === n.key ? "current" : ""}`}>{n.label}</a>
-                  <button class="works-toggle" type="button" aria-expanded="false" aria-controls="menu-work-links">Works</button>
+                  <a class="works-toggle" href="/works/#menu-works" aria-expanded="false" aria-controls="menu-work-links">Works</a>
                 </>
               ) : (
                 <a href={n.href} class={current === n.key ? "current" : ""}>{n.label}</a>
@@ -78,18 +78,17 @@ workMenu.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
       ;(function () {
         var menu = document.getElementById("site-menu")
         var toggle = menu && menu.querySelector(".menu-hamburger")
-        var worksToggle = menu && menu.querySelector(".works-toggle")
         if (!menu || !toggle) return
         toggle.addEventListener("click", function () {
           var isOpen = menu.classList.toggle("is-open")
           toggle.setAttribute("aria-expanded", String(isOpen))
           toggle.setAttribute("aria-label", isOpen ? "Close navigation" : "Open navigation")
         })
-        if (worksToggle) {
-          worksToggle.addEventListener("click", function () {
-            var isOpen = menu.classList.toggle("works-open")
-            worksToggle.setAttribute("aria-expanded", String(isOpen))
-          })
+        if (window.location.hash === "#menu-works") {
+          menu.classList.add("is-open", "works-open")
+          toggle.setAttribute("aria-expanded", "true")
+          var workLink = menu.querySelector(".works-toggle")
+          if (workLink) workLink.setAttribute("aria-expanded", "true")
         }
       })()
     </script>
