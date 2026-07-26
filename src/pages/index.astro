@@ -4,7 +4,16 @@ import WorkGrid from "../components/WorkGrid.astro"
 ---
 
 <Base title="HWANYUN">
-  <nav slot="menu"></nav>
+  <nav slot="menu" class="home-hero-menu" id="home-hero-menu">
+    <div class="name"><a href="/">HWANYUN</a></div>
+    <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="home-hero-menu">
+      <span></span><span></span><span></span>
+    </button>
+    <a href="/works">Works</a>
+    <a href="/sound">Sound</a>
+    <a href="/cv">Bio</a>
+    <a href="/contact">Contact</a>
+  </nav>
 
   <section class="hero" aria-labelledby="hero-title">
     <canvas id="particle-canvas" class="hero__field" aria-hidden="true"></canvas>
@@ -31,6 +40,7 @@ import WorkGrid from "../components/WorkGrid.astro"
       let width = 0
       let height = 0
       let pixelRatio = 1
+      const isMobile = window.matchMedia("(max-width: 700px)").matches
 
       const createTargets = () => {
         const sample = document.createElement("canvas")
@@ -56,7 +66,7 @@ import WorkGrid from "../components/WorkGrid.astro"
 
       const resize = () => {
         const rect = hero.getBoundingClientRect()
-        pixelRatio = Math.min(window.devicePixelRatio || 1, 2)
+        pixelRatio = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2)
         width = Math.round(rect.width)
         height = Math.round(rect.height)
         canvas.width = width * pixelRatio
@@ -65,7 +75,10 @@ import WorkGrid from "../components/WorkGrid.astro"
         canvas.style.height = `${height}px`
         context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0)
         const targets = createTargets()
-        const count = Math.min(3200, Math.max(2400, targets.length * 2))
+        // 모바일에서는 터치 반응성과 안정성을 위해 렌더링 밀도를 낮춘다.
+        const count = isMobile
+          ? Math.min(1400, Math.max(900, targets.length))
+          : Math.min(3200, Math.max(2400, targets.length * 2))
         particles = Array.from({ length: count }, (_, index) => {
           const targetIndex = Math.floor(index / count * targets.length)
           const [targetX, targetY] = targets[targetIndex] || [width / 2, height / 2]
@@ -129,17 +142,34 @@ import WorkGrid from "../components/WorkGrid.astro"
         requestAnimationFrame(draw)
       }
 
-      hero.addEventListener("pointermove", (event) => {
+      const updateInteraction = (event: PointerEvent) => {
         const rect = hero.getBoundingClientRect()
         const x = event.clientX - rect.left - width / 2
         const y = event.clientY - rect.top - height / 2
         isInside = Math.hypot(x, y) < Math.min(width, height) * .48
-      })
+      }
+      hero.addEventListener("pointermove", updateInteraction)
+      hero.addEventListener("pointerdown", updateInteraction)
       hero.addEventListener("pointerleave", () => { isInside = false })
+      hero.addEventListener("pointerup", () => { if (isMobile) isInside = false })
+      hero.addEventListener("pointercancel", () => { isInside = false })
       window.addEventListener("resize", resize)
       resize()
       requestAnimationFrame(draw)
     }
+  </script>
+
+  <script is:inline>
+    ;(function () {
+      var menu = document.getElementById("home-hero-menu")
+      var toggle = menu && menu.querySelector(".menu-toggle")
+      if (!menu || !toggle) return
+      toggle.addEventListener("click", function () {
+        var isOpen = menu.classList.toggle("is-open")
+        toggle.setAttribute("aria-expanded", String(isOpen))
+        toggle.setAttribute("aria-label", isOpen ? "Close navigation" : "Open navigation")
+      })
+    })()
   </script>
 
   <style>
@@ -154,8 +184,52 @@ import WorkGrid from "../components/WorkGrid.astro"
       background: #0a0b0d;
       isolation: isolate;
     }
-    .hero__field { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .hero__field { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: pan-y; }
     .work-archive { scroll-margin-top: 0; }
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+    .home-hero-menu { display: none; }
+
+    @media (max-width: 700px) {
+      .home-hero-menu {
+        position: fixed;
+        inset: 0 0 auto;
+        z-index: 30;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        width: 100%;
+        min-height: 58px;
+        padding: 18px;
+        color: #fff;
+        line-height: 1.4;
+      }
+      .home-hero-menu .name { grid-column: 1; grid-row: 1; align-self: center; font-size: 16px; font-weight: 500; }
+      .home-hero-menu a { display: none; color: inherit; }
+      .home-hero-menu .name a { display: block; }
+      .home-hero-menu .menu-toggle {
+        display: inline-flex;
+        grid-column: 2;
+        grid-row: 1;
+        align-items: center;
+        justify-content: center;
+        justify-self: end;
+        flex-direction: column;
+        gap: 5px;
+        width: 28px;
+        height: 24px;
+        padding: 0;
+        border: 0;
+        color: inherit;
+        background: transparent;
+      }
+      .home-hero-menu .menu-toggle span { display: block; width: 22px; height: 1px; background: currentColor; }
+      .home-hero-menu.is-open {
+        padding-bottom: 22px;
+        color: #000;
+        background: rgba(255, 255, 255, .30);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+      .home-hero-menu.is-open > a { display: block; grid-column: 1 / -1; width: fit-content; margin-top: 10px; font-size: 18px; }
+    }
   </style>
 </Base>

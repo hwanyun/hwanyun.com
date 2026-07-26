@@ -26,8 +26,11 @@ const nav = [
   </head>
   <body>
     <slot name="menu">
-      <nav class="menu">
+      <nav class="menu" id="site-menu">
         <div class="name"><a href="/">HWANYUN</a></div>
+        <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-menu">
+          <span></span><span></span><span></span>
+        </button>
         {
           nav.map((n) => (
             <a href={n.href} class={current === n.key ? "current" : ""}>
@@ -51,6 +54,19 @@ const nav = [
           dot.classList.add("is-visible")
         })
         document.addEventListener("mouseleave", function () { dot.classList.remove("is-visible") })
+      })()
+    </script>
+
+    <script is:inline>
+      ;(function () {
+        var menu = document.getElementById("site-menu")
+        var toggle = menu && menu.querySelector(".menu-toggle")
+        if (!menu || !toggle) return
+        toggle.addEventListener("click", function () {
+          var isOpen = menu.classList.toggle("is-open")
+          toggle.setAttribute("aria-expanded", String(isOpen))
+          toggle.setAttribute("aria-label", isOpen ? "Close navigation" : "Open navigation")
+        })
       })()
     </script>
 
@@ -110,6 +126,7 @@ const nav = [
         margin: 10px 0 0 10px;
         line-height: 1.5;
       }
+      .menu-toggle { display: none; }
       .menu .name { font-weight: 500; margin-bottom: 12px; }
       .menu a { display: block; }
       .menu a:hover { border-bottom: 1px solid var(--hover); width: fit-content; }
@@ -123,7 +140,65 @@ const nav = [
       }
 
       @media (max-width: 700px) {
-        .menu { float: none; width: auto; padding: 0 10px; }
+        .menu {
+          position: relative;
+          z-index: 30;
+          display: grid;
+          grid-template-columns: 1fr auto;
+          width: 100%;
+          margin: 0;
+          min-height: 58px;
+          padding: 18px 18px;
+          color: #000;
+          background: transparent;
+          line-height: 1.4;
+        }
+        .menu-toggle {
+          display: inline-flex;
+          grid-column: 2;
+          grid-row: 1;
+          align-items: center;
+          justify-content: center;
+          justify-self: end;
+          gap: 5px;
+          width: 28px;
+          height: 24px;
+          padding: 0;
+          border: 0;
+          border-radius: 0;
+          color: #000;
+          background: transparent;
+          flex-direction: column;
+        }
+        .menu-toggle span {
+          display: block;
+          width: 22px;
+          height: 1px;
+          background: currentColor;
+        }
+        .menu .name {
+          grid-column: 1;
+          grid-row: 1;
+          margin: 0;
+          align-self: center;
+          font-size: 16px;
+        }
+        .menu > a {
+          display: none;
+          grid-column: 1 / -1;
+          width: fit-content;
+          margin-top: 10px;
+          font-size: 18px;
+        }
+        .menu.is-open {
+          position: fixed;
+          inset: 0 0 auto;
+          padding-bottom: 22px;
+          background: rgba(255, 255, 255, .30);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+        }
+        .menu.is-open > a { display: block; }
       }
     </style>
   </body>

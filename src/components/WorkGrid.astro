@@ -20,8 +20,11 @@ const nav = [
 
 <div id="packed">
   <!-- 메뉴 = 좌상단 고정 오버레이 (트리맵에서 제외, 왜곡·잘림 없음) -->
-  <nav class="home-menu">
+  <nav class="home-menu" id="home-menu">
     <div class="name"><a href="/">HWANYUN</a></div>
+    <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="home-menu">
+      <span></span><span></span><span></span>
+    </button>
     {
       nav.map((n) => (
         <a href={n.href} class={current === n.key ? "current" : ""}>
@@ -64,8 +67,18 @@ const nav = [
     var grid = c.querySelector(".grid")
     var input = document.getElementById("search")
     var none = document.getElementById("noresult")
+    var menu = c.querySelector(".home-menu")
+    var menuToggle = menu && menu.querySelector(".menu-toggle")
     var tiles = Array.prototype.slice.call(grid.querySelectorAll(".tile"))
     var SHARE = 0.4 // hover 시 해당 셀이 차지할 목표 면적 비율
+
+    if (menu && menuToggle) {
+      menuToggle.addEventListener("click", function () {
+        var isOpen = menu.classList.toggle("is-open")
+        menuToggle.setAttribute("aria-expanded", String(isOpen))
+        menuToggle.setAttribute("aria-label", isOpen ? "Close navigation" : "Open navigation")
+      })
+    }
 
     // 각 셀을 leaf 객체로 (DOM 순서 = 패킹 순서)
     var leaves = tiles.map(function (el) {
@@ -143,11 +156,6 @@ const nav = [
       })
     }
     function rebuild() {
-      if (!desktop()) {
-        clearInline()
-        tree = null
-        return
-      }
       var a = activeLeaves()
       a.forEach(function (l) {
         l.w = l.base
@@ -217,6 +225,8 @@ const nav = [
     function mobileFrame() {
       mTicking = false
       if (desktop()) return
+      // Mobile archive uses a compact mosaic rather than the former one-card feed.
+      if (window.matchMedia("(max-width: 700px)").matches) return
       var vh = window.innerHeight || 1
       var cy = vh / 2
       tiles.forEach(function (el) {
@@ -250,9 +260,8 @@ const nav = [
     window.addEventListener("scroll", onScroll, { passive: true })
 
     function syncMode() {
-      rebuild() // 데스크톱=트리맵 배치 / 모바일=인라인 위치 해제
-      if (desktop()) clearMobileStyles()
-      else mobileFrame()
+      rebuild()
+      clearMobileStyles()
     }
 
     var rt
@@ -370,6 +379,7 @@ const nav = [
     font-size: 18px;
     line-height: 1.5;
   }
+  .home-menu .menu-toggle { display: none; }
   .home-menu .name {
     font-weight: 500;
     margin-bottom: 12px;
@@ -422,29 +432,23 @@ const nav = [
     display: none;
   }
 
-  /* 모바일: 패킹 해제하고 세로 블록으로 폴백 */
-  /* 모바일: 스크롤 포커스 — 전체폭 고정 슬롯이 세로로 흐르고,
-     화면 중앙 타일이 선명·확대(JS), 벗어난 타일은 스크림으로 어두워짐 */
+  /* 모바일: 데스크톱과 동일한 패킹 구조를 화면 전체로 확장한다. */
   @media (max-width: 700px) {
     #packed {
-      height: auto;
+      height: 100svh;
       margin: 0;
       width: 100%;
+      background: #000;
     }
     .grid {
-      position: static;
-      left: auto;
-      right: auto;
-      top: auto;
-      bottom: auto;
-      margin-top: 28px; /* 상단 메뉴와 첫 썸네일 사이 간격 */
+      position: absolute;
+      inset: 0;
+      display: block;
     }
     .tile {
-      position: relative !important;
+      position: absolute !important;
       opacity: 1 !important;
-      width: 100% !important;
-      height: 68svh !important;
-      border: 0;
+      border: 1px solid #fff;
       margin: 0;
       overflow: hidden;
       background: #000;
@@ -469,13 +473,12 @@ const nav = [
       padding-bottom: 0;
       background: #1a1a1a;
     }
-    /* 어둡게 덮는 스크림 (JS가 opacity 조절, 중앙=투명) */
     .scrim {
       display: block;
       position: absolute;
       inset: 0;
       background: #000;
-      opacity: 0.45;
+      opacity: 0.18;
       pointer-events: none;
     }
     .card .cap {
@@ -483,16 +486,14 @@ const nav = [
       left: 0;
       right: 0;
       bottom: 0;
-      padding: 40px 18px 20px;
-      font-size: 17px;
+      padding: 28px 10px 8px;
+      font-size: 11px;
       color: #fff;
       background: linear-gradient(to top, rgba(0, 0, 0, 0.66), rgba(0, 0, 0, 0));
-      opacity: 1;
+      opacity: 1 !important;
     }
     .home-menu {
-      position: static;
-      width: auto;
-      padding: 14px 18px 16px;
+      display: none;
     }
     #noresult {
       position: static;
