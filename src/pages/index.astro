@@ -1,6 +1,10 @@
 ---
 import Base from "../layouts/Base.astro"
 import WorkGrid from "../components/WorkGrid.astro"
+import { getCollection } from "astro:content"
+
+const workMenu = await getCollection("works", ({ data }) => !data.draft)
+workMenu.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
 ---
 
 <Base title="HWANYUN">
@@ -9,7 +13,10 @@ import WorkGrid from "../components/WorkGrid.astro"
     <button class="menu-hamburger" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="home-hero-menu">
       <span></span><span></span><span></span>
     </button>
-    <a href="/#works">Works</a>
+    <a href="/works">Works</a>
+    <div class="work-links" aria-label="Works">
+      {workMenu.map((work) => <a href={`/works/${work.slug}/`}>{work.data.title}</a>)}
+    </div>
     <a href="/sound">Sound</a>
     <a href="/cv">Bio</a>
     <a href="/contact">Contact</a>
@@ -205,6 +212,7 @@ import WorkGrid from "../components/WorkGrid.astro"
       .home-hero-menu .name { grid-column: 1; grid-row: 1; align-self: center; font-size: 16px; font-weight: 500; }
       .home-hero-menu a { display: none; color: inherit; }
       .home-hero-menu .name a { display: block; }
+      .home-hero-menu .work-links { display: none; }
       .home-hero-menu .menu-hamburger {
         display: block;
         grid-column: 2;
@@ -227,6 +235,23 @@ import WorkGrid from "../components/WorkGrid.astro"
         -webkit-backdrop-filter: blur(10px);
       }
       .home-hero-menu.is-open > a { display: block; grid-column: 1 / -1; width: fit-content; margin-top: 10px; font-size: 18px; }
+      .home-hero-menu.is-open .work-links {
+        display: grid;
+        grid-column: 1 / -1;
+        gap: 7px;
+        max-height: min(46svh, 350px);
+        margin: 4px 0 8px;
+        padding: 5px 0 5px 13px;
+        overflow-y: auto;
+        border-left: 1px solid rgba(0, 0, 0, .35);
+      }
+      .home-hero-menu.is-open .work-links a {
+        display: block;
+        margin: 0;
+        color: #333;
+        font-size: 13px;
+        line-height: 1.35;
+      }
     }
   </style>
 </Base>

@@ -1,7 +1,7 @@
 ---
 import { getCollection } from "astro:content"
 
-const { filter = "", current = "home", showMenu = true } = Astro.props
+const { filter = "", current = "home" } = Astro.props
 
 // size → 패킹 weight (셀 비중). 클수록 넓은 면적을 차지한다.
 const WEIGHT: Record<string, number> = { "1col": 1, "2col": 1.7, "3col": 2.6 }
@@ -11,33 +11,29 @@ if (filter) works = works.filter((w) => w.data.category === filter)
 works.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
 
 const nav = [
-  { label: "Works", href: "/#works", key: "works" },
+  { label: "Works", href: "/works", key: "works" },
   { label: "Sound", href: "/sound", key: "sound" },
   { label: "Bio", href: "/cv", key: "bio" },
   { label: "Contact", href: "/contact", key: "contact" },
 ]
 ---
 
-<div id="packed" class:list={{ "no-menu": !showMenu }}>
+<div id="packed">
   <!-- 메뉴 = 좌상단 고정 오버레이 (트리맵에서 제외, 왜곡·잘림 없음) -->
-  {
-    showMenu && (
-      <nav class="home-menu" id="home-menu">
-        <div class="name"><a href="/">HWANYUN</a></div>
-        <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="home-menu">
-          <span></span><span></span><span></span>
-        </button>
-        {
-          nav.map((n) => (
-            <a href={n.href} class={current === n.key ? "current" : ""}>
-              {n.label}
-            </a>
-          ))
-        }
-        <input id="search" type="search" placeholder="Search" autocomplete="off" />
-      </nav>
-    )
-  }
+  <nav class="home-menu" id="home-menu">
+    <div class="name"><a href="/">HWANYUN</a></div>
+    <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="home-menu">
+      <span></span><span></span><span></span>
+    </button>
+    {
+      nav.map((n) => (
+        <a href={n.href} class={current === n.key ? "current" : ""}>
+          {n.label}
+        </a>
+      ))
+    }
+    <input id="search" type="search" placeholder="Search" autocomplete="off" />
+  </nav>
 
   <!-- 직사각형 그리드 (메뉴 컬럼 오른쪽, 좌우·상하 여백 안쪽) -->
   <div class="grid">
@@ -300,7 +296,6 @@ const nav = [
     top: 14px;
     bottom: 14px;
   }
-  #packed.no-menu .grid { left: 170px; }
 
   .tile {
     position: absolute;
@@ -450,7 +445,6 @@ const nav = [
       inset: 0;
       display: block;
     }
-    #packed.no-menu .grid { left: 0; }
     .tile {
       position: absolute !important;
       opacity: 1 !important;

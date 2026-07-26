@@ -1,11 +1,15 @@
 ---
+import { getCollection } from "astro:content"
+
 const { title = "HWANYUN", current = "" } = Astro.props
 const nav = [
-  { label: "Works", href: "/#works", key: "works" },
+  { label: "Works", href: "/works", key: "works" },
   { label: "Sound", href: "/sound", key: "sound" },
   { label: "Bio", href: "/cv", key: "bio" },
   { label: "Contact", href: "/contact", key: "contact" },
 ]
+const workMenu = await getCollection("works", ({ data }) => !data.draft)
+workMenu.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
 ---
 
 <!doctype html>
@@ -33,9 +37,16 @@ const nav = [
         </button>
         {
           nav.map((n) => (
-            <a href={n.href} class={current === n.key ? "current" : ""}>
-              {n.label}
-            </a>
+            <>
+              <a href={n.href} class={current === n.key ? "current" : ""}>
+                {n.label}
+              </a>
+              {n.key === "works" && (
+                <div class="work-links" aria-label="Works">
+                  {workMenu.map((work) => <a href={`/works/${work.slug}/`}>{work.data.title}</a>)}
+                </div>
+              )}
+            </>
           ))
         }
       </nav>
@@ -127,6 +138,7 @@ const nav = [
         line-height: 1.5;
       }
       .menu-hamburger { display: none; }
+      .work-links { display: none; }
       .menu .name { font-weight: 500; margin-bottom: 12px; }
       .menu a { display: block; }
       .menu a:hover { border-bottom: 1px solid var(--hover); width: fit-content; }
@@ -200,6 +212,23 @@ const nav = [
           -webkit-backdrop-filter: blur(10px);
         }
         .menu.is-open > a { display: block; }
+        .menu.is-open .work-links {
+          display: grid;
+          grid-column: 1 / -1;
+          gap: 7px;
+          max-height: min(46svh, 350px);
+          margin: 4px 0 8px;
+          padding: 5px 0 5px 13px;
+          overflow-y: auto;
+          border-left: 1px solid rgba(0, 0, 0, .35);
+        }
+        .menu.is-open .work-links a {
+          display: block;
+          margin: 0;
+          color: #333;
+          font-size: 13px;
+          line-height: 1.35;
+        }
       }
     </style>
   </body>
