@@ -193,6 +193,12 @@ const nav = [
       syncMode()
     }
     if (input) input.addEventListener("input", apply)
+    var searchQuery = new URLSearchParams(window.location.search).get("q")
+    if (input && searchQuery) {
+      input.value = searchQuery
+      apply()
+      document.getElementById("works")?.scrollIntoView({ block: "start" })
+    }
 
     // hover-expand
     leaves.forEach(function (l) {

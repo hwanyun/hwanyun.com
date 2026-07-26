@@ -59,6 +59,9 @@ workMenu.sort((a, b) => {
             </>
           ))
         }
+        <form class="menu-search" action="/" role="search">
+          <input type="search" name="q" placeholder="Search" aria-label="Search works" autocomplete="off" />
+        </form>
       </nav>
     </slot>
     <slot />
@@ -178,6 +181,23 @@ workMenu.sort((a, b) => {
       .menu-hamburger { display: none; }
       .menu .works-toggle { display: none; }
       .work-links { display: none; }
+      .menu-search { margin: 14px 0 0; }
+      .menu-search input {
+        display: block;
+        width: 120px;
+        padding: 2px 0;
+        border: 0;
+        border-bottom: 1px solid #000;
+        border-radius: 0;
+        color: #000;
+        background: transparent;
+        outline: 0;
+        font: inherit;
+        font-size: 15px;
+        -webkit-appearance: none;
+      }
+      .menu-search input::placeholder { color: #000; opacity: 1; }
+      .menu-search input:focus { border-bottom-color: var(--hover); }
       .menu .name { font-weight: 500; margin-bottom: 12px; }
       .menu a { display: block; }
       .menu a:hover { border-bottom: 1px solid var(--hover); width: fit-content; }
@@ -296,6 +316,8 @@ workMenu.sort((a, b) => {
           line-height: 1.35;
         }
         .menu.is-open .work-links .all-works { font-weight: 500; }
+        .menu-search { display: none; grid-column: 1 / -1; margin: 16px 0 0; }
+        .menu.is-open .menu-search { display: block; }
       }
     </style>
   </body>
