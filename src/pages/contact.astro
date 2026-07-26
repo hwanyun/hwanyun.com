@@ -31,7 +31,7 @@ import Base from "../layouts/Base.astro"
     .links a::after { content:""; position:absolute; left:2px; right:2px; bottom:-1px; height:2px; background:#111; transform:scaleX(0); transform-origin:left; transition:transform .3s; }
     .links a:hover::after, .links a.active::after { transform: scaleX(1); }
     .links a.active { color:#000; background:#fff59d55; transform: translateX(2px); }
-    #mascot-canvas { position: fixed; inset: 0; z-index: 2; pointer-events: none; }
+    #mascot-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 2; pointer-events: none; }
     #mascot-canvas.grab { cursor: grab; } #mascot-canvas.grabbing { cursor: grabbing; }
     :global(body > footer) {
       position: fixed;
@@ -158,7 +158,7 @@ import Base from "../layouts/Base.astro"
       const halfW = distance * Math.tan(hFov / 2);
       STAGEX = Math.max(0, halfW - avatarSize.x * 0.7);
     }
-    function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth/innerHeight; frameAvatar(); }
+    function resize() { renderer.setSize(innerWidth, innerHeight); camera.aspect = innerWidth/innerHeight; frameAvatar(); }
     addEventListener("resize", resize); resize();
     const clock = new THREE.Clock(), tmpDir = new THREE.Vector3();
     function faceTowards(t) { const a = Math.atan2(t.x-avatar.position.x, t.z-avatar.position.z); let d = a-avatar.rotation.y; while (d > Math.PI) d -= 2*Math.PI; while (d < -Math.PI) d += 2*Math.PI; avatar.rotation.y += d*0.15; }
