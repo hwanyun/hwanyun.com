@@ -85,11 +85,12 @@ import Base from "../layouts/Base.astro"
     const raycaster = new THREE.Raycaster(); const ptr = new THREE.Vector2(-2,-2);
     let model, avatar, mixer, actions = {}, current = null, modelMeshes = [];
     let STAGEX = 60;
-    const target = new THREE.Vector3();
+    let avatarSize = null;
+    const target = new THREE.Vector3(); const home = new THREE.Vector3();
     let dragging = false, noticed = false, waving = false, gesturing = false, presenting = null;
 
     // ▼ 튜닝: FILL 낮추면 캐릭터가 작아짐(전신 여유). STAGEX 비율은 좌우 이동 범위.
-    const FILL = matchMedia("(max-width: 700px)").matches ? 0.22 : 0.30;
+    const FILL = matchMedia("(max-width: 700px)").matches ? 0.18 : 0.22;
 
     new GLTFLoader().load("/mascot/character.glb", (gltf) => {
       model = gltf.scene;
@@ -104,14 +105,10 @@ import Base from "../layouts/Base.astro"
       avatar = new THREE.Group();
       model.position.set(-center.x, -center.y, -center.z);
       avatar.add(model); scene.add(avatar);
-      const h = size.y, fov = camera.fov*Math.PI/180, dist = (h/(2*FILL))/Math.tan(fov/2);
-      camera.position.set(0, 0, dist); camera.lookAt(0, 0, 0);
-      camera.far = dist*6; camera.updateProjectionMatrix();
-      const halfW = dist*Math.tan(fov/2)*camera.aspect;
-      const safeTravel = Math.max(0, halfW - size.x * 0.7);
-      STAGEX = Math.min(halfW * 0.32, safeTravel * 0.72);
+      avatarSize = size;
+      frameAvatar();
       avatar.position.set(0, 0, 0);
-      shadow.scale.setScalar(h*0.55); shadow.position.y = -h * 0.5 + 0.5;
+      shadow.scale.setScalar(size.y*0.55); shadow.position.y = -size.y * 0.5 + 0.5;
       mixer = new THREE.AnimationMixer(model);
       for (const clip of gltf.animations) actions[clip.name] = mixer.clipAction(clip);
       setBusy();
@@ -131,15 +128,12 @@ import Base from "../layouts/Base.astro"
     const updateTarget = () => { target.set(Math.max(-STAGEX, Math.min(STAGEX, ptr.x*STAGEX)), 0, 0); };
     const presentEl = (el) => {
       if (dragging || !avatar) return;
-      const rect = el.getBoundingClientRect();
-      const x = ((rect.left + rect.width * 0.5) / innerWidth) * 2 - 1;
-      const destination = Math.max(-STAGEX, Math.min(STAGEX, x * STAGEX));
       noticed = true; waving = false; gesturing = false;
       setAttentive();
       presenting = {
         el,
-        target: new THREE.Vector3(destination, 0, 0),
-        face: new THREE.Vector3(destination - STAGEX, 0, 0),
+        target: home.clone(),
+        face: new THREE.Vector3(-STAGEX, 0, 0),
         arrived: false,
       };
     };
@@ -147,12 +141,24 @@ import Base from "../layouts/Base.astro"
     function firstNotice() { if (noticed) return; noticed = true;
       if (actions.wave) { waving = true; fadeTo("wave", true); const d = actions.wave.getClip().duration*1000; setTimeout(() => { waving = false; setAttentive(); }, d); } else setAttentive(); }
     addEventListener("pointermove", e => { ptr.x = (e.clientX/innerWidth)*2-1; ptr.y = -(e.clientY/innerHeight)*2+1;
-      if (model && !noticed && !reduce) firstNotice(); updateTarget();
+      if (model && !noticed && !reduce) firstNotice();
       if (model && !dragging) { raycaster.setFromCamera(ptr, camera); const over = raycaster.intersectObjects(modelMeshes, true).length > 0; canvas.style.pointerEvents = over ? "auto" : "none"; canvas.classList.toggle("grab", over); } }, { passive: true });
     addEventListener("pointerdown", () => { if (!model) return; raycaster.setFromCamera(ptr, camera);
       if (raycaster.intersectObjects(modelMeshes, true).length > 0) { dragging = true; mode = "dragging"; canvas.classList.add("grabbing"); presenting = null; fadeTo("idle"); } });
     addEventListener("pointerup", () => { if (dragging) { dragging = false; canvas.classList.remove("grabbing"); setAttentive(); } });
-    function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix(); }
+    function frameAvatar() {
+      if (!avatarSize) return;
+      const vFov = camera.fov * Math.PI / 180;
+      const hFov = 2 * Math.atan(Math.tan(vFov / 2) * camera.aspect);
+      const distanceForHeight = (avatarSize.y / (2 * FILL)) / Math.tan(vFov / 2);
+      const distanceForWidth = (avatarSize.x / (2 * FILL)) / Math.tan(hFov / 2);
+      const distance = Math.max(distanceForHeight, distanceForWidth);
+      camera.position.set(0, 0, distance); camera.lookAt(0, 0, 0);
+      camera.far = distance * 6; camera.updateProjectionMatrix();
+      const halfW = distance * Math.tan(hFov / 2);
+      STAGEX = Math.max(0, halfW - avatarSize.x * 0.7);
+    }
+    function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth/innerHeight; frameAvatar(); }
     addEventListener("resize", resize); resize();
     const clock = new THREE.Clock(), tmpDir = new THREE.Vector3();
     function faceTowards(t) { const a = Math.atan2(t.x-avatar.position.x, t.z-avatar.position.z); let d = a-avatar.rotation.y; while (d > Math.PI) d -= 2*Math.PI; while (d < -Math.PI) d += 2*Math.PI; avatar.rotation.y += d*0.15; }
@@ -160,7 +166,7 @@ import Base from "../layouts/Base.astro"
       if (model && avatar) { const pos = avatar.position;
         if (dragging) { updateTarget(); pos.x += (target.x-pos.x)*0.35; faceTowards(target); }
         else if (!waving && !gesturing && noticed && !reduce) {
-          const goal = presenting ? presenting.target : target; const dist = Math.abs(goal.x-pos.x); const stopAt = (presenting ? 0.14 : 0.24)*STAGEX;
+          const goal = presenting ? presenting.target : home; const dist = Math.abs(goal.x-pos.x); const stopAt = (presenting ? 0.14 : 0.24)*STAGEX;
           if (dist > stopAt) { setWalking(); tmpDir.set(goal.x-pos.x,0,0).normalize(); pos.x += tmpDir.x*dist*dt*2.4; faceTowards(goal); }
           else if (presenting && !presenting.arrived) { presenting.arrived = true; presenting.el.classList.add("active");
             const gest = actions.thumbsup ? "thumbsup" : (actions.wave ? "wave" : null);
