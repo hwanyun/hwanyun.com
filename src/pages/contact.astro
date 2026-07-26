@@ -53,8 +53,8 @@ import Base from "../layouts/Base.astro"
     const shadow = new THREE.Mesh(new THREE.PlaneGeometry(1,1), new THREE.MeshBasicMaterial({ map: shTex, transparent: true, depthWrite: false }));
     shadow.rotation.x = -Math.PI/2; scene.add(shadow);
     const raycaster = new THREE.Raycaster(); const ptr = new THREE.Vector2(-2,-2);
-    let model, mixer, actions = {}, current = null, modelMeshes = [];
-    let STAGEX = 60, HOMEX = 30;
+    let model, avatar, mixer, actions = {}, current = null, modelMeshes = [];
+    let STAGEX = 60;
     const target = new THREE.Vector3();
     let dragging = false, noticed = false, waving = false, gesturing = false, presenting = null;
 
@@ -69,16 +69,19 @@ import Base from "../layouts/Base.astro"
         else o.material.side = THREE.DoubleSide;
         modelMeshes.push(o);
       } });
-      scene.add(model);
       const box = new THREE.Box3().setFromObject(model); const size = new THREE.Vector3(); box.getSize(size);
+      const center = new THREE.Vector3(); box.getCenter(center);
+      avatar = new THREE.Group();
+      model.position.set(-center.x, -center.y, -center.z);
+      avatar.add(model); scene.add(avatar);
       const h = size.y, fov = camera.fov*Math.PI/180, dist = (h/(2*FILL))/Math.tan(fov/2);
-      camera.position.set(0, h*0.5, dist); camera.lookAt(0, h*0.5, 0);
+      camera.position.set(0, 0, dist); camera.lookAt(0, 0, 0);
       camera.far = dist*6; camera.updateProjectionMatrix();
       const halfW = dist*Math.tan(fov/2)*camera.aspect;
       const safeTravel = Math.max(0, halfW - size.x * 0.7);
       STAGEX = Math.min(halfW * 0.32, safeTravel * 0.72);
-      HOMEX = 0;
-      model.position.set(HOMEX, 0, 0); shadow.scale.setScalar(h*0.55);
+      avatar.position.set(0, 0, 0);
+      shadow.scale.setScalar(h*0.55); shadow.position.y = -h * 0.5 + 0.5;
       mixer = new THREE.AnimationMixer(model);
       for (const clip of gltf.animations) actions[clip.name] = mixer.clipAction(clip);
       setBusy();
@@ -96,7 +99,7 @@ import Base from "../layouts/Base.astro"
     const setAttentive = () => { mode = "attentive"; fadeTo("idle"); };
     const setWalking = () => { if (mode !== "walking") { mode = "walking"; fadeTo(actions.walk ? "walk" : "idle"); } };
     const updateTarget = () => { target.set(Math.max(-STAGEX, Math.min(STAGEX, ptr.x*STAGEX)), 0, 0); };
-    const presentEl = (el) => { presenting = { el, target: new THREE.Vector3(HOMEX*0.8,0,0), face: new THREE.Vector3(-STAGEX,0,0), arrived: false }; };
+    const presentEl = (el) => { presenting = { el, target: new THREE.Vector3(0,0,0), face: new THREE.Vector3(-STAGEX,0,0), arrived: false }; };
     document.querySelectorAll(".links a").forEach(a => a.addEventListener("pointerenter", () => { if (!dragging && noticed) presentEl(a); }));
     function firstNotice() { if (noticed) return; noticed = true;
       if (actions.wave) { waving = true; fadeTo("wave", true); const d = actions.wave.getClip().duration*1000; setTimeout(() => { waving = false; setAttentive(); }, d); } else setAttentive(); }
@@ -109,9 +112,9 @@ import Base from "../layouts/Base.astro"
     function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix(); }
     addEventListener("resize", resize); resize();
     const clock = new THREE.Clock(), tmpDir = new THREE.Vector3();
-    function faceTowards(t) { const a = Math.atan2(t.x-model.position.x, t.z-model.position.z); let d = a-model.rotation.y; while (d > Math.PI) d -= 2*Math.PI; while (d < -Math.PI) d += 2*Math.PI; model.rotation.y += d*0.15; }
+    function faceTowards(t) { const a = Math.atan2(t.x-avatar.position.x, t.z-avatar.position.z); let d = a-avatar.rotation.y; while (d > Math.PI) d -= 2*Math.PI; while (d < -Math.PI) d += 2*Math.PI; avatar.rotation.y += d*0.15; }
     function animate() { requestAnimationFrame(animate); const dt = clock.getDelta(); if (mixer) mixer.update(dt);
-      if (model) { const pos = model.position;
+      if (model && avatar) { const pos = avatar.position;
         if (dragging) { updateTarget(); pos.x += (target.x-pos.x)*0.35; faceTowards(target); }
         else if (!waving && !gesturing && noticed && !reduce) {
           const goal = presenting ? presenting.target : target; const dist = Math.abs(goal.x-pos.x); const stopAt = (presenting ? 0.14 : 0.24)*STAGEX;
@@ -122,7 +125,7 @@ import Base from "../layouts/Base.astro"
             faceTowards(presenting.face); }
           else { if (mode === "walking") setAttentive(); const look = presenting ? presenting.face : goal; if (mode === "attentive") faceTowards(look); }
         }
-        shadow.position.set(pos.x, 0.5, pos.z);
+        shadow.position.x = pos.x; shadow.position.z = pos.z;
       }
       renderer.render(scene, camera);
     }
