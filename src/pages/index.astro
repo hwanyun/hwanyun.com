@@ -13,8 +13,9 @@ workMenu.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
     <button class="menu-hamburger" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="home-hero-menu">
       <span></span><span></span><span></span>
     </button>
-    <a href="/works">Works</a>
-    <div class="work-links" aria-label="Works">
+    <button class="works-toggle" type="button" aria-expanded="false" aria-controls="home-work-links">Works</button>
+    <div class="work-links" id="home-work-links" aria-label="Works">
+      <a href="/works/" class="all-works">All Works</a>
       {workMenu.map((work) => <a href={`/works/${work.slug}/`}>{work.data.title}</a>)}
     </div>
     <a href="/sound">Sound</a>
@@ -170,12 +171,19 @@ workMenu.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
     ;(function () {
       var menu = document.getElementById("home-hero-menu")
       var toggle = menu && menu.querySelector(".menu-hamburger")
+      var worksToggle = menu && menu.querySelector(".works-toggle")
       if (!menu || !toggle) return
       toggle.addEventListener("click", function () {
         var isOpen = menu.classList.toggle("is-open")
         toggle.setAttribute("aria-expanded", String(isOpen))
         toggle.setAttribute("aria-label", isOpen ? "Close navigation" : "Open navigation")
       })
+      if (worksToggle) {
+        worksToggle.addEventListener("click", function () {
+          var isOpen = menu.classList.toggle("works-open")
+          worksToggle.setAttribute("aria-expanded", String(isOpen))
+        })
+      }
     })()
   </script>
 
@@ -212,6 +220,7 @@ workMenu.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
       .home-hero-menu .name { grid-column: 1; grid-row: 1; align-self: center; font-size: 16px; font-weight: 500; }
       .home-hero-menu a { display: none; color: inherit; }
       .home-hero-menu .name a { display: block; }
+      .home-hero-menu .works-toggle { display: none; }
       .home-hero-menu .work-links { display: none; }
       .home-hero-menu .menu-hamburger {
         display: block;
@@ -235,15 +244,39 @@ workMenu.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
         -webkit-backdrop-filter: blur(10px);
       }
       .home-hero-menu.is-open > a { display: block; grid-column: 1 / -1; width: fit-content; margin-top: 10px; font-size: 18px; }
+      .home-hero-menu.is-open .works-toggle {
+        display: block;
+        grid-column: 1 / -1;
+        width: fit-content;
+        margin-top: 10px;
+        padding: 0;
+        border: 0;
+        color: inherit;
+        background: transparent;
+        font: inherit;
+        font-size: 18px;
+        line-height: 1.4;
+      }
       .home-hero-menu.is-open .work-links {
         display: grid;
         grid-column: 1 / -1;
         gap: 7px;
+        max-height: 0;
+        margin: 0;
+        padding: 0 0 0 13px;
+        overflow: hidden;
+        border-left: 1px solid rgba(0, 0, 0, .35);
+        opacity: 0;
+        pointer-events: none;
+        transition: max-height .38s ease, margin .28s ease, padding .28s ease, opacity .22s ease;
+      }
+      .home-hero-menu.is-open.works-open .work-links {
         max-height: min(46svh, 350px);
         margin: 4px 0 8px;
         padding: 5px 0 5px 13px;
         overflow-y: auto;
-        border-left: 1px solid rgba(0, 0, 0, .35);
+        opacity: 1;
+        pointer-events: auto;
       }
       .home-hero-menu.is-open .work-links a {
         display: block;
@@ -252,6 +285,7 @@ workMenu.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
         font-size: 13px;
         line-height: 1.35;
       }
+      .home-hero-menu.is-open .work-links .all-works { font-weight: 500; }
     }
   </style>
 </Base>

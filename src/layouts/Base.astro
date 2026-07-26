@@ -38,11 +38,17 @@ workMenu.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
         {
           nav.map((n) => (
             <>
-              <a href={n.href} class={current === n.key ? "current" : ""}>
-                {n.label}
-              </a>
+              {n.key === "works" ? (
+                <>
+                  <a href={n.href} class={`menu-works-link ${current === n.key ? "current" : ""}`}>{n.label}</a>
+                  <button class="works-toggle" type="button" aria-expanded="false" aria-controls="menu-work-links">Works</button>
+                </>
+              ) : (
+                <a href={n.href} class={current === n.key ? "current" : ""}>{n.label}</a>
+              )}
               {n.key === "works" && (
-                <div class="work-links" aria-label="Works">
+                <div class="work-links" id="menu-work-links" aria-label="Works">
+                  <a href="/works/" class="all-works">All Works</a>
                   {workMenu.map((work) => <a href={`/works/${work.slug}/`}>{work.data.title}</a>)}
                 </div>
               )}
@@ -72,12 +78,19 @@ workMenu.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
       ;(function () {
         var menu = document.getElementById("site-menu")
         var toggle = menu && menu.querySelector(".menu-hamburger")
+        var worksToggle = menu && menu.querySelector(".works-toggle")
         if (!menu || !toggle) return
         toggle.addEventListener("click", function () {
           var isOpen = menu.classList.toggle("is-open")
           toggle.setAttribute("aria-expanded", String(isOpen))
           toggle.setAttribute("aria-label", isOpen ? "Close navigation" : "Open navigation")
         })
+        if (worksToggle) {
+          worksToggle.addEventListener("click", function () {
+            var isOpen = menu.classList.toggle("works-open")
+            worksToggle.setAttribute("aria-expanded", String(isOpen))
+          })
+        }
       })()
     </script>
 
@@ -138,6 +151,7 @@ workMenu.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
         line-height: 1.5;
       }
       .menu-hamburger { display: none; }
+      .works-toggle { display: none; }
       .work-links { display: none; }
       .menu .name { font-weight: 500; margin-bottom: 12px; }
       .menu a { display: block; }
@@ -212,15 +226,40 @@ workMenu.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
           -webkit-backdrop-filter: blur(10px);
         }
         .menu.is-open > a { display: block; }
+        .menu.is-open .menu-works-link { display: none; }
+        .menu.is-open .works-toggle {
+          display: block;
+          grid-column: 1 / -1;
+          width: fit-content;
+          margin-top: 10px;
+          padding: 0;
+          border: 0;
+          color: inherit;
+          background: transparent;
+          font: inherit;
+          font-size: 18px;
+          line-height: 1.4;
+        }
         .menu.is-open .work-links {
           display: grid;
           grid-column: 1 / -1;
           gap: 7px;
+          max-height: 0;
+          margin: 0;
+          padding: 0 0 0 13px;
+          overflow: hidden;
+          border-left: 1px solid rgba(0, 0, 0, .35);
+          opacity: 0;
+          pointer-events: none;
+          transition: max-height .38s ease, margin .28s ease, padding .28s ease, opacity .22s ease;
+        }
+        .menu.is-open.works-open .work-links {
           max-height: min(46svh, 350px);
           margin: 4px 0 8px;
           padding: 5px 0 5px 13px;
           overflow-y: auto;
-          border-left: 1px solid rgba(0, 0, 0, .35);
+          opacity: 1;
+          pointer-events: auto;
         }
         .menu.is-open .work-links a {
           display: block;
@@ -229,6 +268,7 @@ workMenu.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
           font-size: 13px;
           line-height: 1.35;
         }
+        .menu.is-open .work-links .all-works { font-weight: 500; }
       }
     </style>
   </body>

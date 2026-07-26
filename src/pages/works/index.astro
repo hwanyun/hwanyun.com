@@ -11,17 +11,21 @@ works.sort((a, b) => {
 ---
 
 <Base title="Works — HWANYUN" current="works">
-  <main class="works-archive">
+  <main class="works-archive" data-language="ko">
     <header class="archive-intro">
       <p class="eyebrow">WORK ARCHIVE</p>
       <h1>Works</h1>
+      <div class="archive-language-switch" role="group" aria-label="Archive introduction language">
+        <button type="button" data-language-choice="en" aria-pressed="false">EN</button>
+        <button type="button" data-language-choice="ko" aria-pressed="true">KO</button>
+      </div>
       <div class="intro-copy">
-        <p lang="en">
+        <p lang="en" data-language-content="en">
           An archive of installations, moving-image works, and interactive systems.
           Each project examines how sound, material, technology, and site are brought
           into relation through embodied experience.
         </p>
-        <p lang="ko">
+        <p lang="ko" data-language-content="ko">
           설치, 영상, 그리고 인터랙티브 시스템으로 구성된 작업 아카이브. 각 프로젝트는
           신체적 경험을 매개로 소리, 물질, 기술, 장소가 맺는 관계를 탐구한다.
         </p>
@@ -43,6 +47,22 @@ works.sort((a, b) => {
   </main>
 </Base>
 
+<script is:inline>
+  ;(function () {
+    var archive = document.querySelector(".works-archive")
+    if (!archive) return
+    var buttons = Array.prototype.slice.call(archive.querySelectorAll("[data-language-choice]"))
+    buttons.forEach(function (button) {
+      button.addEventListener("click", function () {
+        var language = button.getAttribute("data-language-choice")
+        if (!language) return
+        archive.setAttribute("data-language", language)
+        buttons.forEach(function (item) { item.setAttribute("aria-pressed", String(item === button)) })
+      })
+    })
+  })()
+</script>
+
 <style>
   .works-archive { margin: 10px 40px 100px 170px; max-width: var(--content-w); }
   .archive-intro { max-width: 650px; margin: 0 0 84px; }
@@ -51,6 +71,7 @@ works.sort((a, b) => {
   .intro-copy { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3%; }
   .intro-copy p { margin: 0; padding-top: 12px; border-top: 1px solid #000; font-size: 16px; line-height: 1.8; color: #555; }
   .intro-copy p[lang="ko"] { line-height: 1.85; }
+  .archive-language-switch { display: none; }
   ol { margin: 0; padding: 0; list-style: none; }
   .archive-head, li a { display: grid; grid-template-columns: minmax(0, 1fr) 66px; gap: 16px; }
   .archive-head { border-top: 1px solid #111; border-bottom: 1px solid #111; padding: 5px 0 4px; font-size: 18px; font-weight: 500; letter-spacing: 0.025em; }
@@ -63,8 +84,15 @@ works.sort((a, b) => {
   @media (max-width: 700px) {
     .works-archive { margin: 24px 16px 80px; }
     .archive-intro { margin-bottom: 54px; }
-    h1 { font-size: 32px; }
-    .intro-copy { grid-template-columns: 1fr; gap: 18px; }
+    h1 { font-size: clamp(25px, 7vw, 32px); line-height: 1.22; }
+    .archive-language-switch { display: inline-flex; gap: 4px; margin: 0 0 12px; border: 1px solid #c8c8c8; }
+    .archive-language-switch button { min-width: 38px; padding: 6px 8px; border: 0; border-radius: 0; color: #777; background: transparent; font: 500 11px/1 var(--sans); letter-spacing: .08em; }
+    .archive-language-switch button[aria-pressed="true"] { color: #fff; background: #111; }
+    .intro-copy { grid-template-columns: 1fr; gap: 0; }
+    .intro-copy p { margin: 0 0 26px; padding-top: 10px; font-size: 15px; line-height: 1.78; }
+    .intro-copy p[lang="ko"] { line-height: 1.85; }
+    .works-archive[data-language="en"] [data-language-content="ko"],
+    .works-archive[data-language="ko"] [data-language-content="en"] { display: none; }
     .archive-head, li a { grid-template-columns: minmax(0, 1fr) 48px; gap: 8px; }
     .archive-head { font-size: 15px; }
     time { font-size: 13px; }
