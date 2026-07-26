@@ -31,8 +31,10 @@ const releases = (id: string) => {
         <button type="button" data-language-choice="en" aria-pressed="true">EN</button>
         <button type="button" data-language-choice="ko" aria-pressed="false">KO</button>
       </div>
-      <p class="intro" data-language-content="en" lang="en">A selection of sound works, scores, and recordings. Each entry remains connected to the circumstance in which it was made.</p>
-      <p class="intro" data-language-content="ko" lang="ko">사운드 작업, 스코어, 그리고 기록을 모은 아카이브. 각각의 기록은 작업이 만들어진 장소와 시간, 관계의 맥락을 함께 간직한다.</p>
+      <div class="intro-copy">
+        <p class="intro" data-language-content="en" lang="en">A selection of sound works, scores, and recordings. Each entry remains connected to the circumstance in which it was made.</p>
+        <p class="intro" data-language-content="ko" lang="ko">사운드 작업, 스코어, 그리고 기록을 모은 아카이브. 각각의 기록은 작업이 만들어진 장소와 시간, 관계의 맥락을 함께 간직한다.</p>
+      </div>
     </header>
 
     {sections.map((section) => (
@@ -170,9 +172,10 @@ const releases = (id: string) => {
     #backdrop-title { position: fixed; z-index: 2; left: 50%; top: 50%; width: min(88vw, 780px); transform: translate(-50%, -50%); color: #fff; font-size: clamp(24px, 4vw, 52px); font-weight: 300; line-height: 1.12; text-align: center; text-shadow: 0 2px 20px rgba(0,0,0,.45); opacity: 0; pointer-events: none; transition: opacity .45s ease; }
     :global(body.has-backdrop) #backdrop-title { opacity: 1; }
     #sound-archive { position: relative; z-index: 1; width: calc(100% - 190px); max-width: var(--content-w); margin: 10px 0 100px 170px; transition: color .4s ease; }
-    .archive-head { max-width: 650px; margin-bottom: 84px; }
+    .archive-head { max-width: 1040px; margin-bottom: 84px; }
     .eyebrow, .section h2, .number, .release-count, .track span:last-child { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #888; }
     h1 { margin: 8px 0 16px; font-weight: 300; font-size: 38px; }
+    .intro-copy { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7%; }
     .intro { margin: 0; font-size: 18px; line-height: 1.55; }
     .archive-language-switch { display: none; }
     .section { margin: 0 0 70px; }
@@ -216,11 +219,12 @@ const releases = (id: string) => {
       #sound-archive { width: auto; margin: 24px 16px 80px; }
       .archive-head { margin-bottom: 54px; }
       h1 { font-size: clamp(25px, 7vw, 32px); line-height: 1.22; }
-      .archive-language-switch { display: inline-flex; gap: 4px; margin: 0 0 12px; border: 1px solid #c8c8c8; }
-      .archive-language-switch button { min-width: 38px; padding: 6px 8px; border: 0; border-radius: 0; color: #777; background: transparent; font: 500 11px/1 var(--sans); letter-spacing: .08em; }
+      .archive-language-switch { display: inline-flex; align-items: stretch; gap: 4px; margin: 0 0 12px; border: 1px solid #c8c8c8; }
+      .archive-language-switch button { display: block; flex: 0 0 38px; min-width: 38px; min-height: 28px; padding: 6px 8px; border: 0; border-radius: 0; color: #777; background: transparent; font: 500 11px/1 var(--sans); letter-spacing: .08em; }
       .archive-language-switch button[aria-pressed="true"] { color: #fff; background: #111; }
       #sound-archive[data-language="en"] [data-language-content="ko"],
       #sound-archive[data-language="ko"] [data-language-content="en"] { display: none; }
+      .intro-copy { display: block; }
       .intro { font-size: 15px; line-height: 1.78; }
       .intro[lang="ko"] { line-height: 1.85; }
       .section { margin-bottom: 48px; }

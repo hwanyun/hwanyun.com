@@ -1042,13 +1042,20 @@ function toParagraphs(text: string): string {
       .meta .medium-materials { margin-top: 5px; font-size: 13px; line-height: 1.55; }
       .series-link { margin: -5px 0 24px; font-size: 13px; }
       .work-language-switch {
-        display: inline-flex;
+        /* A block-level flex container keeps the switch on its own line after
+           series metadata, regardless of how long the series title is. */
+        display: flex;
+        width: max-content;
+        align-items: stretch;
         gap: 4px;
         margin: 0 0 12px;
         border: 1px solid #c8c8c8;
       }
       .work-language-switch button {
+        display: block;
+        flex: 0 0 38px;
         min-width: 38px;
+        min-height: 28px;
         padding: 6px 8px;
         border: 0;
         border-radius: 0;
