@@ -45,10 +45,12 @@ workMenu.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
       }
       let particles: Particle[] = []
       let isInside = false
+      let mobileTapStart: { x: number; y: number } | null = null
       let width = 0
       let height = 0
       let pixelRatio = 1
       const isMobile = window.matchMedia("(max-width: 700px)").matches
+      hero.dataset.particleMode = "sphere"
 
       const createTargets = () => {
         const sample = document.createElement("canvas")
@@ -150,17 +152,36 @@ workMenu.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
         requestAnimationFrame(draw)
       }
 
-      const updateInteraction = (event: PointerEvent) => {
+      const isWithinGlobe = (event: PointerEvent) => {
         const rect = hero.getBoundingClientRect()
         const x = event.clientX - rect.left - width / 2
         const y = event.clientY - rect.top - height / 2
-        isInside = Math.hypot(x, y) < Math.min(width, height) * .48
+        return Math.hypot(x, y) < Math.min(width, height) * .48
       }
-      hero.addEventListener("pointermove", updateInteraction)
-      hero.addEventListener("pointerdown", updateInteraction)
-      hero.addEventListener("pointerleave", () => { isInside = false })
-      hero.addEventListener("pointerup", () => { if (isMobile) isInside = false })
-      hero.addEventListener("pointercancel", () => { isInside = false })
+      const updateInteraction = (event: PointerEvent) => { isInside = isWithinGlobe(event) }
+
+      if (isMobile) {
+        // 터치에서는 hover 상태를 흉내 내지 않는다. 짧은 탭 한 번은 이름,
+        // 다시 탭하면 원형으로 돌아가는 명확한 두 상태만 제공한다.
+        canvas.addEventListener("pointerdown", (event) => {
+          mobileTapStart = { x: event.clientX, y: event.clientY }
+        })
+        canvas.addEventListener("pointerup", (event) => {
+          if (!mobileTapStart) return
+          const moved = Math.hypot(event.clientX - mobileTapStart.x, event.clientY - mobileTapStart.y)
+          if (moved < 12 && isWithinGlobe(event)) {
+            isInside = !isInside
+            hero.dataset.particleMode = isInside ? "name" : "sphere"
+          }
+          mobileTapStart = null
+        })
+        canvas.addEventListener("pointercancel", () => { mobileTapStart = null })
+      } else {
+        hero.addEventListener("pointermove", updateInteraction)
+        hero.addEventListener("pointerdown", updateInteraction)
+        hero.addEventListener("pointerleave", () => { isInside = false })
+        hero.addEventListener("pointercancel", () => { isInside = false })
+      }
       window.addEventListener("resize", resize)
       resize()
       requestAnimationFrame(draw)
