@@ -336,6 +336,9 @@ function toParagraphs(text: string): string {
         var media = fig.querySelector("img, .video")
         if (!media) return
         var clone = media.cloneNode(true)
+        // Preview media ignores pointer input; the focused copy must retain
+        // native video controls, including the volume slider.
+        if (clone.classList) clone.classList.remove("video-preview")
         var previewButton = clone.querySelector && clone.querySelector(".video-play")
         if (previewButton) previewButton.remove()
         // 파일 영상은 컨트롤+자동재생, 임베드는 autoplay 파라미터 부여
