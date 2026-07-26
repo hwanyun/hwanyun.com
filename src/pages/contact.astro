@@ -87,10 +87,11 @@ import Base from "../layouts/Base.astro"
     let STAGEX = 60;
     let avatarSize = null;
     const target = new THREE.Vector3(); const home = new THREE.Vector3();
-    let dragging = false, noticed = false, waving = false, gesturing = false, presenting = null;
+    let dragging = false, noticed = false, waving = false, gesturing = false, presenting = null, homing = false, lastMove = 0;
+    const IDLE_MS = 3000;   // 이 시간 동안 마우스 정지/이탈 시 자리로 돌아가 '일하기'
 
     // ▼ 튜닝: FILL 낮추면 캐릭터가 작아짐(전신 여유). STAGEX 비율은 좌우 이동 범위.
-    const FILL = matchMedia("(max-width: 700px)").matches ? 0.38 : 0.55;
+    const FILL = matchMedia("(max-width: 700px)").matches ? 0.52 : 0.55;
 
     new GLTFLoader().load("/mascot/character.glb", (gltf) => {
       model = gltf.scene;
@@ -142,6 +143,7 @@ import Base from "../layouts/Base.astro"
       if (actions.wave) { waving = true; fadeTo("wave", true); const d = actions.wave.getClip().duration*1000; setTimeout(() => { waving = false; setAttentive(); }, d); } else setAttentive(); }
     addEventListener("pointermove", e => { ptr.x = (e.clientX/innerWidth)*2-1; ptr.y = -(e.clientY/innerHeight)*2+1;
       updateTarget();
+      lastMove = performance.now(); if (homing) homing = false;
       if (model && !noticed && !reduce) firstNotice();
       if (model && !dragging) { raycaster.setFromCamera(ptr, camera); const over = raycaster.intersectObjects(modelMeshes, true).length > 0; canvas.style.pointerEvents = over ? "auto" : "none"; canvas.classList.toggle("grab", over); } }, { passive: true });
     addEventListener("pointerdown", () => { if (!model) return; raycaster.setFromCamera(ptr, camera);
@@ -165,7 +167,15 @@ import Base from "../layouts/Base.astro"
     function faceTowards(t) { const a = Math.atan2(t.x-avatar.position.x, t.z-avatar.position.z); let d = a-avatar.rotation.y; while (d > Math.PI) d -= 2*Math.PI; while (d < -Math.PI) d += 2*Math.PI; avatar.rotation.y += d*0.15; }
     function animate() { requestAnimationFrame(animate); const dt = clock.getDelta(); if (mixer) mixer.update(dt);
       if (model && avatar) { const pos = avatar.position;
+        // 일정 시간 마우스 정지/이탈 → 자리로 복귀해 '일하기'. 다시 움직이면 인사부터 재시작.
+        if (noticed && !dragging && !presenting && !waving && !gesturing && (performance.now() - lastMove) > IDLE_MS) { noticed = false; homing = true; }
         if (dragging) { updateTarget(); pos.x += (target.x-pos.x)*0.35; faceTowards(target); }
+        else if (homing && !reduce) {
+          const dist = Math.abs(pos.x - home.x);
+          if (dist > 0.05*STAGEX) { setWalking(); tmpDir.set(home.x-pos.x,0,0).normalize(); pos.x += tmpDir.x*Math.max(dist,0.25*STAGEX)*dt*2.4; faceTowards(home); }
+          else { homing = false; setBusy(); }
+        }
+        else if (!noticed && !dragging && !reduce) { faceTowards({ x: pos.x, z: pos.z + 10 }); }  // 일하는 중엔 정면
         else if (!waving && !gesturing && noticed && !reduce) {
           const goal = presenting ? presenting.target : target; const dist = Math.abs(goal.x-pos.x); const stopAt = (presenting ? 0.14 : 0.10)*STAGEX;
           if (dist > stopAt) { setWalking(); tmpDir.set(goal.x-pos.x,0,0).normalize(); pos.x += tmpDir.x*dist*dt*2.4; faceTowards(goal); }
