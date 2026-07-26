@@ -90,7 +90,7 @@ function toParagraphs(text: string): string {
 ---
 
 <Base title={`HWANYUN — ${data.title}`}>
-  <div id="entry" data-work={work.slug} data-media-prototype={useImmersiveMedia ? "true" : undefined} data-language="en">
+  <div id="entry" data-media-prototype={useImmersiveMedia ? "true" : undefined} data-language="en">
     <div class="entry_title">{data.title}{yr}</div>
 
     {
@@ -191,6 +191,7 @@ function toParagraphs(text: string): string {
           {videoMedia.map((m) => (
             <figure
               class="block is-video"
+              data-ratio={m.ratio || "16:9"}
               style={`flex-grow:${ratioNum[m.ratio] || 16 / 9};flex-basis:0`}
             >
               <div class={`video ${useImmersiveMedia ? "video-preview" : ""}`} style={`aspect-ratio:${ratioValue[m.ratio] || "16 / 9"}`}>
@@ -553,6 +554,23 @@ function toParagraphs(text: string): string {
       layout()
       requestAnimationFrame(function () {
         grid.classList.add("ready")
+      })
+    })()
+  </script>
+
+  <script is:inline>
+    ;(function () {
+      /* 모바일 카드 크기는 실제 이미지 비율을 기준으로 조절한다. */
+      function classify(fig) {
+        var img = fig.querySelector("img")
+        if (!img || !img.naturalWidth || !img.naturalHeight) return
+        fig.classList.toggle("is-portrait", img.naturalHeight > img.naturalWidth * 1.12)
+      }
+      document.querySelectorAll(".media-stills .block").forEach(function (fig) {
+        var img = fig.querySelector("img")
+        if (!img) return
+        if (img.complete) classify(fig)
+        else img.addEventListener("load", function () { classify(fig) }, { once: true })
       })
     })()
   </script>
@@ -1092,9 +1110,9 @@ function toParagraphs(text: string): string {
       .media-videos .block { min-width: 0; }
       .media-stills .block { margin-bottom: 16px; }
 
-      /* Atypical Circuit — 모바일 미디어 편집 시안:
-         영상과 이미지는 각각 가로 트랙으로 모으고, 전체 화면은 선택할 때만 연다. */
-      #entry[data-work="atypical-circuit"] .media-videos {
+      /* 모바일 미디어 아카이브: 영상과 이미지는 별도 가로 트랙으로 읽는다. */
+      .media-videos,
+      .media-stills {
         display: flex;
         flex-wrap: nowrap;
         gap: 12px;
@@ -1107,9 +1125,9 @@ function toParagraphs(text: string): string {
         scrollbar-width: none;
         -webkit-overflow-scrolling: touch;
       }
-      #entry[data-work="atypical-circuit"] .media-videos::-webkit-scrollbar,
-      #entry[data-work="atypical-circuit"] .media-stills::-webkit-scrollbar { display: none; }
-      #entry[data-work="atypical-circuit"] .media-videos .block {
+      .media-videos::-webkit-scrollbar,
+      .media-stills::-webkit-scrollbar { display: none; }
+      .media-videos .block {
         flex: 0 0 min(82vw, 320px) !important;
         min-width: 0;
         margin: 0;
@@ -1117,24 +1135,10 @@ function toParagraphs(text: string): string {
         scroll-snap-stop: normal;
         grid-column: auto;
       }
-      #entry[data-work="atypical-circuit"] .media-videos .block:not(:first-child) {
+      .media-videos .block[data-ratio="9:16"] {
         flex-basis: min(46vw, 180px) !important;
       }
-      #entry[data-work="atypical-circuit"] .media-videos .block:first-child { grid-column: auto; }
-      #entry[data-work="atypical-circuit"] .media-stills {
-        display: flex;
-        flex-wrap: nowrap;
-        gap: 12px;
-        margin-right: -16px;
-        padding: 0 16px 8px 0;
-        overflow-x: auto;
-        overscroll-behavior-x: contain;
-        scroll-behavior: smooth;
-        scroll-snap-type: x proximity;
-        scrollbar-width: none;
-        -webkit-overflow-scrolling: touch;
-      }
-      #entry[data-work="atypical-circuit"] .media-stills .block {
+      .media-stills .block {
         flex: 0 0 min(76vw, 300px);
         min-width: 0;
         margin: 0;
@@ -1142,9 +1146,7 @@ function toParagraphs(text: string): string {
         scroll-snap-stop: normal;
         grid-column: auto;
       }
-      #entry[data-work="atypical-circuit"] .media-stills .block:nth-child(1),
-      #entry[data-work="atypical-circuit"] .media-stills .block:nth-child(2),
-      #entry[data-work="atypical-circuit"] .media-stills .block:nth-child(5) {
+      .media-stills .block.is-portrait {
         flex-basis: min(56vw, 220px);
       }
       figcaption, .media-stills figcaption { margin-top: 6px; font-size: 11px; line-height: 1.45; }
