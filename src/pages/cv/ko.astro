@@ -1,0 +1,9 @@
+---
+import Base from "../../layouts/Base.astro"
+import CvDocument from "../../components/CvDocument.astro"
+import cv from "../../data/cv.ko.json"
+---
+
+<Base title="HWANYUN — 이력" current="bio">
+  <CvDocument data={cv} korean />
+</Base>

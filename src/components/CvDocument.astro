@@ -1,0 +1,76 @@
+---
+import BioNav from "./BioNav.astro"
+
+const { data, korean = false } = Astro.props
+---
+
+<article class="page">
+  <BioNav active="cv" />
+
+  <div class="cv">
+    <nav class="language-switch" aria-label="CV language">
+      <a href="/cv" class={!korean ? "active" : ""} aria-current={!korean ? "page" : undefined}>EN</a>
+      <span aria-hidden="true">/</span>
+      <a href="/cv/ko" class={korean ? "active" : ""} aria-current={korean ? "page" : undefined}>KO</a>
+    </nav>
+    {
+      data.sections.map((sec) => (
+        <section class="cv-section">
+          <h2 class="cv-title">{sec.title}</h2>
+          {sec.items.map((it) => (
+            <div class="row">
+              <div class="year">{it.year}</div>
+              <div class="text">{it.text}</div>
+            </div>
+          ))}
+        </section>
+      ))
+    }
+  </div>
+</article>
+
+<style>
+  .page {
+    margin-left: 170px;
+    max-width: var(--content-w);
+    padding: 10px 20px 80px;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.65;
+  }
+  .cv-section { margin: 0 0 34px; }
+  .language-switch {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    margin: 0 0 24px;
+    font-size: 13px;
+    letter-spacing: .04em;
+    color: #999;
+  }
+  .language-switch a { color: #999; }
+  .language-switch a:hover,
+  .language-switch a.active { color: #000; }
+  .cv-title {
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #000;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 16px;
+    padding: 4px 0;
+  }
+  .year {
+    color: #555;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  @media (max-width: 700px) {
+    .page { margin-left: 0; }
+    .row { grid-template-columns: 80px 1fr; gap: 10px; }
+  }
+</style>
