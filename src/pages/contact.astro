@@ -40,7 +40,30 @@ import Base from "../layouts/Base.astro"
       bottom: 30px;
       padding: 0;
     }
-    @media (max-width: 700px) { .page { margin: 0 16px; } }
+    @media (max-width: 700px) {
+      .page {
+        margin: 0;
+        max-width: none;
+        padding: 0 16px 64px;
+        font-size: 15px;
+        line-height: 1.65;
+      }
+      .page h1 {
+        margin: 0 0 8px;
+        padding-bottom: 7px;
+        border-bottom: 1px solid #000;
+        font-size: 16px;
+      }
+      .links li {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2px;
+        padding: 8px 0 10px;
+      }
+      .links span { width: auto; font-size: 14px; line-height: 1.4; color: #777; }
+      .links a { font-size: 15px; line-height: 1.65; }
+      :global(body > footer) { left: 16px; bottom: 18px; }
+    }
   </style>
 
   <script>
@@ -66,7 +89,7 @@ import Base from "../layouts/Base.astro"
     let dragging = false, noticed = false, waving = false, gesturing = false, presenting = null;
 
     // ▼ 튜닝: FILL 낮추면 캐릭터가 작아짐(전신 여유). STAGEX 비율은 좌우 이동 범위.
-    const FILL = 0.30;
+    const FILL = matchMedia("(max-width: 700px)").matches ? 0.22 : 0.30;
 
     new GLTFLoader().load("/mascot/character.glb", (gltf) => {
       model = gltf.scene;
