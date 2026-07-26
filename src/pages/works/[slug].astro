@@ -583,9 +583,13 @@ function toParagraphs(text: string): string {
         var startX = 0
         var startScroll = 0
         var moved = false
+        var startedOnControl = false
         function isMouse(event) { return event.pointerType === "mouse" }
         track.addEventListener("pointerdown", function (event) {
           if (!isMouse(event)) return
+          startedOnControl = Boolean(event.target.closest("button, video, iframe"))
+          // 재생·확대 버튼은 드래그보다 즉시 클릭이 우선이다.
+          if (startedOnControl) return
           startX = event.clientX
           startScroll = track.scrollLeft
           moved = false
@@ -594,14 +598,19 @@ function toParagraphs(text: string): string {
         track.addEventListener("pointermove", function (event) {
           if (!isMouse(event) || !track.hasPointerCapture(event.pointerId)) return
           var distance = event.clientX - startX
-          if (Math.abs(distance) > 4) {
+          if (Math.abs(distance) > 14) {
             moved = true
             track.classList.add("is-dragging")
             track.scrollLeft = startScroll - distance
           }
         })
         function finish(event) {
-          if (!isMouse(event) || !track.hasPointerCapture(event.pointerId)) return
+          if (!isMouse(event)) return
+          if (startedOnControl) {
+            startedOnControl = false
+            return
+          }
+          if (!track.hasPointerCapture(event.pointerId)) return
           track.releasePointerCapture(event.pointerId)
           track.classList.remove("is-dragging")
           if (moved) {
