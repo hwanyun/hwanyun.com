@@ -416,7 +416,9 @@ function toParagraphs(text: string): string {
           var img = fig.querySelector("img")
           if (img) {
             img.style.cursor = "zoom-in"
-            img.addEventListener("click", function () {
+            // 카드의 빈 여백이나 캡션을 눌러도 같은 이미지를 연다.
+            fig.addEventListener("click", function (event) {
+              if (event.target.closest(".focus-open")) return
               openFig(fig)
             })
           }
@@ -1041,8 +1043,9 @@ function toParagraphs(text: string): string {
       width: 54px;
       height: 54px;
       padding: 0;
-      border: 0;
-      background: transparent;
+      border: 1px solid currentColor;
+      border-radius: 50%;
+      background: rgba(255,255,255,.66);
       color: #111;
       font-size: 32px;
       font-weight: 300;
@@ -1059,7 +1062,9 @@ function toParagraphs(text: string): string {
     .focus-next:hover { transform: translate(4px, -50%); }
     .focus.video-focus { background: rgba(7, 8, 10, 0.5); }
     .focus.video-focus .focus-close,
-    .focus.video-focus .focus-cap { color: #f7f7f3; }
+    .focus.video-focus .focus-cap,
+    .focus.video-focus .focus-nav { color: #f7f7f3; }
+    .focus.video-focus .focus-nav { background: rgba(7,8,10,.48); }
     .focus.video-focus .focus-stage .video { box-shadow: none; }
 
     /* 영상: 비율에 맞춰 자동 크기 */
