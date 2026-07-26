@@ -29,6 +29,9 @@ media:
   - { type: image, src: "/images/intuition-i/06.jpg", width: full, layout: detail, align: left }
   - { type: video, src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/intuition-i-03.mp4", width: full, layout: wide, align: left, ratio: "16:9", caption: "Interactive sound installation documentation" }
   - { type: image, src: "/images/intuition-i/07.jpg", width: half, layout: detail, align: right }
+externalLinks:
+  - title: "Raspberry Pi — Beautiful and inspiring plinky-plonky conductivity"
+    url: "https://www.raspberrypi.com/news/bare-conductive-installation-hwan-yun/"
 sponsors:
   - { name: "Listhús", logo: "/images/intuition-i/sponsors/listhus.webp", url: "https://www.listhus.is/" }
 ---
