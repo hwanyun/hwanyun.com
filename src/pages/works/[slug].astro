@@ -1164,6 +1164,17 @@ function toParagraphs(text: string): string {
       display: block;
     }
 
+    @media (min-width: 701px) {
+      /* 작품 상세의 층위 구분선도 좌측 Works 열까지 일관되게 확장한다. */
+      .post-gallery-divider,
+      .layer-label,
+      .media-note {
+        width: calc(100% + var(--desktop-rule-bleed));
+        margin-left: calc(-1 * var(--desktop-rule-bleed));
+        padding-left: var(--desktop-rule-bleed);
+      }
+    }
+
     @media (max-width: 700px) {
       #entry {
         width: calc(100% - 32px);

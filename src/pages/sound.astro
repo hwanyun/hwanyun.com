@@ -235,6 +235,15 @@ const releases = (id: string) => {
     :global(body.has-backdrop) .section-head, :global(body.has-backdrop) .release { border-color: rgba(255,255,255,.48); }
     :global(body.has-backdrop) .section h2, :global(body.has-backdrop) .section-head p, :global(body.has-backdrop) .release-count, :global(body.has-backdrop) .number, :global(body.has-backdrop) .track, :global(body.has-backdrop) .track-meta, :global(body.has-backdrop) .moving-tag { color: rgba(255,255,255,.78); }
     :global(body.has-backdrop) .track.is-playing, :global(body.has-backdrop) summary strong { color: #fff; }
+    @media (min-width: 701px) {
+      /* 목록의 수평선은 공통 좌측 Works 열에서 시작한다. */
+      .section-head,
+      .release {
+        width: calc(100% + var(--desktop-rule-bleed));
+        margin-left: calc(-1 * var(--desktop-rule-bleed));
+        padding-left: var(--desktop-rule-bleed);
+      }
+    }
     @media (max-width: 700px) {
       #sound-archive { width: auto; margin: 24px 16px 80px; }
       .archive-head { margin-bottom: 54px; }

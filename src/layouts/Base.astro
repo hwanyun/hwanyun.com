@@ -110,6 +110,8 @@ workMenu.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
         --content-w: 900px;
         /* 모든 데스크톱 본문·구분선의 공통 시작 열: 좌측 Works 메뉴의 오른쪽 여백과 맞춘다. */
         --desktop-content-x: 170px;
+        /* 본문 안의 구조선은 좌측 메뉴의 Works 열(10px)까지 이어진다. */
+        --desktop-rule-bleed: calc(var(--desktop-content-x) - 10px);
         /* 데스크톱에서는 작가명과 본문을 분리하는 공통 헤더 여백 */
         --desktop-header-clearance: 82px;
         --hover: #00f;
