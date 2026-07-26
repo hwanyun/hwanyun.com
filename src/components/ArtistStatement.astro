@@ -1,0 +1,62 @@
+---
+import BioNav from "./BioNav.astro"
+
+const { korean = false } = Astro.props
+const title = korean ? "작가 노트" : "Artist's Statement"
+const paragraphs = korean
+  ? [
+      "나는 소리와 빛, 물질과 신체가 서로의 상태를 바꾸는 순간을 구성한다. 관객의 거리와 움직임, 접촉은 감지와 변환의 과정을 거쳐 사운드와 이미지의 변화로 이어진다. 작업은 이 과정에서 발생하는 관계를 하나의 공간적 경험으로 드러낸다.",
+      "〈Intuition〉 연작은 아이슬란드에서 경험한 이끼와 돌, 바람과 물의 소리에서 출발한다. 나는 한지와 전기 페인트, 현장 녹음을 통해 손으로 만지고 몸으로 감지한 자연의 밀도를 설치 안으로 옮긴다. 〈Three Pieces〉 연작에서는 폴리카보네이트, 구리, 선과 와이어를 통해 소리와 빛, 신체의 접촉이 서로를 호출하는 구조를 만든다. 〈The voice of stripes〉에서는 의복의 스트라이프를 점, 선, 간격, 반복의 데이터로 읽어 그래픽 스코어와 알고리즘 작곡의 구조로 전환한다.",
+      "작품은 완성된 형태로 제시되기보다 관객의 개입에 따라 매 순간 다른 관계를 만든다. 가까이 다가가거나 손을 대고, 머무르거나 지나가는 행위는 사운드와 빛의 상태를 바꾸며 작업의 일부가 된다. 이때 소리는 들리는 것에 머물지 않고 빛과 진동, 표면의 변화로 확장된다. 나는 이러한 감각의 전환을 통해 익숙한 공간 안에 잠시 낯선 지각의 조건을 만든다."
+    ]
+  : [
+      "I construct situations in which sound, light, material, and the body alter one another. A viewer’s distance, movement, and touch pass through processes of sensing and translation, becoming shifts in sound and image. The work brings the relations that emerge through this process into the space as an experience.",
+      "The Intuition series begins with moss, stone, wind, and water encountered in Iceland. Using hanji, electric paint, and field recordings, I bring the density of a landscape sensed through touch and the body into installation. In Three Pieces, polycarbonate, copper, line, and wire form structures in which sound, light, and physical contact call one another into being. In The voice of stripes, striped garments are read as data—point, line, interval, and repetition—and translated into a graphic score and algorithmic composition.",
+      "Rather than appearing as a completed form, the work produces different relations with each viewer’s intervention. Approaching, touching, lingering, and passing through alter the states of sound and light, becoming part of the work. Sound extends beyond listening into light, vibration, and changes across a surface. Through these sensory shifts, I create brief conditions of unfamiliar perception within familiar space."
+    ]
+---
+
+<article class="page">
+  <BioNav active="about" />
+
+  <section>
+    <nav class="language-switch" aria-label="Artist statement language">
+      <a href="/about" class={!korean ? "active" : ""} aria-current={!korean ? "page" : undefined}>EN</a>
+      <span aria-hidden="true">/</span>
+      <a href="/about/ko" class={korean ? "active" : ""} aria-current={korean ? "page" : undefined}>KO</a>
+    </nav>
+    <h2>{title}</h2>
+    {paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+    <p class="sign">HWANYUN</p>
+  </section>
+</article>
+
+<style>
+  .page {
+    margin-left: 170px;
+    max-width: 680px;
+    padding: 10px 20px 80px;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.8;
+  }
+  .language-switch {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    margin: 0 0 24px;
+    font-size: 13px;
+    letter-spacing: .04em;
+    color: #999;
+  }
+  .language-switch a { color: #999; }
+  .language-switch a:hover,
+  .language-switch a.active { color: #000; }
+  h2 { font-size: 15px; font-weight: 500; margin: 0 0 10px; }
+  section { margin: 0 0 40px; }
+  p { margin: 0 0 1em; }
+  .sign { font-weight: 500; letter-spacing: .02em; }
+  @media (max-width: 700px) {
+    .page { margin-left: 0; }
+  }
+</style>
