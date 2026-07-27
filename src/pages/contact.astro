@@ -87,11 +87,11 @@ import Base from "../layouts/Base.astro"
     let STAGEX = 60;
     let avatarSize = null;
     const target = new THREE.Vector3(); const home = new THREE.Vector3();
-    let dragging = false, noticed = false, waving = false, gesturing = false, presenting = null, homing = false, lastMove = 0, downX = 0, moved = false;
+    let dragging = false, noticed = false, waving = false, gesturing = false, presenting = null, homing = false, lastMove = 0, downX = 0, moved = false, clicks = 0;
     const IDLE_MS = 3000;   // 이 시간 동안 마우스 정지/이탈 시 자리로 돌아가 '일하기'
 
     // ▼ 튜닝: FILL 낮추면 캐릭터가 작아짐(전신 여유). STAGEX 비율은 좌우 이동 범위.
-    const FILL = matchMedia("(max-width: 700px)").matches ? 0.52 : 0.55;
+    const FILL = matchMedia("(max-width: 700px)").matches ? 0.72 : 0.55;
 
     new GLTFLoader().load("/mascot/character.glb", (gltf) => {
       model = gltf.scene;
@@ -153,7 +153,7 @@ import Base from "../layouts/Base.astro"
     addEventListener("pointerdown", e => { if (!model) return; raycaster.setFromCamera(ptr, camera);
       if (raycaster.intersectObjects(modelMeshes, true).length > 0) { dragging = true; moved = false; downX = e.clientX; mode = "dragging"; canvas.classList.add("grabbing"); presenting = null; noticed = true; homing = false; fadeTo(actions.hanging ? "hanging" : "idle"); } });
     addEventListener("pointerup", () => { if (dragging) { dragging = false; canvas.classList.remove("grabbing");
-      if (!moved) { const r = Math.random() < 0.5 && actions.clapping ? "clapping" : "jumping"; reactOnce(r); }  // 탭 = 클릭 반응
+      if (!moved) { clicks++; const r = (clicks % 2 === 0 && actions.clapping) ? "clapping" : "jumping"; reactOnce(r); }  // 탭 = 점프↔박수 번갈아
       else setAttentive(); } });
     function frameAvatar() {
       if (!avatarSize) return;
