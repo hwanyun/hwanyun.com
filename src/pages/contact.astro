@@ -153,8 +153,8 @@ import Base from "../layouts/Base.astro"
     addEventListener("pointerdown", e => { if (!model) return; raycaster.setFromCamera(ptr, camera);
       if (raycaster.intersectObjects(modelMeshes, true).length > 0) { dragging = true; moved = false; downX = e.clientX; mode = "dragging"; canvas.classList.add("grabbing"); presenting = null; noticed = true; homing = false; fadeTo(actions.hanging ? "hanging" : "idle"); } });
     addEventListener("pointerup", () => { if (dragging) { dragging = false; canvas.classList.remove("grabbing");
-      if (!moved) { clicks++; const r = (clicks % 2 === 0 && actions.clapping) ? "clapping" : "jumping"; reactOnce(r); }  // 탭 = 점프↔박수 번갈아
-      else setAttentive(); } });
+      if (!moved) { const seq = ["jumping", "clapping", "thumbsup"]; let name = seq[clicks % seq.length]; clicks++; if (!actions[name]) name = "jumping"; reactOnce(name); }  // 탭 = 점프→박수→엄지척 순환
+      else reactOnce(actions.falling ? "falling" : "idle"); } });  // 드래그 후 놓기 = 툭 떨어지기
     function frameAvatar() {
       if (!avatarSize) return;
       const vFov = camera.fov * Math.PI / 180;
