@@ -183,13 +183,16 @@ import Base from "../layouts/Base.astro"
         }
         else if (!noticed && !dragging && !reduce) { faceTowards({ x: pos.x, z: pos.z + 10 }); }  // 일하는 중엔 정면
         else if (!waving && !gesturing && noticed && !reduce) {
-          const goal = presenting ? presenting.target : target; const dist = Math.abs(goal.x-pos.x); const stopAt = (presenting ? 0.14 : 0.10)*STAGEX;
+          const goal = presenting ? presenting.target : target; const dist = Math.abs(goal.x-pos.x); const stopAt = (presenting ? 0.14 : 0.22)*STAGEX;
           if (dist > stopAt) { const far = dist > 0.5*STAGEX; if (far) setRunning(); else setWalking(); tmpDir.set(goal.x-pos.x,0,0).normalize(); pos.x += tmpDir.x*dist*dt*(far ? 3.6 : 2.4); faceTowards(goal); }
           else if (presenting && !presenting.arrived) { presenting.arrived = true; presenting.el.classList.add("active");
             const gest = actions.pointing ? "pointing" : (actions.thumbsup ? "thumbsup" : (actions.wave ? "wave" : null));
             if (gest) { gesturing = true; fadeTo(gest, true); const g = presenting, d = actions[gest].getClip().duration*1000; setTimeout(() => { gesturing = false; if (g.el) g.el.classList.remove("active"); if (presenting === g) presenting = null; setAttentive(); }, d+900); }
             faceTowards(presenting.face); }
-          else { if (mode === "walking" || mode === "running") setAttentive(); const look = presenting ? presenting.face : goal; if (mode === "attentive") faceTowards(look); }
+          else { if (mode === "walking" || mode === "running") setAttentive();
+            // 멈추면 정면(관객)을 바라보되, 커서 쪽으로만 살짝 틀어 시선을 준다
+            const look = presenting ? presenting.face : { x: pos.x + (target.x - pos.x) * 0.3, z: pos.z + 10 };
+            if (mode === "attentive") faceTowards(look); }
         }
         shadow.position.x = pos.x; shadow.position.z = pos.z;
       }
