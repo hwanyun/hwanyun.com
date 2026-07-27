@@ -170,16 +170,21 @@ import Base from "../layouts/Base.astro"
     document.querySelectorAll(".links a").forEach(a => a.addEventListener("pointerenter", () => presentEl(a)));
     // 메뉴(nav) 항목 설명 — 경로로 매칭, contact의 이메일/인스타 링크는 제외
     const MENU = {
-      "/works":   { ko: "작업들을 둘러보세요", en: "Do peruse the works" },
-      "/sound":   { ko: "사운드 작업이에요", en: "Sound pieces, have a listen" },
-      "/cv":      { ko: "소개 페이지예요", en: "A little about me, the chap" },
-      "/contact": { ko: "지금 이 페이지예요", en: "You're already here! 🎩" },
-      "/":        { ko: "처음으로", en: "Back to the top, then" },
+      "/works":   { ko: "작업들을 둘러보세요", en: "Do peruse the works", gest: "jumping" },
+      "/sound":   { ko: "사운드 작업이에요", en: "Sound pieces, have a listen", gest: "clapping" },
+      "/cv":      { ko: "소개 페이지예요", en: "A little about me, the chap", gest: "wave" },
+      "/contact": { ko: "지금 이 페이지예요", en: "You're already here! 🎩", gest: "thumbsup" },
+      "/":        { ko: "처음으로", en: "Back to the top, then", gest: "running" },
     };
+    let lastMenu = "";
     document.querySelectorAll("a[href]").forEach(a => {
       let path; try { path = new URL(a.href, location.href).pathname.replace(/\/$/, "") || "/"; } catch (e) { return; }
       if (!MENU[path] || a.closest(".links")) return;
-      a.addEventListener("pointerenter", () => { if (dragging) return; noticed = true; homing = false; presenting = null; const m = MENU[path]; say(m.ko, m.en, 2600); });
+      a.addEventListener("pointerenter", () => { if (dragging) return; noticed = true; homing = false; presenting = null;
+        const m = MENU[path]; say(m.ko, m.en, 2600);
+        if (path !== lastMenu) { lastMenu = path; if (m.gest) reactOnce(m.gest); }  // 메뉴마다 다른 액션 (연속 재진입 시 반복 방지)
+      });
+      a.addEventListener("pointerleave", () => { lastMenu = ""; });
     });
     const HELLOS = [["안녕하세요!", "Oh, hello there! 👋"], ["어, 오셨네요!", "Ah, there you are"], ["반가워요 :)", "Fancy seeing you here"]];
     function firstNotice() { if (noticed) return; noticed = true;
