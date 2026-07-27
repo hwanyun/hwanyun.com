@@ -87,7 +87,7 @@ import Base from "../layouts/Base.astro"
     let STAGEX = 60;
     let avatarSize = null;
     const target = new THREE.Vector3(); const home = new THREE.Vector3();
-    let dragging = false, noticed = false, waving = false, gesturing = false, presenting = null, homing = false, lastMove = 0;
+    let dragging = false, noticed = false, waving = false, gesturing = false, presenting = null, homing = false, lastMove = 0, downX = 0, moved = false;
     const IDLE_MS = 3000;   // 이 시간 동안 마우스 정지/이탈 시 자리로 돌아가 '일하기'
 
     // ▼ 튜닝: FILL 낮추면 캐릭터가 작아짐(전신 여유). STAGEX 비율은 좌우 이동 범위.
@@ -126,6 +126,9 @@ import Base from "../layouts/Base.astro"
     const setBusy = () => { mode = "busy"; fadeTo(actions.typing ? "typing" : "idle"); };
     const setAttentive = () => { mode = "attentive"; fadeTo("idle"); };
     const setWalking = () => { if (mode !== "walking") { mode = "walking"; fadeTo(actions.walk ? "walk" : "idle"); } };
+    const setRunning = () => { if (mode !== "running") { mode = "running"; fadeTo(actions.running ? "running" : (actions.walk ? "walk" : "idle")); } };
+    // 클릭(탭) 반응: 한 번 재생 후 대기로 복귀
+    function reactOnce(name) { if (!actions[name]) { setAttentive(); return; } gesturing = true; fadeTo(name, true); const d = actions[name].getClip().duration*1000; setTimeout(() => { gesturing = false; setAttentive(); }, d + 400); }
     const updateTarget = () => { target.set(Math.max(-STAGEX, Math.min(STAGEX, ptr.x*STAGEX)), 0, 0); };
     const presentEl = (el) => {
       if (dragging || !avatar) return;
@@ -144,11 +147,14 @@ import Base from "../layouts/Base.astro"
     addEventListener("pointermove", e => { ptr.x = (e.clientX/innerWidth)*2-1; ptr.y = -(e.clientY/innerHeight)*2+1;
       updateTarget();
       lastMove = performance.now(); if (homing) homing = false;
+      if (dragging && Math.abs(e.clientX - downX) > 6) moved = true;
       if (model && !noticed && !reduce) firstNotice();
       if (model && !dragging) { raycaster.setFromCamera(ptr, camera); const over = raycaster.intersectObjects(modelMeshes, true).length > 0; canvas.style.pointerEvents = over ? "auto" : "none"; canvas.classList.toggle("grab", over); } }, { passive: true });
-    addEventListener("pointerdown", () => { if (!model) return; raycaster.setFromCamera(ptr, camera);
-      if (raycaster.intersectObjects(modelMeshes, true).length > 0) { dragging = true; mode = "dragging"; canvas.classList.add("grabbing"); presenting = null; fadeTo("idle"); } });
-    addEventListener("pointerup", () => { if (dragging) { dragging = false; canvas.classList.remove("grabbing"); setAttentive(); } });
+    addEventListener("pointerdown", e => { if (!model) return; raycaster.setFromCamera(ptr, camera);
+      if (raycaster.intersectObjects(modelMeshes, true).length > 0) { dragging = true; moved = false; downX = e.clientX; mode = "dragging"; canvas.classList.add("grabbing"); presenting = null; noticed = true; homing = false; fadeTo(actions.hanging ? "hanging" : "idle"); } });
+    addEventListener("pointerup", () => { if (dragging) { dragging = false; canvas.classList.remove("grabbing");
+      if (!moved) { const r = Math.random() < 0.5 && actions.clapping ? "clapping" : "jumping"; reactOnce(r); }  // 탭 = 클릭 반응
+      else setAttentive(); } });
     function frameAvatar() {
       if (!avatarSize) return;
       const vFov = camera.fov * Math.PI / 180;
@@ -178,12 +184,12 @@ import Base from "../layouts/Base.astro"
         else if (!noticed && !dragging && !reduce) { faceTowards({ x: pos.x, z: pos.z + 10 }); }  // 일하는 중엔 정면
         else if (!waving && !gesturing && noticed && !reduce) {
           const goal = presenting ? presenting.target : target; const dist = Math.abs(goal.x-pos.x); const stopAt = (presenting ? 0.14 : 0.10)*STAGEX;
-          if (dist > stopAt) { setWalking(); tmpDir.set(goal.x-pos.x,0,0).normalize(); pos.x += tmpDir.x*dist*dt*2.4; faceTowards(goal); }
+          if (dist > stopAt) { const far = dist > 0.5*STAGEX; if (far) setRunning(); else setWalking(); tmpDir.set(goal.x-pos.x,0,0).normalize(); pos.x += tmpDir.x*dist*dt*(far ? 3.6 : 2.4); faceTowards(goal); }
           else if (presenting && !presenting.arrived) { presenting.arrived = true; presenting.el.classList.add("active");
-            const gest = actions.thumbsup ? "thumbsup" : (actions.wave ? "wave" : null);
+            const gest = actions.pointing ? "pointing" : (actions.thumbsup ? "thumbsup" : (actions.wave ? "wave" : null));
             if (gest) { gesturing = true; fadeTo(gest, true); const g = presenting, d = actions[gest].getClip().duration*1000; setTimeout(() => { gesturing = false; if (g.el) g.el.classList.remove("active"); if (presenting === g) presenting = null; setAttentive(); }, d+900); }
             faceTowards(presenting.face); }
-          else { if (mode === "walking") setAttentive(); const look = presenting ? presenting.face : goal; if (mode === "attentive") faceTowards(look); }
+          else { if (mode === "walking" || mode === "running") setAttentive(); const look = presenting ? presenting.face : goal; if (mode === "attentive") faceTowards(look); }
         }
         shadow.position.x = pos.x; shadow.position.z = pos.z;
       }
