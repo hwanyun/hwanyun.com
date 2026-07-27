@@ -12,7 +12,9 @@ import Base from "../layouts/Base.astro"
       <li><span>Instagram</span> <a href="https://instagram.com/hwanyun.lab" target="_blank" rel="noopener">@hwanyun.lab</a></li>
     </ul>
   </article>
+  <div id="mascot-bg"></div>
   <canvas id="mascot-canvas"></canvas>
+  <div id="mascot-bubble" aria-hidden="true"></div>
 
   <style>
     .page {
@@ -33,6 +35,22 @@ import Base from "../layouts/Base.astro"
     .links a.active { color:#000; background:#fff59d55; transform: translateX(2px); }
     #mascot-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 2; pointer-events: none; }
     #mascot-canvas.grab { cursor: grab; } #mascot-canvas.grabbing { cursor: grabbing; }
+    /* 커서를 따라 은은한 빛이 움직이는 배경 */
+    #mascot-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background: radial-gradient(circle 42vmax at var(--mx, 55%) var(--my, 42%), #f3efe6 0%, #faf9f6 45%, #ffffff 75%); }
+    /* 캐릭터 머리 위 말풍선 */
+    #mascot-bubble { position: fixed; z-index: 4; pointer-events: none; left: -9999px; top: -9999px;
+      background: #fff; color: #141414; border: 1px solid #e7e7e7; border-radius: 18px; padding: 13px 20px;
+      font-size: 18px; font-weight: 600; line-height: 1.25; text-align: left; max-width: 300px;
+      box-shadow: 0 12px 32px rgba(0,0,0,.14); opacity: 0; transition: opacity .22s ease; }
+    #mascot-bubble.show { opacity: 1; }
+    #mascot-bubble.right { transform: translateY(-50%); }
+    #mascot-bubble.left  { transform: translate(-100%, -50%); }
+    #mascot-bubble :global(.en) { display: block; margin-top: 5px; font-size: 12.5px; font-weight: 400; color: #a6a6a6; letter-spacing: .02em; }
+    #mascot-bubble.right::after { content: ""; position: absolute; left: -8px; top: 50%; transform: translateY(-50%);
+      border: 8px solid transparent; border-right-color: #fff; }
+    #mascot-bubble.left::after { content: ""; position: absolute; right: -8px; top: 50%; transform: translateY(-50%);
+      border: 8px solid transparent; border-left-color: #fff; }
     :global(body > footer) {
       position: fixed;
       z-index: 3;
@@ -90,6 +108,13 @@ import Base from "../layouts/Base.astro"
     let dragging = false, noticed = false, waving = false, gesturing = false, presenting = null, homing = false, lastMove = 0, downX = 0, moved = false, clicks = 0;
     const IDLE_MS = 3000;   // 이 시간 동안 마우스 정지/이탈 시 자리로 돌아가 '일하기'
 
+    // 말풍선(소통) + 인터랙티브 배경
+    const bubble = document.getElementById("mascot-bubble");
+    const bg = document.getElementById("mascot-bg");
+    let bubbleUntil = 0;
+    // en=메인(제목), ko=서브타이틀
+    function say(ko, en, ms = 2400) { if (!bubble) return; const main = en || ko, sub = en ? ko : ""; bubble.innerHTML = main + (sub ? '<span class="en">' + sub + "</span>" : ""); bubble.classList.add("show"); bubbleUntil = performance.now() + ms; }
+
     // ▼ 튜닝: FILL 낮추면 캐릭터가 작아짐(전신 여유). STAGEX 비율은 좌우 이동 범위.
     const FILL = matchMedia("(max-width: 700px)").matches ? 0.72 : 0.55;
 
@@ -134,17 +159,34 @@ import Base from "../layouts/Base.astro"
       if (dragging || !avatar) return;
       noticed = true; waving = false; gesturing = false;
       setAttentive();
+      const msg = (el.href || "").includes("mailto") ? { ko: "메일은 여기예요", en: "Do drop me a line ✉️" } : { ko: "인스타 구경 오세요", en: "Come have a nosey on Instagram 📸" };
       presenting = {
-        el,
+        el, msg,
         target: home.clone(),
         face: new THREE.Vector3(-STAGEX, 0, 0),
         arrived: false,
       };
     };
     document.querySelectorAll(".links a").forEach(a => a.addEventListener("pointerenter", () => presentEl(a)));
+    // 메뉴(nav) 항목 설명 — 경로로 매칭, contact의 이메일/인스타 링크는 제외
+    const MENU = {
+      "/works":   { ko: "작업들을 둘러보세요", en: "Do peruse the works" },
+      "/sound":   { ko: "사운드 작업이에요", en: "Sound pieces, have a listen" },
+      "/cv":      { ko: "소개 페이지예요", en: "A little about me, the chap" },
+      "/contact": { ko: "지금 이 페이지예요", en: "You're already here! 🎩" },
+      "/":        { ko: "처음으로", en: "Back to the top, then" },
+    };
+    document.querySelectorAll("a[href]").forEach(a => {
+      let path; try { path = new URL(a.href, location.href).pathname.replace(/\/$/, "") || "/"; } catch (e) { return; }
+      if (!MENU[path] || a.closest(".links")) return;
+      a.addEventListener("pointerenter", () => { if (dragging) return; noticed = true; homing = false; presenting = null; const m = MENU[path]; say(m.ko, m.en, 2600); });
+    });
+    const HELLOS = [["안녕하세요!", "Oh, hello there! 👋"], ["어, 오셨네요!", "Ah, there you are"], ["반가워요 :)", "Fancy seeing you here"]];
     function firstNotice() { if (noticed) return; noticed = true;
+      const h = HELLOS[Math.floor(clicks + performance.now()) % HELLOS.length] || HELLOS[0]; say(h[0], h[1]);
       if (actions.wave) { waving = true; fadeTo("wave", true); const d = actions.wave.getClip().duration*1000; setTimeout(() => { waving = false; setAttentive(); }, d); } else setAttentive(); }
     addEventListener("pointermove", e => { ptr.x = (e.clientX/innerWidth)*2-1; ptr.y = -(e.clientY/innerHeight)*2+1;
+      if (bg) { bg.style.setProperty("--mx", e.clientX + "px"); bg.style.setProperty("--my", e.clientY + "px"); }
       updateTarget();
       lastMove = performance.now(); if (homing) homing = false;
       if (dragging && Math.abs(e.clientX - downX) > 6) moved = true;
@@ -153,8 +195,9 @@ import Base from "../layouts/Base.astro"
     addEventListener("pointerdown", e => { if (!model) return; raycaster.setFromCamera(ptr, camera);
       if (raycaster.intersectObjects(modelMeshes, true).length > 0) { dragging = true; moved = false; downX = e.clientX; mode = "dragging"; canvas.classList.add("grabbing"); presenting = null; noticed = true; homing = false; fadeTo(actions.hanging ? "hanging" : "idle"); } });
     addEventListener("pointerup", () => { if (dragging) { dragging = false; canvas.classList.remove("grabbing");
-      if (!moved) { const seq = ["jumping", "clapping", "thumbsup"]; let name = seq[clicks % seq.length]; clicks++; if (!actions[name]) name = "jumping"; reactOnce(name); }  // 탭 = 점프→박수→엄지척 순환
-      else reactOnce(actions.falling ? "falling" : "idle"); } });  // 드래그 후 놓기 = 툭 떨어지기
+      if (!moved) { const seq = ["jumping", "clapping", "thumbsup"]; let name = seq[clicks % seq.length]; clicks++; if (!actions[name]) name = "jumping"; reactOnce(name);
+        const m = { jumping: ["와!", "Splendid! 🎉"], clapping: ["짝짝짝!", "Bravo, jolly good! 👏"], thumbsup: ["좋아요!", "Top-notch! 👍"] }[name] || ["와!", "Splendid! 🎉"]; say(m[0], m[1], 1800); }  // 탭 = 점프→박수→엄지척 순환
+      else { reactOnce(actions.falling ? "falling" : "idle"); say("으앗—!", "Steady on! 😵", 1500); } } });  // 드래그 후 놓기 = 툭 떨어지기
     function frameAvatar() {
       if (!avatarSize) return;
       const vFov = camera.fov * Math.PI / 180;
@@ -162,7 +205,9 @@ import Base from "../layouts/Base.astro"
       const distanceForHeight = (avatarSize.y / (2 * FILL)) / Math.tan(vFov / 2);
       const distanceForWidth = (avatarSize.x / (2 * FILL)) / Math.tan(hFov / 2);
       const distance = Math.max(distanceForHeight, distanceForWidth);
-      camera.position.set(0, 0, distance); camera.lookAt(0, 0, 0);
+      // 시선을 살짝 위로 → 캐릭터가 화면 아래쪽에 앉아 상단 텍스트/말풍선 공간 확보
+      const voff = avatarSize.y * (matchMedia("(max-width: 700px)").matches ? 0.05 : 0.15);
+      camera.position.set(0, voff, distance); camera.lookAt(0, voff, 0);
       camera.far = distance * 6; camera.updateProjectionMatrix();
       const halfW = distance * Math.tan(hFov / 2);
       STAGEX = Math.max(0, halfW - avatarSize.x * 0.7);
@@ -179,13 +224,13 @@ import Base from "../layouts/Base.astro"
         else if (homing && !reduce) {
           const dist = Math.abs(pos.x - home.x);
           if (dist > 0.05*STAGEX) { setWalking(); tmpDir.set(home.x-pos.x,0,0).normalize(); pos.x += tmpDir.x*Math.max(dist,0.25*STAGEX)*dt*2.4; faceTowards(home); }
-          else { homing = false; setBusy(); }
+          else { homing = false; setBusy(); say("다시 작업할게요…", "Right, back to it ⌨️", 1800); }
         }
         else if (!noticed && !dragging && !reduce) { faceTowards({ x: pos.x, z: pos.z + 10 }); }  // 일하는 중엔 정면
         else if (!waving && !gesturing && noticed && !reduce) {
           const goal = presenting ? presenting.target : target; const dist = Math.abs(goal.x-pos.x); const stopAt = (presenting ? 0.14 : 0.22)*STAGEX;
           if (dist > stopAt) { const far = dist > 0.5*STAGEX; if (far) setRunning(); else setWalking(); tmpDir.set(goal.x-pos.x,0,0).normalize(); pos.x += tmpDir.x*dist*dt*(far ? 3.6 : 2.4); faceTowards(goal); }
-          else if (presenting && !presenting.arrived) { presenting.arrived = true; presenting.el.classList.add("active");
+          else if (presenting && !presenting.arrived) { presenting.arrived = true; presenting.el.classList.add("active"); say(presenting.msg.ko, presenting.msg.en, 2800);
             const gest = actions.pointing ? "pointing" : (actions.thumbsup ? "thumbsup" : (actions.wave ? "wave" : null));
             if (gest) { gesturing = true; fadeTo(gest, true); const g = presenting, d = actions[gest].getClip().duration*1000; setTimeout(() => { gesturing = false; if (g.el) g.el.classList.remove("active"); if (presenting === g) presenting = null; setAttentive(); }, d+900); }
             faceTowards(presenting.face); }
@@ -196,6 +241,17 @@ import Base from "../layouts/Base.astro"
         }
         shadow.position.x = pos.x; shadow.position.z = pos.z;
       }
+      // 말풍선을 캐릭터 머리 옆(오른쪽 빈 공간, 없으면 왼쪽)에 고정 + 시간 지나면 숨김
+      if (bubble && avatar && avatarSize) {
+        const hp = new THREE.Vector3(avatar.position.x, avatar.position.y + avatarSize.y * 0.34, avatar.position.z).project(camera);
+        const sx = (hp.x * 0.5 + 0.5) * innerWidth, sy = (-hp.y * 0.5 + 0.5) * innerHeight;
+        const gap = Math.max(120, innerWidth * 0.09);
+        const right = sx < innerWidth * 0.6;
+        bubble.classList.toggle("right", right); bubble.classList.toggle("left", !right);
+        bubble.style.left = (right ? sx + gap : sx - gap) + "px";
+        bubble.style.top = sy + "px";
+      }
+      if (bubble && bubble.classList.contains("show") && performance.now() > bubbleUntil) bubble.classList.remove("show");
       renderer.render(scene, camera);
     }
     animate();
