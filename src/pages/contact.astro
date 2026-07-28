@@ -51,6 +51,10 @@ import Base from "../layouts/Base.astro"
       border: 8px solid transparent; border-right-color: #fff; }
     #mascot-bubble.left::after { content: ""; position: absolute; right: -8px; top: 50%; transform: translateY(-50%);
       border: 8px solid transparent; border-left-color: #fff; }
+    /* 모바일: 발 밑 가운데, 꼬리는 위로 */
+    #mascot-bubble.below { transform: translateX(-50%); max-width: 78vw; text-align: center; }
+    #mascot-bubble.below::after { content: ""; position: absolute; left: 50%; top: -8px; right: auto; bottom: auto;
+      transform: translateX(-50%); border: 8px solid transparent; border-bottom-color: #fff; }
     :global(body > footer) {
       position: fixed;
       z-index: 3;
@@ -81,6 +85,8 @@ import Base from "../layouts/Base.astro"
       .links span { width: auto; font-size: 14px; line-height: 1.4; color: #777; }
       .links a { font-size: 15px; line-height: 1.65; }
       :global(body > footer) { left: 16px; bottom: 18px; }
+      #mascot-bubble { font-size: 14px; padding: 8px 13px; border-radius: 14px; max-width: 70vw; }
+      #mascot-bubble :global(.en) { font-size: 10.5px; margin-top: 3px; }
     }
   </style>
 
@@ -116,7 +122,7 @@ import Base from "../layouts/Base.astro"
     function say(ko, en, ms = 2400) { if (!bubble) return; const main = en || ko, sub = en ? ko : ""; bubble.innerHTML = main + (sub ? '<span class="en">' + sub + "</span>" : ""); bubble.classList.add("show"); bubbleUntil = performance.now() + ms; }
 
     // ▼ 튜닝: FILL 낮추면 캐릭터가 작아짐(전신 여유). STAGEX 비율은 좌우 이동 범위.
-    const FILL = matchMedia("(max-width: 700px)").matches ? 0.72 : 0.55;
+    const FILL = matchMedia("(max-width: 700px)").matches ? 0.66 : 0.55;
 
     new GLTFLoader().load("/mascot/character.glb", (gltf) => {
       model = gltf.scene;
@@ -186,6 +192,17 @@ import Base from "../layouts/Base.astro"
       });
       a.addEventListener("pointerleave", () => { lastMenu = ""; });
     });
+
+    // 모바일: hover가 없으니 캐릭터가 스스로 인사하고 이메일/인스타를 순회 소개
+    if (matchMedia("(max-width: 700px)").matches) {
+      const pois = Array.prototype.slice.call(document.querySelectorAll(".links a"));
+      let greeted = false, ti = 0;
+      setInterval(() => {
+        if (!model || dragging || gesturing || waving || presenting || document.hidden) return;
+        if (!greeted) { greeted = true; firstNotice(); return; }
+        const el = pois[ti % pois.length]; ti++; if (el) presentEl(el);
+      }, 4800);
+    }
     const HELLOS = [["안녕하세요!", "Oh, hello there! 👋"], ["어, 오셨네요!", "Ah, there you are"], ["반가워요 :)", "Fancy seeing you here"]];
     function firstNotice() { if (noticed) return; noticed = true;
       const h = HELLOS[Math.floor(clicks + performance.now()) % HELLOS.length] || HELLOS[0]; say(h[0], h[1]);
@@ -209,9 +226,10 @@ import Base from "../layouts/Base.astro"
       const hFov = 2 * Math.atan(Math.tan(vFov / 2) * camera.aspect);
       const distanceForHeight = (avatarSize.y / (2 * FILL)) / Math.tan(vFov / 2);
       const distanceForWidth = (avatarSize.x / (2 * FILL)) / Math.tan(hFov / 2);
-      const distance = Math.max(distanceForHeight, distanceForWidth);
+      // 모바일(세로)은 높이 기준으로 크게, 데스크탑은 가로/세로 중 더 먼 쪽으로 안전하게
+      const distance = matchMedia("(max-width: 700px)").matches ? distanceForHeight : Math.max(distanceForHeight, distanceForWidth);
       // 시선을 살짝 위로 → 캐릭터가 화면 아래쪽에 앉아 상단 텍스트/말풍선 공간 확보
-      const voff = avatarSize.y * (matchMedia("(max-width: 700px)").matches ? 0.05 : 0.15);
+      const voff = avatarSize.y * (matchMedia("(max-width: 700px)").matches ? -0.02 : 0.15);
       camera.position.set(0, voff, distance); camera.lookAt(0, voff, 0);
       camera.far = distance * 6; camera.updateProjectionMatrix();
       const halfW = distance * Math.tan(hFov / 2);
@@ -248,13 +266,22 @@ import Base from "../layouts/Base.astro"
       }
       // 말풍선을 캐릭터 머리 옆(오른쪽 빈 공간, 없으면 왼쪽)에 고정 + 시간 지나면 숨김
       if (bubble && avatar && avatarSize) {
-        const hp = new THREE.Vector3(avatar.position.x, avatar.position.y + avatarSize.y * 0.34, avatar.position.z).project(camera);
-        const sx = (hp.x * 0.5 + 0.5) * innerWidth, sy = (-hp.y * 0.5 + 0.5) * innerHeight;
-        const gap = Math.max(120, innerWidth * 0.09);
-        const right = sx < innerWidth * 0.6;
-        bubble.classList.toggle("right", right); bubble.classList.toggle("left", !right);
-        bubble.style.left = (right ? sx + gap : sx - gap) + "px";
-        bubble.style.top = sy + "px";
+        if (matchMedia("(max-width: 700px)").matches) {
+          // 모바일: 발 밑 가운데
+          const fp = new THREE.Vector3(avatar.position.x, avatar.position.y - avatarSize.y * 0.5, avatar.position.z).project(camera);
+          bubble.classList.remove("right", "left"); bubble.classList.add("below");
+          bubble.style.left = ((fp.x * 0.5 + 0.5) * innerWidth) + "px";
+          bubble.style.top = ((-fp.y * 0.5 + 0.5) * innerHeight + 16) + "px";
+        } else {
+          // 데스크탑: 머리 옆(오른쪽 우선, 공간 없으면 왼쪽)
+          const hp = new THREE.Vector3(avatar.position.x, avatar.position.y + avatarSize.y * 0.34, avatar.position.z).project(camera);
+          const sx = (hp.x * 0.5 + 0.5) * innerWidth, sy = (-hp.y * 0.5 + 0.5) * innerHeight;
+          const gap = Math.max(120, innerWidth * 0.09);
+          const right = sx < innerWidth * 0.6;
+          bubble.classList.remove("below"); bubble.classList.toggle("right", right); bubble.classList.toggle("left", !right);
+          bubble.style.left = (right ? sx + gap : sx - gap) + "px";
+          bubble.style.top = sy + "px";
+        }
       }
       if (bubble && bubble.classList.contains("show") && performance.now() > bubbleUntil) bubble.classList.remove("show");
       renderer.render(scene, camera);

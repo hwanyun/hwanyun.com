@@ -403,24 +403,12 @@ function toParagraphs(text: string): string {
           })
           return
         }
-        var btn = document.createElement("button")
-        btn.className = "focus-open"
-        btn.setAttribute("aria-label", "Enlarge")
-        btn.innerHTML = "&#10530;" // ⤢
-        btn.addEventListener("click", function (e) {
-          e.stopPropagation()
-          openFig(fig)
-        })
-        fig.appendChild(btn)
+        // 이미지: 별도 버튼 없이 그림 전체를 클릭하면 확대 (hover 시 중앙 ⤢ 힌트는 CSS로)
         if (!fig.classList.contains("is-video")) {
           var img = fig.querySelector("img")
           if (img) {
-            img.style.cursor = "zoom-in"
-            // 카드의 빈 여백이나 캡션을 눌러도 같은 이미지를 연다.
-            fig.addEventListener("click", function (event) {
-              if (event.target.closest(".focus-open")) return
-              openFig(fig)
-            })
+            fig.style.cursor = "zoom-in"
+            fig.addEventListener("click", function () { openFig(fig) })
           }
         }
       })
@@ -892,6 +880,18 @@ function toParagraphs(text: string): string {
 
     /* 12열 그리드: 자료의 역할과 여백을 함께 조절한다. */
     .block { position: relative; grid-column: span 5; }
+    /* 이미지 확대 힌트: 별도 버튼 없이 그림 전체 클릭. hover 시 이미지만 살짝 어두워지고 중앙에 ⤢ */
+    .block:not(.is-video) { cursor: zoom-in; align-self: start; }
+    .block:not(.is-video) img { transition: filter 0.2s ease; }
+    .block:not(.is-video):hover img { filter: brightness(0.9); }
+    .block:not(.is-video)::before {
+      content: "\2922"; position: absolute; left: 50%; top: 50%; z-index: 2; pointer-events: none;
+      display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%;
+      background: rgba(255,255,255,0.92); color: #111; font-size: 20px;
+      transform: translate(-50%, -50%) scale(0.9); opacity: 0;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .block:not(.is-video):hover::before { opacity: 1; transform: translate(-50%, -50%) scale(1); }
     .block.hero { grid-column: 1 / span 9; }
     .block.wide { grid-column: span 7; }
     .block.standard { grid-column: span 5; }
@@ -1032,14 +1032,21 @@ function toParagraphs(text: string): string {
     .focus-cap { font-size: 14px; color: #444; text-align: center; }
     .focus-close {
       position: fixed;
-      top: 16px;
-      right: 22px;
-      width: 40px;
-      height: 40px;
-      font-size: 30px;
+      top: 14px;
+      right: 16px;
+      z-index: 3;               /* 영상/스테이지 위로 → 항상 클릭 가능 (버그 수정) */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 46px;
+      height: 46px;
+      font-size: 28px;
       line-height: 1;
-      background: none;
+      background: rgba(255, 255, 255, 0.78);
+      -webkit-backdrop-filter: blur(4px);
+      backdrop-filter: blur(4px);
       border: 0;
+      border-radius: 50%;
       color: #111;
       cursor: pointer;
     }
@@ -1074,6 +1081,7 @@ function toParagraphs(text: string): string {
     .focus.video-focus .focus-cap,
     .focus.video-focus .focus-nav { color: #f7f7f3; }
     .focus.video-focus .focus-nav { background: rgba(7,8,10,.48); }
+    .focus.video-focus .focus-close { background: rgba(7,8,10,.55); color: #fff; }
     .focus.video-focus .focus-stage .video { box-shadow: none; }
 
     /* 영상: 비율에 맞춰 자동 크기 */
