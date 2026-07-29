@@ -46,7 +46,7 @@ const nav = [
           data-search={`${w.data.title} ${w.data.year} ${w.data.medium}`.toLowerCase()}
         >
           <div class="thumb">
-            {w.data.thumb ? <img src={w.data.thumb} alt={w.data.title} /> : <div class="ph" />}
+            {w.data.thumb ? <img src={w.data.thumb} alt={w.data.title} draggable="false" /> : <div class="ph" />}
           </div>
           <span class="scrim" aria-hidden="true" />
           <div class="cap">
@@ -309,6 +309,9 @@ const nav = [
     border: 2px solid #fff;
     background: #f2f2f2;
     opacity: 0;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
   }
   #packed.ready .tile {
     opacity: 1;
@@ -340,6 +343,12 @@ const nav = [
     height: 100%;
     object-fit: cover;
     display: block;
+    /* 모바일 롱프레스로 이미지가 '복사/드래그'되어 뜯겨 나오는 것 방지: 탭은 항상 링크로 */
+    pointer-events: none;
+    -webkit-user-drag: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
   }
   .card .ph {
     background: #ececec;
