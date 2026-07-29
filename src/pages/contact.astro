@@ -196,11 +196,13 @@ import Base from "../layouts/Base.astro"
     // 모바일: hover가 없으니 캐릭터가 스스로 인사하고 이메일/인스타를 순회 소개
     if (matchMedia("(max-width: 700px)").matches) {
       const pois = Array.prototype.slice.call(document.querySelectorAll(".links a"));
-      let greeted = false, ti = 0;
+      let step = 0;
       setInterval(() => {
         if (!model || dragging || gesturing || waving || presenting || document.hidden) return;
-        if (!greeted) { greeted = true; firstNotice(); return; }
-        const el = pois[ti % pois.length]; ti++; if (el) presentEl(el);
+        if (step === 0) { step++; noticed = true;
+          if (actions.wave) { waving = true; fadeTo("wave", true); const d = actions.wave.getClip().duration*1000; setTimeout(() => { waving = false; setAttentive(); }, d); }
+          say("저를 탭해보세요!", "Tap me! 👆", 3200); return; }
+        const el = pois[(step - 1) % pois.length]; step++; if (el) presentEl(el);
       }, 4800);
     }
     const HELLOS = [["안녕하세요!", "Oh, hello there! 👋"], ["어, 오셨네요!", "Ah, there you are"], ["반가워요 :)", "Fancy seeing you here"]];
@@ -214,8 +216,11 @@ import Base from "../layouts/Base.astro"
       if (dragging && Math.abs(e.clientX - downX) > 6) moved = true;
       if (model && !noticed && !reduce) firstNotice();
       if (model && !dragging) { raycaster.setFromCamera(ptr, camera); const over = raycaster.intersectObjects(modelMeshes, true).length > 0; canvas.style.pointerEvents = over ? "auto" : "none"; canvas.classList.toggle("grab", over); } }, { passive: true });
-    addEventListener("pointerdown", e => { if (!model) return; raycaster.setFromCamera(ptr, camera);
-      if (raycaster.intersectObjects(modelMeshes, true).length > 0) { dragging = true; moved = false; downX = e.clientX; mode = "dragging"; canvas.classList.add("grabbing"); presenting = null; noticed = true; homing = false; fadeTo(actions.hanging ? "hanging" : "idle"); } });
+    addEventListener("pointerdown", e => { if (!model) return;
+      ptr.x = (e.clientX/innerWidth)*2-1; ptr.y = -(e.clientY/innerHeight)*2+1;   // 터치도 정확히 히트 판정
+      raycaster.setFromCamera(ptr, camera);
+      if (raycaster.intersectObjects(modelMeshes, true).length > 0) { dragging = true; moved = false; downX = e.clientX; mode = "dragging"; canvas.classList.add("grabbing"); presenting = null; noticed = true; homing = false; fadeTo(actions.hanging ? "hanging" : "idle"); }
+    });
     addEventListener("pointerup", () => { if (dragging) { dragging = false; canvas.classList.remove("grabbing");
       if (!moved) { const seq = ["jumping", "clapping", "thumbsup"]; let name = seq[clicks % seq.length]; clicks++; if (!actions[name]) name = "jumping"; reactOnce(name);
         const m = { jumping: ["와!", "Splendid! 🎉"], clapping: ["짝짝짝!", "Bravo, jolly good! 👏"], thumbsup: ["좋아요!", "Top-notch! 👍"] }[name] || ["와!", "Splendid! 🎉"]; say(m[0], m[1], 1800); }  // 탭 = 점프→박수→엄지척 순환
