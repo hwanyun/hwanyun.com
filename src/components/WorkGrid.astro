@@ -309,7 +309,6 @@ const nav = [
     border: 2px solid #fff;
     background: #f2f2f2;
     opacity: 0;
-    -webkit-touch-callout: none;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
   }
@@ -343,12 +342,12 @@ const nav = [
     height: 100%;
     object-fit: cover;
     display: block;
-    /* 모바일 롱프레스로 이미지가 '복사/드래그'되어 뜯겨 나오는 것 방지: 탭은 항상 링크로 */
+    /* 롱프레스가 이미지가 아니라 링크(a)로 전달되게 → iOS 링크 미리보기 팝업 유지.
+       동시에 이미지 자체의 드래그(뜯겨 나옴)만 차단. (touch-callout은 끄지 않음) */
     pointer-events: none;
     -webkit-user-drag: none;
     user-select: none;
     -webkit-user-select: none;
-    -webkit-touch-callout: none;
   }
   .card .ph {
     background: #ececec;
