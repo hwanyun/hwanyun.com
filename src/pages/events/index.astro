@@ -90,8 +90,8 @@ function fmt(start: string, end: string) {
       max-width: 720px;
     }
     .events-head { margin-bottom: 40px; }
-    .eyebrow { font-size: 11px; letter-spacing: 0.14em; color: #999; margin: 0 0 10px; text-transform: uppercase; }
-    .events h1 { font-size: 30px; font-weight: 400; margin: 0 0 10px; }
+    .eyebrow { margin: 0; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #888; }
+    .events h1 { margin: 8px 0 16px; font-size: 38px; font-weight: 300; line-height: 1.15; }
     .intro { font-size: 15px; color: #666; margin: 0; max-width: 460px; line-height: 1.6; }
 
     .ev-list { list-style: none; margin: 0; padding: 0; }
@@ -122,7 +122,7 @@ function fmt(start: string, end: string) {
 
     @media (max-width: 700px) {
       .events { margin: 0 16px 80px; padding-top: 8px; max-width: none; }
-      .events h1 { font-size: 24px; }
+      .events h1 { font-size: clamp(25px, 7vw, 32px); line-height: 1.22; }
       .ev-link { grid-template-columns: 1fr auto; gap: 6px 12px; padding: 16px 2px; }
       .ev-date { grid-column: 1 / -1; order: -1; font-size: 13px; }
       .ev-title { font-size: 16px; }

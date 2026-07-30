@@ -6,6 +6,7 @@ import Base from "../layouts/Base.astro"
 
 <Base title="HWANYUN — Contact" current="contact">
   <article class="page">
+    <p class="eyebrow">HWANYUN / CONTACT</p>
     <h1>Contact</h1>
     <ul class="links">
       <li><span>Email</span> <a href="mailto:hwanyun.lab@gmail.com">hwanyun.lab@gmail.com</a></li>
@@ -24,8 +25,9 @@ import Base from "../layouts/Base.astro"
       pointer-events: none;
     }
     .page * { pointer-events: auto; }
-    .page h1, .page li, .page a { text-shadow: 0 0 6px #fff, 0 0 6px #fff, 0 0 10px #fff; }
-    .page h1 { font-size: 18px; font-weight: 500; margin: 0 0 24px; }
+    .page h1, .page li, .page a, .page .eyebrow { text-shadow: 0 0 6px #fff, 0 0 6px #fff, 0 0 10px #fff; }
+    .page .eyebrow { margin: 0; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #888; }
+    .page h1 { margin: 8px 0 24px; font-size: 38px; font-weight: 300; line-height: 1.15; }
     .links { list-style: none; padding: 0; margin: 0; }
     .links li { display: flex; gap: 16px; padding: 4px 0; }
     .links span { width: 90px; color: #555; }
@@ -71,10 +73,9 @@ import Base from "../layouts/Base.astro"
         line-height: 1.65;
       }
       .page h1 {
-        margin: 0 0 8px;
-        padding-bottom: 7px;
-        border-bottom: 1px solid #000;
-        font-size: 16px;
+        margin: 6px 0 16px;
+        font-size: clamp(25px, 7vw, 32px);
+        line-height: 1.22;
       }
       .links li {
         display: grid;
