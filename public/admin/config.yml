@@ -151,3 +151,33 @@ collections:
       - { name: order, label: "순서 (작을수록 앞)", widget: number, value_type: int, default: 100 }
       - { name: draft, label: "비공개(초안)", widget: boolean, default: false }
       - { name: body, label: "설명", widget: markdown, required: false }
+  - name: events
+    label: "이벤트 (Events)"
+    label_singular: "이벤트"
+    folder: "src/content/events"
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    format: frontmatter
+    sortable_fields: [dateStart, title, order]
+    fields:
+      - { name: title, label: "제목", widget: string }
+      - { name: dateStart, label: "시작일", widget: datetime, date_format: "YYYY-MM-DD", time_format: false, picker_utc: true, hint: "예: 2026-09-10" }
+      - { name: dateEnd, label: "종료일 (기간 전시)", widget: datetime, date_format: "YYYY-MM-DD", time_format: false, picker_utc: true, required: false }
+      - { name: timeNote, label: "시간·오프닝 메모", widget: string, required: false, hint: "예: Opening 18:00" }
+      - { name: venue, label: "장소", widget: string, required: false }
+      - { name: city, label: "도시", widget: string, required: false }
+      - { name: summary, label: "한 줄 소개", widget: string, required: false }
+      - { name: thumb, label: "대표 이미지", widget: image, required: false }
+      - { name: externalUrl, label: "외부 링크 (예매·기관)", widget: string, required: false }
+      - { name: externalLabel, label: "링크 버튼 문구", widget: string, required: false, hint: "비우면 '자세히 보기 · Details'" }
+      - name: images
+        label: "상세 이미지"
+        widget: list
+        required: false
+        fields:
+          - { name: src, label: "이미지", widget: image }
+          - { name: caption, label: "캡션", widget: string, required: false }
+      - { name: order, label: "정렬 보조 (작을수록 앞)", widget: number, value_type: int, default: 100 }
+      - { name: draft, label: "비공개(초안)", widget: boolean, default: false }
+      - { name: body, label: "상세 설명", widget: markdown, required: false }

@@ -108,4 +108,27 @@ const sounds = defineCollection({
   }),
 })
 
-export const collections = { works, sounds }
+// 이벤트 컬렉션 — 전시·공연 등 일정. 날짜가 지나면 프론트에서 자동으로 '지난 일정'으로 이동.
+const events = defineCollection({
+  type: "content", // 본문(마크다운) = 상세 설명
+  schema: z.object({
+    title: z.string(),
+    dateStart: z.string(), // "2026-09-10" (필수)
+    dateEnd: z.string().optional().default(""), // 종료일(기간 전시)
+    timeNote: z.string().optional().default(""), // 예: "19:00 오프닝"
+    venue: z.string().optional().default(""),
+    city: z.string().optional().default(""),
+    summary: z.string().optional().default(""), // 한 줄 소개
+    thumb: z.string().optional().default(""), // 카드/하이라이트 이미지
+    externalUrl: z.string().optional().default(""), // 예매·기관 외부 링크
+    externalLabel: z.string().optional().default(""), // 버튼 문구(비우면 기본값)
+    images: z
+      .array(z.object({ src: z.string(), caption: z.string().optional().default("") }))
+      .optional()
+      .default([]),
+    order: z.number().default(100), // 같은 날짜 내 정렬 보조
+    draft: z.boolean().optional().default(false),
+  }),
+})
+
+export const collections = { works, sounds, events }

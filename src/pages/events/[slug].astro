@@ -1,0 +1,91 @@
+---
+import { getCollection } from "astro:content"
+import Base from "../../layouts/Base.astro"
+
+export async function getStaticPaths() {
+  const events = await getCollection("events", ({ data }) => !data.draft)
+  return events.map((e) => ({ params: { slug: e.slug }, props: { event: e } }))
+}
+
+const { event } = Astro.props
+const { data } = event
+const { Content } = await event.render()
+
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+function fmt(start: string, end: string) {
+  const s = start.split("-").map(Number)
+  if (!s[0]) return start
+  const sd = `${s[2]} ${MONTHS[s[1] - 1]}`
+  if (end) {
+    const e = end.split("-").map(Number)
+    if (e[1] === s[1] && e[0] === s[0]) return `${s[2]}–${e[2]} ${MONTHS[s[1] - 1]} ${s[0]}`
+    return `${sd} – ${e[2]} ${MONTHS[e[1] - 1]} ${e[0]}`
+  }
+  return `${sd} ${s[0]}`
+}
+const where = [data.venue, data.city].filter(Boolean).join(", ")
+---
+
+<Base title={`HWANYUN — ${data.title}`} current="events">
+  <article class="ev-detail">
+    <a class="back" href="/events/">← Events</a>
+    <h1>{data.title}</h1>
+    <p class="meta">
+      <span class="d">{fmt(data.dateStart, data.dateEnd)}</span>
+      {data.timeNote && <span class="tn">{data.timeNote}</span>}
+      {where && <span class="w">{where}</span>}
+    </p>
+    {data.summary && <p class="summary">{data.summary}</p>}
+
+    <div class="body"><Content /></div>
+
+    {
+      data.images && data.images.length > 0 && (
+        <div class="ev-media">
+          {data.images.map((m) => (
+            <figure>
+              <img src={m.src} alt={m.caption || data.title} loading="lazy" />
+              {m.caption && <figcaption>{m.caption}</figcaption>}
+            </figure>
+          ))}
+        </div>
+      )
+    }
+
+    {
+      data.externalUrl && (
+        <a class="ev-cta" href={data.externalUrl} target="_blank" rel="noopener">
+          {data.externalLabel || "자세히 보기 · Details"} ↗
+        </a>
+      )
+    }
+  </article>
+
+  <style>
+    .ev-detail {
+      margin: var(--desktop-header-clearance) 40px 120px var(--desktop-content-x);
+      max-width: 720px;
+    }
+    .back { display: inline-block; font-size: 13px; color: #888; text-decoration: none; margin-bottom: 26px; }
+    .back:hover { color: #111; }
+    .ev-detail h1 { font-size: 30px; font-weight: 400; line-height: 1.25; margin: 0 0 14px; }
+    .meta { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 15px; color: #555; margin: 0 0 20px; }
+    .meta .d { color: #111; }
+    .summary { font-size: 17px; line-height: 1.6; color: #333; margin: 0 0 28px; max-width: 560px; }
+    .body { font-size: 16px; line-height: 1.8; color: #333; max-width: 620px; }
+    .body :global(p) { margin: 0 0 1em; }
+    .ev-media { margin: 34px 0 0; display: grid; gap: 18px; }
+    .ev-media img { width: 100%; display: block; }
+    .ev-media figcaption { font-size: 13px; color: #888; margin-top: 5px; }
+    .ev-cta {
+      display: inline-block; margin-top: 34px; padding: 12px 22px;
+      border: 1px solid #111; color: #111; text-decoration: none; font-size: 15px;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    .ev-cta:hover { background: #111; color: #fff; }
+    @media (max-width: 700px) {
+      .ev-detail { margin: 0 16px 80px; padding-top: 8px; max-width: none; }
+      .ev-detail h1 { font-size: 24px; }
+    }
+  </style>
+</Base>

@@ -5,6 +5,11 @@ import { getCollection } from "astro:content"
 
 const workMenu = await getCollection("works", ({ data }) => !data.draft)
 workMenu.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
+
+// 홈 하이라이트용 이벤트 데이터 (가장 가까운 미래 일정은 클라이언트에서 오늘 기준으로 선택)
+const upEvents = (await getCollection("events", ({ data }) => !data.draft))
+  .map((e) => ({ slug: e.slug, title: e.data.title, start: e.data.dateStart, end: e.data.dateEnd || e.data.dateStart, venue: e.data.venue, city: e.data.city }))
+  .sort((a, b) => a.start.localeCompare(b.start))
 ---
 
 <Base title="HWANYUN">
@@ -19,6 +24,7 @@ workMenu.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
       {workMenu.map((work) => <a href={`/works/${work.slug}/`}>{work.data.title}</a>)}
     </div>
     <a href="/sound">Sound</a>
+    <a href="/events">Events</a>
     <a href="/cv">Bio</a>
     <a href="/contact">Contact</a>
   </nav>
@@ -26,7 +32,37 @@ workMenu.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
   <section class="hero" aria-labelledby="hero-title">
     <canvas id="particle-canvas" class="hero__field" aria-hidden="true"></canvas>
     <h1 id="hero-title" class="sr-only">HWANYUN</h1>
+    <a id="upcoming-ticker" class="upcoming-ticker" href="/events/" hidden aria-label="Upcoming events"><span class="ut-track" id="ut-track"></span></a>
   </section>
+  <script type="application/json" id="ev-data" is:inline set:html={JSON.stringify(upEvents)}></script>
+  <script is:inline>
+    ;(function () {
+      var el = document.getElementById("upcoming-ticker")
+      var track = document.getElementById("ut-track")
+      var d = document.getElementById("ev-data")
+      if (!el || !track || !d) return
+      var evs
+      try { evs = JSON.parse(d.textContent || "[]") } catch (e) { return }
+      function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") }
+      var today = new Date(); today.setHours(0, 0, 0, 0)
+      var M = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+      var items = []
+      for (var i = 0; i < evs.length; i++) {
+        var end = new Date(evs[i].end + "T23:59:59")
+        if (isNaN(end) || end < today) continue
+        var s = evs[i].start.split("-").map(Number)
+        var date = s[2] + " " + M[s[1] - 1]
+        var where = [evs[i].venue, evs[i].city].filter(Boolean).join(", ")
+        items.push(esc(evs[i].title) + '<span class="ut-dim"> · ' + date + (where ? " · " + esc(where) : "") + "</span>")
+      }
+      if (!items.length) return
+      var sep = '<span class="ut-sep">✳</span>'
+      var content = '<span class="ut-tag">UPCOMING</span>' + sep + items.join(sep) + sep
+      var seg = '<span class="ut-seg">' + content + "</span>"
+      track.innerHTML = seg + seg // 이음새 없는 반복
+      el.hidden = false
+    })()
+  </script>
 
   <section id="works" class="work-archive" aria-label="Selected works">
     <WorkGrid current="home" />
@@ -227,6 +263,29 @@ workMenu.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
       isolation: isolate;
     }
     .hero__field { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: pan-y; }
+    /* 홈 하이라이트: 다가오는 이벤트 티커 (박스 없이, 좌→우로 흐름, 가장자리 페이드) */
+    .upcoming-ticker {
+      position: absolute; left: 0; right: 0; bottom: 26px; z-index: 2;
+      display: block; overflow: hidden; color: #ececea; text-decoration: none;
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+      mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+    }
+    .ut-track {
+      display: inline-flex; white-space: nowrap; will-change: transform;
+      animation: ut-move 34s linear infinite; /* 좌 → 우 */
+    }
+    @keyframes ut-move { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+    .upcoming-ticker:hover .ut-track { animation-play-state: paused; }
+    .ut-seg { display: inline-flex; align-items: center; font-size: 13.5px; letter-spacing: .01em; }
+    .upcoming-ticker :global(.ut-tag) { color: #b7c4d6; letter-spacing: .16em; font-size: 11px; }
+    .upcoming-ticker :global(.ut-dim) { color: #9a9a9a; }
+    .upcoming-ticker :global(.ut-sep) { margin: 0 24px; color: #556; }
+    @media (prefers-reduced-motion: reduce) { .ut-track { animation: none; } }
+    @media (max-width: 700px) {
+      .upcoming-ticker { bottom: 18px; }
+      .ut-seg { font-size: 12.5px; }
+      .upcoming-ticker :global(.ut-sep) { margin: 0 16px; }
+    }
     .work-archive { scroll-margin-top: 0; }
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
     .home-hero-menu { display: none; }
