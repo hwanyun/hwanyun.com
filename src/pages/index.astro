@@ -111,8 +111,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       // 이름 전체가 날아간다. 기준은 데스크톱(글자 높이 ≈ 93px, 반경 128 / 세기 2.6).
       // 모바일은 더 세게 — 손가락이 닿는 면적이 커서보다 훨씬 크고 그 자리를 가리기까지 한다.
       // 같은 비율이면 밀린 결과가 손가락에 덮여 아무 일도 안 일어난 것처럼 보인다.
-      const REPEL_RADIUS_RATIO = isMobile ? 1.8 : 1.38
-      const REPEL_FORCE_RATIO = isMobile ? .05 : .028
+      const REPEL_RADIUS_RATIO = isMobile ? 2.1 : 1.38
+      const REPEL_FORCE_RATIO = isMobile ? .08 : .028
       let repelRadius = 128
       // 접촉점에서의 최대 밀림 = FORCE / 스프링계수(.025). 감쇠 안에서 더하므로
       // 값이 커져도 발산하지 않고 밀림 폭만 늘어난다.
