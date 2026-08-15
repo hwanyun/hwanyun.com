@@ -8,18 +8,32 @@ import Base from "../layouts/Base.astro"
   <article class="page">
     <p class="eyebrow">HWANYUN / CONTACT</p>
     <h1>Contact</h1>
+    <p class="lead">
+      <span lang="en">For exhibitions, commissions, and collaborations.</span>
+      <span lang="ko">전시, 커미션, 협업 문의.</span>
+    </p>
     <ul class="links">
-      <li><span>Email</span> <a href="mailto:hwanyun.lab@gmail.com">hwanyun.lab@gmail.com</a></li>
-      <li><span>Instagram</span> <a href="https://instagram.com/hwanyun.lab" target="_blank" rel="noopener">@hwanyun.lab</a></li>
+      <li>
+        <span>Email</span>
+        <a href="mailto:hwanyun.lab@gmail.com" class="primary">hwanyun.lab@gmail.com</a>
+        <button type="button" class="copy" data-copy="hwanyun.lab@gmail.com" aria-label="Copy email address">Copy</button>
+      </li>
+      <li>
+        <span>Instagram</span>
+        <a href="https://instagram.com/hwanyun.lab" target="_blank" rel="noopener">@hwanyun.lab</a>
+      </li>
     </ul>
   </article>
+  {/* 마스코트가 사는 공간 — 지면과 공기는 캐릭터 뒤에, 캐릭터가 만드는 신호는 앞에 */}
+  <canvas id="habitat" aria-hidden="true"></canvas>
+  <canvas id="habitat-fx" aria-hidden="true"></canvas>
   <div id="mascot-bg"></div>
   <canvas id="mascot-canvas"></canvas>
   <div id="mascot-bubble" aria-hidden="true"></div>
 
   <style>
     .page {
-      position: relative; z-index: 3;
+      position: relative; z-index: 5;
       margin: var(--desktop-header-clearance) 40px 100px var(--desktop-content-x);
       max-width: 460px; padding: 0; font-size: var(--fs-body); font-weight: 400; line-height: 1.7;
       pointer-events: none;
@@ -28,14 +42,38 @@ import Base from "../layouts/Base.astro"
     .page h1, .page li, .page a, .page .eyebrow { text-shadow: 0 0 6px var(--surface), 0 0 6px var(--surface), 0 0 10px var(--surface); }
     .page .eyebrow { margin: 0; font-size: var(--fs-2xs); letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
     .page h1 { margin: 8px 0 24px; font-size: var(--fs-display); font-weight: 300; line-height: 1.15; }
+    /* 이 페이지의 목적을 첫 줄에서 밝힌다 — 방문자는 연락처를 찾으러 왔다 */
+    .page .lead { margin: -12px 0 26px; font-size: var(--fs-sm); line-height: 1.6; color: var(--text-2); }
+    .page .lead span { display: block; }
+    .page .lead span[lang="ko"] { color: var(--text-3); }
+
     .links { list-style: none; padding: 0; margin: 0; }
-    .links li { display: flex; gap: 16px; padding: 4px 0; }
-    .links span { width: 90px; color: var(--text-2); }
+    .links li { display: flex; align-items: baseline; gap: 16px; padding: 7px 0; border-top: 1px solid var(--line); }
+    .links li:last-child { border-bottom: 1px solid var(--line); }
+    .links span { width: 90px; flex: none; color: var(--text-3); font-size: var(--fs-sm); }
+    /* 이메일은 이 페이지의 핵심 정보이므로 한 단계 크게 */
+    .links a.primary { font-size: var(--fs-lead); }
+    .copy {
+      margin-left: auto;
+      padding: 4px 10px;
+      border: 1px solid var(--line-2);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--text-3);
+      font: 400 var(--fs-2xs)/1 var(--sans);
+      letter-spacing: .06em;
+      transition: border-color .18s ease, color .18s ease;
+    }
+    .copy:hover { border-color: var(--text); color: var(--text); }
+    .copy.done { border-color: var(--text); color: var(--text); }
     .links a { color: var(--text); text-decoration: none; position: relative; padding: 2px 2px; border-radius: 4px; transition: color .25s, background .25s, transform .25s; }
     .links a::after { content:""; position:absolute; left:2px; right:2px; bottom:-1px; height:2px; background:var(--text); transform:scaleX(0); transform-origin:left; transition:transform .3s; }
     .links a:hover::after, .links a.active::after { transform: scaleX(1); }
     /* 활성 표시는 색이 아니라 명도로 — 이 페이지에서 색을 갖는 것은 마스코트뿐이다 */
     .links a.active { color:var(--text); background:var(--surface-2); transform: translateX(2px); }
+    /* 마스코트의 서식지 — 지면과 공기는 캐릭터 뒤(1), 캐릭터가 만드는 신호는 앞(3) */
+    #habitat { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 1; pointer-events: none; }
+    #habitat-fx { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 3; pointer-events: none; }
     #mascot-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 2; pointer-events: none; }
     #mascot-canvas.grab { cursor: grab; } #mascot-canvas.grabbing { cursor: grabbing; }
     /* 커서를 따라 은은한 빛이 움직이는 배경.
@@ -46,7 +84,7 @@ import Base from "../layouts/Base.astro"
     #mascot-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background: radial-gradient(circle 42vmax at var(--mx, 55%) var(--my, 42%), var(--surface-2) 0%, var(--surface) 62%); }
     /* 캐릭터 머리 위 말풍선 */
-    #mascot-bubble { position: fixed; z-index: 4; pointer-events: none; left: -9999px; top: -9999px;
+    #mascot-bubble { position: fixed; z-index: 6; pointer-events: none; left: -9999px; top: -9999px;
       background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: 18px; padding: 13px 20px;
       font-size: var(--fs-body); font-weight: 600; line-height: 1.25; text-align: left; max-width: 300px;
       box-shadow: 0 12px 32px rgba(0,0,0,.14); opacity: 0; transition: opacity .22s ease; }
@@ -95,6 +133,223 @@ import Base from "../layouts/Base.astro"
       #mascot-bubble :global(.en) { font-size: var(--fs-2xs); margin-top: 3px; }
     }
   </style>
+
+  <script is:inline>
+    /* 마스코트가 사는 공간.
+       홈 히어로와 같은 "입자의 결"을 쓰되 형태는 구체가 아니다. 히어로가 허공에 뜬
+       구(球)라면 여기는 발 딛고 사는 장소여야 하므로, 원근이 있는 입자 지면과
+       지평선을 만들고 공중에 먼지가 떠다니게 한다.
+       three.js와 무관한 2D 캔버스라 마스코트가 로드되지 않아도 공간은 남는다. */
+    ;(function () {
+      var canvas = document.getElementById("habitat")
+      var fx = document.getElementById("habitat-fx")
+      if (!canvas || !fx) return
+      var ctx = canvas.getContext("2d")
+      var fxc = fx.getContext("2d")
+      if (!ctx || !fxc) return
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      var W = 0, H = 0, dpr = 1, raf = 0
+      var ground = [], motes = []
+      // 캐릭터의 행동이 공간에 남기는 것들
+      var sparks = []   // 타자를 칠 때 손끝에서 튀는 신호
+      var rings = []    // 점프·박수 같은 한 번의 동작이 만드는 파문
+      var lastSpark = 0
+
+      window.addEventListener("mascot:burst", function (e) {
+        if (reduce) return
+        rings.push({ x: e.detail.x, y: e.detail.y, r: 6, a: 0.5 })
+      })
+
+      // 지면 입자 — 바닥 평면 위에 흩뿌리고 원근 투영한다
+      var NEAR = 1.1, FAR = 26
+
+      function build() {
+        var rect = canvas.getBoundingClientRect()
+        W = Math.round(rect.width); H = Math.round(rect.height)
+        dpr = Math.min(window.devicePixelRatio || 1, 2)
+        canvas.width = W * dpr; canvas.height = H * dpr
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+        fx.width = W * dpr; fx.height = H * dpr
+        fxc.setTransform(dpr, 0, 0, dpr, 0, 0)
+
+        var gN = W < 700 ? 900 : 1700
+        ground = []
+        for (var i = 0; i < gN; i++) {
+          // 가까울수록 촘촘하게 — 시선이 닿는 바닥이 실제로 있는 느낌
+          var t = Math.pow(i / gN, 1.7)
+          var z = NEAR + t * (FAR - NEAR)
+          var spread = 9 + z * 1.5
+          ground.push({
+            x: (Math.random() - 0.5) * 2 * spread,
+            z: z,
+            j: Math.random() * 6.28, // 미세한 흔들림 위상
+          })
+        }
+
+        var mN = W < 700 ? 60 : 110
+        motes = []
+        for (var k = 0; k < mN; k++) {
+          motes.push({
+            x: Math.random() * W,
+            y: Math.random() * H * 0.72,
+            r: 0.5 + Math.random() * 0.9,
+            sp: 0.12 + Math.random() * 0.35,
+            ph: Math.random() * 6.28,
+          })
+        }
+      }
+
+      function draw(time) {
+        ctx.clearRect(0, 0, W, H)
+        fxc.clearRect(0, 0, W, H)
+        var t = reduce ? 0 : time * 0.001
+        var cx = W / 2
+        // 지평선 아래가 바닥. z=NEAR이 화면 맨 아래, z가 커질수록 지평선에 수렴한다.
+        // 화면 기준으로 정규화해 뷰포트 비율이 바뀌어도 바닥이 항상 보이게 한다.
+        var horizon = H * 0.60
+        var depthPx = H - horizon
+
+        for (var i = 0; i < ground.length; i++) {
+          var p = ground[i]
+          var zz = p.z / NEAR // 1부터 시작
+          var sy = horizon + depthPx / zz
+          if (sy > H + 4 || sy < horizon) continue
+          var sx = cx + (p.x / zz) * (W * 0.055)
+          if (sx < -4 || sx > W + 4) continue
+          var wob = reduce ? 0 : Math.sin(t * 0.6 + p.j) * 0.35
+          // 가까울수록 크고 진하게 — 거리감이 공간을 만든다
+          var fade = 1 / zz
+          var r = 0.4 + fade * 1.3
+          ctx.beginPath()
+          ctx.arc(sx, sy + wob, r, 0, Math.PI * 2)
+          ctx.fillStyle = "rgba(17,17,17," + (0.04 + fade * 0.2) + ")"
+          ctx.fill()
+        }
+
+        // 공중의 먼지 — 히어로와 같은 입자의 결을 유지하는 층
+        for (var k = 0; k < motes.length; k++) {
+          var m = motes[k]
+          var my = reduce ? m.y : m.y - ((t * 12 * m.sp) % (H * 0.72))
+          if (my < 0) my += H * 0.72
+          var mx = m.x + (reduce ? 0 : Math.sin(t * 0.5 + m.ph) * 7)
+          ctx.beginPath()
+          ctx.arc(mx, my, m.r, 0, Math.PI * 2)
+          ctx.fillStyle = "rgba(17,17,17,.10)"
+          ctx.fill()
+        }
+
+        /* ── 캐릭터의 행동에 대한 반응 ──
+           작업의 문법 그대로다: 신호가 발생하고, 전도되고, 감쇠한다. */
+        var ms = window.__mascot
+        if (ms && !reduce) {
+          // 타자를 치는 동안 손끝에서 신호가 튄다
+          if (ms.mode === "busy" && !ms.gesturing && time - lastSpark > 90) {
+            lastSpark = time
+            sparks.push({
+              x: ms.handX + (Math.random() - 0.5) * 26,
+              y: ms.handY + (Math.random() - 0.5) * 14,
+              vx: (Math.random() - 0.5) * 0.5,
+              vy: -0.35 - Math.random() * 0.5,
+              a: 0.85,
+            })
+            if (sparks.length > 60) sparks.shift()
+          }
+
+          for (var s = sparks.length - 1; s >= 0; s--) {
+            var sp = sparks[s]
+            sp.x += sp.vx; sp.y += sp.vy; sp.a -= 0.007
+            if (sp.a <= 0) { sparks.splice(s, 1); continue }
+            fxc.beginPath()
+            fxc.arc(sp.x, sp.y, 1.5, 0, Math.PI * 2)
+            fxc.fillStyle = "rgba(17,17,17," + sp.a * 0.75 + ")"
+            fxc.fill()
+          }
+          // 가까운 신호끼리 이어진다 — 전도(conduction)
+          for (var a1 = 0; a1 < sparks.length; a1++) {
+            for (var b1 = a1 + 1; b1 < sparks.length; b1++) {
+              var p1 = sparks[a1], p2 = sparks[b1]
+              var dx = p1.x - p2.x, dy = p1.y - p2.y
+              var d2 = dx * dx + dy * dy
+              if (d2 > 5184) continue // 72px 이내만
+              var op = (1 - Math.sqrt(d2) / 72) * Math.min(p1.a, p2.a) * 0.4
+              fxc.beginPath()
+              fxc.moveTo(p1.x, p1.y)
+              fxc.lineTo(p2.x, p2.y)
+              fxc.strokeStyle = "rgba(17,17,17," + op + ")"
+              fxc.lineWidth = 0.6
+              fxc.stroke()
+            }
+          }
+        }
+
+        // 파문 — 한 번의 동작이 공간 전체로 퍼진다
+        for (var r1 = rings.length - 1; r1 >= 0; r1--) {
+          var rg = rings[r1]
+          rg.r += 3.2; rg.a -= 0.008
+          if (rg.a <= 0) { rings.splice(r1, 1); continue }
+          fxc.beginPath()
+          fxc.arc(rg.x, rg.y, rg.r, 0, Math.PI * 2)
+          fxc.strokeStyle = "rgba(17,17,17," + rg.a + ")"
+          fxc.lineWidth = 1
+          fxc.stroke()
+        }
+
+        if (!reduce) raf = requestAnimationFrame(draw)
+      }
+
+      build()
+      if (reduce) requestAnimationFrame(draw)
+      else raf = requestAnimationFrame(draw)
+      window.addEventListener("resize", function () {
+        build()
+        if (reduce) requestAnimationFrame(draw)
+      })
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden) { if (raf) { cancelAnimationFrame(raf); raf = 0 } }
+        else if (!reduce && !raf) raf = requestAnimationFrame(draw)
+      })
+    })()
+
+    /* 이메일 주소 복사 — 연락이 목적인 페이지이므로 마찰을 줄인다.
+       클립보드 API가 막힌 환경(권한 거부·비보안 컨텍스트)에서도 동작해야 하므로
+       execCommand 폴백을 둔다. 실패하면 버튼을 숨겨 링크만 남긴다. */
+    ;(function () {
+      var btn = document.querySelector(".copy")
+      if (!btn) return
+      var text = btn.getAttribute("data-copy")
+
+      function feedback(ok) {
+        if (!ok) { btn.hidden = true; return }
+        btn.textContent = "Copied"
+        btn.classList.add("done")
+        setTimeout(function () { btn.textContent = "Copy"; btn.classList.remove("done") }, 1600)
+      }
+      function legacy() {
+        try {
+          var ta = document.createElement("textarea")
+          ta.value = text
+          ta.setAttribute("readonly", "")
+          ta.style.cssText = "position:fixed;top:-9999px;opacity:0"
+          document.body.appendChild(ta)
+          ta.select()
+          var ok = document.execCommand("copy")
+          document.body.removeChild(ta)
+          return ok
+        } catch (e) { return false }
+      }
+
+      btn.addEventListener("click", function () {
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(text).then(
+            function () { feedback(true) },
+            function () { feedback(legacy()) }
+          )
+        } else {
+          feedback(legacy())
+        }
+      })
+    })()
+  </script>
 
   <script>
     import * as THREE from "three";
@@ -295,8 +550,31 @@ import Base from "../layouts/Base.astro"
         }
       }
       if (bubble && bubble.classList.contains("show") && performance.now() > bubbleUntil) bubble.classList.remove("show");
+
+      // 서식지 캔버스가 읽을 수 있게 캐릭터의 화면 좌표와 상태를 공개한다.
+      // 공간이 캐릭터의 행동에 반응하려면 둘이 같은 좌표계를 공유해야 한다.
+      if (avatar && avatarSize) {
+        const fp = new THREE.Vector3(avatar.position.x, avatar.position.y - avatarSize.y * 0.42, avatar.position.z).project(camera);
+        const hp = new THREE.Vector3(avatar.position.x, avatar.position.y + avatarSize.y * 0.18, avatar.position.z).project(camera);
+        window.__mascot = {
+          footX: (fp.x * 0.5 + 0.5) * innerWidth,
+          footY: (-fp.y * 0.5 + 0.5) * innerHeight,
+          handX: (hp.x * 0.5 + 0.5) * innerWidth,
+          handY: (-hp.y * 0.5 + 0.5) * innerHeight,
+          mode: mode,
+          gesturing: gesturing,
+        };
+      }
       renderer.render(scene, camera);
     }
     animate();
+
+    // 점프·박수처럼 한 번 재생되는 동작은 공간에 파문을 남긴다
+    const _reactOnce = reactOnce;
+    reactOnce = function (name) {
+      const m = window.__mascot;
+      if (m) window.dispatchEvent(new CustomEvent("mascot:burst", { detail: { x: m.handX, y: m.handY, kind: name } }));
+      return _reactOnce(name);
+    };
   </script>
 </Base>

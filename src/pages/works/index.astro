@@ -40,6 +40,14 @@ const materialCounts = MATERIALS.map((m) => ({
       </div>
     </header>
 
+    {/* 뷰 전환 — 정연한 목록 ↔ 작품이 입자로 흩어지는 필드.
+        홈 히어로의 입자 시스템과 같은 언어의 확장이고,
+        Atypical Circuit의 "질서 ↔ 붕괴"라는 주제 자체이기도 하다. */}
+    <div class="view-toggle" role="group" aria-label="View mode">
+      <button type="button" data-view="list" aria-pressed="true">List</button>
+      <button type="button" data-view="field" aria-pressed="false">Field</button>
+    </div>
+
     {/* 재료 필터 — 같은 재료를 쓴 작품끼리 회로처럼 이어 보여 준다 */}
     <nav class="material-filter" aria-label="Filter by material">
       <a href="/works/" class="mf-all" data-material="">All works <span class="mf-n">{works.length}</span></a>
@@ -64,6 +72,12 @@ const materialCounts = MATERIALS.map((m) => ({
         ))}
       </ol>
       <p class="mf-empty" id="mf-empty" hidden>이 재료를 쓴 작품이 없습니다.</p>
+      {/* 필드 뷰 — 같은 li 데이터를 캔버스로 다시 그린다.
+          목록 DOM은 그대로 두므로 접근성·검색·필터 로직이 하나로 유지된다. */}
+      <div class="field-view" id="field-view" hidden>
+        <canvas id="field-canvas"></canvas>
+        <a class="field-label" id="field-label" href="#" hidden></a>
+      </div>
     </section>
   </main>
 
@@ -126,6 +140,167 @@ const materialCounts = MATERIALS.map((m) => ({
       })
     })
     window.addEventListener("popstate", function () { apply(fromURL()) })
+    window.__hyApplyMaterial = apply
+  })()
+
+  /* 필드 뷰 — 작품이 입자 군집으로 흩어져 연도 축에 재정렬된다.
+     홈 히어로의 입자 시스템과 같은 언어. 목록 DOM을 원본으로 삼아 다시 그리므로
+     검색·필터·접근성 로직은 목록 쪽 하나만 유지하면 된다. */
+  ;(function () {
+    var wrap = document.getElementById("field-view")
+    var canvas = document.getElementById("field-canvas")
+    var label = document.getElementById("field-label")
+    var list = document.getElementById("work-list")
+    var toggle = document.querySelector(".view-toggle")
+    if (!wrap || !canvas || !list || !toggle) return
+    var ctx = canvas.getContext("2d")
+    if (!ctx) return
+
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    var items = Array.prototype.slice.call(list.querySelectorAll("li"))
+    var W = 0, H = 0, dpr = 1, raf = 0, active = false
+    var hoverIdx = -1
+    var mx = -9999, my = -9999
+
+    // 작품 하나 = 입자 군집 하나. 연도가 x축, 재료 수가 군집 크기를 정한다.
+    var nodes = items.map(function (li) {
+      var year = parseInt((li.querySelector("time") || {}).textContent, 10) || 2000
+      var mats = (li.getAttribute("data-materials") || "").split(" ").filter(Boolean)
+      return {
+        li: li,
+        slug: li.getAttribute("data-slug"),
+        title: (li.querySelector("span") || {}).textContent || "",
+        year: year,
+        mats: mats,
+        seen: li.classList.contains("is-seen"),
+        n: 26 + mats.length * 14, // 재료가 많을수록 촘촘하다
+        x: 0, y: 0, r: 0,
+        pts: [],
+      }
+    })
+    var years = nodes.map(function (n) { return n.year })
+    var minY = Math.min.apply(null, years), maxY = Math.max.apply(null, years)
+
+    function layout() {
+      var rect = wrap.getBoundingClientRect()
+      W = Math.max(320, Math.round(rect.width))
+      H = Math.round(Math.min(620, Math.max(380, window.innerHeight * 0.62)))
+      dpr = Math.min(window.devicePixelRatio || 1, 2)
+      canvas.width = W * dpr
+      canvas.height = H * dpr
+      canvas.style.width = W + "px"
+      canvas.style.height = H + "px"
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+
+      var visible = nodes.filter(function (n) { return !n.li.hidden })
+      var padX = 54, padY = 46
+      var span = Math.max(1, maxY - minY)
+      // 같은 연도가 겹치지 않게 세로로 분산한다
+      var byYear = {}
+      visible.forEach(function (n) { (byYear[n.year] = byYear[n.year] || []).push(n) })
+      visible.forEach(function (n) {
+        var group = byYear[n.year]
+        var idx = group.indexOf(n)
+        var t = (n.year - minY) / span
+        n.x = padX + t * (W - padX * 2)
+        n.y = padY + ((idx + 0.5) / group.length) * (H - padY * 2)
+        n.r = 16 + n.mats.length * 4
+        n.pts = []
+        for (var i = 0; i < n.n; i++) {
+          // 황금각 배치 — 히어로 구체와 같은 분포 방식
+          var a = i * 2.399963229728653
+          var rr = n.r * Math.sqrt((i + 0.5) / n.n)
+          n.pts.push({ dx: Math.cos(a) * rr, dy: Math.sin(a) * rr, ph: i * 0.7 })
+        }
+      })
+    }
+
+    function draw(time) {
+      raf = 0
+      ctx.clearRect(0, 0, W, H)
+      var visible = nodes.filter(function (n) { return !n.li.hidden })
+      var t = reduce ? 0 : time * 0.0006
+      var newHover = -1
+
+      visible.forEach(function (n) {
+        var d = Math.hypot(mx - n.x, my - n.y)
+        var near = d < n.r + 22
+        if (near) newHover = nodes.indexOf(n)
+        // 가까울수록 군집이 조여들고, 멀면 느슨하게 떠 있다 — 근접 반응과 같은 문법
+        var tighten = near ? 0.55 : 1
+        n.pts.forEach(function (p) {
+          var wob = reduce ? 0 : Math.sin(t + p.ph) * 1.6
+          var x = n.x + p.dx * tighten + wob
+          var y = n.y + p.dy * tighten + wob * 0.6
+          ctx.beginPath()
+          ctx.arc(x, y, near ? 1.5 : 1.1, 0, Math.PI * 2)
+          ctx.fillStyle = near ? "rgba(0,0,0,.85)" : n.seen ? "rgba(0,0,0,.5)" : "rgba(0,0,0,.28)"
+          ctx.fill()
+        })
+      })
+
+      if (newHover !== hoverIdx) {
+        hoverIdx = newHover
+        if (hoverIdx === -1) {
+          label.hidden = true
+          canvas.style.cursor = ""
+        } else {
+          var n = nodes[hoverIdx]
+          label.hidden = false
+          label.textContent = n.title + " (" + n.year + ")"
+          label.setAttribute("href", "/works/" + n.slug)
+          label.style.left = Math.round(n.x) + "px"
+          label.style.top = Math.round(n.y - n.r - 14) + "px"
+          canvas.style.cursor = "pointer"
+        }
+      }
+      if (active && !reduce) raf = requestAnimationFrame(draw)
+    }
+
+    function tick() { if (!raf && active) raf = requestAnimationFrame(draw) }
+
+    canvas.addEventListener("pointermove", function (e) {
+      var r = canvas.getBoundingClientRect()
+      mx = e.clientX - r.left
+      my = e.clientY - r.top
+      tick()
+    })
+    canvas.addEventListener("pointerleave", function () { mx = my = -9999; tick() })
+    canvas.addEventListener("click", function () {
+      if (hoverIdx !== -1) window.location.href = "/works/" + nodes[hoverIdx].slug
+    })
+
+    function setView(mode) {
+      active = mode === "field"
+      wrap.hidden = !active
+      list.hidden = active
+      document.querySelector(".archive-head").hidden = active
+      Array.prototype.forEach.call(toggle.querySelectorAll("button"), function (b) {
+        b.setAttribute("aria-pressed", String(b.getAttribute("data-view") === mode))
+      })
+      if (active) { layout(); tick(); if (reduce) requestAnimationFrame(draw) }
+      else if (raf) { cancelAnimationFrame(raf); raf = 0 }
+    }
+
+    Array.prototype.forEach.call(toggle.querySelectorAll("button"), function (b) {
+      b.addEventListener("click", function () { setView(b.getAttribute("data-view")) })
+    })
+    window.addEventListener("resize", function () { if (active) { layout(); tick() } })
+
+    // 재료 필터가 바뀌면 필드도 다시 배치한다
+    var origApply = window.__hyApplyMaterial
+    if (origApply) {
+      window.__hyApplyMaterial = function (m) {
+        origApply(m)
+        nodes.forEach(function (n) { n.seen = n.li.classList.contains("is-seen") })
+        if (active) { layout(); tick() }
+      }
+      document.querySelectorAll(".material-filter a").forEach(function (a) {
+        a.addEventListener("click", function () {
+          setTimeout(function () { if (active) { layout(); tick() } }, 0)
+        })
+      })
+    }
   })()
 </script>
 
@@ -138,6 +313,37 @@ const materialCounts = MATERIALS.map((m) => ({
   .intro-copy p { margin: 0; padding-top: 12px; border-top: 1px solid var(--text); font-size: var(--fs-body); line-height: 1.8; color: var(--text-2); }
   .intro-copy p[lang="ko"] { line-height: 1.85; }
   .archive-language-switch { display: none; }
+  /* display를 지정한 요소는 [hidden]이 무시되므로 명시적으로 되돌린다 */
+  [hidden] { display: none !important; }
+
+  /* 뷰 전환 */
+  .view-toggle { display: inline-flex; gap: 4px; margin: 0 0 14px; border: 1px solid var(--line-2); }
+  .view-toggle button {
+    padding: 6px 14px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--text-3);
+    font: 400 var(--fs-xs)/1 var(--sans);
+    letter-spacing: 0.04em;
+  }
+  .view-toggle button[aria-pressed="true"] { background: var(--text); color: var(--surface); }
+
+  /* 필드 뷰 — 작품이 입자 군집으로 흩어져 연도 축에 재정렬된다 */
+  .field-view { position: relative; margin-top: 6px; }
+  #field-canvas { display: block; width: 100%; }
+  .field-label {
+    position: absolute;
+    transform: translate(-50%, -100%);
+    padding: 4px 9px;
+    background: var(--text);
+    color: var(--surface);
+    font-size: var(--fs-xs);
+    line-height: 1.2;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
   /* 재료 필터 바 */
   .material-filter {
     display: flex;
