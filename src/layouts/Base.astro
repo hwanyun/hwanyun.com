@@ -44,10 +44,17 @@ const shareImage = "https://www.hwanyun.com/images/social/hwanyun-share-preview.
     <link rel="stylesheet" href="/fonts/pretendard/pretendardvariable-dynamic-subset.css" />
     <slot name="head" />
   </head>
-  <body>
+  <body data-page={current || "home"}>
     <slot name="menu">
       <SiteMenu variant="page" current={current} />
     </slot>
+    {/* 언어는 내비게이션이 아니라 설정이다 — 링크 목록에 끼우지 않고
+        우상단 코너에 텍스트로만 둔다 (데스크톱). 모바일은 햄버거 패널 안. */}
+    <nav class="lang-corner" aria-label="Language">
+      <button type="button" data-lang-choice="en" aria-pressed="true">EN</button>
+      <span aria-hidden="true">/</span>
+      <button type="button" data-lang-choice="ko" aria-pressed="false">KO</button>
+    </nav>
     <slot />
     <div class="cursor-dot" aria-hidden="true"></div>
     <footer>
@@ -253,23 +260,48 @@ const shareImage = "https://www.hwanyun.com/images/social/hwanyun-share-preview.
          모드 전환            = 사각 세그먼트
          외부 링크 버튼        = 사각 + ↗
          새 컨트롤은 이 넷 중 하나를 따른다. */
-      .lang-switch {
-        display: inline-flex;
-        width: fit-content;   /* 모바일 메뉴가 grid라 늘어나는 것을 막는다 */
-        margin: 14px 0 0;
-        border: 1px solid var(--line-2);
-      }
+      /* 언어 토글 공통 — 박스가 아니라 텍스트. 설정은 조용해야 한다. */
+      .lang-corner button,
       .lang-switch button {
-        min-width: 34px;
-        padding: 4px 8px;
+        padding: 2px 1px;
         border: 0;
         border-radius: 0;
         background: transparent;
         color: var(--text-3);
         font: 400 var(--fs-2xs)/1 var(--sans);
         letter-spacing: .08em;
+        transition: color var(--dur-fast) var(--ease);
       }
-      .lang-switch button[aria-pressed="true"] { background: var(--text); color: var(--surface); }
+      .lang-corner button:hover,
+      .lang-switch button:hover { color: var(--hover); }
+      .lang-corner button[aria-pressed="true"],
+      .lang-switch button[aria-pressed="true"] {
+        color: var(--text);
+        border-bottom: 1px solid var(--text);
+      }
+
+      /* 데스크톱: 우상단 코너 */
+      .lang-corner {
+        position: absolute;
+        top: 26px;
+        right: 24px;
+        z-index: 40;
+        display: inline-flex;
+        align-items: baseline;
+        gap: 6px;
+        color: var(--line-2);
+        font-size: var(--fs-2xs);
+      }
+      /* 홈 상단은 어두운 히어로 — 밝은 톤으로 */
+      body[data-page="home"] .lang-corner button { color: var(--void-text-2); }
+      body[data-page="home"] .lang-corner button:hover { color: var(--void-text); }
+      body[data-page="home"] .lang-corner button[aria-pressed="true"] {
+        color: var(--void-text);
+        border-bottom-color: var(--void-text);
+      }
+      body[data-page="home"] .lang-corner { color: var(--void-line); }
+      /* 메뉴 안의 토글은 데스크톱에서 숨긴다 — 코너가 대신한다 */
+      .site-menu .lang-switch { display: none; }
       a { color: var(--text); text-decoration: none; }
       a:hover { color: var(--hover); }
 
@@ -494,13 +526,18 @@ const shareImage = "https://www.hwanyun.com/images/social/hwanyun-share-preview.
         }
         .site-menu.is-open .work-links .all-works { font-weight: 500; }
 
-        .lang-switch { grid-column: 1 / -1; justify-self: start; margin: 14px 0 0; }
-        .site-menu--hero:not(.is-open) .name a { color: var(--void-text); }
-        .site-menu--hero:not(.is-open) .lang-switch { border-color: var(--void-line); }
-        .site-menu--hero:not(.is-open) .lang-switch button { color: var(--void-text-2); }
-        .site-menu--hero:not(.is-open) .lang-switch button[aria-pressed="true"] {
-          background: var(--void-text); color: var(--void);
+        /* 코너 토글은 데스크톱 전용 — 모바일 상단은 로고+햄버거로 충분하다 */
+        .lang-corner { display: none; }
+        /* 언어 설정은 햄버거 패널 안에서만 */
+        .site-menu .lang-switch { display: none; }
+        .site-menu.is-open .lang-switch {
+          display: inline-flex;
+          gap: 10px;
+          grid-column: 1 / -1;
+          justify-self: start;
+          margin: 14px 0 0;
         }
+        .site-menu--hero:not(.is-open) .name a { color: var(--void-text); }
         .menu-search { display: none; grid-column: 1 / -1; margin: 16px 0 0; }
         .site-menu input[type="search"] { width: min(110px, 100%); }
         .site-menu.is-open .menu-search { display: block; }

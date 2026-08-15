@@ -245,7 +245,20 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
 
   <style>
     :global(body) { background: var(--surface); }
+    /* 한 화면 = 한 페이지. 구체와 그리드가 한 페이지에 쌓인 느낌이 아니라,
+       스크롤하면 다음 페이지가 나타나는 느낌이 되도록 화면 단위로 스냅한다.
+       이 규칙은 홈에서만 적용된다 (페이지 스코프 전역 스타일). */
+    :global(html) {
+      scroll-snap-type: y mandatory;
+    }
+    /* 모바일은 그리드 아래 푸터가 있어 mandatory면 마지막 영역에 닿지 못한다.
+       proximity로 완화 — 전환감은 유지하되 끝까지 스크롤이 된다. */
+    @media (max-width: 700px) {
+      :global(html) { scroll-snap-type: y proximity; }
+    }
     .hero {
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
       position: relative;
       display: grid;
       min-height: 100svh;
@@ -278,7 +291,12 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     @media (max-width: 700px) {
       .upcoming-ticker { left: 16px; bottom: 18px; max-width: calc(100vw - 32px); }
     }
-    .work-archive { scroll-margin-top: 0; }
+    .work-archive {
+      scroll-margin-top: 0;
+      scroll-snap-align: start;
+      /* 두 번째 '페이지'로 성립하려면 자체가 한 화면을 차지해야 한다 */
+      min-height: 100svh;
+    }
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
   </style>
 </Base>
