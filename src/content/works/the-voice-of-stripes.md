@@ -2,6 +2,9 @@
 title: "The voice of stripes"
 year: "2016"
 medium: "Sound installation; ultrasonic/vibration speakers, polyvinyl, soundtrack player"
+materials:
+  - speaker
+  - plastic-sheet
 size: 2col
 category: sound
 order: 4

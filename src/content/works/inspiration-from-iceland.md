@@ -2,6 +2,8 @@
 title: "Inspiration from Iceland"
 year: "2017"
 medium: "Research / residency; field recording, interactive sound installation, Listhús"
+materials:
+  - field-recording
 size: 1col
 category: work
 order: 12

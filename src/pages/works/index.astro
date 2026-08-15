@@ -1,6 +1,7 @@
 ---
 import { getCollection } from "astro:content"
 import Base from "../../layouts/Base.astro"
+import { MATERIALS } from "../../data/materials"
 
 const works = await getCollection("works", ({ data }) => !data.draft)
 works.sort((a, b) => {
@@ -8,6 +9,12 @@ works.sort((a, b) => {
   const byYear = sortYear(b.data.year) - sortYear(a.data.year)
   return byYear || (a.data.order ?? 0) - (b.data.order ?? 0)
 })
+
+// 재료별 작품 수 — 0개인 재료는 필터 바에 띄우지 않는다
+const materialCounts = MATERIALS.map((m) => ({
+  ...m,
+  count: works.filter((w) => w.data.materials.includes(m.id)).length,
+})).filter((m) => m.count > 0)
 ---
 
 <Base title="Works — HWANYUN" current="works">
@@ -32,17 +39,30 @@ works.sort((a, b) => {
       </div>
     </header>
 
+    {/* 재료 필터 — 같은 재료를 쓴 작품끼리 회로처럼 이어 보여 준다 */}
+    <nav class="material-filter" aria-label="Filter by material">
+      <a href="/works/" class="mf-all" data-material="">All works <span class="mf-n">{works.length}</span></a>
+      {
+        materialCounts.map((m) => (
+          <a href={`/works/?material=${m.id}`} data-material={m.id}>
+            {m.en} <span class="mf-n">{m.count}</span>
+          </a>
+        ))
+      }
+    </nav>
+
     <section class="archive-list" aria-label="Works by year">
       <div class="archive-head" aria-hidden="true"><span>WORKS</span><span>YEAR</span></div>
-      <ol>
+      <ol id="work-list">
         {works.map((work) => (
-          <li>
+          <li data-materials={work.data.materials.join(" ")}>
             <a href={`/works/${work.slug}`}>
               <time>{work.data.year}</time><span>{work.data.title}</span>
             </a>
           </li>
         ))}
       </ol>
+      <p class="mf-empty" id="mf-empty" hidden>이 재료를 쓴 작품이 없습니다.</p>
     </section>
   </main>
 </Base>
@@ -61,6 +81,49 @@ works.sort((a, b) => {
       })
     })
   })()
+
+  /* 재료 필터 — 정적 사이트라 쿼리 파라미터를 브라우저에서 해석한다.
+     페이지 이동 없이 상태만 바꾸므로 뒤로 가기도 동작해야 한다. */
+  ;(function () {
+    var list = document.getElementById("work-list")
+    var nav = document.querySelector(".material-filter")
+    var empty = document.getElementById("mf-empty")
+    if (!list || !nav) return
+    var items = Array.prototype.slice.call(list.querySelectorAll("li"))
+    var links = Array.prototype.slice.call(nav.querySelectorAll("a"))
+
+    function apply(material) {
+      var shown = 0
+      items.forEach(function (li) {
+        var mats = (li.getAttribute("data-materials") || "").split(" ")
+        var hit = !material || mats.indexOf(material) !== -1
+        li.hidden = !hit
+        if (hit) shown++
+      })
+      // 필터가 걸린 동안에만 트레이스를 그린다
+      list.classList.toggle("is-tracing", !!material)
+      links.forEach(function (a) {
+        a.setAttribute("aria-current", a.getAttribute("data-material") === material ? "true" : "false")
+      })
+      if (empty) empty.hidden = shown !== 0
+    }
+
+    function fromURL() {
+      return new URLSearchParams(window.location.search).get("material") || ""
+    }
+    apply(fromURL())
+
+    links.forEach(function (a) {
+      a.addEventListener("click", function (e) {
+        // 같은 페이지 안에서의 상태 변경 — 전체 리로드를 피한다
+        e.preventDefault()
+        var m = a.getAttribute("data-material") || ""
+        history.pushState({ material: m }, "", m ? "/works/?material=" + m : "/works/")
+        apply(m)
+      })
+    })
+    window.addEventListener("popstate", function () { apply(fromURL()) })
+  })()
 </script>
 
 <style>
@@ -72,7 +135,67 @@ works.sort((a, b) => {
   .intro-copy p { margin: 0; padding-top: 12px; border-top: 1px solid var(--text); font-size: var(--fs-body); line-height: 1.8; color: var(--text-2); }
   .intro-copy p[lang="ko"] { line-height: 1.85; }
   .archive-language-switch { display: none; }
+  /* 재료 필터 바 */
+  .material-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 8px;
+    margin: 0 0 26px;
+  }
+  .material-filter a {
+    font-size: var(--fs-xs);
+    line-height: 1;
+    padding: 6px 11px;
+    border: 1px solid var(--line-2);
+    border-radius: 999px;
+    color: var(--text-2);
+    transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease;
+  }
+  .material-filter a:hover { border-color: var(--hover); color: var(--hover); }
+  .material-filter a[aria-current="true"] {
+    border-color: var(--text);
+    background: var(--text);
+    color: var(--surface);
+  }
+  .mf-n { color: var(--text-4); margin-left: 3px; }
+  .material-filter a[aria-current="true"] .mf-n { color: var(--line-2); }
+  .mf-empty { font-size: var(--fs-sm); color: var(--text-4); padding: 24px 2px; }
+
   ol { margin: 0; padding: 0; list-style: none; }
+
+  /* 트레이스 — 필터가 걸린 동안 남은 항목들을 한 회로로 잇는다.
+     구리선을 흑백 톤 안에서 표현: 얇은 수직선 + 각 항목의 접점. */
+  #work-list.is-tracing { position: relative; padding-left: 22px; }
+  #work-list.is-tracing li { position: relative; }
+  #work-list.is-tracing li::before {
+    content: "";
+    position: absolute;
+    left: -14px;
+    top: -1px;
+    bottom: -1px;
+    width: 1px;
+    background: var(--line-2);
+  }
+  /* 첫 항목은 위쪽, 마지막 항목은 아래쪽 선을 잘라 회로의 끝을 만든다 */
+  #work-list.is-tracing li:not([hidden]):first-of-type::before { top: 50%; }
+  #work-list.is-tracing li::after {
+    content: "";
+    position: absolute;
+    left: -17px;
+    top: 50%;
+    width: 7px;
+    height: 7px;
+    margin-top: -3.5px;
+    border-radius: 50%;
+    border: 1px solid var(--line-2);
+    background: var(--surface);
+  }
+  #work-list.is-tracing li:hover::before,
+  #work-list.is-tracing li:hover::after { border-color: var(--hover); background: var(--hover); }
+  #work-list.is-tracing li:hover::before { background: var(--hover); }
+  @media (prefers-reduced-motion: reduce) {
+    .material-filter a { transition: none; }
+  }
   .archive-head, li a { display: grid; grid-template-columns: minmax(0, 1fr) 66px; gap: 16px; }
   .archive-head { border-top: 1px solid var(--text); border-bottom: 1px solid var(--text); padding: 5px 0 4px; font-size: var(--fs-body); font-weight: 500; letter-spacing: 0.025em; }
   .archive-head span:last-child { text-align: right; }

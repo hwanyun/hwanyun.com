@@ -2,6 +2,8 @@
 title: "Three Pieces: Untitled III"
 year: "2018"
 medium: "Cyanotype prints; light-sensitive paper"
+materials:
+  - light
 size: 1col
 category: work
 order: 9

@@ -2,6 +2,8 @@
 title: "Three Pieces: Untitled II"
 year: "2018"
 medium: "Hanging 3D drawing; ABS filament, 3D pen, wood, fabric"
+materials:
+  - 3d-pen
 size: 1col
 category: work
 order: 8

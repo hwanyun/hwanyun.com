@@ -1,4 +1,5 @@
 import { defineCollection, z } from "astro:content"
+import { MATERIAL_IDS } from "../data/materials"
 
 // 작품 컬렉션 — 관리자 UI(Sveltia CMS)가 이 스키마대로 폼을 생성한다.
 const works = defineCollection({
@@ -21,6 +22,8 @@ const works = defineCollection({
     // 절반도 전달되지 않는다. 지정하면 thumb 자리에서 재생하고, 없으면 thumb으로 폴백.
     // thumb은 항상 채워 둔다 — 포스터 프레임이자 reduced-motion·저사양 폴백이다.
     thumbVideo: z.string().optional().default(""),
+    // 재료 태그 — 작품들을 잇는 그래프의 간선. 어휘는 src/data/materials.ts에서 고정한다.
+    materials: z.array(z.enum(MATERIAL_IDS)).optional().default([]),
 
     // 세부 페이지 텍스트 (레퍼런스처럼 EN/KR 2단)
     textEn: z.string().optional().default(""),

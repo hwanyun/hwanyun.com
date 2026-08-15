@@ -2,6 +2,8 @@
 title: "Intuition: Untitled II"
 year: "2017"
 medium: "Sculpture (34\"); ABS filament, 3D pen"
+materials:
+  - 3d-pen
 series:
   id: "intuition-untitled"
   label: "Intuition: Untitled"

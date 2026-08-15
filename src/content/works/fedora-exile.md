@@ -2,6 +2,9 @@
 title: "Fedora – Exile"
 year: "2014"
 medium: "Video installation; original sound composition sourced from sewing recordings"
+materials:
+  - field-recording
+  - moving-image
 size: 2col
 category: work
 order: 11

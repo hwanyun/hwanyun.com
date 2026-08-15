@@ -2,6 +2,10 @@
 title: "Atypical Circuit"
 year: "2026"
 medium: "Generative and interactive media installation; ultrasonic sensors, TouchDesigner, Ableton Live, flat-screen display and stand, electrical wires, Arduino, loudspeaker"
+materials:
+  - sensor
+  - speaker
+  - moving-image
 size: 3col
 category: work
 order: 1

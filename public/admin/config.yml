@@ -46,6 +46,24 @@ collections:
       - { name: order, label: "순서 (작을수록 앞)", widget: number, value_type: int, default: 100 }
       - { name: thumb, label: "홈 썸네일", widget: image, required: false }
       - { name: thumbVideo, label: "홈 썸네일 영상 (무음 루프)", widget: string, required: false, hint: "R2 URL 또는 /videos/… 경로. 넣으면 홈 그리드에서 반복 재생되고 위 썸네일은 포스터·폴백이 된다. 3~6초 무음 클립 권장" }
+      - name: materials
+        label: "재료 (작품 간 연결)"
+        widget: select
+        multiple: true
+        required: false
+        hint: "같은 재료를 쓴 작품끼리 연결된다. 어휘를 늘리려면 src/data/materials.ts를 먼저 고칠 것"
+        options:
+          - { label: "구리 (copper)", value: "copper" }
+          - { label: "센서 (sensor)", value: "sensor" }
+          - { label: "플라스틱 시트 (plastic-sheet)", value: "plastic-sheet" }
+          - { label: "스피커 (speaker)", value: "speaker" }
+          - { label: "전도성 도료·테이프 (conductive-paint)", value: "conductive-paint" }
+          - { label: "프로젝션 (projection)", value: "projection" }
+          - { label: "3D펜 (3d-pen)", value: "3d-pen" }
+          - { label: "필드 레코딩 (field-recording)", value: "field-recording" }
+          - { label: "영상 (moving-image)", value: "moving-image" }
+          - { label: "빛 (light)", value: "light" }
+          - { label: "한지 (hanji)", value: "hanji" }
       - { name: textEn, label: "설명 (영문)", widget: text, required: false }
       - { name: textKr, label: "설명 (국문)", widget: text, required: false }
       - name: processNote

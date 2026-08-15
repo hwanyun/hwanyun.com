@@ -1,6 +1,7 @@
 ---
 import { getCollection } from "astro:content"
 import Base from "../../layouts/Base.astro"
+import { materialLabel } from "../../data/materials"
 
 export async function getStaticPaths() {
   const works = await getCollection("works", ({ data }) => !data.draft)
@@ -21,6 +22,19 @@ const seriesWorks = data.series
 const relatedSounds = allSounds
   .filter((sound) => sound.data.works.includes(work.slug))
   .sort((a, b) => a.data.order - b.data.order)
+
+// 재료로 이어지는 다른 작품 — 작품 페이지가 막다른 골목이 되지 않게 한다.
+// 공유 재료가 많은 순, 같으면 최근작 순.
+const yearOf = (y: string) => Math.max(...(y.match(/\d{4}/g) ?? ["0"]).map(Number))
+const relatedByMaterial = allWorks
+  .filter((w) => w.slug !== work.slug)
+  .map((w) => ({ work: w, shared: w.data.materials.filter((m) => data.materials.includes(m)) }))
+  .filter((r) => r.shared.length > 0)
+  .sort(
+    (a, b) =>
+      b.shared.length - a.shared.length || yearOf(b.work.data.year) - yearOf(a.work.data.year)
+  )
+
 const useImmersiveMedia = work.slug !== "fedora-exile"
 
 // 영상 URL을 임베드 가능한 형태로 정규화 (YouTube/Vimeo는 일반 링크를 붙여도 됨)
@@ -101,6 +115,18 @@ function toParagraphs(text: string): string {
             <span class="medium-materials">{mediumParts.slice(1).join("; ")}</span>
           )}
         </p>
+      )
+    }
+
+    {
+      data.materials.length > 0 && (
+        <nav class="materials" aria-label="Materials">
+          {data.materials.map((m) => (
+            <a class="material-tag" href={`/works/?material=${m}`}>
+              {materialLabel(m)}
+            </a>
+          ))}
+        </nav>
       )
     }
 
@@ -259,6 +285,24 @@ function toParagraphs(text: string): string {
               </a>
             ))}
           </div>
+        </section>
+      )
+    }
+
+    {
+      relatedByMaterial.length > 0 && (
+        <section class="related-materials" aria-labelledby="related-materials-title">
+          <div id="related-materials-title" class="related-materials-label">Sharing materials</div>
+          <ul class="related-materials-list">
+            {relatedByMaterial.map((r) => (
+              <li>
+                <a href={`/works/${r.work.slug}/`}>
+                  <span class="rm-title">{r.work.data.title}</span>
+                  <span class="rm-shared">{r.shared.map((m) => materialLabel(m)).join(" · ")}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
         </section>
       )
     }
@@ -653,6 +697,62 @@ function toParagraphs(text: string): string {
     .meta { font-size: var(--fs-body); font-weight: 400; line-height: 1.6; color: var(--text-2); margin: 0 0 34px; }
     .meta .medium-type { display: block; color: var(--text); }
     .meta .medium-materials { display: block; margin-top: 8px; font-size: var(--fs-body); color: var(--text-3); }
+
+    /* 재료 태그 — 같은 재료를 쓴 작품으로 가는 통로.
+       회로의 접점을 연상시키되 사이트의 흑백 톤은 유지한다. */
+    .materials {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 8px;
+      margin: -22px 0 34px;
+    }
+    .material-tag {
+      font-size: var(--fs-xs);
+      line-height: 1;
+      padding: 6px 11px;
+      border: 1px solid var(--line-2);
+      border-radius: 999px;
+      color: var(--text-2);
+      transition: border-color 0.18s ease, color 0.18s ease;
+    }
+    .material-tag::before {
+      content: "";
+      display: inline-block;
+      width: 4px;
+      height: 4px;
+      margin-right: 7px;
+      vertical-align: 1px;
+      border-radius: 50%;
+      background: var(--line-2);
+      transition: background 0.18s ease;
+    }
+    .material-tag:hover { border-color: var(--hover); color: var(--hover); }
+    .material-tag:hover::before { background: var(--hover); }
+
+    /* 같은 재료의 작품 — 작품 페이지의 막다른 골목을 없앤다 */
+    .related-materials { margin: 56px 0 0; }
+    .related-materials-label {
+      font-size: var(--fs-2xs);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-4);
+      margin-bottom: 10px;
+    }
+    .related-materials-list { list-style: none; margin: 0; padding: 0; }
+    .related-materials-list li { border-top: 1px solid var(--line); }
+    .related-materials-list li:last-child { border-bottom: 1px solid var(--line); }
+    .related-materials-list a {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 18px;
+      padding: 12px 2px;
+      color: var(--text);
+    }
+    .related-materials-list a:hover { color: var(--hover); }
+    .rm-title { font-size: var(--fs-sm); }
+    .rm-shared { font-size: var(--fs-xs); color: var(--text-3); text-align: right; }
+    .related-materials-list a:hover .rm-shared { color: var(--hover); }
     .series-link {
       display: inline-flex;
       flex-direction: column;

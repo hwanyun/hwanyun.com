@@ -2,6 +2,11 @@
 title: "Three Pieces: Untitled I"
 year: "2018"
 medium: "Interactive sound and light installation; sensors, polycarbonate, copper, wire"
+materials:
+  - copper
+  - sensor
+  - plastic-sheet
+  - light
 size: 2col
 category: work
 order: 7
