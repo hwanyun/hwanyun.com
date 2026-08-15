@@ -27,12 +27,9 @@ const shareImage = "https://www.hwanyun.com/images/social/hwanyun-share-preview.
     <meta name="twitter:description" content="Sound, installation, and interactive media." />
     <meta name="twitter:image" content={shareImage} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500&display=swap"
-      rel="stylesheet"
-    />
+    {/* Pretendard Variable 셀프호스트 — 동적 서브셋(unicode-range)이라
+        브라우저가 필요한 글리프 블록만 받는다. 외부 폰트 요청 0. */}
+    <link rel="stylesheet" href="/fonts/pretendard/pretendardvariable-dynamic-subset.css" />
     <slot name="head" />
   </head>
   <body>
@@ -159,15 +156,18 @@ const shareImage = "https://www.hwanyun.com/images/social/hwanyun-share-preview.
         --desktop-content-x: 170px;
         /* 데스크톱에서는 작가명과 본문을 분리하는 공통 헤더 여백 */
         --desktop-header-clearance: 82px;
-        --sans: "Noto Sans KR", sans-serif;
+        --sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+          system-ui, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
       }
       * { box-sizing: border-box; }
       html, body { overflow-x: hidden; }
       body {
         font-family: var(--sans);
-        font-weight: 300;
+        /* 300은 18px 이상에서만 성립한다 — 본문·메타는 400, 라이트는 h1 전용 */
+        font-weight: 400;
         font-size: var(--fs-body);
         line-height: 1.35;
+        letter-spacing: -0.01em;
         color: var(--text);
         background: var(--surface);
         margin: 0;
@@ -176,6 +176,7 @@ const shareImage = "https://www.hwanyun.com/images/social/hwanyun-share-preview.
         -webkit-font-smoothing: antialiased;
         text-rendering: optimizeLegibility;
       }
+      h1 { letter-spacing: -0.02em; }
       a { color: var(--text); text-decoration: none; }
       a:hover { color: var(--hover); }
 

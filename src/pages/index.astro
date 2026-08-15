@@ -89,7 +89,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         sample.width = width
         sample.height = height
         const fontSize = Math.min(width * .145, 180)
-        sampleContext.font = `600 ${fontSize}px Arial, sans-serif`
+        // 사이트에서 가장 큰 타이포그래피가 시스템 폰트여선 안 된다 — 본문과 같은 폰트로
+        sampleContext.font = `600 ${fontSize}px "Pretendard Variable", Pretendard, sans-serif`
         sampleContext.textAlign = "center"
         sampleContext.textBaseline = "middle"
         sampleContext.fillStyle = "#fff"
@@ -216,6 +217,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       window.addEventListener("resize", resize)
       resize()
       requestAnimationFrame(draw)
+      // 폰트가 늦게 도착하면 워드마크 샘플이 폴백 글꼴로 찍힌다 — 로드 후 한 번 재생성
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => resize())
     }
   </script>
 
