@@ -53,12 +53,16 @@
   - [x] ~~SoundCloud 의존 제거~~ — **이미 완료되어 있었음**. 22/22곡이 자체 R2 호스팅이고
     `sounds.url`은 기록 보존용으로만 남아 페이지에서 사용하지 않는다. YouTube/Vimeo 임베드도 0건.
     (앞선 분석에서 낡은 체크아웃의 스키마를 근거로 잘못 지적했던 항목)
-  - [ ] **`assets.zyrosite.com` 4개 파일 이전** — 이전 웹빌더 CDN에 남은 유일한 외부 의존.
-    계정 해지·정책 변경 시 아래 두 작품의 썸네일이 깨진다 (홈 그리드에도 노출됨)
-    - `intuition-ii.md` — thumb, 본문 이미지, Listhús 후원 로고
-    - `the-voice-of-stripes.md` — thumb, 본문 이미지 3장
-    - 원본으로 보이는 파일이 `~/Documents/홈페이지`에 있음: `DSC02280.jpg`, `_MG_6580-1.jpg`,
-      `Live E_edited.jpg`, `Edited Image 2016-08-22 08-24-16.jpg`, `Listhus_ses_logo_new_4cm.jpg.webp`
+  - [x] **`assets.zyrosite.com` 이전 완료** — 저장소 전체 외부 이미지 참조 0건
+    - `intuition-ii/` — thumbnail, 01 (원본 `DSC02280.jpg`에서 생성), sponsors/listhus.webp
+    - `the-voice-of-stripes/` — 02는 원본 `Live E_edited.jpg`에서 크롭, 03은 원본 무크롭 복사
+    - `the-voice-of-stripes/` thumbnail·01은 **라이브 CDN본을 내려받아 사용**.
+      원본 `_MG_6580-1.jpg`는 EXIF상 세로(upper-right)인데 웹빌더에서 상단 와이어 영역만
+      16:9로 크롭한 별도 파일이 올라가 있어, 원본에서 기계적으로 재현할 수 없었다.
+      더 높은 해상도가 필요하면 5184px 원본에서 같은 프레이밍으로 다시 크롭할 것.
+    - 교훈: sips가 보고하는 픽셀 크기는 EXIF 방향을 반영하지 않는다. 이미지 이전 시
+      `file`로 orientation을 먼저 확인하고, 회전을 픽셀에 반영한 뒤 EXIF를 제거해야
+      브라우저가 이중으로 회전시키지 않는다.
   - [ ] Google Fonts → 셀프호스팅 검토 (외부 요청 0으로)
 
 ## Phase 2 — 무음 루프 썸네일 (체류 시간 최대 레버)
