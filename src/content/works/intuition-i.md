@@ -10,7 +10,7 @@ materials:
   - hanji
 size: 2col
 category: sound
-order: 5
+order: 3
 series:
   id: "intuition-untitled"
   label: "Intuition: Untitled"

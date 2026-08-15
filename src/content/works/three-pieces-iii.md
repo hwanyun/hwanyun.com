@@ -6,7 +6,7 @@ materials:
   - light
 size: 1col
 category: work
-order: 9
+order: 8
 series:
   id: "three-pieces-untitled"
   label: "Three Pieces: Untitled"

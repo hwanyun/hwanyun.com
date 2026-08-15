@@ -7,7 +7,7 @@ materials:
   - projection
 size: 2col
 category: work
-order: 3
+order: 5
 thumb: "/images/conductive-circles/home.png"
 thumbVideo: "/videos/loops/conductive-circles.mp4"
 textEn: |
