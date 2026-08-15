@@ -10,7 +10,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
   .sort((a, b) => a.start.localeCompare(b.start))
 ---
 
-<Base title="HWANYUN">
+<Base title="HWANYUN" chrome="dark">
   <SiteMenu slot="menu" variant="hero" />
 
   <section class="hero" aria-labelledby="hero-title">
@@ -101,10 +101,22 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       let width = 0
       let height = 0
       let pixelRatio = 1
+      // 이름으로 모인 뒤의 커서 반응 — 그리드 타일과 같은 "거리=입력" 문법을 히어로까지
+      let pointerX = 0
+      let pointerY = 0
+      let hasPointer = false
+      let nameBounds = { minX: 0, minY: 0, maxX: 0, maxY: 0 }
+      const REPEL_RADIUS = 128
+      // 접촉점에서의 최대 밀림 = FORCE / 스프링계수(.025) ≈ 104px. 커서가 지나간 자리에서
+      // 글자가 크게 열린다. 감쇠 안에서 더하므로 값이 커져도 발산하지 않고 밀림 폭만 늘어난다.
+      const REPEL_FORCE = 2.6
       const isMobile = window.matchMedia("(max-width: 700px)").matches
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
       hero.dataset.particleMode = "sphere"
 
       const createTargets = () => {
+        // 폭·높이가 0인 순간(숨겨진 상태, 첫 레이아웃 전)에 부르면 getImageData가 던진다
+        if (width < 1 || height < 1) return []
         const sample = document.createElement("canvas")
         const sampleContext = sample.getContext("2d")!
         sample.width = width
@@ -129,19 +141,30 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
 
       const resize = () => {
         const rect = hero.getBoundingClientRect()
+        const nextWidth = Math.round(rect.width)
+        const nextHeight = Math.round(rect.height)
+        // 크기가 그대로면 아무것도 다시 만들지 않는다 — 재구축은 입자를 중앙으로
+        // 되돌리므로, 반복 호출되면 이름이 영영 모이지 못한다.
+        if (nextWidth === width && nextHeight === height && particles.length) return
         pixelRatio = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2)
-        width = Math.round(rect.width)
-        height = Math.round(rect.height)
+        width = nextWidth
+        height = nextHeight
         canvas.width = width * pixelRatio
         canvas.height = height * pixelRatio
         canvas.style.width = `${width}px`
         canvas.style.height = `${height}px`
         context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0)
         const targets = createTargets()
+        // 워드마크가 실제로 차지하는 사각형 — 모인 뒤의 판정 영역이 된다
+        nameBounds = targets.reduce((box, [x, y]) => ({
+          minX: Math.min(box.minX, x), minY: Math.min(box.minY, y),
+          maxX: Math.max(box.maxX, x), maxY: Math.max(box.maxY, y),
+        }), { minX: width, minY: height, maxX: 0, maxY: 0 })
         // 모바일에서는 터치 반응성과 안정성을 위해 렌더링 밀도를 낮춘다.
         const count = isMobile
           ? Math.min(1400, Math.max(900, targets.length))
           : Math.min(3200, Math.max(2400, targets.length * 2))
+        const previous = particles
         particles = Array.from({ length: count }, (_, index) => {
           const targetIndex = Math.floor(index / count * targets.length)
           const [targetX, targetY] = targets[targetIndex] || [width / 2, height / 2]
@@ -150,9 +173,11 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
           const sphereAngle = index * 2.399963229728653
           const sphereX = Math.cos(sphereAngle) * sphereRadius
           const sphereZ = Math.sin(sphereAngle) * sphereRadius
+          // 실제로 크기가 바뀐 경우엔 있던 자리에서 이어가게 둔다(창 크기 조절 시 튀지 않게)
+          const carried = previous[index]
           return {
-            x: width / 2,
-            y: height / 2,
+            x: carried ? carried.x : width / 2,
+            y: carried ? carried.y : height / 2,
             vx: 0, vy: 0,
             sphereX,
             sphereY,
@@ -179,7 +204,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         const sinRotation = Math.sin(rotation)
         const cosTilt = Math.cos(tilt)
         const sinTilt = Math.sin(tilt)
-        const globeRadius = size * .49
+        const globeRadius = size * .38
+        const repelling = isInside && hasPointer && !isMobile && !reduceMotion
 
         for (const particle of particles) {
           const rotatedX = particle.sphereX * cosRotation - particle.sphereZ * sinRotation
@@ -191,8 +217,25 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
           const driftY = centerY + rotatedY * globeRadius * perspective
           const destinationX = isInside ? particle.targetX : driftX
           const destinationY = isInside ? particle.targetY : driftY
-          particle.vx = (particle.vx + (destinationX - particle.x) * (isInside ? .025 : .024)) * .8
-          particle.vy = (particle.vy + (destinationY - particle.y) * (isInside ? .025 : .024)) * .8
+          // 이름이 모인 뒤에는 커서가 글자를 밀어낸다. 반발은 감쇠 안에서 더해야 한다 —
+          // 밖에서 더하면 매 프레임 누적돼 속도가 발산하고 글자가 흩어져 버린다.
+          // 스프링은 그대로 살아 있으므로 손을 치우면 글자는 스스로 제 자리로 돌아온다.
+          let pushX = 0
+          let pushY = 0
+          if (repelling) {
+            const deltaX = particle.x - pointerX
+            const deltaY = particle.y - pointerY
+            const distanceSquared = deltaX * deltaX + deltaY * deltaY
+            if (distanceSquared < REPEL_RADIUS * REPEL_RADIUS) {
+              const distance = Math.sqrt(distanceSquared) || .001
+              const falloff = 1 - distance / REPEL_RADIUS
+              const push = falloff * falloff * REPEL_FORCE
+              pushX = (deltaX / distance) * push
+              pushY = (deltaY / distance) * push
+            }
+          }
+          particle.vx = (particle.vx + (destinationX - particle.x) * (isInside ? .025 : .024) + pushX) * .8
+          particle.vy = (particle.vy + (destinationY - particle.y) * (isInside ? .025 : .024) + pushY) * .8
           particle.x += particle.vx
           particle.y += particle.vy
           context.beginPath()
@@ -211,7 +254,20 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         const y = event.clientY - rect.top - height / 2
         return Math.hypot(x, y) < Math.min(width, height) * .48
       }
-      const updateInteraction = (event: PointerEvent) => { isInside = isWithinGlobe(event) }
+      // 워드마크는 구체보다 넓다. 구체 안으로 들어가면 모이고, 흩어지는 기준은
+      // 이름의 사각형이다 — 그렇지 않으면 글자를 만지려는 순간 구체로 되돌아간다.
+      const isWithinName = (x: number, y: number) => {
+        const pad = REPEL_RADIUS
+        return x > nameBounds.minX - pad && x < nameBounds.maxX + pad
+          && y > nameBounds.minY - pad && y < nameBounds.maxY + pad
+      }
+      const updateInteraction = (event: PointerEvent) => {
+        const rect = hero.getBoundingClientRect()
+        pointerX = event.clientX - rect.left
+        pointerY = event.clientY - rect.top
+        hasPointer = true
+        isInside = isInside ? isWithinName(pointerX, pointerY) : isWithinGlobe(event)
+      }
 
       if (isMobile) {
         // 터치에서는 hover 상태를 흉내 내지 않는다. 짧은 탭 한 번은 이름,
@@ -232,10 +288,13 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       } else {
         hero.addEventListener("pointermove", updateInteraction)
         hero.addEventListener("pointerdown", updateInteraction)
-        hero.addEventListener("pointerleave", () => { isInside = false })
-        hero.addEventListener("pointercancel", () => { isInside = false })
+        hero.addEventListener("pointerleave", () => { isInside = false; hasPointer = false })
+        hero.addEventListener("pointercancel", () => { isInside = false; hasPointer = false })
       }
       window.addEventListener("resize", resize)
+      // window resize만으로는 부족하다 — 히어로가 처음 측정 가능해지는 시점(폭 0에서 벗어나는
+      // 순간)과 뷰포트 변화 없이 박스만 바뀌는 경우를 놓쳐 워드마크가 낡은 폭으로 남는다.
+      if ("ResizeObserver" in window) new ResizeObserver(resize).observe(hero)
       resize()
       requestAnimationFrame(draw)
       // 폰트가 늦게 도착하면 워드마크 샘플이 폴백 글꼴로 찍힌다 — 로드 후 한 번 재생성
