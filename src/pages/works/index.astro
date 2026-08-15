@@ -19,14 +19,10 @@ const materialCounts = MATERIALS.map((m) => ({
 ---
 
 <Base title="Works — HWANYUN" current="works">
-  <main class="works-archive" data-language="en">
+  <main class="works-archive">
     <header class="archive-intro">
       <p class="eyebrow">WORK ARCHIVE</p>
       <h1>Works</h1>
-      <div class="archive-language-switch" role="group" aria-label="Archive introduction language">
-        <button type="button" data-language-choice="en" aria-pressed="true">EN</button>
-        <button type="button" data-language-choice="ko" aria-pressed="false">KO</button>
-      </div>
       <div class="intro-copy">
         <p lang="en" data-language-content="en">
           An archive of installations, moving-image works, and interactive systems.
@@ -85,19 +81,6 @@ const materialCounts = MATERIALS.map((m) => ({
 </Base>
 
 <script is:inline>
-  ;(function () {
-    var archive = document.querySelector(".works-archive")
-    if (!archive) return
-    var buttons = Array.prototype.slice.call(archive.querySelectorAll("[data-language-choice]"))
-    buttons.forEach(function (button) {
-      button.addEventListener("click", function () {
-        var language = button.getAttribute("data-language-choice")
-        if (!language) return
-        archive.setAttribute("data-language", language)
-        buttons.forEach(function (item) { item.setAttribute("aria-pressed", String(item === button)) })
-      })
-    })
-  })()
 
   /* 재료 필터 — 정적 사이트라 쿼리 파라미터를 브라우저에서 해석한다.
      페이지 이동 없이 상태만 바꾸므로 뒤로 가기도 동작해야 한다. */
@@ -319,11 +302,11 @@ const materialCounts = MATERIALS.map((m) => ({
   .archive-intro { max-width: 650px; margin: 0 0 84px; }
   .eyebrow { margin: 0; font-size: var(--fs-2xs); letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
   h1 { margin: 8px 0 16px; font-size: var(--fs-display); font-weight: 300; line-height: 1.15; }
-  .intro-copy { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3%; }
+  /* 한 번에 한 언어만 보이므로 단을 나누지 않는다 — 본문이 제 폭을 되찾는다 */
+  .intro-copy { display: block; }
   .intro-copy p { margin: 0; padding-top: 12px; border-top: 1px solid var(--text); font-size: var(--fs-body); line-height: 1.8; color: var(--text-2); }
   .intro-copy p[lang="ko"] { line-height: 1.85; }
-  .archive-language-switch { display: none; }
-  /* display를 지정한 요소는 [hidden]이 무시되므로 명시적으로 되돌린다 */
+    /* display를 지정한 요소는 [hidden]이 무시되므로 명시적으로 되돌린다 */
   [hidden] { display: none !important; }
 
   /* 뷰 전환 */
@@ -448,14 +431,9 @@ const materialCounts = MATERIALS.map((m) => ({
     .works-archive { margin: 24px 16px 80px; }
     .archive-intro { margin-bottom: 54px; }
     h1 { font-size: clamp(25px, 7vw, 32px); line-height: 1.22; }
-    .archive-language-switch { display: inline-flex; align-items: stretch; gap: 4px; margin: 0 0 12px; border: 1px solid var(--line-2); }
-    .archive-language-switch button { display: block; flex: 0 0 38px; min-width: 38px; min-height: 28px; padding: 6px 8px; border: 0; border-radius: 0; color: var(--text-3); background: transparent; font: 500 11px/1 var(--sans); letter-spacing: .08em; }
-    .archive-language-switch button[aria-pressed="true"] { color: var(--surface); background: var(--text); }
     .intro-copy { grid-template-columns: 1fr; gap: 0; }
     .intro-copy p { margin: 0 0 26px; padding-top: 10px; font-size: var(--fs-sm); line-height: 1.78; }
     .intro-copy p[lang="ko"] { line-height: 1.85; }
-    .works-archive[data-language="en"] [data-language-content="ko"],
-    .works-archive[data-language="ko"] [data-language-content="en"] { display: none; }
     .archive-head, li a { grid-template-columns: minmax(0, 1fr) 48px; gap: 8px; }
     .archive-head { font-size: var(--fs-sm); }
     time { font-size: var(--fs-xs); }

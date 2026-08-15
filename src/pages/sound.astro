@@ -23,14 +23,10 @@ const releases = (id: string) => {
 <Base title="HWANYUN — Sound" current="sound">
   <video id="listening-backdrop" muted loop playsinline aria-hidden="true"></video>
   <div id="backdrop-title" aria-live="polite"></div>
-  <main id="sound-archive" data-language="en">
+  <main id="sound-archive">
     <header class="archive-head">
       <p class="eyebrow">HWANYUN / LISTENING ARCHIVE</p>
       <h1>Sound</h1>
-      <div class="archive-language-switch" role="group" aria-label="Sound archive introduction language">
-        <button type="button" data-language-choice="en" aria-pressed="true">EN</button>
-        <button type="button" data-language-choice="ko" aria-pressed="false">KO</button>
-      </div>
       <div class="intro-copy">
         <p class="intro" data-language-content="en" lang="en">A selection of sound works, scores, and recordings. Each entry remains connected to the circumstance in which it was made.</p>
         <p class="intro" data-language-content="ko" lang="ko">사운드 작업, 스코어, 그리고 기록을 모은 아카이브. 각각의 기록은 작업이 만들어진 장소와 시간, 관계의 맥락을 함께 간직한다.</p>
@@ -151,20 +147,7 @@ const releases = (id: string) => {
   </script>
 
   <script is:inline>
-    ;(function () {
-      var archive = document.getElementById("sound-archive")
-      if (!archive) return
-      var buttons = Array.prototype.slice.call(archive.querySelectorAll("[data-language-choice]"))
-      buttons.forEach(function (button) {
-        button.addEventListener("click", function () {
-          var language = button.getAttribute("data-language-choice")
-          if (!language) return
-          archive.setAttribute("data-language", language)
-          buttons.forEach(function (item) { item.setAttribute("aria-pressed", String(item === button)) })
-        })
-      })
-    })()
-  </script>
+    </script>
 
   <style>
     #listening-backdrop { position: fixed; z-index: 0; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; pointer-events: none; filter: brightness(.42) saturate(.75); transition: opacity .7s ease; }
@@ -176,10 +159,10 @@ const releases = (id: string) => {
     .archive-head { max-width: 650px; margin-bottom: 84px; }
     .eyebrow, .section h2, .number, .release-count, .track span:last-child { font-size: var(--fs-2xs); letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
     h1 { margin: 8px 0 16px; font-weight: 300; font-size: var(--fs-display); line-height: 1.15; }
-    .intro-copy { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3%; }
+    /* 한 번에 한 언어만 보이므로 단을 나누지 않는다 */
+    .intro-copy { display: block; }
     .intro { margin: 0; padding-top: 12px; border-top: 1px solid var(--text); font-size: var(--fs-body); line-height: 1.8; color: var(--text-2); }
     .intro[lang="ko"] { line-height: 1.85; }
-    .archive-language-switch { display: none; }
     .section { margin: 0 0 70px; }
     .section-head { display: grid; grid-template-columns: 220px 1fr; gap: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--text); }
     .section h2 { margin: 0; font-weight: 400; }
@@ -239,11 +222,6 @@ const releases = (id: string) => {
       #sound-archive { width: auto; margin: 24px 16px 80px; }
       .archive-head { margin-bottom: 54px; }
       h1 { font-size: clamp(25px, 7vw, 32px); line-height: 1.22; }
-      .archive-language-switch { display: inline-flex; align-items: stretch; gap: 4px; margin: 0 0 12px; border: 1px solid var(--line-2); }
-      .archive-language-switch button { display: block; flex: 0 0 38px; min-width: 38px; min-height: 28px; padding: 6px 8px; border: 0; border-radius: 0; color: var(--text-3); background: transparent; font: 500 11px/1 var(--sans); letter-spacing: .08em; }
-      .archive-language-switch button[aria-pressed="true"] { color: var(--surface); background: var(--text); }
-      #sound-archive[data-language="en"] [data-language-content="ko"],
-      #sound-archive[data-language="ko"] [data-language-content="en"] { display: none; }
       .intro-copy { display: block; }
       .intro { font-size: var(--fs-sm); line-height: 1.78; }
       .intro[lang="ko"] { line-height: 1.85; }

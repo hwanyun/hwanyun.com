@@ -9,8 +9,8 @@ import Base from "../layouts/Base.astro"
     <p class="eyebrow">HWANYUN / CONTACT</p>
     <h1>Contact</h1>
     <p class="lead">
-      <span lang="en">For exhibitions, commissions, and collaborations.</span>
-      <span lang="ko">전시, 커미션, 협업 문의.</span>
+      <span lang="en" data-language-content="en">For exhibitions, commissions, and collaborations.</span>
+      <span lang="ko" data-language-content="ko">전시, 커미션, 협업 문의.</span>
     </p>
     <ul class="links">
       <li>
@@ -45,7 +45,7 @@ import Base from "../layouts/Base.astro"
     /* 이 페이지의 목적을 첫 줄에서 밝힌다 — 방문자는 연락처를 찾으러 왔다 */
     .page .lead { margin: -12px 0 26px; font-size: var(--fs-sm); line-height: 1.6; color: var(--text-2); }
     .page .lead span { display: block; }
-    .page .lead span[lang="ko"] { color: var(--text-3); }
+    
 
     .links { list-style: none; padding: 0; margin: 0; }
     .links li { display: flex; align-items: baseline; gap: 16px; padding: 7px 0; border-top: 1px solid var(--line); }

@@ -84,6 +84,11 @@ if (showWorksSubmenu) {
       )
     )
   }
+  {/* 언어 전환 — 사이트 전역. 서술 콘텐츠만 바뀌고 크롬은 영문 고정이다. */}
+  <div class="lang-switch" role="group" aria-label="Language">
+    <button type="button" data-lang-choice="en" aria-pressed="true">EN</button>
+    <button type="button" data-lang-choice="ko" aria-pressed="false">KO</button>
+  </div>
   {
     liveSearch ? (
       <input id="search" type="search" placeholder="Search" aria-label="Search works" autocomplete="off" />

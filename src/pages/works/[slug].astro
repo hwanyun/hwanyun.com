@@ -134,7 +134,7 @@ function toParagraphs(text: string): string {
 ---
 
 <Base title={`HWANYUN — ${data.title}`}>
-  <div id="entry" data-media-prototype={useImmersiveMedia ? "true" : undefined} data-language="en">
+  <div id="entry" data-media-prototype={useImmersiveMedia ? "true" : undefined}>
     <div class="entry_title">{data.title}{yr}</div>
 
     {
@@ -210,12 +210,8 @@ function toParagraphs(text: string): string {
       )
     }
 
-    <div class="work-language-switch" role="group" aria-label="Description language">
-      <button type="button" data-language-choice="en" aria-pressed="true">EN</button>
-      <button type="button" data-language-choice="ko" aria-pressed="false">KO</button>
-    </div>
 
-    <!-- 데스크톱은 EN/KR 병기, 모바일은 언어 전환으로 한 언어만 읽는다. -->
+    <!-- 한 번에 한 언어만 보인다 (전역 EN/KO 토글). 본문은 제 폭을 쓴다. -->
     <div class="textcols">
       <div class="col" data-language-content="en" lang="en" set:html={toParagraphs(data.textEn)} />
       <div class="col kr" data-language-content="ko" lang="ko" set:html={toParagraphs(data.textKr)} />
@@ -575,23 +571,7 @@ function toParagraphs(text: string): string {
 
 
   <script is:inline>
-    ;(function () {
-      var entry = document.getElementById("entry")
-      if (!entry) return
-      var buttons = Array.prototype.slice.call(entry.querySelectorAll("[data-language-choice]"))
-      if (!buttons.length) return
-      buttons.forEach(function (button) {
-        button.addEventListener("click", function () {
-          var language = button.getAttribute("data-language-choice")
-          if (!language) return
-          entry.setAttribute("data-language", language)
-          buttons.forEach(function (item) {
-            item.setAttribute("aria-pressed", String(item === button))
-          })
-        })
-      })
-    })()
-  </script>
+    </script>
 
   <style>
     /* 레퍼런스: 메뉴 170px 옆, 본문 최대 1100px */
@@ -693,9 +673,11 @@ function toParagraphs(text: string): string {
     /* EN/KR 2단 — 본문 가독성만 개선(두께 400 / 16px / 넓은 줄간격) */
     .textcols::after { content: ""; display: block; clear: both; }
     .textcols .col {
-      width: 46.5%;
-      float: left;
-      margin: 0 3% 30px 0;
+      /* 병기를 걷어냈으므로 단을 나누지 않는다 — 62ch에서 한글·라틴 모두 잘 읽힌다 */
+      width: auto;
+      max-width: 62ch;
+      float: none;
+      margin: 0 0 30px 0;
       padding: 12px 0 0 0;
       border-top: 1px solid var(--text);
       font-size: var(--fs-body);
@@ -706,7 +688,6 @@ function toParagraphs(text: string): string {
     .textcols .col.kr { line-height: 1.85; }
     .textcols .col p { margin: 0 0 1em; }
     .textcols .col p:last-child { margin-bottom: 0; }
-    .work-language-switch { display: none; }
 
     .desc { font-size: var(--fs-body); font-weight: 400; line-height: 1.8; max-width: 640px; margin: 0 0 30px; }
     .desc :global(p) { margin: 0 0 1em; }
@@ -715,7 +696,8 @@ function toParagraphs(text: string): string {
       margin: -4px 0 42px;
       color: var(--text-4);
     }
-    .process-note-cols { display: grid; grid-template-columns: 46.5% 46.5%; column-gap: 3%; }
+    /* 한 번에 한 언어만 보이므로 단을 나누지 않는다 */
+    .process-note-cols { display: block; }
     .process-note p { margin: 0; font-size: var(--fs-sm); line-height: 1.75; }
 
     /* 미디어 — 홈 그리드처럼 220/380/540 크기가 여백 있게 흐름 */
@@ -830,7 +812,7 @@ function toParagraphs(text: string): string {
       text-transform: uppercase;
       color: var(--text-4);
     }
-    .media-note-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+    .media-note-cols { display: block; }
     .media-note p { margin: 0; font-size: var(--fs-sm); line-height: 1.7; }
 
     /* 미디어 확대 버튼 (hover 시 노출) — JS 생성 요소라 :global 필요 */
@@ -1098,30 +1080,6 @@ function toParagraphs(text: string): string {
       }
       .meta .medium-materials { margin-top: 5px; font-size: var(--fs-xs); line-height: 1.55; }
       .series-link { margin: -5px 0 24px; font-size: var(--fs-xs); }
-      .work-language-switch {
-        /* A block-level flex container keeps the switch on its own line after
-           series metadata, regardless of how long the series title is. */
-        display: flex;
-        width: max-content;
-        align-items: stretch;
-        gap: 4px;
-        margin: 0 0 12px;
-        border: 1px solid var(--line-2);
-      }
-      .work-language-switch button {
-        display: block;
-        flex: 0 0 38px;
-        min-width: 38px;
-        min-height: 28px;
-        padding: 6px 8px;
-        border: 0;
-        border-radius: 0;
-        color: var(--text-3);
-        background: transparent;
-        font: 500 11px/1 var(--sans);
-        letter-spacing: .08em;
-      }
-      .work-language-switch button[aria-pressed="true"] { color: var(--surface); background: var(--text); }
       .textcols .col {
         width: 100%;
         margin: 0 0 26px;
@@ -1131,8 +1089,6 @@ function toParagraphs(text: string): string {
         line-height: 1.78;
       }
       .textcols .col.kr { line-height: 1.85; }
-      #entry[data-language="en"] [data-language-content="ko"],
-      #entry[data-language="ko"] [data-language-content="en"] { display: none; }
       .desc { margin-bottom: 26px; font-size: var(--fs-sm); line-height: 1.78; }
       .process-note { margin: -2px 0 32px; }
       .process-note-cols { grid-template-columns: 1fr; gap: 10px; }
