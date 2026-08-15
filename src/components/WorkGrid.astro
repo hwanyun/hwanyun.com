@@ -1,5 +1,6 @@
 ---
 import { getCollection } from "astro:content"
+import SiteMenu from "./SiteMenu.astro"
 
 const { filter = "", current = "home" } = Astro.props
 
@@ -10,31 +11,10 @@ let works = await getCollection("works", ({ data }) => !data.draft)
 if (filter) works = works.filter((w) => w.data.category === filter)
 works.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
 
-const nav = [
-  { label: "Works", href: "/works", key: "works" },
-  { label: "Sound", href: "/sound", key: "sound" },
-  { label: "Events", href: "/events", key: "events" },
-  { label: "Bio", href: "/cv", key: "bio" },
-  { label: "Contact", href: "/contact", key: "contact" },
-]
 ---
 
 <div id="packed">
-  <!-- 메뉴 = 좌상단 고정 오버레이 (트리맵에서 제외, 왜곡·잘림 없음) -->
-  <nav class="home-menu" id="home-menu">
-    <div class="name"><a href="/">HWANYUN</a></div>
-    <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="home-menu">
-      <span></span><span></span><span></span>
-    </button>
-    {
-      nav.map((n) => (
-        <a href={n.href} class={current === n.key ? "current" : ""}>
-          {n.label}
-        </a>
-      ))
-    }
-    <input id="search" type="search" placeholder="Search" autocomplete="off" />
-  </nav>
+  <SiteMenu variant="grid" current={current} />
 
   <!-- 직사각형 그리드 (메뉴 컬럼 오른쪽, 좌우·상하 여백 안쪽) -->
   <div class="grid">
@@ -68,18 +48,8 @@ const nav = [
     var grid = c.querySelector(".grid")
     var input = document.getElementById("search")
     var none = document.getElementById("noresult")
-    var menu = c.querySelector(".home-menu")
-    var menuToggle = menu && menu.querySelector(".menu-toggle")
     var tiles = Array.prototype.slice.call(grid.querySelectorAll(".tile"))
     var SHARE = 0.4 // hover 시 해당 셀이 차지할 목표 면적 비율
-
-    if (menu && menuToggle) {
-      menuToggle.addEventListener("click", function () {
-        var isOpen = menu.classList.toggle("is-open")
-        menuToggle.setAttribute("aria-expanded", String(isOpen))
-        menuToggle.setAttribute("aria-label", isOpen ? "Close navigation" : "Open navigation")
-      })
-    }
 
     // 각 셀을 leaf 객체로 (DOM 순서 = 패킹 순서)
     var leaves = tiles.map(function (el) {
@@ -307,8 +277,8 @@ const nav = [
   .tile {
     position: absolute;
     overflow: hidden;
-    border: 2px solid #fff;
-    background: #f2f2f2;
+    border: 2px solid var(--surface);
+    background: var(--surface-2);
     opacity: 0;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
@@ -331,7 +301,7 @@ const nav = [
   /* 작품 셀 */
   .card {
     display: block;
-    color: #fff;
+    color: var(--surface);
   }
   .card .thumb,
   .card .ph {
@@ -351,7 +321,7 @@ const nav = [
     -webkit-user-select: none;
   }
   .card .ph {
-    background: #ececec;
+    background: var(--line);
   }
   .card .cap {
     position: absolute;
@@ -359,7 +329,7 @@ const nav = [
     right: 0;
     bottom: 0;
     padding: 26px 12px 9px;
-    font-size: 14px;
+    font-size: var(--fs-sm);
     line-height: 1.25;
     background: linear-gradient(to top, rgba(0, 0, 0, 0.62), rgba(0, 0, 0, 0));
     opacity: 0;
@@ -383,53 +353,6 @@ const nav = [
   }
 
   /* 메뉴 = 좌상단 고정 오버레이 */
-  .home-menu {
-    position: absolute;
-    left: 0;
-    top: 0;
-    z-index: 3;
-    width: 210px;
-    padding: 15px 18px 18px;
-    background: #fff;
-    font-size: 18px;
-    line-height: 1.5;
-  }
-  .home-menu .menu-toggle { display: none; }
-  .home-menu .name {
-    font-size: 22px;
-    font-weight: 500;
-    margin-bottom: 12px;
-  }
-  .home-menu a {
-    display: block;
-    color: #000;
-  }
-  .home-menu a:hover {
-    border-bottom: 1px solid var(--hover);
-    width: fit-content;
-  }
-  .home-menu a.current {
-    border-bottom: 1px solid #000;
-    width: fit-content;
-  }
-  .home-menu #search {
-    display: block;
-    width: 110px;
-    height: 34px;
-    margin-top: 14px;
-    padding: 6px 9px;
-    border: 1px solid #000;
-    font: inherit;
-    font-size: 15px;
-    background: transparent;
-    outline: none;
-    border-radius: 0;
-    -webkit-appearance: none;
-  }
-  .home-menu #search::placeholder {
-    color: #000;
-  }
-  .home-menu #search:focus { border-color: var(--hover); }
 
   #noresult {
     position: absolute;
@@ -437,8 +360,8 @@ const nav = [
     left: 0;
     right: 0;
     text-align: center;
-    font-size: 15px;
-    color: #888;
+    font-size: var(--fs-sm);
+    color: var(--text-3);
   }
 
   /* 홈에서는 전역 footer 숨김 (그리드가 화면을 채움) — 이 컴포넌트는 홈 전용 */
@@ -452,7 +375,7 @@ const nav = [
       height: 100svh;
       margin: 0;
       width: 100%;
-      background: #000;
+      background: var(--text);
     }
     .grid {
       position: absolute;
@@ -462,14 +385,14 @@ const nav = [
     .tile {
       position: absolute !important;
       opacity: 1 !important;
-      border: 1px solid #fff;
+      border: 1px solid var(--surface);
       margin: 0;
       overflow: hidden;
-      background: #000;
+      background: var(--text);
     }
     .card {
       display: block;
-      color: #fff;
+      color: var(--surface);
     }
     .card .thumb,
     .card .ph {
@@ -485,13 +408,13 @@ const nav = [
     }
     .card .ph {
       padding-bottom: 0;
-      background: #1a1a1a;
+      background: var(--text);
     }
     .scrim {
       display: block;
       position: absolute;
       inset: 0;
-      background: #000;
+      background: var(--text);
       opacity: 0.18;
       pointer-events: none;
     }
@@ -501,13 +424,10 @@ const nav = [
       right: 0;
       bottom: 0;
       padding: 28px 10px 8px;
-      font-size: 11px;
-      color: #fff;
+      font-size: var(--fs-2xs);
+      color: var(--surface);
       background: linear-gradient(to top, rgba(0, 0, 0, 0.66), rgba(0, 0, 0, 0));
       opacity: 1 !important;
-    }
-    .home-menu {
-      display: none;
     }
     #noresult {
       position: static;

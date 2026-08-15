@@ -12,9 +12,9 @@ const { active = "about" } = Astro.props
     display: flex;
     gap: 18px;
     margin: 0 0 28px;
-    font-size: 15px;
+    font-size: var(--fs-sm);
   }
-  .bionav a { color: #000; }
+  .bionav a { color: var(--text); }
   .bionav a:hover { border-bottom: 1px solid var(--hover); }
-  .bionav a.on { border-bottom: 1px solid #000; }
+  .bionav a.on { border-bottom: 1px solid var(--text); }
 </style>

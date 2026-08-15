@@ -1,0 +1,96 @@
+---
+/**
+ * 사이트 메뉴 — 단일 소스.
+ *
+ * variant
+ *  - "page" : 일반 페이지(Works/Sound/Events/Bio/Contact). 데스크톱 좌상단 고정 + 모바일 햄버거
+ *  - "hero" : 홈 히어로 위. 데스크톱에서는 숨김(구체를 가리지 않음), 모바일에서만 햄버거
+ *  - "grid" : 홈 작품 그리드 위 오버레이. 데스크톱 전용(모바일에서는 hero가 대신함)
+ *
+ * 검색 동작이 variant마다 다르다:
+ *  - "grid"는 WorkGrid의 실시간 필터 스크립트가 `#search`를 직접 읽는다 → 폼 없이 input만
+ *  - 나머지는 `/?q=`로 전송해 홈 그리드에서 필터링된다 → form
+ *
+ * 스타일은 Base.astro의 전역 <style>에 모아 둔다 (variant별 셀렉터).
+ * 동작(햄버거·Works 아코디언·바깥 클릭 닫기)도 Base.astro의 스크립트 하나가 전담한다.
+ */
+import { getCollection } from "astro:content"
+
+const { variant = "page", current = "" } = Astro.props
+
+const nav = [
+  { label: "Works", href: "/works", key: "works" },
+  { label: "Sound", href: "/sound", key: "sound" },
+  { label: "Events", href: "/events", key: "events" },
+  { label: "Bio", href: "/cv", key: "bio" },
+  { label: "Contact", href: "/contact", key: "contact" },
+]
+
+const MENU_ID: Record<string, string> = {
+  page: "site-menu",
+  hero: "home-hero-menu",
+  grid: "home-menu",
+}
+const menuId = MENU_ID[variant] ?? "site-menu"
+const linksId = `${menuId}-work-links`
+
+// grid는 데스크톱 전용이고 그 폭에서는 Works 아코디언이 뜨지 않는다.
+// 넣으면 홈 한 페이지에 작품 링크가 두 번 렌더링되고 id도 겹친다.
+const showWorksSubmenu = variant !== "grid"
+const liveSearch = variant === "grid"
+
+let workMenu: Awaited<ReturnType<typeof getCollection>> = []
+if (showWorksSubmenu) {
+  workMenu = await getCollection("works", ({ data }) => !data.draft)
+  const sortYear = (year: string) => Math.max(...(year.match(/\d{4}/g) ?? ["0"]).map(Number))
+  workMenu.sort((a, b) => {
+    const byYear = sortYear(b.data.year) - sortYear(a.data.year)
+    return byYear || (a.data.order ?? 0) - (b.data.order ?? 0)
+  })
+}
+---
+
+<nav class={`site-menu site-menu--${variant}`} id={menuId}>
+  <div class="name"><a href="/">HWANYUN</a></div>
+  <button
+    class="menu-hamburger"
+    type="button"
+    aria-label="Open navigation"
+    aria-expanded="false"
+    aria-controls={menuId}
+  >
+    <span></span><span></span><span></span>
+  </button>
+  {
+    nav.map((n) =>
+      n.key === "works" && showWorksSubmenu ? (
+        <>
+          <a href={n.href} class={`menu-works-link ${current === n.key ? "current" : ""}`}>
+            {n.label}
+          </a>
+          {/* 모바일 아코디언 전용 트리거 — 데스크톱에서는 숨김 */}
+          <a class="works-toggle" href="/works/#menu-works" aria-expanded="false" aria-controls={linksId}>
+            {n.label}
+          </a>
+          <div class="work-links" id={linksId} aria-label="Works">
+            <a href="/works/" class="all-works">All Works</a>
+            {workMenu.map((work) => <a href={`/works/${work.slug}/`}>{work.data.title}</a>)}
+          </div>
+        </>
+      ) : (
+        <a href={n.href} class={current === n.key ? "current" : ""}>
+          {n.label}
+        </a>
+      )
+    )
+  }
+  {
+    liveSearch ? (
+      <input id="search" type="search" placeholder="Search" aria-label="Search works" autocomplete="off" />
+    ) : (
+      <form class="menu-search" action="/" role="search">
+        <input type="search" name="q" placeholder="Search" aria-label="Search works" autocomplete="off" />
+      </form>
+    )
+  }
+</nav>

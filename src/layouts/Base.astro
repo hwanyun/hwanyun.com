@@ -1,22 +1,9 @@
 ---
-import { getCollection } from "astro:content"
+import SiteMenu from "../components/SiteMenu.astro"
 
 const { title = "HWANYUN", current = "" } = Astro.props
 const canonicalUrl = new URL(Astro.url.pathname, "https://www.hwanyun.com").href
 const shareImage = "https://www.hwanyun.com/images/social/hwanyun-share-preview.png"
-const nav = [
-  { label: "Works", href: "/works", key: "works" },
-  { label: "Sound", href: "/sound", key: "sound" },
-  { label: "Events", href: "/events", key: "events" },
-  { label: "Bio", href: "/cv", key: "bio" },
-  { label: "Contact", href: "/contact", key: "contact" },
-]
-const workMenu = await getCollection("works", ({ data }) => !data.draft)
-const sortYear = (year: string) => Math.max(...(year.match(/\d{4}/g) ?? ["0"]).map(Number))
-workMenu.sort((a, b) => {
-  const byYear = sortYear(b.data.year) - sortYear(a.data.year)
-  return byYear || (a.data.order ?? 0) - (b.data.order ?? 0)
-})
 ---
 
 <!doctype html>
@@ -50,39 +37,21 @@ workMenu.sort((a, b) => {
   </head>
   <body>
     <slot name="menu">
-      <nav class="menu" id="site-menu">
-        <div class="name"><a href="/">HWANYUN</a></div>
-        <button class="menu-hamburger" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-menu">
-          <span></span><span></span><span></span>
-        </button>
-        {
-          nav.map((n) => (
-            <>
-              {n.key === "works" ? (
-                <>
-                  <a href={n.href} class={`menu-works-link ${current === n.key ? "current" : ""}`}>{n.label}</a>
-                  <a class="works-toggle" href="/works/#menu-works" aria-expanded="false" aria-controls="menu-work-links">Works</a>
-                </>
-              ) : (
-                <a href={n.href} class={current === n.key ? "current" : ""}>{n.label}</a>
-              )}
-              {n.key === "works" && (
-                <div class="work-links" id="menu-work-links" aria-label="Works">
-                  <a href="/works/" class="all-works">All Works</a>
-                  {workMenu.map((work) => <a href={`/works/${work.slug}/`}>{work.data.title}</a>)}
-                </div>
-              )}
-            </>
-          ))
-        }
-        <form class="menu-search" action="/" role="search">
-          <input type="search" name="q" placeholder="Search" aria-label="Search works" autocomplete="off" />
-        </form>
-      </nav>
+      <SiteMenu variant="page" current={current} />
     </slot>
     <slot />
     <div class="cursor-dot" aria-hidden="true"></div>
-    <footer>COPYRIGHT © 2014 HWANYUN. All rights reserved.</footer>
+    <footer>
+      COPYRIGHT © 2014–<span id="footer-year">{new Date().getFullYear()}</span> HWANYUN. All rights reserved.
+    </footer>
+
+    <script is:inline>
+      /* 빌드 시점 연도가 박히면 재배포 없이 해가 바뀔 때 낡는다. 브라우저에서 보정한다. */
+      ;(function () {
+        var el = document.getElementById("footer-year")
+        if (el) el.textContent = String(new Date().getFullYear())
+      })()
+    </script>
 
     <script is:inline>
       ;(function () {
@@ -98,41 +67,88 @@ workMenu.sort((a, b) => {
     </script>
 
     <script is:inline>
+      /* 메뉴 동작 단일 소스 — 페이지에 있는 모든 .site-menu(page/hero/grid)에 같은 규칙을 건다. */
       ;(function () {
-        var menu = document.getElementById("site-menu")
-        var toggle = menu && menu.querySelector(".menu-hamburger")
-        if (!menu || !toggle) return
-        toggle.addEventListener("click", function () {
-          var isOpen = menu.classList.toggle("is-open")
-          toggle.setAttribute("aria-expanded", String(isOpen))
-          toggle.setAttribute("aria-label", isOpen ? "Close navigation" : "Open navigation")
-        })
-        var workLink = menu.querySelector(".works-toggle")
-        if (workLink) {
-          workLink.addEventListener("click", function (event) {
-            var onWorksArchive = window.location.pathname === "/works" || window.location.pathname === "/works/"
-            if (!onWorksArchive) return
-            event.preventDefault()
-            var isWorksOpen = menu.classList.toggle("works-open")
-            workLink.setAttribute("aria-expanded", String(isWorksOpen))
+        var menus = document.querySelectorAll(".site-menu")
+        if (!menus.length) return
+
+        Array.prototype.forEach.call(menus, function (menu) {
+          var toggle = menu.querySelector(".menu-hamburger")
+          var workLink = menu.querySelector(".works-toggle")
+
+          if (toggle) {
+            toggle.addEventListener("click", function () {
+              var isOpen = menu.classList.toggle("is-open")
+              toggle.setAttribute("aria-expanded", String(isOpen))
+              toggle.setAttribute("aria-label", isOpen ? "Close navigation" : "Open navigation")
+            })
+          }
+
+          if (workLink) {
+            workLink.addEventListener("click", function (event) {
+              // Works 아카이브에 이미 있으면 이동 대신 아코디언만 편다.
+              var path = window.location.pathname
+              if (path !== "/works" && path !== "/works/") return
+              event.preventDefault()
+              var isWorksOpen = menu.classList.toggle("works-open")
+              workLink.setAttribute("aria-expanded", String(isWorksOpen))
+            })
+          }
+
+          document.addEventListener("pointerdown", function (event) {
+            if (!menu.classList.contains("is-open") || menu.contains(event.target)) return
+            menu.classList.remove("is-open", "works-open")
+            if (toggle) toggle.setAttribute("aria-expanded", "false")
+            if (workLink) workLink.setAttribute("aria-expanded", "false")
           })
-        }
-        document.addEventListener("pointerdown", function (event) {
-          if (!menu.classList.contains("is-open") || menu.contains(event.target)) return
-          menu.classList.remove("is-open", "works-open")
-          toggle.setAttribute("aria-expanded", "false")
-          if (workLink) workLink.setAttribute("aria-expanded", "false")
+
+          // 다른 페이지에서 "Works"로 넘어온 경우 메뉴를 펼친 상태로 연다.
+          if (window.location.hash === "#menu-works") {
+            menu.classList.add("is-open", "works-open")
+            if (toggle) toggle.setAttribute("aria-expanded", "true")
+            if (workLink) workLink.setAttribute("aria-expanded", "true")
+          }
         })
-        if (window.location.hash === "#menu-works") {
-          menu.classList.add("is-open", "works-open")
-          toggle.setAttribute("aria-expanded", "true")
-          if (workLink) workLink.setAttribute("aria-expanded", "true")
-        }
       })()
     </script>
 
     <style is:global>
+      /* ────────────────────────────────────────────────────────────
+         디자인 토큰 — 새 hex 값과 새 font-size를 페이지에 직접 쓰지 않는다.
+         필요한 값이 없으면 여기에 단계를 추가하고 그 변수를 쓴다.
+         (근거·규칙: REDESIGN_ROADMAP.md Phase 1)
+         ──────────────────────────────────────────────────────────── */
       :root {
+        /* 밝은 배경 위 텍스트 — 4단계 */
+        --text: #111;        /* 본문·제목 */
+        --text-2: #555;      /* 부제·캡션 */
+        --text-3: #888;      /* 메타·보조 정보 */
+        --text-4: #aaa;      /* 라벨·eyebrow */
+
+        /* 면과 선 */
+        --surface: #fff;
+        --surface-2: #f7f7f3; /* 옅은 강조 배경 */
+        --line: #e6e6e6;      /* 기본 헤어라인 */
+        --line-2: #c8c8c8;    /* 강한 구분선 */
+
+        /* 어두운 면(히어로) 위 텍스트 */
+        --void: #0a0b0d;
+        --void-text: #ececea;
+        --void-text-2: #9a9a9a;
+        --void-label: #b7c4d6;
+        --void-line: #556;
+
+        --hover: #00f;
+
+        /* 타입 스케일 — 7단계 */
+        --fs-display: 38px;  /* 페이지 h1 */
+        --fs-title: 30px;    /* 작품 제목 */
+        --fs-lead: 22px;     /* 로고·리드 */
+        --fs-body: 18px;     /* 본문 */
+        --fs-sm: 15px;       /* 부가 정보 */
+        --fs-xs: 13px;       /* 메타·푸터 */
+        --fs-2xs: 11px;      /* eyebrow·태그 */
+
         --w-1col: 380px;
         --w-2col: 460px;
         --w-3col: 540px;
@@ -143,7 +159,6 @@ workMenu.sort((a, b) => {
         --desktop-content-x: 170px;
         /* 데스크톱에서는 작가명과 본문을 분리하는 공통 헤더 여백 */
         --desktop-header-clearance: 82px;
-        --hover: #00f;
         --sans: "Noto Sans KR", sans-serif;
       }
       * { box-sizing: border-box; }
@@ -151,17 +166,17 @@ workMenu.sort((a, b) => {
       body {
         font-family: var(--sans);
         font-weight: 300;
-        font-size: 18px;
+        font-size: var(--fs-body);
         line-height: 1.35;
-        color: #000;
-        background: #fff;
+        color: var(--text);
+        background: var(--surface);
         margin: 0;
         padding: 0;
         word-break: keep-all;
         -webkit-font-smoothing: antialiased;
         text-rendering: optimizeLegibility;
       }
-      a { color: #000; text-decoration: none; }
+      a { color: var(--text); text-decoration: none; }
       a:hover { color: var(--hover); }
 
       .cursor-dot { display: none; }
@@ -176,7 +191,7 @@ workMenu.sort((a, b) => {
           width: 14px;
           height: 14px;
           border-radius: 50%;
-          background: #fff;
+          background: var(--surface);
           mix-blend-mode: difference;
           pointer-events: none;
           opacity: 0;
@@ -185,65 +200,91 @@ workMenu.sort((a, b) => {
         .cursor-dot.is-visible { opacity: 1; }
       }
 
-      .menu {
+      /* ── 메뉴 ─────────────────────────────────────────────────
+         마크업은 components/SiteMenu.astro 하나, 스타일은 여기 한 곳,
+         동작은 위 스크립트 하나. variant(page/hero/grid)로만 갈라진다.
+         ──────────────────────────────────────────────────────── */
+      .site-menu { margin: 0; line-height: 1.5; }
+      .site-menu .name { font-size: var(--fs-lead); font-weight: 500; margin-bottom: 12px; }
+      .site-menu a { display: block; color: var(--text); }
+      .site-menu a:hover { border-bottom: 1px solid var(--hover); width: fit-content; }
+      .site-menu a.current { border-bottom: 1px solid var(--text); width: fit-content; }
+      /* 아래 셋은 모바일 아코디언 전용 — 데스크톱에서는 항상 숨김 */
+      .site-menu .menu-hamburger { display: none; }
+      .site-menu .works-toggle { display: none; }
+      .site-menu .work-links { display: none; }
+
+      .menu-search { margin: 14px 0 0; }
+      .site-menu--grid #search { margin-top: 14px; }
+      .site-menu input[type="search"] {
+        display: block;
+        width: 110px;
+        height: 34px;
+        padding: 6px 9px;
+        border: 1px solid var(--text);
+        border-radius: 0;
+        color: var(--text);
+        background: transparent;
+        outline: 0;
+        font: inherit;
+        font-size: var(--fs-sm);
+        -webkit-appearance: none;
+      }
+      .site-menu input[type="search"]::placeholder { color: var(--text); opacity: 1; }
+      .site-menu input[type="search"]:focus { border-color: var(--hover); }
+
+      /* variant: page — 일반 페이지 좌상단 */
+      .site-menu--page {
         position: absolute;
         z-index: 20;
         top: 10px;
         left: 10px;
         width: 140px;
-        margin: 0;
-        line-height: 1.5;
       }
-      .menu-hamburger { display: none; }
-      .menu .works-toggle { display: none; }
-      .work-links { display: none; }
-      .menu-search { margin: 14px 0 0; }
-      .menu-search input {
-        display: block;
-        width: 110px;
-        height: 34px;
-        padding: 6px 9px;
-        border: 1px solid #000;
-        border-radius: 0;
-        color: #000;
-        background: transparent;
-        outline: 0;
-        font: inherit;
-        font-size: 15px;
-        -webkit-appearance: none;
+      /* variant: hero — 데스크톱에서는 구체를 가리지 않도록 숨긴다 */
+      .site-menu--hero { display: none; }
+      /* variant: grid — 홈 작품 그리드 위 오버레이 (데스크톱 전용) */
+      .site-menu--grid {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 3;
+        width: 210px;
+        padding: 15px 18px 18px;
+        background: var(--surface);
+        font-size: var(--fs-body);
       }
-      .menu-search input::placeholder { color: #000; opacity: 1; }
-      .menu-search input:focus { border-color: var(--hover); }
-      .menu .name { font-size: 22px; font-weight: 500; margin-bottom: 12px; }
-      .menu a { display: block; }
-      .menu a:hover { border-bottom: 1px solid var(--hover); width: fit-content; }
-      .menu a.current { border-bottom: 1px solid #000; width: fit-content; }
 
       footer {
         clear: both;
         padding: 60px 10px 30px;
-        font-size: 13px;
-        color: #888;
+        font-size: var(--fs-xs);
+        color: var(--text-3);
       }
 
       @media (max-width: 700px) {
-        .menu {
-          position: relative;
+        /* grid variant는 모바일에서 hero가 대신한다 */
+        .site-menu--grid { display: none; }
+
+        .site-menu--page,
+        .site-menu--hero {
           z-index: 30;
           display: grid;
           grid-template-columns: 1fr auto;
           width: 100%;
-          top: auto;
-          left: auto;
-          margin: 0;
           min-height: 58px;
-          padding: 18px 18px;
-          color: #000;
+          margin: 0;
+          padding: 18px;
+          color: var(--text);
           background: transparent;
           line-height: 1.4;
         }
-        .menu .menu-hamburger {
-          display: block !important;
+        /* page는 문서 흐름 안에서 시작해 열릴 때만 고정, hero는 항상 히어로 위에 떠 있다 */
+        .site-menu--page { position: relative; top: auto; left: auto; width: 100%; }
+        .site-menu--hero { position: fixed; inset: 0 0 auto; }
+
+        .site-menu .menu-hamburger {
+          display: block;
           grid-column: 2;
           grid-row: 1;
           justify-self: end;
@@ -252,35 +293,35 @@ workMenu.sort((a, b) => {
           padding: 0;
           border: 0;
           border-radius: 0;
-          color: #000;
+          color: var(--text);
           background: transparent;
         }
-        .menu .menu-hamburger span {
-          display: none;
-        }
-        .menu .menu-hamburger::after {
+        .site-menu .menu-hamburger span { display: none; }
+        .site-menu .menu-hamburger::after {
           content: "☰";
           display: block;
           color: currentColor;
-          font-size: 20px;
+          font-size: var(--fs-lead);
           font-weight: 500;
           line-height: 24px;
         }
-        .menu .name {
+        .site-menu .name {
           grid-column: 1;
           grid-row: 1;
           margin: 0;
           align-self: center;
-          font-size: 20px;
+          font-size: var(--fs-lead);
         }
-        .menu > a {
+        .site-menu > a {
           display: none;
           grid-column: 1 / -1;
           width: fit-content;
           margin-top: 10px;
-          font-size: 18px;
+          font-size: var(--fs-body);
         }
-        .menu.is-open {
+        .site-menu .name a { display: block; }
+
+        .site-menu.is-open {
           position: fixed;
           inset: 0 0 auto;
           padding-bottom: 22px;
@@ -288,9 +329,10 @@ workMenu.sort((a, b) => {
           backdrop-filter: blur(10px);
           -webkit-backdrop-filter: blur(10px);
         }
-        .menu.is-open > a { display: block; }
-        .menu.is-open .menu-works-link { display: none; }
-        .menu.is-open .works-toggle {
+        .site-menu.is-open > a { display: block; }
+        /* 아코디언이 열리면 평범한 Works 링크는 감추고 토글이 그 자리를 대신한다 */
+        .site-menu.is-open .menu-works-link { display: none; }
+        .site-menu.is-open .works-toggle {
           display: block;
           grid-column: 1 / -1;
           width: fit-content;
@@ -300,10 +342,10 @@ workMenu.sort((a, b) => {
           color: inherit;
           background: transparent;
           font: inherit;
-          font-size: 18px;
+          font-size: var(--fs-body);
           line-height: 1.4;
         }
-        .menu.is-open .work-links {
+        .site-menu.is-open .work-links {
           display: grid;
           grid-column: 1 / -1;
           gap: 7px;
@@ -316,7 +358,7 @@ workMenu.sort((a, b) => {
           pointer-events: none;
           transition: max-height .38s ease, margin .28s ease, padding .28s ease, opacity .22s ease;
         }
-        .menu.is-open.works-open .work-links {
+        .site-menu.is-open.works-open .work-links {
           max-height: min(46svh, 350px);
           margin: 4px 0 8px;
           padding: 5px 0 5px 13px;
@@ -324,17 +366,18 @@ workMenu.sort((a, b) => {
           opacity: 1;
           pointer-events: auto;
         }
-        .menu.is-open .work-links a {
+        .site-menu.is-open .work-links a {
           display: block;
           margin: 0;
-          color: #333;
-          font-size: 13px;
+          color: var(--text-2);
+          font-size: var(--fs-xs);
           line-height: 1.35;
         }
-        .menu.is-open .work-links .all-works { font-weight: 500; }
+        .site-menu.is-open .work-links .all-works { font-weight: 500; }
+
         .menu-search { display: none; grid-column: 1 / -1; margin: 16px 0 0; }
-        .menu-search input { width: min(110px, 100%); }
-        .menu.is-open .menu-search { display: block; }
+        .site-menu input[type="search"] { width: min(110px, 100%); }
+        .site-menu.is-open .menu-search { display: block; }
       }
     </style>
   </body>

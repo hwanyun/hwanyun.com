@@ -34,7 +34,7 @@ const { data, korean = false } = Astro.props
     margin: var(--desktop-header-clearance) 40px 100px var(--desktop-content-x);
     max-width: var(--content-w);
     padding: 0;
-    font-size: 16px;
+    font-size: var(--fs-body);
     font-weight: 400;
     line-height: 1.65;
   }
@@ -44,19 +44,19 @@ const { data, korean = false } = Astro.props
     justify-content: flex-end;
     gap: 6px;
     margin: 0 0 24px;
-    font-size: 13px;
+    font-size: var(--fs-xs);
     letter-spacing: .04em;
-    color: #999;
+    color: var(--text-4);
   }
-  .language-switch a { color: #999; }
+  .language-switch a { color: var(--text-4); }
   .language-switch a:hover,
-  .language-switch a.active { color: #000; }
+  .language-switch a.active { color: var(--text); }
   .cv-title {
-    font-size: 18px;
+    font-size: var(--fs-body);
     font-weight: 500;
     margin: 0 0 12px;
     padding-bottom: 6px;
-    border-bottom: 1px solid #000;
+    border-bottom: 1px solid var(--text);
   }
   .row {
     display: grid;
@@ -65,18 +65,18 @@ const { data, korean = false } = Astro.props
     padding: 4px 0;
   }
   .year {
-    color: #555;
+    color: var(--text-2);
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
   }
   @media (max-width: 700px) {
-    .page { margin: 0; padding: 0 16px 64px; font-size: 15px; line-height: 1.65; }
+    .page { margin: 0; padding: 0 16px 64px; font-size: var(--fs-sm); line-height: 1.65; }
     .bionav { margin-bottom: 26px; }
-    .language-switch { margin-bottom: 28px; font-size: 12px; }
+    .language-switch { margin-bottom: 28px; font-size: var(--fs-xs); }
     .cv-section { margin-bottom: 30px; }
-    .cv-title { margin-bottom: 8px; padding-bottom: 7px; font-size: 16px; }
+    .cv-title { margin-bottom: 8px; padding-bottom: 7px; font-size: var(--fs-body); }
     .row { grid-template-columns: 1fr; gap: 2px; padding: 8px 0 10px; }
-    .year { font-size: 14px; line-height: 1.4; color: #777; }
-    .text { font-size: 15px; line-height: 1.65; }
+    .year { font-size: var(--fs-sm); line-height: 1.4; color: var(--text-3); }
+    .text { font-size: var(--fs-sm); line-height: 1.65; }
   }
 </style>

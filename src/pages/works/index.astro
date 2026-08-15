@@ -66,36 +66,36 @@ works.sort((a, b) => {
 <style>
   .works-archive { margin: var(--desktop-header-clearance) 40px 100px var(--desktop-content-x); max-width: var(--content-w); }
   .archive-intro { max-width: 650px; margin: 0 0 84px; }
-  .eyebrow { margin: 0; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #888; }
-  h1 { margin: 8px 0 16px; font-size: 38px; font-weight: 300; line-height: 1.15; }
+  .eyebrow { margin: 0; font-size: var(--fs-2xs); letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
+  h1 { margin: 8px 0 16px; font-size: var(--fs-display); font-weight: 300; line-height: 1.15; }
   .intro-copy { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3%; }
-  .intro-copy p { margin: 0; padding-top: 12px; border-top: 1px solid #000; font-size: 16px; line-height: 1.8; color: #555; }
+  .intro-copy p { margin: 0; padding-top: 12px; border-top: 1px solid var(--text); font-size: var(--fs-body); line-height: 1.8; color: var(--text-2); }
   .intro-copy p[lang="ko"] { line-height: 1.85; }
   .archive-language-switch { display: none; }
   ol { margin: 0; padding: 0; list-style: none; }
   .archive-head, li a { display: grid; grid-template-columns: minmax(0, 1fr) 66px; gap: 16px; }
-  .archive-head { border-top: 1px solid #111; border-bottom: 1px solid #111; padding: 5px 0 4px; font-size: 18px; font-weight: 500; letter-spacing: 0.025em; }
+  .archive-head { border-top: 1px solid var(--text); border-bottom: 1px solid var(--text); padding: 5px 0 4px; font-size: var(--fs-body); font-weight: 500; letter-spacing: 0.025em; }
   .archive-head span:last-child { text-align: right; }
-  li { border-bottom: 1px solid #8b8b8b; }
+  li { border-bottom: 1px solid var(--text-3); }
   li a { align-items: baseline; padding: 5px 0 6px; }
-  time { grid-column: 2; grid-row: 1; text-align: right; font-size: 15px; font-weight: 300; letter-spacing: 0.025em; }
-  li span { grid-column: 1; grid-row: 1; font-size: 18px; font-weight: 300; line-height: 1.16; letter-spacing: 0.012em; }
+  time { grid-column: 2; grid-row: 1; text-align: right; font-size: var(--fs-sm); font-weight: 300; letter-spacing: 0.025em; }
+  li span { grid-column: 1; grid-row: 1; font-size: var(--fs-body); font-weight: 300; line-height: 1.16; letter-spacing: 0.012em; }
   li a:hover { color: var(--hover); }
   @media (max-width: 700px) {
     .works-archive { margin: 24px 16px 80px; }
     .archive-intro { margin-bottom: 54px; }
     h1 { font-size: clamp(25px, 7vw, 32px); line-height: 1.22; }
-    .archive-language-switch { display: inline-flex; align-items: stretch; gap: 4px; margin: 0 0 12px; border: 1px solid #c8c8c8; }
-    .archive-language-switch button { display: block; flex: 0 0 38px; min-width: 38px; min-height: 28px; padding: 6px 8px; border: 0; border-radius: 0; color: #777; background: transparent; font: 500 11px/1 var(--sans); letter-spacing: .08em; }
-    .archive-language-switch button[aria-pressed="true"] { color: #fff; background: #111; }
+    .archive-language-switch { display: inline-flex; align-items: stretch; gap: 4px; margin: 0 0 12px; border: 1px solid var(--line-2); }
+    .archive-language-switch button { display: block; flex: 0 0 38px; min-width: 38px; min-height: 28px; padding: 6px 8px; border: 0; border-radius: 0; color: var(--text-3); background: transparent; font: 500 11px/1 var(--sans); letter-spacing: .08em; }
+    .archive-language-switch button[aria-pressed="true"] { color: var(--surface); background: var(--text); }
     .intro-copy { grid-template-columns: 1fr; gap: 0; }
-    .intro-copy p { margin: 0 0 26px; padding-top: 10px; font-size: 15px; line-height: 1.78; }
+    .intro-copy p { margin: 0 0 26px; padding-top: 10px; font-size: var(--fs-sm); line-height: 1.78; }
     .intro-copy p[lang="ko"] { line-height: 1.85; }
     .works-archive[data-language="en"] [data-language-content="ko"],
     .works-archive[data-language="ko"] [data-language-content="en"] { display: none; }
     .archive-head, li a { grid-template-columns: minmax(0, 1fr) 48px; gap: 8px; }
-    .archive-head { font-size: 15px; }
-    time { font-size: 13px; }
-    li span { font-size: 16px; }
+    .archive-head { font-size: var(--fs-sm); }
+    time { font-size: var(--fs-xs); }
+    li span { font-size: var(--fs-body); }
   }
 </style>

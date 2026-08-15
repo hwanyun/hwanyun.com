@@ -36,7 +36,7 @@ const paragraphs = korean
     margin: var(--desktop-header-clearance) 40px 100px var(--desktop-content-x);
     max-width: 680px;
     padding: 0;
-    font-size: 16px;
+    font-size: var(--fs-body);
     font-weight: 400;
     line-height: 1.8;
   }
@@ -45,21 +45,21 @@ const paragraphs = korean
     justify-content: flex-end;
     gap: 6px;
     margin: 0 0 24px;
-    font-size: 13px;
+    font-size: var(--fs-xs);
     letter-spacing: .04em;
-    color: #999;
+    color: var(--text-4);
   }
-  .language-switch a { color: #999; }
+  .language-switch a { color: var(--text-4); }
   .language-switch a:hover,
-  .language-switch a.active { color: #000; }
-  h2 { font-size: 15px; font-weight: 500; margin: 0 0 10px; }
+  .language-switch a.active { color: var(--text); }
+  h2 { font-size: var(--fs-sm); font-weight: 500; margin: 0 0 10px; }
   section { margin: 0 0 40px; }
   p { margin: 0 0 1em; }
   .sign { font-weight: 500; letter-spacing: .02em; }
   @media (max-width: 700px) {
-    .page { margin: 0; padding: 0 16px 64px; font-size: 15px; line-height: 1.75; }
+    .page { margin: 0; padding: 0 16px 64px; font-size: var(--fs-sm); line-height: 1.75; }
     .bionav { margin-bottom: 26px; }
-    .language-switch { margin-bottom: 28px; font-size: 12px; }
+    .language-switch { margin-bottom: 28px; font-size: var(--fs-xs); }
     section { margin-bottom: 32px; }
     p { margin-bottom: 1.1em; }
   }

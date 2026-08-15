@@ -66,26 +66,26 @@ const where = [data.venue, data.city].filter(Boolean).join(", ")
       margin: var(--desktop-header-clearance) 40px 120px var(--desktop-content-x);
       max-width: 720px;
     }
-    .back { display: inline-block; font-size: 13px; color: #888; text-decoration: none; margin-bottom: 26px; }
-    .back:hover { color: #111; }
-    .ev-detail h1 { font-size: 30px; font-weight: 400; line-height: 1.25; margin: 0 0 14px; }
-    .meta { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 15px; color: #555; margin: 0 0 20px; }
-    .meta .d { color: #111; }
-    .summary { font-size: 17px; line-height: 1.6; color: #333; margin: 0 0 28px; max-width: 560px; }
-    .body { font-size: 16px; line-height: 1.8; color: #333; max-width: 620px; }
+    .back { display: inline-block; font-size: var(--fs-xs); color: var(--text-3); text-decoration: none; margin-bottom: 26px; }
+    .back:hover { color: var(--text); }
+    .ev-detail h1 { font-size: var(--fs-title); font-weight: 400; line-height: 1.25; margin: 0 0 14px; }
+    .meta { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: var(--fs-sm); color: var(--text-2); margin: 0 0 20px; }
+    .meta .d { color: var(--text); }
+    .summary { font-size: var(--fs-body); line-height: 1.6; color: var(--text-2); margin: 0 0 28px; max-width: 560px; }
+    .body { font-size: var(--fs-body); line-height: 1.8; color: var(--text-2); max-width: 620px; }
     .body :global(p) { margin: 0 0 1em; }
     .ev-media { margin: 34px 0 0; display: grid; gap: 18px; }
     .ev-media img { width: 100%; display: block; }
-    .ev-media figcaption { font-size: 13px; color: #888; margin-top: 5px; }
+    .ev-media figcaption { font-size: var(--fs-xs); color: var(--text-3); margin-top: 5px; }
     .ev-cta {
       display: inline-block; margin-top: 34px; padding: 12px 22px;
-      border: 1px solid #111; color: #111; text-decoration: none; font-size: 15px;
+      border: 1px solid var(--text); color: var(--text); text-decoration: none; font-size: var(--fs-sm);
       transition: background 0.2s ease, color 0.2s ease;
     }
-    .ev-cta:hover { background: #111; color: #fff; }
+    .ev-cta:hover { background: var(--text); color: var(--surface); }
     @media (max-width: 700px) {
       .ev-detail { margin: 0 16px 80px; padding-top: 8px; max-width: none; }
-      .ev-detail h1 { font-size: 24px; }
+      .ev-detail h1 { font-size: var(--fs-lead); }
     }
   </style>
 </Base>

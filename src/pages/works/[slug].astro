@@ -645,35 +645,35 @@ function toParagraphs(text: string): string {
       position: relative;
     }
     .entry_title {
-      font-size: 34px;
+      font-size: var(--fs-display);
       font-weight: 300;
       line-height: 1.25;
       margin-bottom: 22px;
     }
-    .meta { font-size: 18px; font-weight: 400; line-height: 1.6; color: #555; margin: 0 0 34px; }
-    .meta .medium-type { display: block; color: #111; }
-    .meta .medium-materials { display: block; margin-top: 8px; font-size: 16px; color: #777; }
+    .meta { font-size: var(--fs-body); font-weight: 400; line-height: 1.6; color: var(--text-2); margin: 0 0 34px; }
+    .meta .medium-type { display: block; color: var(--text); }
+    .meta .medium-materials { display: block; margin-top: 8px; font-size: var(--fs-body); color: var(--text-3); }
     .series-link {
       display: inline-flex;
       flex-direction: column;
       gap: 2px;
       margin: -14px 0 30px;
-      font-size: 14px;
+      font-size: var(--fs-sm);
       line-height: 1.4;
-      color: #333;
+      color: var(--text-2);
     }
     .series-link span {
-      font-size: 11px;
+      font-size: var(--fs-2xs);
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: #999;
+      color: var(--text-4);
     }
     .series-members { display: flex; flex-wrap: wrap; gap: 0 10px; }
     .series-members a,
-    .series-current { color: #333; }
+    .series-current { color: var(--text-2); }
     .series-members a + a::before,
     .series-members a + .series-current::before,
-    .series-current + a::before { content: "·"; margin-right: 10px; color: #aaa; }
+    .series-current + a::before { content: "·"; margin-right: 10px; color: var(--text-4); }
     .series-members a:hover { color: var(--hover); }
     .series-link:hover > span { color: var(--hover); }
 
@@ -684,26 +684,26 @@ function toParagraphs(text: string): string {
       float: left;
       margin: 0 3% 30px 0;
       padding: 12px 0 0 0;
-      border-top: 1px solid #000;
-      font-size: 16px;
+      border-top: 1px solid var(--text);
+      font-size: var(--fs-body);
       font-weight: 400;
       line-height: 1.8;
-      color: #555;
+      color: var(--text-2);
     }
     .textcols .col.kr { line-height: 1.85; }
     .textcols .col p { margin: 0 0 1em; }
     .textcols .col p:last-child { margin-bottom: 0; }
     .work-language-switch { display: none; }
 
-    .desc { font-size: 16px; font-weight: 400; line-height: 1.8; max-width: 640px; margin: 0 0 30px; }
+    .desc { font-size: var(--fs-body); font-weight: 400; line-height: 1.8; max-width: 640px; margin: 0 0 30px; }
     .desc :global(p) { margin: 0 0 1em; }
     .process-note {
       clear: both;
       margin: -4px 0 42px;
-      color: #999;
+      color: var(--text-4);
     }
     .process-note-cols { display: grid; grid-template-columns: 46.5% 46.5%; column-gap: 3%; }
-    .process-note p { margin: 0; font-size: 14px; line-height: 1.75; }
+    .process-note p { margin: 0; font-size: var(--fs-sm); line-height: 1.75; }
 
     /* 미디어 — 홈 그리드처럼 220/380/540 크기가 여백 있게 흐름 */
     .media {
@@ -720,11 +720,11 @@ function toParagraphs(text: string): string {
       clear: both;
       margin: 48px 0 18px;
       padding-top: 11px;
-      border-top: 1px solid #ccc;
-      font-size: 12px;
+      border-top: 1px solid var(--line-2);
+      font-size: var(--fs-xs);
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: #999;
+      color: var(--text-4);
     }
 
     /* 영상·사진 모두 하나의 수평 아카이브로 읽는다.
@@ -779,7 +779,7 @@ function toParagraphs(text: string): string {
     }
     .media-stills .block.is-portrait { flex-basis: clamp(190px, 21vw, 250px); }
     .media-stills .block img { display: block; width: 100%; height: auto; }
-    .media-stills figcaption { margin-top: 8px; font-size: 13px; color: #666; }
+    .media-stills figcaption { margin-top: 8px; font-size: var(--fs-xs); color: var(--text-3); }
 
     /* 데스크톱: justified 타일 그리드 — 각 타일이 사진 비율 그대로라 resting에서 잘림 없음.
        hover 시 그 타일이 살짝 떠오름(전체 그대로). */
@@ -793,7 +793,7 @@ function toParagraphs(text: string): string {
         position: absolute;
         margin: 0;
         overflow: hidden;
-        background: #f2f2f2;
+        background: var(--surface-2);
         opacity: 0;
         transition:
           opacity 0.4s ease,
@@ -823,8 +823,8 @@ function toParagraphs(text: string): string {
         bottom: 0;
         margin: 0;
         padding: 22px 12px 9px;
-        color: #fff;
-        font-size: 13px;
+        color: var(--surface);
+        font-size: var(--fs-xs);
         background: linear-gradient(to top, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0));
         opacity: 0;
         transition: opacity 0.3s ease;
@@ -866,7 +866,7 @@ function toParagraphs(text: string): string {
         position: static;
         margin-top: 8px;
         padding: 0;
-        color: #666;
+        color: var(--text-3);
         background: none;
         opacity: 1;
       }
@@ -875,7 +875,7 @@ function toParagraphs(text: string): string {
     .post-gallery-divider {
       clear: both;
       margin: 72px 0 0;
-      border-top: 1px solid #ddd;
+      border-top: 1px solid var(--line);
     }
 
     /* 12열 그리드: 자료의 역할과 여백을 함께 조절한다. */
@@ -887,7 +887,7 @@ function toParagraphs(text: string): string {
     .block:not(.is-video)::before {
       content: "\2922"; position: absolute; left: 50%; top: 50%; z-index: 2; pointer-events: none;
       display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%;
-      background: rgba(255,255,255,0.92); color: #111; font-size: 20px;
+      background: rgba(255,255,255,0.92); color: var(--text); font-size: var(--fs-lead);
       transform: translate(-50%, -50%) scale(0.9); opacity: 0;
       transition: opacity 0.2s ease, transform 0.2s ease;
     }
@@ -908,24 +908,24 @@ function toParagraphs(text: string): string {
     .block.detail.align-right,
     .block.portrait.align-right { grid-column: 9 / span 4; }
     .block img { display: block; width: 100%; }
-    .block .ph { background: #ececec; height: 0; }
+    .block .ph { background: var(--line); height: 0; }
     figure { margin: 0; }
-    figcaption { font-size: 13px; color: #555; margin-top: 4px; }
+    figcaption { font-size: var(--fs-xs); color: var(--text-2); margin-top: 4px; }
     .media-note {
       margin-top: 18px;
       padding-top: 12px;
-      border-top: 1px solid #d8d8d8;
-      color: #555;
+      border-top: 1px solid var(--line);
+      color: var(--text-2);
     }
     .media-note-label {
       margin-bottom: 10px;
-      font-size: 11px;
+      font-size: var(--fs-2xs);
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: #999;
+      color: var(--text-4);
     }
     .media-note-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
-    .media-note p { margin: 0; font-size: 14px; line-height: 1.7; }
+    .media-note p { margin: 0; font-size: var(--fs-sm); line-height: 1.7; }
 
     /* 미디어 확대 버튼 (hover 시 노출) — JS 생성 요소라 :global 필요 */
     .block :global(.focus-open) {
@@ -938,8 +938,8 @@ function toParagraphs(text: string): string {
       border: 0;
       border-radius: 0;
       background: rgba(255, 255, 255, 0.86);
-      color: #111;
-      font-size: 15px;
+      color: var(--text);
+      font-size: var(--fs-sm);
       line-height: 1;
       cursor: zoom-in;
       opacity: 0;
@@ -971,7 +971,7 @@ function toParagraphs(text: string): string {
       border: 1px solid rgba(255, 255, 255, 0.9);
       border-radius: 50%;
       background: rgba(8, 8, 10, 0.32);
-      color: #fff;
+      color: var(--surface);
       cursor: pointer;
       transform: translate(-50%, -50%);
       transition: background 0.25s ease, transform 0.25s ease;
@@ -985,8 +985,8 @@ function toParagraphs(text: string): string {
       border-left: 12px solid currentColor;
     }
     .video-preview:hover .video-play {
-      background: #fff;
-      color: #111;
+      background: var(--surface);
+      color: var(--text);
       transform: translate(-50%, -50%) scale(1.08);
     }
 
@@ -1029,7 +1029,7 @@ function toParagraphs(text: string): string {
       max-width: 92vw;
       box-shadow: 0 12px 48px rgba(0, 0, 0, 0.16);
     }
-    .focus-cap { font-size: 14px; color: #444; text-align: center; }
+    .focus-cap { font-size: var(--fs-sm); color: var(--text-2); text-align: center; }
     .focus-close {
       position: fixed;
       top: 14px;
@@ -1040,14 +1040,14 @@ function toParagraphs(text: string): string {
       justify-content: center;
       width: 46px;
       height: 46px;
-      font-size: 28px;
+      font-size: var(--fs-title);
       line-height: 1;
       background: rgba(255, 255, 255, 0.78);
       -webkit-backdrop-filter: blur(4px);
       backdrop-filter: blur(4px);
       border: 0;
       border-radius: 50%;
-      color: #111;
+      color: var(--text);
       cursor: pointer;
     }
     .focus-close:hover { color: var(--hover); }
@@ -1062,8 +1062,8 @@ function toParagraphs(text: string): string {
       border: 1px solid currentColor;
       border-radius: 50%;
       background: rgba(255,255,255,.66);
-      color: #111;
-      font-size: 32px;
+      color: var(--text);
+      font-size: var(--fs-title);
       font-weight: 300;
       line-height: 1;
       cursor: pointer;
@@ -1079,13 +1079,13 @@ function toParagraphs(text: string): string {
     .focus.video-focus { background: rgba(7, 8, 10, 0.5); }
     .focus.video-focus .focus-close,
     .focus.video-focus .focus-cap,
-    .focus.video-focus .focus-nav { color: #f7f7f3; }
+    .focus.video-focus .focus-nav { color: var(--surface-2); }
     .focus.video-focus .focus-nav { background: rgba(7,8,10,.48); }
-    .focus.video-focus .focus-close { background: rgba(7,8,10,.55); color: #fff; }
+    .focus.video-focus .focus-close { background: rgba(7,8,10,.55); color: var(--surface); }
     .focus.video-focus .focus-stage .video { box-shadow: none; }
 
     /* 영상: 비율에 맞춰 자동 크기 */
-    .video { position: relative; width: 100%; background: #000; }
+    .video { position: relative; width: 100%; background: var(--text); }
     .video iframe,
     .video video {
       position: absolute;
@@ -1113,14 +1113,14 @@ function toParagraphs(text: string): string {
     }
     .related-sounds-label {
       margin-bottom: 13px;
-      font-size: 12px;
+      font-size: var(--fs-xs);
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: #999;
+      color: var(--text-4);
     }
     .related-sounds-list { display: flex; flex-wrap: wrap; gap: 9px 24px; }
-    .related-sounds-list a { display: inline-flex; gap: 8px; align-items: baseline; color: #333; font-size: 15px; }
-    .related-sounds-list a span:last-child { font-size: 12px; color: #999; }
+    .related-sounds-list a { display: inline-flex; gap: 8px; align-items: baseline; color: var(--text-2); font-size: var(--fs-sm); }
+    .related-sounds-list a span:last-child { font-size: var(--fs-xs); color: var(--text-4); }
     .related-sounds-list a:hover, .related-sounds-list a:hover span:last-child { color: var(--hover); }
     .external-links {
       clear: both;
@@ -1131,25 +1131,25 @@ function toParagraphs(text: string): string {
     }
     .external-links-label {
       margin-bottom: 13px;
-      font-size: 12px;
+      font-size: var(--fs-xs);
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: #999;
+      color: var(--text-4);
     }
     .external-links-list { display: flex; flex-wrap: wrap; gap: 9px 24px; }
-    .external-links-list a { display: inline-flex; gap: 8px; align-items: baseline; color: #777; font-size: 15px; }
-    .external-links-list a span:last-child { font-size: 12px; color: #aaa; }
+    .external-links-list a { display: inline-flex; gap: 8px; align-items: baseline; color: var(--text-3); font-size: var(--fs-sm); }
+    .external-links-list a span:last-child { font-size: var(--fs-xs); color: var(--text-4); }
     .external-links-list a:hover, .external-links-list a:hover span:last-child { color: var(--hover); }
     .exhibition-label,
     .sponsors-label {
-      font-size: 12px;
+      font-size: var(--fs-xs);
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: #999;
+      color: var(--text-4);
       margin-bottom: 16px;
     }
-    .exhibition-title { display: flex; flex-wrap: wrap; gap: 0 10px; font-size: 16px; color: #555; }
-    .exhibition-title span + span::before { content: "·"; margin-right: 10px; color: #aaa; }
+    .exhibition-title { display: flex; flex-wrap: wrap; gap: 0 10px; font-size: var(--fs-body); color: var(--text-2); }
+    .exhibition-title span + span::before { content: "·"; margin-right: 10px; color: var(--text-4); }
     .exhibition-meta { font: inherit; color: inherit; }
     .sponsors {
       clear: both;
@@ -1164,7 +1164,7 @@ function toParagraphs(text: string): string {
       gap: 32px;
     }
     .sponsor { display: inline-flex; align-items: center; }
-    .sponsor-name { font-size: 16px; color: #333; }
+    .sponsor-name { font-size: var(--fs-body); color: var(--text-2); }
     .sponsor img {
       max-height: 40px;
       max-width: 140px;
@@ -1184,11 +1184,11 @@ function toParagraphs(text: string): string {
       }
       .meta {
         margin-bottom: 24px;
-        font-size: 14px;
+        font-size: var(--fs-sm);
         line-height: 1.6;
       }
-      .meta .medium-materials { margin-top: 5px; font-size: 13px; line-height: 1.55; }
-      .series-link { margin: -5px 0 24px; font-size: 13px; }
+      .meta .medium-materials { margin-top: 5px; font-size: var(--fs-xs); line-height: 1.55; }
+      .series-link { margin: -5px 0 24px; font-size: var(--fs-xs); }
       .work-language-switch {
         /* A block-level flex container keeps the switch on its own line after
            series metadata, regardless of how long the series title is. */
@@ -1197,7 +1197,7 @@ function toParagraphs(text: string): string {
         align-items: stretch;
         gap: 4px;
         margin: 0 0 12px;
-        border: 1px solid #c8c8c8;
+        border: 1px solid var(--line-2);
       }
       .work-language-switch button {
         display: block;
@@ -1207,29 +1207,29 @@ function toParagraphs(text: string): string {
         padding: 6px 8px;
         border: 0;
         border-radius: 0;
-        color: #777;
+        color: var(--text-3);
         background: transparent;
         font: 500 11px/1 var(--sans);
         letter-spacing: .08em;
       }
-      .work-language-switch button[aria-pressed="true"] { color: #fff; background: #111; }
+      .work-language-switch button[aria-pressed="true"] { color: var(--surface); background: var(--text); }
       .textcols .col {
         width: 100%;
         margin: 0 0 26px;
         padding-top: 10px;
         float: none;
-        font-size: 15px;
+        font-size: var(--fs-sm);
         line-height: 1.78;
       }
       .textcols .col.kr { line-height: 1.85; }
       #entry[data-language="en"] [data-language-content="ko"],
       #entry[data-language="ko"] [data-language-content="en"] { display: none; }
-      .desc { margin-bottom: 26px; font-size: 15px; line-height: 1.78; }
+      .desc { margin-bottom: 26px; font-size: var(--fs-sm); line-height: 1.78; }
       .process-note { margin: -2px 0 32px; }
       .process-note-cols { grid-template-columns: 1fr; gap: 10px; }
-      .process-note p { font-size: 13px; line-height: 1.7; }
+      .process-note p { font-size: var(--fs-xs); line-height: 1.7; }
       .media--lead { margin-bottom: 32px; }
-      .layer-label { margin: 36px 0 14px; padding-top: 9px; font-size: 10px; }
+      .layer-label { margin: 36px 0 14px; padding-top: 9px; font-size: var(--fs-2xs); }
       .block,
       .block.hero,
       .block.wide,
@@ -1280,27 +1280,27 @@ function toParagraphs(text: string): string {
       .media-stills .block.is-portrait {
         flex-basis: min(56vw, 220px);
       }
-      figcaption, .media-stills figcaption { margin-top: 6px; font-size: 11px; line-height: 1.45; }
+      figcaption, .media-stills figcaption { margin-top: 6px; font-size: var(--fs-2xs); line-height: 1.45; }
       .media-note { margin-top: 13px; padding-top: 9px; }
       .media-note-cols { grid-template-columns: 1fr; gap: 8px; }
-      .media-note p { font-size: 13px; line-height: 1.65; }
+      .media-note p { font-size: var(--fs-xs); line-height: 1.65; }
       .block :global(.focus-open) { opacity: 0.9; }
       .focus-stage .video { height: auto; width: 92vw; max-height: 82vh; }
       .video-play { width: 52px; height: 52px; }
-      .focus-nav { width: 42px; height: 42px; font-size: 27px; }
+      .focus-nav { width: 42px; height: 42px; font-size: var(--fs-title); }
       .focus-prev { left: 4px; }
       .focus-next { right: 4px; }
       .post-gallery-divider { margin-top: 48px; }
       .related-sounds, .external-links, .exhibition-credit { margin-top: 22px; }
-      .related-sounds-label, .external-links-label, .exhibition-label, .sponsors-label { margin-bottom: 10px; font-size: 10px; }
+      .related-sounds-label, .external-links-label, .exhibition-label, .sponsors-label { margin-bottom: 10px; font-size: var(--fs-2xs); }
       .related-sounds-list, .external-links-list { display: grid; gap: 9px; }
-      .related-sounds-list a, .external-links-list a { justify-content: space-between; font-size: 13px; }
-      .exhibition-title { font-size: 14px; line-height: 1.6; }
+      .related-sounds-list a, .external-links-list a { justify-content: space-between; font-size: var(--fs-xs); }
+      .exhibition-title { font-size: var(--fs-sm); line-height: 1.6; }
       .exhibition-title span + span::before { content: none; }
-      .exhibition-meta { width: 100%; color: #777; }
+      .exhibition-meta { width: 100%; color: var(--text-3); }
       .sponsors { margin-top: 22px; }
       .sponsors-row { gap: 20px; }
-      .sponsor-name { font-size: 14px; }
+      .sponsor-name { font-size: var(--fs-sm); }
     }
 
     @media (prefers-reduced-motion: reduce) {
