@@ -623,13 +623,15 @@ function toParagraphs(text: string): string {
     .material-tag:hover::before { background: var(--hover); }
 
     /* 같은 재료의 작품 — 작품 페이지의 막다른 골목을 없앤다 */
-    .related-materials { margin: 56px 0 0; }
+    /* 본문 뒤 크레딧 블록들(재료·전시·읽을거리·후원)은 하나의 리듬을 공유한다 —
+       블록 사이 48px, 라벨과 내용 사이 12px. 4:1이라 어디서 끊기는지 눈이 안다. */
+    .related-materials { margin: var(--space-4) 0 0; }
     .related-materials-label {
       font-size: var(--fs-2xs);
       letter-spacing: 0.14em;
       text-transform: uppercase;
       color: var(--text-4);
-      margin-bottom: 10px;
+      margin-bottom: var(--space-2);
     }
     .related-materials-list { list-style: none; margin: 0; padding: 0; }
     .related-materials-list li { border-top: 1px solid var(--line); }
@@ -989,20 +991,20 @@ function toParagraphs(text: string): string {
       clear: both;
       position: relative;
       z-index: 1;
-      margin: 26px 0 0;
+      margin: var(--space-4) 0 0;
       padding-top: 0;
     }
     .related-sounds {
       clear: both;
       position: relative;
       z-index: 1;
-      margin: 24px 0 0;
+      margin: var(--space-4) 0 0;
       padding-top: 0;
     }
     .related-sounds-label {
-      margin-bottom: 13px;
-      font-size: var(--fs-xs);
-      letter-spacing: 0.08em;
+      margin-bottom: var(--space-2);
+      font-size: var(--fs-2xs);
+      letter-spacing: 0.14em;
       text-transform: uppercase;
       color: var(--text-4);
     }
@@ -1014,13 +1016,13 @@ function toParagraphs(text: string): string {
       clear: both;
       position: relative;
       z-index: 1;
-      margin: 26px 0 0;
+      margin: var(--space-4) 0 0;
       padding-top: 0;
     }
     .external-links-label {
-      margin-bottom: 13px;
-      font-size: var(--fs-xs);
-      letter-spacing: 0.08em;
+      margin-bottom: var(--space-2);
+      font-size: var(--fs-2xs);
+      letter-spacing: 0.14em;
       text-transform: uppercase;
       color: var(--text-4);
     }
@@ -1030,11 +1032,11 @@ function toParagraphs(text: string): string {
     .external-links-list a:hover, .external-links-list a:hover span:last-child { color: var(--hover); }
     .exhibition-label,
     .sponsors-label {
-      font-size: var(--fs-xs);
-      letter-spacing: 0.08em;
+      font-size: var(--fs-2xs);
+      letter-spacing: 0.14em;
       text-transform: uppercase;
       color: var(--text-4);
-      margin-bottom: 16px;
+      margin-bottom: var(--space-2);
     }
     .exhibition-title { display: flex; flex-wrap: wrap; gap: 0 10px; font-size: var(--fs-body); color: var(--text-2); }
     .exhibition-title span + span::before { content: "·"; margin-right: 10px; color: var(--text-4); }
@@ -1043,7 +1045,7 @@ function toParagraphs(text: string): string {
       clear: both;
       position: relative;
       z-index: 1;
-      margin: 26px 0 40px;
+      margin: var(--space-4) 0 var(--space-4);
     }
     .sponsors-row {
       display: flex;
@@ -1111,14 +1113,15 @@ function toParagraphs(text: string): string {
       .focus-prev { left: 4px; }
       .focus-next { right: 4px; }
       .post-gallery-divider { margin-top: 48px; }
-      .related-sounds, .external-links, .exhibition-credit { margin-top: 22px; }
-      .related-sounds-label, .external-links-label, .exhibition-label, .sponsors-label { margin-bottom: 10px; font-size: var(--fs-2xs); }
+      /* 모바일도 같은 4:1 — 블록 24px, 라벨 6px */
+      .related-materials, .related-sounds, .external-links, .exhibition-credit { margin-top: var(--space-3); }
+      .related-materials-label, .related-sounds-label, .external-links-label, .exhibition-label, .sponsors-label { margin-bottom: var(--space-1); font-size: var(--fs-2xs); }
       .related-sounds-list, .external-links-list { display: grid; gap: 9px; }
       .related-sounds-list a, .external-links-list a { justify-content: space-between; font-size: var(--fs-xs); }
       .exhibition-title { font-size: var(--fs-sm); line-height: 1.6; }
       .exhibition-title span + span::before { content: none; }
       .exhibition-meta { width: 100%; color: var(--text-3); }
-      .sponsors { margin-top: 22px; }
+      .sponsors { margin-top: var(--space-3); }
       .sponsors-row { gap: 20px; }
       .sponsor-name { font-size: var(--fs-sm); }
     }
