@@ -106,10 +106,14 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       let pointerY = 0
       let hasPointer = false
       let nameBounds = { minX: 0, minY: 0, maxX: 0, maxY: 0 }
-      const REPEL_RADIUS = 128
-      // 접촉점에서의 최대 밀림 = FORCE / 스프링계수(.025) ≈ 104px. 커서가 지나간 자리에서
-      // 글자가 크게 열린다. 감쇠 안에서 더하므로 값이 커져도 발산하지 않고 밀림 폭만 늘어난다.
-      const REPEL_FORCE = 2.6
+      // 반경·세기는 워드마크 크기에 비례한다 — 고정값을 쓰면 글자가 작은 모바일에서
+      // 이름 전체가 날아간다. 기준은 데스크톱(글자 높이 ≈ 93px, 반경 128 / 세기 2.6).
+      const REPEL_RADIUS_RATIO = 1.38
+      const REPEL_FORCE_RATIO = .028
+      let repelRadius = 128
+      // 접촉점에서의 최대 밀림 = FORCE / 스프링계수(.025). 감쇠 안에서 더하므로
+      // 값이 커져도 발산하지 않고 밀림 폭만 늘어난다.
+      let repelForce = 2.6
       const isMobile = window.matchMedia("(max-width: 700px)").matches
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
       hero.dataset.particleMode = "sphere"
@@ -160,6 +164,9 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
           minX: Math.min(box.minX, x), minY: Math.min(box.minY, y),
           maxX: Math.max(box.maxX, x), maxY: Math.max(box.maxY, y),
         }), { minX: width, minY: height, maxX: 0, maxY: 0 })
+        const nameHeight = Math.max(1, nameBounds.maxY - nameBounds.minY)
+        repelRadius = nameHeight * REPEL_RADIUS_RATIO
+        repelForce = nameHeight * REPEL_FORCE_RATIO
         // 모바일에서는 터치 반응성과 안정성을 위해 렌더링 밀도를 낮춘다.
         const count = isMobile
           ? Math.min(1400, Math.max(900, targets.length))
@@ -205,7 +212,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         const cosTilt = Math.cos(tilt)
         const sinTilt = Math.sin(tilt)
         const globeRadius = size * .38
-        const repelling = isInside && hasPointer && !isMobile && !reduceMotion
+        // 데스크톱은 커서가 얹혀 있는 동안, 모바일은 손가락이 닿아 있는 동안
+        const repelling = isInside && hasPointer && !reduceMotion
 
         for (const particle of particles) {
           const rotatedX = particle.sphereX * cosRotation - particle.sphereZ * sinRotation
@@ -226,10 +234,10 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
             const deltaX = particle.x - pointerX
             const deltaY = particle.y - pointerY
             const distanceSquared = deltaX * deltaX + deltaY * deltaY
-            if (distanceSquared < REPEL_RADIUS * REPEL_RADIUS) {
+            if (distanceSquared < repelRadius * repelRadius) {
               const distance = Math.sqrt(distanceSquared) || .001
-              const falloff = 1 - distance / REPEL_RADIUS
-              const push = falloff * falloff * REPEL_FORCE
+              const falloff = 1 - distance / repelRadius
+              const push = falloff * falloff * repelForce
               pushX = (deltaX / distance) * push
               pushY = (deltaY / distance) * push
             }
@@ -257,7 +265,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       // 워드마크는 구체보다 넓다. 구체 안으로 들어가면 모이고, 흩어지는 기준은
       // 이름의 사각형이다 — 그렇지 않으면 글자를 만지려는 순간 구체로 되돌아간다.
       const isWithinName = (x: number, y: number) => {
-        const pad = REPEL_RADIUS
+        const pad = repelRadius
         return x > nameBounds.minX - pad && x < nameBounds.maxX + pad
           && y > nameBounds.minY - pad && y < nameBounds.maxY + pad
       }
@@ -272,8 +280,21 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       if (isMobile) {
         // 터치에서는 hover 상태를 흉내 내지 않는다. 짧은 탭 한 번은 이름,
         // 다시 탭하면 원형으로 돌아가는 명확한 두 상태만 제공한다.
+        // 대신 **손가락을 대고 끄는 동안**은 커서와 같은 입력이 된다 — 글자를 밀 수 있다.
+        // 제스처가 갈리므로 서로 방해하지 않는다: 탭 = 상태 전환, 드래그 = 밀기.
+        const trackTouch = (event: PointerEvent) => {
+          const rect = hero.getBoundingClientRect()
+          pointerX = event.clientX - rect.left
+          pointerY = event.clientY - rect.top
+        }
         canvas.addEventListener("pointerdown", (event) => {
           mobileTapStart = { x: event.clientX, y: event.clientY }
+          trackTouch(event)
+          hasPointer = true
+        })
+        canvas.addEventListener("pointermove", (event) => {
+          if (!mobileTapStart) return
+          trackTouch(event)
         })
         canvas.addEventListener("pointerup", (event) => {
           if (!mobileTapStart) return
@@ -283,8 +304,10 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
             hero.dataset.particleMode = isInside ? "name" : "sphere"
           }
           mobileTapStart = null
+          // 손을 떼면 밀림이 풀리고 스프링이 글자를 되모은다
+          hasPointer = false
         })
-        canvas.addEventListener("pointercancel", () => { mobileTapStart = null })
+        canvas.addEventListener("pointercancel", () => { mobileTapStart = null; hasPointer = false })
       } else {
         hero.addEventListener("pointermove", updateInteraction)
         hero.addEventListener("pointerdown", updateInteraction)
