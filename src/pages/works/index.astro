@@ -204,7 +204,8 @@ const materialCounts = MATERIALS.map((m) => ({
         var t = (n.year - minY) / span
         n.x = padX + t * (W - padX * 2)
         n.y = padY + ((idx + 0.5) / group.length) * (H - padY * 2)
-        n.r = 16 + n.mats.length * 4
+        // 좁은 화면에서는 군집을 줄여 같은 해 작품끼리 뭉치지 않게 한다
+        n.r = (W < 520 ? 10 : 16) + n.mats.length * (W < 520 ? 2.4 : 4)
         n.pts = []
         for (var i = 0; i < n.n; i++) {
           // 황금각 배치 — 히어로 구체와 같은 분포 방식
@@ -259,15 +260,24 @@ const materialCounts = MATERIALS.map((m) => ({
 
     function tick() { if (!raf && active) raf = requestAnimationFrame(draw) }
 
-    canvas.addEventListener("pointermove", function (e) {
+    function at(e) {
       var r = canvas.getBoundingClientRect()
       mx = e.clientX - r.left
       my = e.clientY - r.top
       tick()
+    }
+    canvas.addEventListener("pointermove", at)
+    // 터치에는 호버가 없다. 탭하면 그 군집이 선택되고 이름표가 뜨며,
+    // 이름표를 다시 누르면 작품으로 간다. (이름표가 링크다)
+    canvas.addEventListener("pointerdown", at)
+    canvas.addEventListener("pointerleave", function () {
+      if (window.matchMedia("(pointer: fine)").matches) { mx = my = -9999; tick() }
     })
-    canvas.addEventListener("pointerleave", function () { mx = my = -9999; tick() })
     canvas.addEventListener("click", function () {
-      if (hoverIdx !== -1) window.location.href = "/works/" + nodes[hoverIdx].slug
+      // 마우스는 한 번 클릭으로 바로 이동
+      if (hoverIdx !== -1 && window.matchMedia("(pointer: fine)").matches) {
+        window.location.href = "/works/" + nodes[hoverIdx].slug
+      }
     })
 
     function setView(mode) {
@@ -332,16 +342,20 @@ const materialCounts = MATERIALS.map((m) => ({
   /* 필드 뷰 — 작품이 입자 군집으로 흩어져 연도 축에 재정렬된다 */
   .field-view { position: relative; margin-top: 6px; }
   #field-canvas { display: block; width: 100%; }
+  /* 이름표는 링크다 — 터치 기기에서 탭으로 이동하는 경로가 된다 */
   .field-label {
     position: absolute;
     transform: translate(-50%, -100%);
-    padding: 4px 9px;
+    padding: 6px 10px;
     background: var(--text);
     color: var(--surface);
     font-size: var(--fs-xs);
     line-height: 1.2;
     white-space: nowrap;
-    pointer-events: none;
+  }
+  @media (pointer: fine) {
+    /* 마우스에서는 캔버스 클릭만으로 이동하므로 이름표가 커서를 막지 않게 한다 */
+    .field-label { pointer-events: none; }
   }
 
   /* 재료 필터 바 */

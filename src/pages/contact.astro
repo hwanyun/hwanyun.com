@@ -425,7 +425,8 @@ import Base from "../layouts/Base.astro"
     function say(ko, en, ms = 2400) { if (!bubble) return; const main = en || ko, sub = en ? ko : ""; bubble.innerHTML = main + (sub ? '<span class="en">' + sub + "</span>" : ""); bubble.classList.add("show"); bubbleUntil = performance.now() + ms; }
 
     // ▼ 튜닝: FILL 낮추면 캐릭터가 작아짐(전신 여유). STAGEX 비율은 좌우 이동 범위.
-    const FILL = matchMedia("(max-width: 700px)").matches ? 0.66 : 0.55;
+    // 모바일에서는 캐릭터를 작게 — 크면 좌측 상단의 연락처 정보를 덮는다.
+    const FILL = matchMedia("(max-width: 700px)").matches ? 0.46 : 0.55;
 
     new GLTFLoader().load("/mascot/character.glb", (gltf) => {
       model = gltf.scene;
@@ -537,7 +538,9 @@ import Base from "../layouts/Base.astro"
       // 모바일(세로)은 높이 기준으로 크게, 데스크탑은 가로/세로 중 더 먼 쪽으로 안전하게
       const distance = matchMedia("(max-width: 700px)").matches ? distanceForHeight : Math.max(distanceForHeight, distanceForWidth);
       // 시선을 살짝 위로 → 캐릭터가 화면 아래쪽에 앉아 상단 텍스트/말풍선 공간 확보
-      const voff = avatarSize.y * (matchMedia("(max-width: 700px)").matches ? -0.02 : 0.15);
+      // voff를 키우면 캐릭터가 화면 아래쪽에 놓인다. 모바일은 연락처 블록을
+      // 피해 아래로 내린다 — 이 페이지의 목적은 연락처를 읽는 것이다.
+      const voff = avatarSize.y * (matchMedia("(max-width: 700px)").matches ? 0.34 : 0.15);
       camera.position.set(0, voff, distance); camera.lookAt(0, voff, 0);
       camera.far = distance * 6; camera.updateProjectionMatrix();
       const halfW = distance * Math.tan(hFov / 2);
