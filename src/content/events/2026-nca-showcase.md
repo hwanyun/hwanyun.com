@@ -2,7 +2,7 @@
 title: "무제"
 dateStart: "2026-08-19"
 dateEnd: "2026-08-21"
-timeNote: ""
+timeNote: "10:00 – 17:00"
 venue: "콘텐츠문화광장 스튜디오1"
 city: "Seoul"
 summary: "2026 뉴콘텐츠아카데미 쇼케이스에서 선보이는 팀 프로젝트."
