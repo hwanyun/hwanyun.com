@@ -123,6 +123,7 @@ works.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
     var none = document.getElementById("noresult")
     var tiles = Array.prototype.slice.call(grid.querySelectorAll(".tile"))
     var SHARE = 0.4 // hover 시 해당 셀이 차지할 목표 면적 비율
+    var proximityRemeasure = null // 근접 반응이 타일 좌표를 다시 재도록 하는 훅
 
     // 각 셀을 leaf 객체로 (DOM 순서 = 패킹 순서)
     var leaves = tiles.map(function (el) {
@@ -235,6 +236,7 @@ works.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
       })
       if (none) none.hidden = shown !== 0
       syncMode()
+      if (proximityRemeasure) proximityRemeasure()
     }
     if (input) input.addEventListener("input", apply)
     var searchQuery = new URLSearchParams(window.location.search).get("q")
@@ -254,6 +256,68 @@ works.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
     grid.addEventListener("mouseleave", function () {
       relayout(null)
     })
+
+    /* ---- 데스크톱: 커서 = 센서 ----
+       각 타일과 커서의 거리를 0~1로 정규화해 --p로 넣는다. 표현은 CSS가 맡는다.
+       레이아웃은 건드리지 않는다(hover-expand와 충돌 방지). */
+    ;(function proximity() {
+      if (!window.matchMedia("(pointer: fine)").matches) return
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
+
+      var RADIUS = 280 // px — 이 거리부터 반응이 시작된다
+      var pTicking = false
+      var lastX = 0
+      var lastY = 0
+      var rects = []
+
+      function measure() {
+        rects = tiles
+          .filter(function (el) { return el.style.display !== "none" })
+          .map(function (el) { return { el: el, r: el.getBoundingClientRect() } })
+      }
+      // transitionend는 타일·속성마다 발생하므로 프레임당 한 번으로 묶는다
+      var mQueued = false
+      function measureSoon() {
+        if (mQueued) return
+        mQueued = true
+        requestAnimationFrame(function () {
+          mQueued = false
+          measure()
+        })
+      }
+
+      function frame() {
+        pTicking = false
+        for (var i = 0; i < rects.length; i++) {
+          var r = rects[i].r
+          // 사각형까지의 최단 거리 (안에 있으면 0)
+          var dx = Math.max(r.left - lastX, 0, lastX - r.right)
+          var dy = Math.max(r.top - lastY, 0, lastY - r.bottom)
+          var d = Math.sqrt(dx * dx + dy * dy)
+          var t = Math.max(0, 1 - d / RADIUS)
+          rects[i].el.style.setProperty("--p", t.toFixed(3))
+        }
+      }
+
+      grid.addEventListener("pointermove", function (e) {
+        lastX = e.clientX
+        lastY = e.clientY
+        if (!pTicking) {
+          pTicking = true
+          requestAnimationFrame(frame)
+        }
+      })
+      grid.addEventListener("pointerleave", function () {
+        tiles.forEach(function (el) { el.style.removeProperty("--p") })
+      })
+
+      // 타일이 재배치되면(hover-expand·검색 필터·리사이즈) 좌표를 다시 잰다
+      measure()
+      window.addEventListener("resize", measureSoon)
+      window.addEventListener("scroll", measureSoon, { passive: true })
+      grid.addEventListener("transitionend", measureSoon)
+      proximityRemeasure = measureSoon
+    })()
 
     /* ---- 모바일: 스크롤 포커스 ----
        화면 중앙에 가까운 타일일수록 선명·확대, 벗어날수록 어두워짐.
@@ -413,6 +477,13 @@ works.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
   .card .ph {
     background: var(--line);
   }
+  /* 근접 반응 — 커서가 다가올수록 --p가 0→1로 오른다 (스크립트가 주입).
+     초음파 센서가 거리를 연속값으로 읽는 작업의 문법을 화면에 옮긴 것.
+     모바일의 스크롤 포커스와 같은 원리이고, 입력만 커서 거리로 바뀐다. */
+  .card .thumb {
+    filter: brightness(calc(0.93 + var(--p, 0) * 0.13));
+    transition: filter 0.25s ease;
+  }
   .card .cap {
     position: absolute;
     left: 0;
@@ -422,12 +493,20 @@ works.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
     font-size: var(--fs-sm);
     line-height: 1.25;
     background: linear-gradient(to top, rgba(0, 0, 0, 0.62), rgba(0, 0, 0, 0));
-    opacity: 0;
+    /* 가까워지면 서서히 드러나고, 올리면 완전히 나타난다 */
+    opacity: calc(var(--p, 0) * 0.85);
     transition: opacity 0.3s ease;
     pointer-events: none;
   }
   .card:hover .cap {
     opacity: 1;
+  }
+  /* 근접 반응은 장식이 아니라 정보 접근을 돕는 층이므로, 끄더라도
+     호버 시 캡션은 반드시 보여야 한다. */
+  @media (prefers-reduced-motion: reduce) {
+    .card .thumb { filter: none; transition: none; }
+    .card .cap { opacity: 0; }
+    .card:hover .cap { opacity: 1; }
   }
   .card .cap .t {
     font-weight: 400;
