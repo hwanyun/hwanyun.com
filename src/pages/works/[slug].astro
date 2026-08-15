@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content"
 import Base from "../../layouts/Base.astro"
 import { materialLabel } from "../../data/materials"
+import SeenTracker from "../../components/SeenTracker.astro"
 
 export async function getStaticPaths() {
   const works = await getCollection("works", ({ data }) => !data.draft)
@@ -1407,4 +1408,6 @@ function toParagraphs(text: string): string {
       .media-reveal { transition: none; transform: none; filter: none; }
     }
   </style>
+
+  <SeenTracker slug={work.slug} />
 </Base>

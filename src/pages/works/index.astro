@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content"
 import Base from "../../layouts/Base.astro"
 import { MATERIALS } from "../../data/materials"
+import SeenTracker from "../../components/SeenTracker.astro"
 
 const works = await getCollection("works", ({ data }) => !data.draft)
 works.sort((a, b) => {
@@ -55,7 +56,7 @@ const materialCounts = MATERIALS.map((m) => ({
       <div class="archive-head" aria-hidden="true"><span>WORKS</span><span>YEAR</span></div>
       <ol id="work-list">
         {works.map((work) => (
-          <li data-materials={work.data.materials.join(" ")}>
+          <li data-materials={work.data.materials.join(" ")} data-slug={work.slug}>
             <a href={`/works/${work.slug}`}>
               <time>{work.data.year}</time><span>{work.data.title}</span>
             </a>
@@ -65,6 +66,8 @@ const materialCounts = MATERIALS.map((m) => ({
       <p class="mf-empty" id="mf-empty" hidden>이 재료를 쓴 작품이 없습니다.</p>
     </section>
   </main>
+
+  <SeenTracker />
 </Base>
 
 <script is:inline>
@@ -193,6 +196,23 @@ const materialCounts = MATERIALS.map((m) => ({
   #work-list.is-tracing li:hover::before,
   #work-list.is-tracing li:hover::after { border-color: var(--hover); background: var(--hover); }
   #work-list.is-tracing li:hover::before { background: var(--hover); }
+
+  /* 방문의 흔적 — 시아노타입(감광지) 인용. 본 작품은 접점이 "노출되어" 채워진다.
+     세션 한정이라 탭을 닫으면 사라진다. */
+  #work-list.is-tracing li.is-seen::after { background: var(--text-3); border-color: var(--text-3); }
+  /* 필터가 없을 때는 연도 앞에 작은 흔적만 남긴다 — 목록의 조용함을 해치지 않는다.
+     필터 중에는 접점이 그 역할을 하므로 이중 표시를 피한다. */
+  #work-list.is-tracing li.is-seen time::before { display: none; }
+  li.is-seen time::before {
+    content: "";
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    margin-right: 6px;
+    vertical-align: 2px;
+    border-radius: 50%;
+    background: var(--text-4);
+  }
   @media (prefers-reduced-motion: reduce) {
     .material-filter a { transition: none; }
   }
