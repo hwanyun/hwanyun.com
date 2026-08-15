@@ -34,12 +34,17 @@ import Base from "../layouts/Base.astro"
     .links a { color: var(--text); text-decoration: none; position: relative; padding: 2px 2px; border-radius: 4px; transition: color .25s, background .25s, transform .25s; }
     .links a::after { content:""; position:absolute; left:2px; right:2px; bottom:-1px; height:2px; background:var(--text); transform:scaleX(0); transform-origin:left; transition:transform .3s; }
     .links a:hover::after, .links a.active::after { transform: scaleX(1); }
-    .links a.active { color:var(--text); background:#fff59d55; transform: translateX(2px); }
+    /* 활성 표시는 색이 아니라 명도로 — 이 페이지에서 색을 갖는 것은 마스코트뿐이다 */
+    .links a.active { color:var(--text); background:var(--surface-2); transform: translateX(2px); }
     #mascot-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 2; pointer-events: none; }
     #mascot-canvas.grab { cursor: grab; } #mascot-canvas.grabbing { cursor: grabbing; }
-    /* 커서를 따라 은은한 빛이 움직이는 배경 */
+    /* 커서를 따라 은은한 빛이 움직이는 배경.
+       크림색 웜톤이던 것을 중립 명도로 바꿨다 — 사이트 나머지가 흑백이라
+       이 페이지만 다른 사이트처럼 보이던 원인이었다. 인터랙션(커서 추적)은 유지하고
+       색만 뺀다. 이제 이 화면에서 색을 갖는 것은 마스코트뿐이고, 그 대비가
+       사고가 아니라 의도로 읽힌다. */
     #mascot-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none;
-      background: radial-gradient(circle 42vmax at var(--mx, 55%) var(--my, 42%), #f3efe6 0%, #faf9f6 45%, var(--surface) 75%); }
+      background: radial-gradient(circle 42vmax at var(--mx, 55%) var(--my, 42%), var(--surface-2) 0%, var(--surface) 62%); }
     /* 캐릭터 머리 위 말풍선 */
     #mascot-bubble { position: fixed; z-index: 4; pointer-events: none; left: -9999px; top: -9999px;
       background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: 18px; padding: 13px 20px;
