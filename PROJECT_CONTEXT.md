@@ -10,16 +10,21 @@
 
 ## 실제 최신 배포본 확인
 
-고정된 도메인이나 로컬 개발 서버를 최신 배포본으로 가정하지 않습니다. 항상 GitHub의 최신 main 커밋에서 배포 주소를 확인합니다.
+고정된 도메인이나 로컬 개발 서버를 최신 배포본으로 가정하지 않습니다. 항상 최신 main 커밋에 연결된 배포 주소를 확인합니다.
 
-1. GitHub 저장소에서 main의 최신 커밋을 연다.
-2. Status checks를 열고 Cloudflare Pages - Deployed successfully를 확인한다.
-3. Details를 열어 Preview URL을 연다.
-4. 해당 URL이 지금 배포된 검증 대상이다.
+```bash
+npx wrangler pages deployment list --project-name hwanyun-com
+```
 
+1. 위 명령을 실행한다. 커밋 해시·환경(Production/Preview)·브랜치·배포 URL이 한 표에 나온다.
+2. `Environment = Production`, `Branch = main`, `Source`가 방금 올린 커밋 해시인 행을 찾는다.
+3. 그 행의 배포 URL이 지금 검증할 대상이다.
+4. 그 커밋의 행이 아직 없으면 배포가 진행 중이다. 잠시 뒤 다시 실행한다.
+
+- **GitHub의 Status checks는 이 확인에 쓰지 않는다.** Cloudflare Pages가 커밋 상태를 GitHub에 되보고하지 않아, 배포가 성공해도 `pending`으로 남는다(2026-08 확인). 상태가 pending인 것은 실패의 근거가 아니다. 되살리려면 GitHub → Settings → Applications → Cloudflare Pages에서 Commit statuses 쓰기 권한을 확인해야 하는데, 그 전까지는 위 명령이 유일하게 믿을 수 있는 확인 방법이다.
 - www.hwanyun.com은 이 작업의 실제 최신 배포본을 확인하는 기준이 아니라 참고용이다.
 - Cloudflare Pages의 Preview URL은 배포마다 바뀔 수 있으므로, 과거 URL을 재사용하지 말고 위 절차로 다시 확인한다.
-- 이 문서에는 특정 배포 커밋이나 URL을 고정해 적지 않는다. 매 릴리스마다 최신 `main` 커밋의 Cloudflare Pages 상태와 연결된 URL을 확인한다.
+- 이 문서에는 특정 배포 커밋이나 URL을 고정해 적지 않는다. 매 릴리스마다 위 명령으로 최신 `main` 커밋에 연결된 URL을 다시 확인한다.
 
 ## 콘텐츠 데이터 위치
 
