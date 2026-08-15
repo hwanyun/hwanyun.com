@@ -154,6 +154,7 @@ import Base from "../layouts/Base.astro"
       var sparks = []   // 타자를 칠 때 손끝에서 튀는 신호
       var rings = []    // 점프·박수 같은 한 번의 동작이 만드는 파문
       var lastSpark = 0
+      var lastFootX = 0 // 발의 이동 속도 — 지면 입자가 끌리는 방향
 
       window.addEventListener("mascot:burst", function (e) {
         if (reduce) return
@@ -209,6 +210,19 @@ import Base from "../layouts/Base.astro"
         var horizon = H * 0.60
         var depthPx = H - horizon
 
+        /* 캐릭터의 발이 지면에 영향을 준다 — 배경 위에 얹힌 게 아니라 이 공간에 서 있는 것.
+           발 주변 입자는 바깥으로 밀려나고 진해지며, 캐릭터가 움직이면 그 방향으로 끌린다. */
+        var ms0 = window.__mascot
+        var fX = ms0 ? ms0.footX : -9999
+        var fY = ms0 ? ms0.footY : -9999
+        var vel = 0
+        if (ms0) {
+          vel = Math.max(-30, Math.min(30, fX - lastFootX))
+          lastFootX = fX
+        }
+        var PUSH_R = Math.max(150, W * 0.16) // 영향 반경
+        var nearFoot = [] // 발과 이어 그릴 후보
+
         for (var i = 0; i < ground.length; i++) {
           var p = ground[i]
           var zz = p.z / NEAR // 1부터 시작
@@ -217,13 +231,41 @@ import Base from "../layouts/Base.astro"
           var sx = cx + (p.x / zz) * (W * 0.055)
           if (sx < -4 || sx > W + 4) continue
           var wob = reduce ? 0 : Math.sin(t * 0.6 + p.j) * 0.35
-          // 가까울수록 크고 진하게 — 거리감이 공간을 만든다
           var fade = 1 / zz
           var r = 0.4 + fade * 1.3
+          var alpha = 0.04 + fade * 0.2
+
+          // 발의 영향 — 화면 좌표에서 계산한다
+          var dxf = sx - fX, dyf = (sy - fY) * 1.9 // 세로는 원근 때문에 더 좁게 본다
+          var df = Math.sqrt(dxf * dxf + dyf * dyf)
+          if (df < PUSH_R) {
+            var push = 1 - df / PUSH_R
+            var inv = df > 0.001 ? 1 / df : 0
+            // 바깥으로 밀려나고, 이동 방향으로 끌린다
+            sx += dxf * inv * push * push * 26 + vel * push * 1.4
+            sy += dyf * inv * push * push * 9
+            r += push * 1.1
+            alpha += push * 0.3
+            if (push > 0.45 && nearFoot.length < 26) nearFoot.push({ x: sx, y: sy + wob, w: push })
+          }
+
           ctx.beginPath()
           ctx.arc(sx, sy + wob, r, 0, Math.PI * 2)
-          ctx.fillStyle = "rgba(17,17,17," + (0.04 + fade * 0.2) + ")"
+          ctx.fillStyle = "rgba(17,17,17," + alpha + ")"
           ctx.fill()
+        }
+
+        // 발과 지면을 잇는다 — 접지(接地). 전도성 재료를 쓰는 작업의 문법.
+        if (ms0 && nearFoot.length) {
+          for (var nf = 0; nf < nearFoot.length; nf++) {
+            var g = nearFoot[nf]
+            ctx.beginPath()
+            ctx.moveTo(fX, fY)
+            ctx.lineTo(g.x, g.y)
+            ctx.strokeStyle = "rgba(17,17,17," + g.w * 0.12 + ")"
+            ctx.lineWidth = 0.5
+            ctx.stroke()
+          }
         }
 
         // 공중의 먼지 — 히어로와 같은 입자의 결을 유지하는 층

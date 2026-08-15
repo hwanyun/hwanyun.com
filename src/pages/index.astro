@@ -16,7 +16,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
   <section class="hero" aria-labelledby="hero-title">
     <canvas id="particle-canvas" class="hero__field" aria-hidden="true"></canvas>
     <h1 id="hero-title" class="sr-only">HWANYUN</h1>
-    <a id="upcoming-ticker" class="upcoming-ticker" href="/events/" hidden aria-label="Upcoming events"><span class="ut-track" id="ut-track"></span></a>
+    <a id="upcoming-ticker" class="upcoming-ticker" href="/events/" hidden aria-label="Upcoming events"><span class="ut-list" id="ut-track"></span></a>
   </section>
   <script type="application/json" id="ev-data" is:inline set:html={JSON.stringify(upEvents)}></script>
   <script is:inline>
@@ -43,37 +43,19 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         if (!isNaN(start) && start <= today) nowItems.push(item)
         else soonItems.push(item)
       }
-      var items = nowItems.concat(soonItems)
-      if (!items.length) return
-      var sep = '<span class="ut-sep">✳</span>'
-      var content = ""
-      if (nowItems.length) content += '<span class="ut-tag ut-tag-now">NOW ON</span>' + sep + nowItems.join(sep) + sep
-      if (soonItems.length) content += '<span class="ut-tag">UPCOMING</span>' + sep + soonItems.join(sep) + sep
-      var seg = '<span class="ut-seg">' + content + "</span>"
-      track.innerHTML = seg + seg // 이음새 없는 반복
-      el.hidden = false
-
-      // 구체 표면의 체감 속도에 맞춘다.
-      // 적도 정면 지점의 화면상 수평 속도 = ω · globeRadius · perspective
-      //   ω = 0.00028 rad/ms = 0.28 rad/s, globeRadius = size × 0.49,
-      //   perspective(front) = 2.8 / (3.3 − cos(tilt)) = 1.2048  (tilt = −0.22)
-      // → size × 0.16529 px/s. 트랙 폭이 아니라 픽셀 속도를 고정하므로
-      //   이벤트 개수가 늘어도 흐르는 속도는 그대로다.
-      var SPHERE_PX_PER_SEC = 0.28 * 0.49 * (2.8 / (3.3 - Math.cos(-0.22)))
-      // 1 = 구체 표면과 정확히 같은 속도. 글자를 더 천천히 읽히게 하려면 낮춘다.
-      var SPEED_FACTOR = 1
-      function syncSpeed() {
-        var hero = el.parentElement
-        if (!hero) return
-        var size = Math.min(hero.clientWidth, hero.clientHeight)
-        var segWidth = track.scrollWidth / 2 // 세그먼트 2개를 이어붙였다
-        var speed = size * SPHERE_PX_PER_SEC * SPEED_FACTOR
-        if (!segWidth || !speed) return
-        track.style.animationDuration = segWidth / speed + "s"
+      if (!nowItems.length && !soonItems.length) return
+      // 흐르는 티커는 글자를 쫓게 만든다. 좌측 하단에 고정해 한눈에 읽히게 둔다.
+      var html = ""
+      if (nowItems.length) {
+        html += '<span class="ut-tag ut-tag-now">NOW ON</span>'
+        html += nowItems.map(function (s) { return '<span class="ut-row">' + s + "</span>" }).join("")
       }
-      syncSpeed()
-      window.addEventListener("resize", syncSpeed)
-      if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncSpeed)
+      if (soonItems.length) {
+        html += '<span class="ut-tag">UPCOMING</span>'
+        html += soonItems.map(function (s) { return '<span class="ut-row">' + s + "</span>" }).join("")
+      }
+      track.innerHTML = html
+      el.hidden = false
     })()
   </script>
 
@@ -250,30 +232,27 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       isolation: isolate;
     }
     .hero__field { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: pan-y; }
-    /* 홈 하이라이트: 다가오는 이벤트 티커 (박스 없이, 우→좌로 흐름, 가장자리 페이드) */
+    /* 홈 하이라이트: 다가오는 일정.
+       흐르는 티커는 글자를 눈으로 쫓게 만든다. 좌측 하단에 고정해 한눈에 읽히게 둔다. */
     .upcoming-ticker {
-      position: absolute; left: 0; right: 0; bottom: 26px; z-index: 2;
-      display: block; overflow: hidden; color: var(--void-text); text-decoration: none;
-      -webkit-mask-image: linear-gradient(90deg, transparent, var(--text) 9%, var(--text) 91%, transparent);
-      mask-image: linear-gradient(90deg, transparent, var(--text) 9%, var(--text) 91%, transparent);
+      position: absolute; left: 22px; bottom: 26px; z-index: 2;
+      display: block; max-width: min(48ch, 64vw);
+      color: var(--void-text); text-decoration: none;
     }
-    .ut-track {
-      display: inline-flex; white-space: nowrap; will-change: transform;
-      /* duration은 구체 표면 속도에 맞춰 스크립트가 설정한다 (아래 값은 폴백) */
-      animation: ut-move 34s linear infinite; /* 우 → 좌 */
+    .ut-list { display: block; }
+    .upcoming-ticker :global(.ut-row) {
+      display: block; font-size: var(--fs-xs); line-height: 1.5; letter-spacing: .01em;
     }
-    @keyframes ut-move { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-    .upcoming-ticker:hover .ut-track { animation-play-state: paused; }
-    .ut-seg { display: inline-flex; align-items: center; font-size: var(--fs-xs); letter-spacing: .01em; }
-    .upcoming-ticker :global(.ut-tag) { color: var(--void-label); letter-spacing: .16em; font-size: var(--fs-2xs); }
+    .upcoming-ticker :global(.ut-tag) {
+      display: block; margin: 10px 0 3px;
+      color: var(--void-label); letter-spacing: .16em; font-size: var(--fs-2xs);
+    }
+    .upcoming-ticker :global(.ut-tag:first-child) { margin-top: 0; }
     .upcoming-ticker :global(.ut-tag-now) { color: var(--surface); }
     .upcoming-ticker :global(.ut-dim) { color: var(--void-text-2); }
-    .upcoming-ticker :global(.ut-sep) { margin: 0 24px; color: var(--void-line); }
-    @media (prefers-reduced-motion: reduce) { .ut-track { animation: none; } }
+    .upcoming-ticker:hover :global(.ut-row) { color: var(--surface); }
     @media (max-width: 700px) {
-      .upcoming-ticker { bottom: 18px; }
-      .ut-seg { font-size: var(--fs-xs); }
-      .upcoming-ticker :global(.ut-sep) { margin: 0 16px; }
+      .upcoming-ticker { left: 16px; bottom: 18px; max-width: calc(100vw - 32px); }
     }
     .work-archive { scroll-margin-top: 0; }
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
