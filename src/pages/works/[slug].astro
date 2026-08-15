@@ -71,11 +71,40 @@ const media = data.media ?? []
 const galleryMedia = data.mediaFirst && !useImmersiveMedia ? media.slice(1) : media
 const hasText = data.textEn || data.textKr
 
-// 미디어 층위 분리: 움직이는 이미지(영상)를 앞·크게, 스틸(사진)은 아래 갤러리로
-const videoMedia = galleryMedia.filter((m) => m.type === "video")
-const stillMedia = galleryMedia.filter((m) => m.type !== "video")
-// 세로 영상(9:16)은 나란히 묶고, 가로 영상은 풀와이드로
-const isPortrait = (m: (typeof media)[number]) => m.ratio === "9:16"
+// 세로 영상(9:16) 판별 — 가로와 같은 행에 세우지 않는다
+const isPortrait = (m: (typeof media)[number]) => m.type === "video" && m.ratio === "9:16"
+
+/* 미디어는 타입(영상/사진)이 아니라 배열 순서가 서사다.
+   MD에서 짠 순서 그대로 흐르되, 행 패턴은 셋뿐이다:
+     · 전체폭 1장   — width: full
+     · 2장 나란히   — half·third가 연속하면 짝. 같은 높이로 정렬(JS가 비율 기반 보정)
+     · 단독 부분폭  — 짝이 없는 half·third는 혼자, align을 따른다
+   세로 영상은 가로와 짝짓지 않는다 — 세로끼리만 나란히 선다. */
+type MediaItem = (typeof media)[number]
+const packRows = (list: MediaItem[]): MediaItem[][] => {
+  const rows: MediaItem[][] = []
+  let i = 0
+  while (i < list.length) {
+    const a = list[i]
+    if ((a.width ?? "full") === "full" && !isPortrait(a)) {
+      rows.push([a])
+      i += 1
+      continue
+    }
+    const b = list[i + 1]
+    const pairable =
+      b !== undefined && (b.width ?? "full") !== "full" && isPortrait(a) === isPortrait(b)
+    if (pairable) {
+      rows.push([a, b])
+      i += 2
+    } else {
+      rows.push([a])
+      i += 1
+    }
+  }
+  return rows
+}
+const mediaRows = packRows(galleryMedia)
 
 // 매체 표기: ";" 기준으로 종류 / 재료 분리 → 종류 한 줄, 재료 아래 줄
 const mediumParts = (data.medium || "")
@@ -206,68 +235,69 @@ function toParagraphs(text: string): string {
       )
     }
 
-    <!-- 영상 층: 움직이는 이미지가 작품의 본체 → 앞·크게 -->
+    <!-- 미디어 — 배열 순서 그대로 한 흐름 (도록의 페이지처럼).
+         VIDEO/IMAGES 타입 라벨은 관람자의 관심사가 아니므로 없다. -->
     {
-      videoMedia.length > 0 && (
-        <div class={`layer-label ${useImmersiveMedia ? "media-reveal" : ""}`}>Video</div>
-      )
-    }
-    {
-      videoMedia.length > 0 && (
-        <div class={`media-videos ${useImmersiveMedia ? "media-reveal" : ""}`}>
-          {videoMedia.map((m) => (
-            <figure
-              class="block is-video"
-              data-ratio={m.ratio || "16:9"}
-              style={`flex-grow:${ratioNum[m.ratio] || 16 / 9};flex-basis:0`}
-            >
-              <div class={`video ${useImmersiveMedia ? "video-preview" : ""}`} style={`aspect-ratio:${ratioValue[m.ratio] || "16 / 9"}`}>
-                {embedURL(m.src).kind === "iframe" ? (
-                  <iframe src={embedURL(m.src).src} allow="autoplay; fullscreen; picture-in-picture" allowfullscreen frameborder="0" loading="lazy" tabindex={useImmersiveMedia ? "-1" : undefined} />
-                ) : (
-                  <video src={embedURL(m.src).src} controls={!useImmersiveMedia} preload={useImmersiveMedia ? "metadata" : undefined} muted={useImmersiveMedia} playsinline />
+      mediaRows.length > 0 && (
+        <div class="media-flow">
+          {mediaRows.map((row) => {
+            const portraitRow = row.every(isPortrait)
+            const solo = row.length === 1 ? row[0] : null
+            // 세로 행은 자체 폭 규칙을 가지므로 solo 부분폭을 겹치지 않는다
+            const soloPartial = solo && !portraitRow && (solo.width ?? "full") !== "full"
+            const rowClass = [
+              "media-row",
+              `count-${row.length}`,
+              portraitRow ? "is-portrait-row" : "",
+              soloPartial ? `solo-${solo.width} align-${solo.align || "left"}` : "",
+              useImmersiveMedia ? "media-reveal" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")
+            return (
+              <div class={rowClass}>
+                {row.map((m) =>
+                  m.type === "video" ? (
+                    <figure class="block is-video" data-ratio={m.ratio || "16:9"}>
+                      <div class={`video ${useImmersiveMedia ? "video-preview" : ""}`} style={`aspect-ratio:${ratioValue[m.ratio] || "16 / 9"}`}>
+                        {embedURL(m.src).kind === "iframe" ? (
+                          <iframe src={embedURL(m.src).src} allow="autoplay; fullscreen; picture-in-picture" allowfullscreen frameborder="0" loading="lazy" tabindex={useImmersiveMedia ? "-1" : undefined} />
+                        ) : (
+                          <video src={embedURL(m.src).src} controls={!useImmersiveMedia} preload={useImmersiveMedia ? "metadata" : undefined} muted={useImmersiveMedia} playsinline />
+                        )}
+                        {useImmersiveMedia && <button class="video-play" type="button" aria-label={`Play ${m.caption || data.title}`}><span aria-hidden="true"></span></button>}
+                      </div>
+                      {m.caption && <figcaption>{m.caption}</figcaption>}
+                      {(m.noteEn || m.noteKr) && (
+                        <div class="media-note">
+                          {m.noteLabel && <div class="media-note-label">{m.noteLabel}</div>}
+                          <div class="media-note-cols">
+                            <p data-language-content="en">{m.noteEn}</p>
+                            <p data-language-content="ko" lang="ko">{m.noteKr}</p>
+                          </div>
+                        </div>
+                      )}
+                    </figure>
+                  ) : (
+                    <figure class="block">
+                      <img src={m.src} alt={m.caption || data.title} loading="lazy" />
+                      {m.caption && <figcaption>{m.caption}</figcaption>}
+                    </figure>
+                  )
                 )}
-                {useImmersiveMedia && <button class="video-play" type="button" aria-label={`Play ${m.caption || data.title}`}><span aria-hidden="true"></span></button>}
               </div>
-              {m.caption && <figcaption>{m.caption}</figcaption>}
-              {(m.noteEn || m.noteKr) && (
-                <div class="media-note">
-                  {m.noteLabel && <div class="media-note-label">{m.noteLabel}</div>}
-                  <div class="media-note-cols">
-                    <p data-language-content="en">{m.noteEn}</p>
-                    <p data-language-content="ko" lang="ko">{m.noteKr}</p>
-                  </div>
-                </div>
-              )}
-            </figure>
-          ))}
-        </div>
-      )
-    }
-
-    <!-- 사진 층: 스틸 기록을 건축 모듈 그리드로 -->
-    {
-      stillMedia.length > 0 && (
-        <div class={`layer-label ${useImmersiveMedia ? "media-reveal" : ""}`}>Images</div>
-      )
-    }
-    {
-      stillMedia.length > 0 && (
-        <div class={`media-stills ${useImmersiveMedia ? "media-reveal" : ""}`}>
-          {stillMedia.map((m) => (
-            <figure class="block" data-span={m.span ? String(m.span) : undefined}>
-              <img src={m.src} alt={m.caption || data.title} loading="lazy" />
-              {m.caption && <figcaption>{m.caption}</figcaption>}
-            </figure>
-          ))}
+            )
+          })}
         </div>
       )
     }
 
     {
       media.length === 0 && (
-        <div class="media-stills">
-          <figure class="block"><div class="ph" style="padding-bottom:120%" /></figure>
+        <div class="media-flow">
+          <div class="media-row count-1">
+            <figure class="block"><div class="ph" style="padding-bottom:120%" /></figure>
+          </div>
         </div>
       )
     }
@@ -499,168 +529,50 @@ function toParagraphs(text: string): string {
           entry.target.classList.add("is-visible")
           observer.unobserve(entry.target)
         })
-      }, { threshold: 0.12, rootMargin: "0px 0px -7%" })
+      }, { threshold: 0.05, rootMargin: "0px 0px -3%" })
       targets.forEach(function (target) { observer.observe(target) })
     })()
   </script>
 
   <script is:inline>
-    /* 이전 justified 갤러리의 inline 좌표를 제거한다. 수평 트랙은 CSS가 담당한다. */
+    /* 2장 행: 실제 비율로 열 폭을 배분해 두 장의 높이·캡션 기선을 정확히 맞춘다.
+       크롭 없이 저스티파이 — 도록 조판의 핵심. */
     ;(function () {
-      var grid = document.querySelector(".media-stills")
-      if (!grid) return
-      var figs = Array.prototype.slice.call(grid.querySelectorAll(".block"))
-      if (!figs.length) return
-      var GAP = 14
-      var TARGET = 320 // 목표 행 높이(px) — 사진 비율에 따라 폭이 정해짐
-      function desktop() {
-        return false
-      }
-      function arOf(fig) {
-        var img = fig.querySelector("img")
-        if (img && img.naturalWidth && img.naturalHeight) return img.naturalWidth / img.naturalHeight
-        return 1
-      }
-      function clearInline() {
-        figs.forEach(function (f) {
-          f.style.left = f.style.top = f.style.width = f.style.height = ""
-        })
-        grid.style.height = ""
-      }
-      function layout() {
-        if (!desktop()) {
-          clearInline()
-          return
-        }
-        var W = grid.clientWidth
-        var y = 0
-        var row = []
-        var i = 0
-        function flushRow(stretch) {
-          if (!row.length) return
-          // 행 안 타일들의 종횡비 합 → 목표 높이에서 총 폭 계산, W에 맞게 높이 보정
-          var arSum = 0
-          row.forEach(function (r) {
-            arSum += r.ar
-          })
-          var gaps = GAP * (row.length - 1)
-          var h = stretch ? (W - gaps) / arSum : TARGET
-          if (!stretch && TARGET * arSum + gaps > W) h = (W - gaps) / arSum // 마지막 행도 넘치면 맞춤
-          var x = 0
-          row.forEach(function (r) {
-            var w = h * r.ar
-            r.fig.style.left = x + "px"
-            r.fig.style.top = y + "px"
-            r.fig.style.width = w + "px"
-            r.fig.style.height = h + "px"
-            x += w + GAP
-          })
-          y += h + GAP
-          row = []
-        }
-        for (i = 0; i < figs.length; i++) {
-          var ar = arOf(figs[i])
-          row.push({ fig: figs[i], ar: ar })
-          // 현재 행이 목표 높이에서 폭을 채우면 justify하고 새 행
-          var arSum = 0
-          row.forEach(function (r) {
-            arSum += r.ar
-          })
-          var gaps = GAP * (row.length - 1)
-          if (TARGET * arSum + gaps >= W) flushRow(true)
-        }
-        flushRow(false) // 마지막 행
-        grid.style.height = Math.max(0, y - GAP) + "px"
-      }
-      // 이미지 로드/리사이즈마다 재계산
-      figs.forEach(function (fig) {
-        var img = fig.querySelector("img")
-        if (img && !img.complete) {
-          img.addEventListener("load", layout)
-          img.addEventListener("error", layout)
-        }
-      })
-      var rt
-      window.addEventListener("resize", function () {
-        clearTimeout(rt)
-        rt = setTimeout(layout, 150)
-      })
-      layout()
-      requestAnimationFrame(function () {
-        grid.classList.add("ready")
-      })
-    })()
-  </script>
-
-  <script is:inline>
-    ;(function () {
-      /* 모바일 카드 크기는 실제 이미지 비율을 기준으로 조절한다. */
-      function classify(fig) {
-        var img = fig.querySelector("img")
-        if (!img || !img.naturalWidth || !img.naturalHeight) return
-        fig.classList.toggle("is-portrait", img.naturalHeight > img.naturalWidth * 1.12)
-      }
-      document.querySelectorAll(".media-stills .block").forEach(function (fig) {
-        var img = fig.querySelector("img")
-        if (!img) return
-        if (img.complete) classify(fig)
-        else img.addEventListener("load", function () { classify(fig) }, { once: true })
-      })
-    })()
-  </script>
-
-  <script is:inline>
-    ;(function () {
-      /* 데스크톱에서 트랙을 직접 끌 수 있게 하되, 드래그 뒤에는 확대 클릭을 막는다. */
-      document.querySelectorAll(".media-videos, .media-stills").forEach(function (track) {
-        var startX = 0
-        var startScroll = 0
-        var moved = false
-        var startedOnControl = false
-        function isMouse(event) { return event.pointerType === "mouse" }
-        track.addEventListener("pointerdown", function (event) {
-          if (!isMouse(event)) return
-          startedOnControl = Boolean(event.target.closest("button, video, iframe"))
-          // 재생·확대 버튼은 드래그보다 즉시 클릭이 우선이다.
-          if (startedOnControl) return
-          startX = event.clientX
-          startScroll = track.scrollLeft
-          moved = false
-          track.setPointerCapture(event.pointerId)
-        })
-        track.addEventListener("pointermove", function (event) {
-          if (!isMouse(event) || !track.hasPointerCapture(event.pointerId)) return
-          var distance = event.clientX - startX
-          if (Math.abs(distance) > 14) {
-            moved = true
-            track.classList.add("is-dragging")
-            track.scrollLeft = startScroll - distance
-          }
-        })
-        function finish(event) {
-          if (!isMouse(event)) return
-          if (startedOnControl) {
-            startedOnControl = false
+      var rows = document.querySelectorAll(".media-row.count-2:not(.is-portrait-row)")
+      Array.prototype.forEach.call(rows, function (row) {
+        var blocks = row.querySelectorAll(".block")
+        if (blocks.length !== 2) return
+        function ratioOf(block, done) {
+          var v = block.querySelector(".video")
+          if (v) {
+            var parts = (v.style.aspectRatio || "16 / 9").split("/")
+            done(parseFloat(parts[0]) / (parseFloat(parts[1]) || 1))
             return
           }
-          if (!track.hasPointerCapture(event.pointerId)) return
-          track.releasePointerCapture(event.pointerId)
-          track.classList.remove("is-dragging")
-          if (moved) {
-            track.dataset.dragged = "true"
-            setTimeout(function () { delete track.dataset.dragged }, 0)
+          var img = block.querySelector("img")
+          if (!img) { done(1); return }
+          if (img.complete && img.naturalWidth) {
+            done(img.naturalWidth / img.naturalHeight)
+            return
           }
+          img.addEventListener("load", function () { done(img.naturalWidth / img.naturalHeight || 1) }, { once: true })
+          img.addEventListener("error", function () { done(1) }, { once: true })
         }
-        track.addEventListener("pointerup", finish)
-        track.addEventListener("pointercancel", finish)
-        track.addEventListener("click", function (event) {
-          if (track.dataset.dragged !== "true") return
-          event.preventDefault()
-          event.stopPropagation()
-        }, true)
+        var ratios = [0, 0]
+        var got = 0
+        Array.prototype.forEach.call(blocks, function (block, i) {
+          ratioOf(block, function (r) {
+            ratios[i] = r
+            got++
+            if (got === 2) row.style.gridTemplateColumns = ratios[0].toFixed(4) + "fr " + ratios[1].toFixed(4) + "fr"
+          })
+        })
       })
     })()
   </script>
+
+
+
 
   <script is:inline>
     ;(function () {
@@ -817,160 +729,53 @@ function toParagraphs(text: string): string {
     .media--lead { margin: 0 0 42px; }
 
     /* 층 구분 라벨 — 스폰서 라벨 형식(회색 소문자) + 가로선 */
-    .layer-label {
-      clear: both;
-      margin: 48px 0 18px;
-      padding-top: 11px;
-      border-top: 1px solid var(--line-2);
-      font-size: var(--fs-xs);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-4);
-    }
-
-    /* 영상·사진 모두 하나의 수평 아카이브로 읽는다.
-       트랙패드, 가로 스크롤, 마우스 드래그를 지원하고 전체 화면은 선택할 때만 연다. */
-    .media-videos,
-    .media-stills {
+    /* ── 미디어 흐름: 도록의 조판 ──────────────────────────────
+       행 패턴은 셋뿐 — 전체폭 / 2장 나란히(같은 높이) / 단독 부분폭.
+       2장 행은 아래 스크립트가 실제 비율로 열 폭을 보정해
+       두 장의 높이와 캡션 기선이 정확히 맞는다. 크롭은 어디에도 없다. */
+    .media-flow {
       clear: both;
       display: flex;
-      flex-wrap: nowrap;
+      flex-direction: column;
+      gap: 44px;
+      margin-top: 56px;
+    }
+    .media-row {
+      display: grid;
+      grid-template-columns: 1fr;
       gap: 14px;
-      margin: 0;
-      padding: 0 0 12px;
-      overflow-x: auto;
-      overscroll-behavior-x: contain;
-      scroll-behavior: smooth;
-      scroll-snap-type: x proximity;
-      scrollbar-width: none;
-      -webkit-overflow-scrolling: touch;
-      cursor: grab;
+      align-items: start;
     }
-    .media-videos::-webkit-scrollbar,
-    .media-stills::-webkit-scrollbar { display: none; }
-    .media-videos.is-dragging,
-    .media-stills.is-dragging { cursor: grabbing; }
-    .media-videos .block {
-      flex: 0 0 clamp(320px, 42vw, 480px) !important;
-      min-width: 0;
-      margin: 0;
-      scroll-snap-align: start;
-      scroll-snap-stop: normal;
-    }
-    .media-videos .block[data-ratio="9:16"] { flex-basis: clamp(190px, 21vw, 250px) !important; }
+    .media-row.count-2 { grid-template-columns: 1fr 1fr; }
+    .media-row .block { grid-column: auto; margin: 0; min-width: 0; }
+    .media-row .block img { display: block; width: 100%; height: auto; }
+    .media-row figcaption { margin-top: 8px; font-size: var(--fs-xs); color: var(--text-3); }
 
-    /* 작품 상세 공통: 텍스트 다음의 미디어가 스크롤에 맞춰 한 번만 드러남 */
+    /* 세로 미디어 행 — 화면을 다 먹지 않게 폭을 묶고 중앙 정렬 */
+    .media-row.is-portrait-row { display: flex; justify-content: center; gap: 14px; }
+    .media-row.is-portrait-row .block { width: min(340px, 38vw); }
+
+    /* 단독 부분폭 — half는 2/3, third는 2/5. align을 따른다 */
+    .media-row.solo-half .block { width: 66%; }
+    .media-row.solo-third .block { width: 40%; }
+    .media-row.align-right .block { margin-left: auto; }
+    .media-row.align-center .block { margin-inline: auto; }
+
+    /* 스크롤 리빌 — 있는 듯 없는 듯.
+       블러·큰 이동은 작품보다 연출이 먼저 보이게 하므로 쓰지 않는다. */
     .media-reveal {
-      opacity: 0;
-      transform: translateY(18px);
-      filter: blur(7px);
-      transition: opacity 0.72s ease, transform 0.72s cubic-bezier(0.22, 0.61, 0.36, 1), filter 0.72s ease;
+      opacity: 0.45;
+      transform: translateY(6px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
     }
-    .media-reveal.is-visible { opacity: 1; transform: none; filter: none; }
+    .media-reveal.is-visible { opacity: 1; transform: none; }
 
-    /* 사진 카드 — 원본 비율을 유지한 미리보기. */
-    .media-stills .block {
-      position: relative;
-      flex: 0 0 clamp(300px, 31vw, 380px);
-      min-width: 0;
-      margin: 0;
-      scroll-snap-align: start;
-      scroll-snap-stop: normal;
-      cursor: zoom-in;
-    }
-    .media-stills .block.is-portrait { flex-basis: clamp(190px, 21vw, 250px); }
-    .media-stills .block img { display: block; width: 100%; height: auto; }
-    .media-stills figcaption { margin-top: 8px; font-size: var(--fs-xs); color: var(--text-3); }
-
-    /* 데스크톱: justified 타일 그리드 — 각 타일이 사진 비율 그대로라 resting에서 잘림 없음.
-       hover 시 그 타일이 살짝 떠오름(전체 그대로). */
-    @media (min-width: 701px) {
-      .media-stills {
-        position: relative;
-        margin-top: 0;
-        width: 100%;
-      }
-      .media-stills .block {
-        position: absolute;
-        margin: 0;
-        overflow: hidden;
-        background: var(--surface-2);
-        opacity: 0;
-        transition:
-          opacity 0.4s ease,
-          transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1),
-          box-shadow 0.35s ease;
-        cursor: zoom-in;
-      }
-      .media-stills.ready .block { opacity: 1; }
-      /* 타일 비율 = 사진 비율 → cover여도 잘리지 않음 */
-      .media-stills .block img {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-      /* hover: 그 타일이 위로 떠오르며 확대 (이미지는 이미 전체가 보임) */
-      .media-stills .block:hover {
-        transform: scale(1.06);
-        z-index: 5;
-        box-shadow: 0 14px 44px rgba(0, 0, 0, 0.22);
-      }
-      .media-stills figcaption {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        margin: 0;
-        padding: 22px 12px 9px;
-        color: var(--surface);
-        font-size: var(--fs-xs);
-        background: linear-gradient(to top, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0));
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        pointer-events: none;
-      }
-      .media-stills .block:hover figcaption { opacity: 1; }
-    }
-
-    /* 기존 justified 갤러리를 수평 트랙으로 대체한다. */
-    @media (min-width: 701px) {
-      .media-stills {
-        position: relative;
-        width: auto;
-        height: auto !important;
-        overflow-x: auto;
-      }
-      .media-stills .block,
-      .media-stills.ready .block {
-        position: relative;
-        flex: 0 0 clamp(300px, 31vw, 380px);
-        height: auto !important;
-        margin: 0;
-        overflow: visible;
-        background: transparent;
-        opacity: 1;
-        transform: none;
-        box-shadow: none;
-      }
-      .media-stills .block.is-portrait { flex-basis: clamp(190px, 21vw, 250px); }
-      .media-stills .block img {
-        position: relative;
-        inset: auto;
-        width: 100%;
-        height: auto;
-        object-fit: contain;
-      }
-      .media-stills .block:hover { transform: none; box-shadow: none; }
-      .media-stills figcaption {
-        position: static;
-        margin-top: 8px;
-        padding: 0;
-        color: var(--text-3);
-        background: none;
-        opacity: 1;
-      }
+    @media (max-width: 700px) {
+      .media-flow { gap: 28px; margin-top: 40px; }
+      .media-row { gap: 8px; }
+      .media-row.solo-half .block,
+      .media-row.solo-third .block { width: 100%; }
+      .media-row.is-portrait-row .block { width: min(78vw, 340px); }
     }
 
     .post-gallery-divider {
@@ -1266,6 +1071,9 @@ function toParagraphs(text: string): string {
     }
     .sponsor { display: inline-flex; align-items: center; }
     .sponsor-name { font-size: var(--fs-body); color: var(--text-2); }
+    /* 크롬은 무채색 — 기관 로고도 예외가 아니다. 호버 시에만 원색. */
+    .sponsor img { filter: grayscale(1); opacity: 0.72; transition: filter 0.2s ease, opacity 0.2s ease; }
+    .sponsor:hover img { filter: none; opacity: 1; }
     .sponsor img {
       max-height: 40px;
       max-width: 140px;
@@ -1330,7 +1138,7 @@ function toParagraphs(text: string): string {
       .process-note-cols { grid-template-columns: 1fr; gap: 10px; }
       .process-note p { font-size: var(--fs-xs); line-height: 1.7; }
       .media--lead { margin-bottom: 32px; }
-      .layer-label { margin: 36px 0 14px; padding-top: 9px; font-size: var(--fs-2xs); }
+      /* 리드 미디어(비몰입 모드)는 모바일에서 전체폭 */
       .block,
       .block.hero,
       .block.wide,
@@ -1338,50 +1146,7 @@ function toParagraphs(text: string): string {
       .block.detail,
       .block.portrait { grid-column: 1 / -1; }
       .media { gap: 16px; }
-      .media-videos { gap: 12px; }
-      .media-videos .block { min-width: 0; }
-      .media-stills .block { margin-bottom: 16px; }
-
-      /* 모바일 미디어 아카이브: 영상과 이미지는 별도 가로 트랙으로 읽는다. */
-      .media-videos,
-      .media-stills {
-        display: flex;
-        flex-wrap: nowrap;
-        gap: 12px;
-        margin-right: -16px;
-        padding: 0 16px 8px 0;
-        overflow-x: auto;
-        overscroll-behavior-x: contain;
-        scroll-behavior: smooth;
-        scroll-snap-type: x proximity;
-        scrollbar-width: none;
-        -webkit-overflow-scrolling: touch;
-      }
-      .media-videos::-webkit-scrollbar,
-      .media-stills::-webkit-scrollbar { display: none; }
-      .media-videos .block {
-        flex: 0 0 min(82vw, 320px) !important;
-        min-width: 0;
-        margin: 0;
-        scroll-snap-align: start;
-        scroll-snap-stop: normal;
-        grid-column: auto;
-      }
-      .media-videos .block[data-ratio="9:16"] {
-        flex-basis: min(46vw, 180px) !important;
-      }
-      .media-stills .block {
-        flex: 0 0 min(76vw, 300px);
-        min-width: 0;
-        margin: 0;
-        scroll-snap-align: start;
-        scroll-snap-stop: normal;
-        grid-column: auto;
-      }
-      .media-stills .block.is-portrait {
-        flex-basis: min(56vw, 220px);
-      }
-      figcaption, .media-stills figcaption { margin-top: 6px; font-size: var(--fs-2xs); line-height: 1.45; }
+      figcaption { margin-top: 6px; font-size: var(--fs-2xs); line-height: 1.45; }
       .media-note { margin-top: 13px; padding-top: 9px; }
       .media-note-cols { grid-template-columns: 1fr; gap: 8px; }
       .media-note p { font-size: var(--fs-xs); line-height: 1.65; }
