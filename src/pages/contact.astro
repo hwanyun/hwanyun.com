@@ -6,7 +6,7 @@ import Base from "../layouts/Base.astro"
 
 <Base title="HWANYUN — Contact" current="contact">
   <article class="page">
-    <p class="eyebrow">HWANYUN / CONTACT</p>
+    <p class="eyebrow">CONTACT</p>
     <h1>Contact</h1>
     <p class="lead">
       <span lang="en" data-language-content="en">For exhibitions, commissions, and collaborations.</span>
@@ -62,12 +62,12 @@ import Base from "../layouts/Base.astro"
       color: var(--text-3);
       font: 400 var(--fs-2xs)/1 var(--sans);
       letter-spacing: .06em;
-      transition: border-color .18s ease, color .18s ease;
+      transition: border-color var(--dur-fast) ease, color var(--dur-fast) ease;
     }
     .copy:hover { border-color: var(--text); color: var(--text); }
     .copy.done { border-color: var(--text); color: var(--text); }
-    .links a { color: var(--text); text-decoration: none; position: relative; padding: 2px 2px; border-radius: 4px; transition: color .25s, background .25s, transform .25s; }
-    .links a::after { content:""; position:absolute; left:2px; right:2px; bottom:-1px; height:2px; background:var(--text); transform:scaleX(0); transform-origin:left; transition:transform .3s; }
+    .links a { color: var(--text); text-decoration: none; position: relative; padding: 2px 2px; border-radius: 4px; transition: color var(--dur-base), background var(--dur-base), transform var(--dur-base); }
+    .links a::after { content:""; position:absolute; left:2px; right:2px; bottom:-1px; height:2px; background:var(--text); transform:scaleX(0); transform-origin:left; transition:transform var(--dur-base); }
     .links a:hover::after, .links a.active::after { transform: scaleX(1); }
     /* 활성 표시는 색이 아니라 명도로 — 이 페이지에서 색을 갖는 것은 마스코트뿐이다 */
     .links a.active { color:var(--text); background:var(--surface-2); transform: translateX(2px); }
@@ -87,7 +87,7 @@ import Base from "../layouts/Base.astro"
     #mascot-bubble { position: fixed; z-index: 6; pointer-events: none; left: -9999px; top: -9999px;
       background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: 18px; padding: 13px 20px;
       font-size: var(--fs-body); font-weight: 600; line-height: 1.25; text-align: left; max-width: 300px;
-      box-shadow: 0 12px 32px rgba(0,0,0,.14); opacity: 0; transition: opacity .22s ease; }
+      box-shadow: 0 12px 32px rgba(0,0,0,.14); opacity: 0; transition: opacity var(--dur-base) ease; }
     #mascot-bubble.show { opacity: 1; }
     #mascot-bubble.right { transform: translateY(-50%); }
     #mascot-bubble.left  { transform: translate(-100%, -50%); }

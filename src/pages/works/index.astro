@@ -67,7 +67,7 @@ const materialCounts = MATERIALS.map((m) => ({
           </li>
         ))}
       </ol>
-      <p class="mf-empty" id="mf-empty" hidden>이 재료를 쓴 작품이 없습니다.</p>
+      <p class="mf-empty" id="mf-empty" hidden>No works with this material.</p>
       {/* 필드 뷰 — 같은 li 데이터를 캔버스로 다시 그린다.
           목록 DOM은 그대로 두므로 접근성·검색·필터 로직이 하나로 유지된다. */}
       <div class="field-view" id="field-view" hidden>
@@ -355,7 +355,7 @@ const materialCounts = MATERIALS.map((m) => ({
     border: 1px solid var(--line-2);
     border-radius: 999px;
     color: var(--text-2);
-    transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease;
+    transition: border-color var(--dur-fast) ease, color var(--dur-fast) ease, background var(--dur-fast) ease;
   }
   .material-filter a:hover { border-color: var(--hover); color: var(--hover); }
   .material-filter a[aria-current="true"] {

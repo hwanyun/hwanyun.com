@@ -319,7 +319,7 @@ function toParagraphs(text: string): string {
     {
       relatedByMaterial.length > 0 && (
         <section class="related-materials" aria-labelledby="related-materials-title">
-          <div id="related-materials-title" class="related-materials-label">Sharing materials</div>
+          <div id="related-materials-title" class="related-materials-label">Related by material</div>
           <ul class="related-materials-list">
             {relatedByMaterial.map((r) => (
               <li>
@@ -606,7 +606,7 @@ function toParagraphs(text: string): string {
       border: 1px solid var(--line-2);
       border-radius: 999px;
       color: var(--text-2);
-      transition: border-color 0.18s ease, color 0.18s ease;
+      transition: border-color var(--dur-fast) ease, color var(--dur-fast) ease;
     }
     .material-tag::before {
       content: "";
@@ -617,7 +617,7 @@ function toParagraphs(text: string): string {
       vertical-align: 1px;
       border-radius: 50%;
       background: var(--line-2);
-      transition: background 0.18s ease;
+      transition: background var(--dur-fast) ease;
     }
     .material-tag:hover { border-color: var(--hover); color: var(--hover); }
     .material-tag:hover::before { background: var(--hover); }
@@ -748,7 +748,7 @@ function toParagraphs(text: string): string {
     .media-reveal {
       opacity: 0.45;
       transform: translateY(6px);
-      transition: opacity 0.3s ease, transform 0.3s ease;
+      transition: opacity var(--dur-base) ease, transform var(--dur-base) ease;
     }
     .media-reveal.is-visible { opacity: 1; transform: none; }
 
@@ -770,14 +770,14 @@ function toParagraphs(text: string): string {
     .block { position: relative; grid-column: span 5; }
     /* 이미지 확대 힌트: 별도 버튼 없이 그림 전체 클릭. hover 시 이미지만 살짝 어두워지고 중앙에 ⤢ */
     .block:not(.is-video) { cursor: zoom-in; align-self: start; }
-    .block:not(.is-video) img { transition: filter 0.2s ease; }
+    .block:not(.is-video) img { transition: filter var(--dur-base) ease; }
     .block:not(.is-video):hover img { filter: brightness(0.9); }
     .block:not(.is-video)::before {
       content: "\2922"; position: absolute; left: 50%; top: 50%; z-index: 2; pointer-events: none;
       display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%;
       background: rgba(255,255,255,0.92); color: var(--text); font-size: var(--fs-lead);
       transform: translate(-50%, -50%) scale(0.9); opacity: 0;
-      transition: opacity 0.2s ease, transform 0.2s ease;
+      transition: opacity var(--dur-base) ease, transform var(--dur-base) ease;
     }
     .block:not(.is-video):hover::before { opacity: 1; transform: translate(-50%, -50%) scale(1); }
     .block.hero { grid-column: 1 / span 9; }
@@ -831,7 +831,7 @@ function toParagraphs(text: string): string {
       line-height: 1;
       cursor: zoom-in;
       opacity: 0;
-      transition: opacity 0.2s ease;
+      transition: opacity var(--dur-base) ease;
     }
     .block:hover :global(.focus-open) { opacity: 1; }
 
@@ -862,7 +862,7 @@ function toParagraphs(text: string): string {
       color: var(--surface);
       cursor: pointer;
       transform: translate(-50%, -50%);
-      transition: background 0.25s ease, transform 0.25s ease;
+      transition: background var(--dur-base) ease, transform var(--dur-base) ease;
     }
     .video-play span {
       width: 0;
@@ -893,7 +893,7 @@ function toParagraphs(text: string): string {
       -webkit-backdrop-filter: blur(9px);
       backdrop-filter: blur(9px);
       opacity: 0;
-      transition: opacity 0.28s ease;
+      transition: opacity var(--dur-base) ease;
     }
     .focus.open { opacity: 1; }
     .focus[hidden] { display: none; }
@@ -956,7 +956,7 @@ function toParagraphs(text: string): string {
       line-height: 1;
       cursor: pointer;
       transform: translateY(-50%);
-      transition: color 0.2s ease, transform 0.2s ease;
+      transition: color var(--dur-base) ease, transform var(--dur-base) ease;
     }
     .focus.has-gallery-nav .focus-nav { display: block; }
     .focus-prev { left: 18px; }
@@ -1054,7 +1054,7 @@ function toParagraphs(text: string): string {
     .sponsor { display: inline-flex; align-items: center; }
     .sponsor-name { font-size: var(--fs-body); color: var(--text-2); }
     /* 크롬은 무채색 — 기관 로고도 예외가 아니다. 호버 시에만 원색. */
-    .sponsor img { filter: grayscale(1); opacity: 0.72; transition: filter 0.2s ease, opacity 0.2s ease; }
+    .sponsor img { filter: grayscale(1); opacity: 0.72; transition: filter var(--dur-base) ease, opacity var(--dur-base) ease; }
     .sponsor:hover img { filter: none; opacity: 1; }
     .sponsor img {
       max-height: 40px;

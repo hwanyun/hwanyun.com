@@ -25,7 +25,7 @@ const releases = (id: string) => {
   <div id="backdrop-title" aria-live="polite"></div>
   <main id="sound-archive">
     <header class="archive-head">
-      <p class="eyebrow">HWANYUN / LISTENING ARCHIVE</p>
+      <p class="eyebrow">LISTENING ARCHIVE</p>
       <h1>Sound</h1>
       <div class="intro-copy">
         <p class="intro" data-language-content="en" lang="en">A selection of sound works, scores, and recordings. Each entry remains connected to the circumstance in which it was made.</p>
@@ -150,11 +150,11 @@ const releases = (id: string) => {
     </script>
 
   <style>
-    #listening-backdrop { position: fixed; z-index: 0; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; pointer-events: none; filter: brightness(.42) saturate(.75); transition: opacity .7s ease; }
+    #listening-backdrop { position: fixed; z-index: 0; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; pointer-events: none; filter: brightness(.42) saturate(.75); transition: opacity var(--dur-slow) ease; }
     :global(body.has-backdrop) #listening-backdrop { opacity: 1; }
-    #backdrop-title { position: fixed; z-index: 2; left: 50%; top: 50%; width: min(88vw, 780px); transform: translate(-50%, -50%); color: var(--surface); font-size: clamp(24px, 4vw, 52px); font-weight: 300; line-height: 1.12; text-align: center; text-shadow: 0 2px 20px rgba(0,0,0,.45); opacity: 0; pointer-events: none; transition: opacity .45s ease; }
+    #backdrop-title { position: fixed; z-index: 2; left: 50%; top: 50%; width: min(88vw, 780px); transform: translate(-50%, -50%); color: var(--surface); font-size: clamp(24px, 4vw, 52px); font-weight: 300; line-height: 1.12; text-align: center; text-shadow: 0 2px 20px rgba(0,0,0,.45); opacity: 0; pointer-events: none; transition: opacity var(--dur-slow) ease; }
     :global(body.has-backdrop) #backdrop-title { opacity: 1; }
-    #sound-archive { position: relative; z-index: 1; max-width: var(--content-w); margin: var(--desktop-header-clearance) 40px 100px var(--desktop-content-x); transition: color .4s ease; }
+    #sound-archive { position: relative; z-index: 1; max-width: var(--content-w); margin: var(--desktop-header-clearance) 40px 100px var(--desktop-content-x); transition: color var(--dur-slow) ease; }
     /* Works archive의 소개 블록과 같은 데스크톱 읽기 규격 */
     .archive-head { max-width: 650px; margin-bottom: 84px; }
     .eyebrow, .section h2, .number, .release-count, .track span:last-child { font-size: var(--fs-2xs); letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
@@ -195,7 +195,7 @@ const releases = (id: string) => {
     }
     .track.is-playing .moving-tag::before {
       opacity: 1;
-      animation: moving-spectrum 3.6s linear infinite;
+      animation: moving-spectrum var(--dur-slow) linear infinite;
     }
     @keyframes moving-spectrum { to { background-position: 0 0, 220% 0; } }
     .track.is-playing { color: var(--text); }
@@ -212,7 +212,7 @@ const releases = (id: string) => {
     .player-actions button { width: 28px; height: 28px; color: var(--surface); padding: 0; }
     .stop span { width: 8px; height: 8px; background: currentColor; }
     .progress { grid-column: 1 / -1; height: 2px; background: var(--text-2); }
-    .progress span { display: block; width: 0; height: 100%; background: var(--surface); transition: width .1s linear; }
+    .progress span { display: block; width: 0; height: 100%; background: var(--surface); transition: width var(--dur-fast) linear; }
     :global(body.has-backdrop) #sound-archive { color: var(--surface); text-shadow: 0 1px 12px rgba(0,0,0,.35); }
     :global(body.has-backdrop) #sound-archive, :global(body.has-backdrop) .menu, :global(body.has-backdrop) footer { opacity: 0; pointer-events: none; }
     :global(body.has-backdrop) .section-head, :global(body.has-backdrop) .release { border-color: rgba(255,255,255,.48); }

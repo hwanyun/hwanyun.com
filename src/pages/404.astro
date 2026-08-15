@@ -1,0 +1,106 @@
+---
+import Base from "../layouts/Base.astro"
+---
+
+<Base title="HWANYUN — Page not found">
+  <main class="nf">
+    <canvas id="nf-field" aria-hidden="true"></canvas>
+    <div class="nf-copy">
+      <p class="eyebrow">404</p>
+      <h1>Page not found</h1>
+      <p class="nf-lead">
+        <span data-language-content="en">The signal did not reach anything here.</span>
+        <span data-language-content="ko">이 주소에는 닿는 것이 없습니다.</span>
+      </p>
+      <nav class="nf-links" aria-label="Continue">
+        <a href="/">Home</a>
+        <a href="/works/">Works</a>
+        <a href="/events/">Events</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </main>
+
+  <script is:inline>
+    /* 흩어진 입자 — 홈 히어로의 구체가 형태를 잃은 상태.
+       같은 입자 언어를 쓰되 여기서는 모이지 않는다. */
+    ;(function () {
+      var canvas = document.getElementById("nf-field")
+      if (!canvas) return
+      var ctx = canvas.getContext("2d")
+      if (!ctx) return
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      var W = 0, H = 0, dpr = 1, pts = [], raf = 0
+
+      function build() {
+        var r = canvas.getBoundingClientRect()
+        W = Math.round(r.width); H = Math.round(r.height)
+        dpr = Math.min(window.devicePixelRatio || 1, 2)
+        canvas.width = W * dpr; canvas.height = H * dpr
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+        var n = W < 700 ? 420 : 900
+        pts = []
+        for (var i = 0; i < n; i++) {
+          pts.push({
+            x: Math.random() * W,
+            y: Math.random() * H,
+            vx: (Math.random() - 0.5) * 0.14,
+            vy: (Math.random() - 0.5) * 0.14,
+            r: 0.4 + Math.random() * 1.0,
+            a: 0.06 + Math.random() * 0.16,
+          })
+        }
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H)
+        for (var i = 0; i < pts.length; i++) {
+          var p = pts[i]
+          if (!reduce) {
+            p.x += p.vx; p.y += p.vy
+            if (p.x < 0) p.x += W; else if (p.x > W) p.x -= W
+            if (p.y < 0) p.y += H; else if (p.y > H) p.y -= H
+          }
+          ctx.beginPath()
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
+          ctx.fillStyle = "rgba(17,17,17," + p.a + ")"
+          ctx.fill()
+        }
+        if (!reduce) raf = requestAnimationFrame(draw)
+      }
+
+      build(); draw()
+      window.addEventListener("resize", function () { build(); if (reduce) draw() })
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden) { if (raf) { cancelAnimationFrame(raf); raf = 0 } }
+        else if (!reduce && !raf) raf = requestAnimationFrame(draw)
+      })
+    })()
+  </script>
+
+  <style>
+    .nf {
+      position: relative;
+      min-height: 74svh;
+      margin: var(--desktop-header-clearance) 40px 100px var(--desktop-content-x);
+      max-width: var(--content-w);
+    }
+    #nf-field { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+    .nf-copy { position: relative; z-index: 1; max-width: 62ch; }
+    .eyebrow {
+      margin: 0; font-size: var(--fs-2xs); letter-spacing: .14em;
+      text-transform: uppercase; color: var(--text-3);
+      font-variant-numeric: tabular-nums;
+    }
+    h1 { margin: 8px 0 16px; font-size: var(--fs-display); font-weight: 300; line-height: 1.15; }
+    .nf-lead { margin: 0 0 var(--space-4); font-size: var(--fs-sm); line-height: 1.6; color: var(--text-2); }
+    .nf-links { display: flex; flex-wrap: wrap; gap: var(--space-3); font-size: var(--fs-sm); }
+    .nf-links a { color: var(--text); }
+    .nf-links a:hover { border-bottom: 1px solid var(--hover); }
+
+    @media (max-width: 700px) {
+      .nf { margin: 24px 16px 80px; min-height: 62svh; }
+      h1 { font-size: clamp(25px, 7vw, 32px); line-height: 1.22; }
+    }
+  </style>
+</Base>

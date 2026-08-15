@@ -431,7 +431,7 @@ works.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
     opacity: 1;
   }
   .tile {
-    transition: opacity 0.45s ease;
+    transition: opacity var(--dur-slow) ease;
   }
   #packed.animate .tile {
     transition:
@@ -462,7 +462,7 @@ works.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
     object-fit: cover;
     display: block;
     opacity: 0;
-    transition: opacity 0.45s ease;
+    transition: opacity var(--dur-slow) ease;
     pointer-events: none;
   }
   .card .thumb-video.is-playing { opacity: 1; }
@@ -489,7 +489,7 @@ works.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
      모바일의 스크롤 포커스와 같은 원리이고, 입력만 커서 거리로 바뀐다. */
   .card .thumb {
     filter: brightness(calc(0.93 + var(--p, 0) * 0.13));
-    transition: filter 0.25s ease;
+    transition: filter var(--dur-base) ease;
   }
   .card .cap {
     position: absolute;
@@ -502,7 +502,7 @@ works.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
     background: linear-gradient(to top, rgba(0, 0, 0, 0.62), rgba(0, 0, 0, 0));
     /* 가까워지면 서서히 드러나고, 올리면 완전히 나타난다 */
     opacity: calc(var(--p, 0) * 0.85);
-    transition: opacity 0.3s ease;
+    transition: opacity var(--dur-base) ease;
     pointer-events: none;
   }
   .card:hover .cap {

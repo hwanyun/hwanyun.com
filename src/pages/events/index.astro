@@ -28,7 +28,7 @@ function fmt(start: string, end: string) {
 <Base title="HWANYUN — Events" current="events">
   <main class="events">
     <header class="events-head">
-      <p class="eyebrow">HWANYUN / EVENTS</p>
+      <p class="eyebrow">EVENTS</p>
       <h1>Events</h1>
       <p class="intro">Exhibitions, performances, and screenings.</p>
     </header>
@@ -72,7 +72,7 @@ function fmt(start: string, end: string) {
       <div id="ev-past-groups"></div>
     </section>
 
-    <p class="ev-empty" id="ev-empty" hidden>예정된 일정이 아직 없습니다 · No upcoming events yet.</p>
+    <p class="ev-empty" id="ev-empty" hidden>No upcoming events.</p>
   </main>
 
   <script is:inline>
@@ -162,15 +162,18 @@ function fmt(start: string, end: string) {
       padding: 18px 4px;
       color: var(--text);
       text-decoration: none;
-      transition: background 0.15s ease, padding-left 0.2s ease;
+      transition: color var(--dur-fast) var(--ease);
     }
-    .ev-link:hover { background: var(--surface-2); padding-left: 10px; }
+    /* 리스트 호버는 사이트 전체에서 색 변화 하나로 통일한다.
+       배경+들여쓰기는 레이아웃을 흔들어 목록이 요동친다. */
+    .ev-link:hover { color: var(--hover); }
+    .ev-link:hover .ev-date, .ev-link:hover .ev-where { color: var(--hover); }
     .ev-date { font-size: var(--fs-sm); color: var(--text-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
     .ev-main { display: flex; flex-direction: column; gap: 4px; }
     .ev-title { font-size: var(--fs-body); line-height: 1.3; }
     .ev-where { font-size: var(--fs-sm); color: var(--text-3); }
-    .ev-arrow { color: var(--text-4); font-size: var(--fs-body); transition: transform 0.2s ease, color 0.2s ease; }
-    .ev-link:hover .ev-arrow { color: var(--text); transform: translateX(3px); }
+    .ev-arrow { color: var(--text-4); font-size: var(--fs-body); transition: color var(--dur-fast) var(--ease); }
+    .ev-link:hover .ev-arrow { color: var(--hover); }
 
     .ev-empty { color: var(--text-4); font-size: var(--fs-sm); padding: 26px 4px; }
     .ev-pool { display: none; }

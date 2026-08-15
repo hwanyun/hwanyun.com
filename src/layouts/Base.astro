@@ -51,7 +51,7 @@ const shareImage = "https://www.hwanyun.com/images/social/hwanyun-share-preview.
     <slot />
     <div class="cursor-dot" aria-hidden="true"></div>
     <footer>
-      COPYRIGHT © 2014–<span id="footer-year">{new Date().getFullYear()}</span> HWANYUN. All rights reserved.
+      © 2014–<span id="footer-year">{new Date().getFullYear()}</span> HWANYUN
     </footer>
 
     <script is:inline>
@@ -167,7 +167,7 @@ const shareImage = "https://www.hwanyun.com/images/social/hwanyun-share-preview.
         --text: #111;        /* 본문·제목 */
         --text-2: #555;      /* 부제·캡션 */
         --text-3: #888;      /* 메타·보조 정보 */
-        --text-4: #aaa;      /* 라벨·eyebrow */
+        --text-4: #767676;   /* 라벨·eyebrow — 흰 배경 4.5:1 (이전 #aaa는 2.3:1로 읽기 어려웠다) */
 
         /* 면과 선 */
         --surface: #fff;
@@ -183,6 +183,19 @@ const shareImage = "https://www.hwanyun.com/images/social/hwanyun-share-preview.
         --void-line: #556;
 
         --hover: #00f;
+
+        /* 모션 — 3단계와 이징 1종. 이 밖의 값을 새로 쓰지 않는다.
+           fast: 색·불투명도 / base: 형태·위치 / slow: 등장·레이아웃 */
+        --dur-fast: 150ms;
+        --dur-base: 250ms;
+        --dur-slow: 450ms;
+        --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+        /* 스페이싱 — 컨트롤의 내부 여백과 요소 간격 */
+        --space-1: 6px;
+        --space-2: 12px;
+        --space-3: 24px;
+        --space-4: 48px;
 
         /* 타입 스케일 — 7단계 */
         --fs-display: 38px;  /* 페이지 h1 */
@@ -234,6 +247,12 @@ const shareImage = "https://www.hwanyun.com/images/social/hwanyun-share-preview.
          제 폭을 쓴다. 이것이 병기를 걷어내는 실질적 이득이다. */
       html [data-language-content] { max-width: 62ch; }
 
+      /* ── 컨트롤 형태 규칙 ───────────────────────────────────
+         이동(메뉴·링크)      = 텍스트 + 밑줄
+         필터·태그(회로 노드)  = 필 + 점
+         모드 전환            = 사각 세그먼트
+         외부 링크 버튼        = 사각 + ↗
+         새 컨트롤은 이 넷 중 하나를 따른다. */
       .lang-switch {
         display: inline-flex;
         width: fit-content;   /* 모바일 메뉴가 grid라 늘어나는 것을 막는다 */
@@ -270,7 +289,7 @@ const shareImage = "https://www.hwanyun.com/images/social/hwanyun-share-preview.
           mix-blend-mode: difference;
           pointer-events: none;
           opacity: 0;
-          transition: opacity 0.18s ease;
+          transition: opacity var(--dur-fast) ease;
         }
         .cursor-dot.is-visible { opacity: 1; }
       }
@@ -291,22 +310,25 @@ const shareImage = "https://www.hwanyun.com/images/social/hwanyun-share-preview.
 
       .menu-search { margin: 14px 0 0; }
       .site-menu--grid #search { margin-top: 14px; }
+      /* 검색은 '이동' 계열이다 — 박스가 아니라 밑줄.
+         사이트에서 유일하게 무거운 테두리였다. */
       .site-menu input[type="search"] {
         display: block;
         width: 110px;
-        height: 34px;
-        padding: 6px 9px;
-        border: 1px solid var(--text);
+        padding: 3px 0;
+        border: 0;
+        border-bottom: 1px solid var(--line-2);
         border-radius: 0;
         color: var(--text);
         background: transparent;
         outline: 0;
         font: inherit;
         font-size: var(--fs-sm);
+        transition: border-color var(--dur-fast) var(--ease);
         -webkit-appearance: none;
       }
-      .site-menu input[type="search"]::placeholder { color: var(--text); opacity: 1; }
-      .site-menu input[type="search"]:focus { border-color: var(--hover); }
+      .site-menu input[type="search"]::placeholder { color: var(--text-3); opacity: 1; }
+      .site-menu input[type="search"]:focus { border-bottom-color: var(--hover); }
 
       /* variant: page — 일반 페이지 좌상단 */
       .site-menu--page {
@@ -316,8 +338,23 @@ const shareImage = "https://www.hwanyun.com/images/social/hwanyun-share-preview.
         left: 10px;
         width: 140px;
       }
-      /* variant: hero — 데스크톱에서는 구체를 가리지 않도록 숨긴다 */
-      .site-menu--hero { display: none; }
+      /* variant: hero — 데스크톱에서는 메뉴를 숨겨 구체를 가리지 않는다.
+         다만 워드마크 하나는 남긴다. 처음 온 사람이 여기가 누구 사이트인지
+         알 수 없는 채로 스크롤을 도박해야 하는 상태였다. */
+      .site-menu--hero {
+        position: absolute;
+        z-index: 20;
+        top: 24px;
+        left: 24px;
+        width: auto;
+      }
+      .site-menu--hero > *:not(.name) { display: none; }
+      .site-menu--hero .name { margin: 0; }
+      .site-menu--hero .name a {
+        color: var(--void-text-2);
+        transition: color var(--dur-fast) var(--ease);
+      }
+      .site-menu--hero .name a:hover { color: var(--void-text); border-bottom: 0; }
       /* variant: grid — 홈 작품 그리드 위 오버레이 (데스크톱 전용) */
       .site-menu--grid {
         position: absolute;
@@ -361,7 +398,7 @@ const shareImage = "https://www.hwanyun.com/images/social/hwanyun-share-preview.
         }
         /* page는 문서 흐름 안에서 시작해 열릴 때만 고정, hero는 항상 히어로 위에 떠 있다 */
         .site-menu--page { position: relative; top: auto; left: auto; width: 100%; }
-        .site-menu--hero { position: fixed; inset: 0 0 auto; transition: opacity .25s ease; }
+        .site-menu--hero { position: fixed; inset: 0 0 auto; transition: opacity var(--dur-base) ease; }
         /* 히어로를 벗어나면 숨긴다 — 흰 배경 위 밝은 글자는 읽히지 않고 작품을 가린다 */
         .site-menu--hero.is-past-hero:not(.is-open) { opacity: 0; pointer-events: none; }
 
@@ -438,7 +475,7 @@ const shareImage = "https://www.hwanyun.com/images/social/hwanyun-share-preview.
           border-left: 1px solid rgba(0, 0, 0, .35);
           opacity: 0;
           pointer-events: none;
-          transition: max-height .38s ease, margin .28s ease, padding .28s ease, opacity .22s ease;
+          transition: max-height var(--dur-slow) ease, margin var(--dur-base) ease, padding var(--dur-base) ease, opacity var(--dur-base) ease;
         }
         .site-menu.is-open.works-open .work-links {
           max-height: min(46svh, 350px);
