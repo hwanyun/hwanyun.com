@@ -1,5 +1,5 @@
 ---
-title: "무제 (Untitled)"
+title: "무제"
 dateStart: "2026-08-19"
 dateEnd: "2026-08-21"
 timeNote: ""
@@ -23,4 +23,4 @@ draft: false
 A team project presented at the 2026 New Content Academy Showcase,
 organised by the Korea Creative Content Agency (KOCCA) in Hongneung, Seoul.
 Twenty-one student teams present convergence works made with AI, XR, and VR;
-*Untitled* is shown at Studio 1, Contents Culture Square.
+〈무제〉 is shown at Studio 1, Contents Culture Square.
