@@ -6,9 +6,12 @@ timeNote: ""
 venue: "콘텐츠문화광장 스튜디오1"
 city: "Seoul"
 summary: "2026 뉴콘텐츠아카데미 쇼케이스에서 선보이는 팀 프로젝트."
-thumb: ""
+thumb: "/images/events/2026-nca-showcase.jpg"
 externalUrl: "https://www.ncakocca.kr"
 externalLabel: "NCA 공식 누리집"
+images:
+  - src: "/images/events/2026-nca-showcase.jpg"
+    caption: "2026 뉴콘텐츠아카데미 쇼케이스 포스터"
 order: 100
 draft: false
 ---
