@@ -552,8 +552,11 @@ works.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
 
   /* 모바일: 데스크톱과 동일한 패킹 구조를 화면 전체로 확장한다. */
   @media (max-width: 700px) {
+    /* 트리맵 패킹은 모바일에서도 유지한다.
+       다만 화면을 통째로(100svh) 쓰면 타일이 길고 가늘어져 작품이 안 보인다.
+       높이를 2/3로 줄이면 같은 폭에 더 납작한 비율이 나와 훨씬 읽힌다. */
     #packed {
-      height: 100svh;
+      height: 67svh;
       margin: 0;
       width: 100%;
       background: var(--text);

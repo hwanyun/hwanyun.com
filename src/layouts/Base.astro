@@ -351,12 +351,19 @@ const shareImage = "https://www.hwanyun.com/images/social/hwanyun-share-preview.
           margin: 0;
           padding: 18px;
           color: var(--text);
+        }
+        /* hero는 검은 히어로 위에 뜬다 — 어두운 글자면 보이지 않는다.
+           열리면 흰 반투명 패널이 깔리므로 그때는 다시 어두운 글자로 돌아간다. */
+        .site-menu--hero:not(.is-open) {
+          color: var(--void-text);
           background: transparent;
           line-height: 1.4;
         }
         /* page는 문서 흐름 안에서 시작해 열릴 때만 고정, hero는 항상 히어로 위에 떠 있다 */
         .site-menu--page { position: relative; top: auto; left: auto; width: 100%; }
-        .site-menu--hero { position: fixed; inset: 0 0 auto; }
+        .site-menu--hero { position: fixed; inset: 0 0 auto; transition: opacity .25s ease; }
+        /* 히어로를 벗어나면 숨긴다 — 흰 배경 위 밝은 글자는 읽히지 않고 작품을 가린다 */
+        .site-menu--hero.is-past-hero:not(.is-open) { opacity: 0; pointer-events: none; }
 
         .site-menu .menu-hamburger {
           display: block;
@@ -368,7 +375,7 @@ const shareImage = "https://www.hwanyun.com/images/social/hwanyun-share-preview.
           padding: 0;
           border: 0;
           border-radius: 0;
-          color: var(--text);
+          color: inherit;
           background: transparent;
         }
         .site-menu .menu-hamburger span { display: none; }
@@ -451,6 +458,12 @@ const shareImage = "https://www.hwanyun.com/images/social/hwanyun-share-preview.
         .site-menu.is-open .work-links .all-works { font-weight: 500; }
 
         .lang-switch { grid-column: 1 / -1; justify-self: start; margin: 14px 0 0; }
+        .site-menu--hero:not(.is-open) .name a { color: var(--void-text); }
+        .site-menu--hero:not(.is-open) .lang-switch { border-color: var(--void-line); }
+        .site-menu--hero:not(.is-open) .lang-switch button { color: var(--void-text-2); }
+        .site-menu--hero:not(.is-open) .lang-switch button[aria-pressed="true"] {
+          background: var(--void-text); color: var(--void);
+        }
         .menu-search { display: none; grid-column: 1 / -1; margin: 16px 0 0; }
         .site-menu input[type="search"] { width: min(110px, 100%); }
         .site-menu.is-open .menu-search { display: block; }

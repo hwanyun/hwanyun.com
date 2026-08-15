@@ -59,6 +59,27 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     })()
   </script>
 
+  <script is:inline>
+    /* 히어로 메뉴는 검은 히어로 위에 고정된다. 스크롤해 작품 그리드로 넘어가면
+       흰 배경 위에 밝은 글자가 남아 읽히지 않고 작품도 가린다 — 그때는 숨긴다.
+       (그리드 자체 메뉴는 데스크톱 전용이고, 모바일에서는 상단으로 되돌아가면 다시 나온다) */
+    ;(function () {
+      var menu = document.getElementById("home-hero-menu")
+      var hero = document.querySelector(".hero")
+      if (!menu || !hero || !("IntersectionObserver" in window)) return
+      if (!window.matchMedia("(max-width: 700px)").matches) return
+      var io = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (e) {
+            menu.classList.toggle("is-past-hero", e.intersectionRatio < 0.12)
+          })
+        },
+        { threshold: [0, 0.12, 1] }
+      )
+      io.observe(hero)
+    })()
+  </script>
+
   <section id="works" class="work-archive" aria-label="Selected works">
     <WorkGrid current="home" />
   </section>
