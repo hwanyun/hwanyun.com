@@ -22,6 +22,7 @@ textKr: |
 
   〈공존: Coexistence〉은 함께 존재한다는 것이 단순히 같은 장소에 있는 일이 아니라, 서로의 감각에 반응하고 자신의 방식을 조금씩 조정해가는 일임을 말한다. 보이는 것과 들리는 것, 감지되는 것과 드러나는 것 사이의 관계를 통해, 함께 있음의 의미를 하나의 살아 있는 감각적 경험으로 제안한다.
 thumb: "/images/coexistence/coexistence-thumbnail.png"
+thumbVideo: "/videos/loops/coexistence.mp4"
 media:
   - { type: image, src: "/images/coexistence/01.jpg", width: full, layout: hero }
   - { type: image, src: "/images/coexistence/02.jpg", width: half, layout: wide, align: right }

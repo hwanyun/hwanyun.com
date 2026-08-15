@@ -28,6 +28,20 @@ works.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
         >
           <div class="thumb">
             {w.data.thumb ? <img src={w.data.thumb} alt={w.data.title} draggable="false" /> : <div class="ph" />}
+            {/* 영상은 src 없이 심어 두고, 뷰포트에 들어올 때 스크립트가 붙인다.
+                12개를 한꺼번에 받으면 첫 화면이 느려진다. */}
+            {w.data.thumbVideo && (
+              <video
+                class="thumb-video"
+                data-src={w.data.thumbVideo}
+                muted
+                loop
+                playsinline
+                preload="none"
+                aria-hidden="true"
+                tabindex="-1"
+              />
+            )}
           </div>
           <span class="scrim" aria-hidden="true" />
           <div class="cap">
@@ -40,6 +54,65 @@ works.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
     <div id="noresult" hidden>No results.</div>
   </div>
 </div>
+
+<script is:inline>
+  /* 썸네일 무음 루프 — 뷰포트 안에 있을 때만 재생한다.
+     작품이 대부분 시간 기반이라 정지 이미지로는 전달되지 않는 것을 보완한다. */
+  ;(function () {
+    var videos = Array.prototype.slice.call(document.querySelectorAll(".thumb-video"))
+    if (!videos.length) return
+
+    // 재생하지 않아야 하는 조건 — 이 경우 thumb 이미지만 남는다(폴백).
+    var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    var conn = navigator.connection || {}
+    var saveData = conn.saveData === true
+    var slow = typeof conn.effectiveType === "string" && /^(slow-)?2g$/.test(conn.effectiveType)
+    // 저사양·모바일에서 동시 디코딩을 줄인다.
+    var isMobile = window.matchMedia("(max-width: 700px)").matches
+    var MAX_CONCURRENT = isMobile ? 2 : 6
+
+    if (reduced || saveData || slow) return
+
+    var playing = []
+    function stop(v) {
+      try { v.pause() } catch (e) {}
+      var i = playing.indexOf(v)
+      if (i !== -1) playing.splice(i, 1)
+      v.classList.remove("is-playing")
+    }
+    function start(v) {
+      if (playing.indexOf(v) !== -1) return
+      // 동시 재생 상한을 넘으면 가장 오래된 것을 내린다.
+      while (playing.length >= MAX_CONCURRENT) stop(playing[0])
+      if (!v.src) {
+        var s = v.getAttribute("data-src")
+        if (!s) return
+        v.src = s
+      }
+      playing.push(v)
+      var p = v.play()
+      if (p && p.catch) p.catch(function () { stop(v) })
+      v.classList.add("is-playing")
+    }
+
+    if (!("IntersectionObserver" in window)) return
+    var io = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) start(e.target)
+          else stop(e.target)
+        })
+      },
+      { rootMargin: "150px" }
+    )
+    videos.forEach(function (v) { io.observe(v) })
+
+    // 탭이 백그라운드로 가면 모두 멈춘다 (배터리·CPU)
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) playing.slice().forEach(stop)
+    })
+  })()
+</script>
 
 <script is:inline>
   ;(function () {
@@ -307,6 +380,23 @@ works.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
   .card .ph {
     position: absolute;
     inset: 0;
+  }
+  /* 무음 루프 영상 — thumb 이미지 위에 겹치고, 재생이 시작되면 페이드인.
+     로드 전·실패 시에는 아래의 thumb 이미지가 그대로 보인다(폴백). */
+  .card .thumb-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    opacity: 0;
+    transition: opacity 0.45s ease;
+    pointer-events: none;
+  }
+  .card .thumb-video.is-playing { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    .card .thumb-video { display: none; }
   }
   .card img {
     width: 100%;

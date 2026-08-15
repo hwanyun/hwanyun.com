@@ -70,12 +70,21 @@
 작품은 전부 시간 기반인데 썸네일이 정지 이미지 = 작품의 90%를 버리는 표현.
 Zimoun 홈의 체류 시간이 여기서 나온다.
 
-- [ ] **2-1. works 스키마에 `thumbVideo` 필드 추가** (`src/content/config.ts` + `public/admin/config.yml`)
-- [ ] **2-2. WorkGrid 렌더링** — `thumbVideo` 있으면 `<video muted loop autoplay playsinline>`,
-  없으면 기존 `thumb` 이미지 폴백. `prefers-reduced-motion`이면 정지 이미지 + 재생은 호버 시만
-- [ ] **2-3. 루프 소스 제작** — 작품별 3~5초, 무음, 720p 내외, R2 업로드
-  - 후보: atypical-circuit, conductive-circles, coexistence, voice-of-stripes (영상 이미 있음)
-- [ ] 성능 규칙: 뷰포트 밖 video는 `IntersectionObserver`로 pause, 모바일은 총 재생 개수 제한
+- [x] **2-1. `thumbVideo` 필드 추가** — `src/content/config.ts` + `public/admin/config.yml`
+- [x] **2-2. WorkGrid 렌더링** — `thumb` 이미지 위에 `<video muted loop playsinline preload="none">`를
+  겹치고, 재생이 시작되면 페이드인. 로드 전·실패·reduced-motion에서는 thumb이 그대로 보인다
+- [x] **2-3. 루프 클립 3종** (`public/videos/loops/`, 각 4초, 합계 2.3MB)
+  - atypical-circuit ← `atypical-circuit-2.mp4` 4.5s~ (형태가 터져 나오는 구간)
+  - coexistence ← `coexistence-1.mp4` 9s~ (투사면이 크게 잡힌 구간)
+  - conductive-circles ← `conductive-circles-intro.mp4` 18s~ (원형 그리드 = 작품 시그니처)
+  - the-voice-of-stripes는 **의도적으로 제외** — 보유 영상이 오실로스코프 화면이라
+    설치 사진 썸네일이 더 강하다. 나중에 설치 기록 영상이 생기면 추가할 것
+- [x] 성능·접근성 규칙 — `IntersectionObserver`로 뷰포트 밖 정지, 동시 재생 상한
+  (데스크톱 6 / 모바일 2), 탭 백그라운드 시 전체 정지, `prefers-reduced-motion`·
+  `saveData`·2G에서는 아예 로드하지 않음
+- 도구 메모: 이 기기에 `ffmpeg`이 없다. macOS 내장 `avconvert`로 만들었다.
+  `avconvert --source X --output Y --preset Preset640x480 --start 4.5 --duration 4 --replace`
+  (오디오 트랙 제거 옵션은 없음. 비트레이트 직접 제어도 불가 — 프리셋과 길이로만 조절)
 
 ## Phase 3 — 커서 = 센서 (근접 반응 그리드)
 

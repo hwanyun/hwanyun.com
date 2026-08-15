@@ -6,6 +6,7 @@ size: 3col
 category: work
 order: 1
 thumb: "/images/atypical-circuit/04.png"
+thumbVideo: "/videos/loops/atypical-circuit.mp4"
 textEn: |
   This work explores the tension between perfectly controlled systems and their
   inevitable decay. In Atypical Circuit, noise operates not as an error, but as

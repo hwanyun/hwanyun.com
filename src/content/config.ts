@@ -17,6 +17,10 @@ const works = defineCollection({
     category: z.enum(["work", "sound"]).default("work"),
     order: z.number().default(0),
     thumb: z.string().optional().default(""), // 홈 썸네일
+    // 홈 그리드용 무음 루프 영상. 작품이 대부분 시간 기반이라 정지 이미지로는
+    // 절반도 전달되지 않는다. 지정하면 thumb 자리에서 재생하고, 없으면 thumb으로 폴백.
+    // thumb은 항상 채워 둔다 — 포스터 프레임이자 reduced-motion·저사양 폴백이다.
+    thumbVideo: z.string().optional().default(""),
 
     // 세부 페이지 텍스트 (레퍼런스처럼 EN/KR 2단)
     textEn: z.string().optional().default(""),

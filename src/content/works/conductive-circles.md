@@ -6,6 +6,7 @@ size: 2col
 category: work
 order: 3
 thumb: "/images/conductive-circles/home.png"
+thumbVideo: "/videos/loops/conductive-circles.mp4"
 textEn: |
   Presenting the outcome of a 4-day KalmaLab workshop at GlogauAIR, Berlin,
   participants were introduced to the live performance possibilities of

@@ -45,6 +45,7 @@ collections:
         default: "work"
       - { name: order, label: "순서 (작을수록 앞)", widget: number, value_type: int, default: 100 }
       - { name: thumb, label: "홈 썸네일", widget: image, required: false }
+      - { name: thumbVideo, label: "홈 썸네일 영상 (무음 루프)", widget: string, required: false, hint: "R2 URL 또는 /videos/… 경로. 넣으면 홈 그리드에서 반복 재생되고 위 썸네일은 포스터·폴백이 된다. 3~6초 무음 클립 권장" }
       - { name: textEn, label: "설명 (영문)", widget: text, required: false }
       - { name: textKr, label: "설명 (국문)", widget: text, required: false }
       - name: processNote
