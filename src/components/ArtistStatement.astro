@@ -19,12 +19,10 @@ const paragraphs = korean
 <article class="page">
   <BioNav active="about" />
 
+  {/* 언어 전환은 우상단 전역 EN/KO 하나뿐이다. 그쪽이 이미 /about ↔ /about/ko를
+      라우팅으로 처리하므로(Base.astro의 ROUTED), 여기 따로 두면 같은 일을 하는
+      전환이 한 화면에 둘이 된다. */}
   <section>
-    <nav class="language-switch" aria-label="Artist statement language">
-      <a href="/about" class={!korean ? "active" : ""} aria-current={!korean ? "page" : undefined}>EN</a>
-      <span aria-hidden="true">/</span>
-      <a href="/about/ko" class={korean ? "active" : ""} aria-current={korean ? "page" : undefined}>KO</a>
-    </nav>
     <h2>{title}</h2>
     {paragraphs.map((paragraph) => <p>{paragraph}</p>)}
     <p class="sign">HWANYUN</p>
@@ -40,26 +38,12 @@ const paragraphs = korean
     font-weight: 400;
     line-height: 1.8;
   }
-  .language-switch {
-    display: flex;
-    justify-content: flex-end;
-    gap: 6px;
-    margin: 0 0 24px;
-    font-size: var(--fs-xs);
-    letter-spacing: .04em;
-    color: var(--text-4);
-  }
-  .language-switch a { color: var(--text-4); }
-  .language-switch a:hover,
-  .language-switch a.active { color: var(--text); }
   h2 { font-size: var(--fs-sm); font-weight: 500; margin: 0 0 10px; }
   section { margin: 0 0 40px; }
   p { margin: 0 0 1em; }
   .sign { font-weight: 500; letter-spacing: .02em; }
   @media (max-width: 700px) {
     .page { margin: 0; padding: 0 16px 64px; font-size: var(--fs-sm); line-height: 1.75; }
-    .bionav { margin-bottom: 26px; }
-    .language-switch { margin-bottom: 28px; font-size: var(--fs-xs); }
     section { margin-bottom: 32px; }
     p { margin-bottom: 1.1em; }
   }
