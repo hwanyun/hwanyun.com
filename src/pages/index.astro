@@ -16,7 +16,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
   <section class="hero" aria-labelledby="hero-title">
     <canvas id="particle-canvas" class="hero__field" aria-hidden="true"></canvas>
     <h1 id="hero-title" class="sr-only">HWANYUN</h1>
-    <a id="upcoming-ticker" class="upcoming-ticker" href="/events/" hidden aria-label="Upcoming events"><span class="ut-list" id="ut-track"></span></a>
+    <a id="upcoming-ticker" class="upcoming-ticker" href="/events/" hidden draggable="false" aria-label="Upcoming events"><span class="ut-list" id="ut-track"></span></a>
   </section>
   <script type="application/json" id="ev-data" is:inline set:html={JSON.stringify(upEvents)}></script>
   <script is:inline>
@@ -56,6 +56,148 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       }
       track.innerHTML = html
       el.hidden = false
+      makeElastic(track, el)
+
+      /* 글자를 끌면 그 글자가 커서를 따라오고, 이웃 글자가 감쇠하며 끌려온다.
+         놓으면 스프링으로 제자리에 튕겨 돌아간다 — 히어로 입자와 같은
+         "커서=힘, 놓으면 복원" 문법을 하단 한 줄까지 잇는다.
+         데스크톱 전용: 터치에서는 드래그가 스크롤과 충돌하고, 이 줄은 모바일에서
+         화면 하단 좁은 영역이라 조작 대상이 되기 어렵다. */
+      function makeElastic(root, anchor) {
+        if (!window.matchMedia("(min-width: 701px)").matches) return
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
+
+        var FOLLOW = 9                        // 0(뻣뻣) – 20(느슨): 이웃이 따라오는 범위
+        var SIGMA = Math.max(1, FOLLOW / 3)
+        var SPRING = .16
+        var DAMPING = .74
+        var DRAG_SLOP = 5                     // 이보다 덜 움직이면 클릭(= /events 이동)
+
+        // 한 줄이 하나의 사슬이다. 줄이 다르면 서로 끌지 않는다 —
+        // 안 그러면 NOW ON 태그를 끌 때 아래 줄까지 딸려와 글이 뭉개진다.
+        var chains = []
+        Array.prototype.forEach.call(root.querySelectorAll(".ut-tag, .ut-row"), function (block) {
+          var chars = splitChars(block)
+          if (chars.length) {
+            chains.push(chars.map(function (node) {
+              return { el: node, x: 0, y: 0, vx: 0, vy: 0 }
+            }))
+          }
+        })
+        if (!chains.length) return
+        anchor.classList.add("is-elastic")
+
+        var active = null
+        var suppressClick = false
+        var raf = 0
+
+        function splitChars(block) {
+          var walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT, null)
+          var texts = []
+          var node
+          while ((node = walker.nextNode())) texts.push(node)
+          var chars = []
+          texts.forEach(function (text) {
+            var frag = document.createDocumentFragment()
+            var value = text.nodeValue
+            for (var i = 0; i < value.length; i++) {
+              var span = document.createElement("i")
+              span.className = "ut-ch"
+              span.textContent = value[i]
+              frag.appendChild(span)
+              chars.push(span)
+            }
+            text.parentNode.replaceChild(frag, text)
+          })
+          return chars
+        }
+
+        function find(el) {
+          for (var c = 0; c < chains.length; c++) {
+            for (var i = 0; i < chains[c].length; i++) {
+              if (chains[c][i].el === el) return { chain: chains[c], index: i }
+            }
+          }
+          return null
+        }
+
+        function frame() {
+          var moving = false
+          for (var c = 0; c < chains.length; c++) {
+            var chain = chains[c]
+            for (var i = 0; i < chain.length; i++) {
+              var p = chain[i]
+              var tx = 0
+              var ty = 0
+              if (active && active.chain === chain) {
+                // 잡은 글자에서 멀어질수록 가우시안으로 약해진다 = 탄성 감쇠
+                var d = i - active.index
+                var w = Math.exp(-(d * d) / (2 * SIGMA * SIGMA))
+                tx = active.dx * w
+                ty = active.dy * w
+              }
+              p.vx = (p.vx + (tx - p.x) * SPRING) * DAMPING
+              p.vy = (p.vy + (ty - p.y) * SPRING) * DAMPING
+              p.x += p.vx
+              p.y += p.vy
+              if (Math.abs(p.x) > .05 || Math.abs(p.y) > .05) moving = true
+              p.el.style.transform = "translate(" + p.x.toFixed(2) + "px," + p.y.toFixed(2) + "px)"
+            }
+          }
+          // 잡고 있지 않고 전부 제자리로 돌아왔으면 루프를 멈춘다 —
+          // 히어로 입자 캔버스가 이미 상시 rAF를 돌리고 있어 하나 더 놀릴 이유가 없다.
+          if (active || moving) raf = requestAnimationFrame(frame)
+          else {
+            raf = 0
+            for (var a = 0; a < chains.length; a++) {
+              for (var b = 0; b < chains[a].length; b++) {
+                var q = chains[a][b]
+                q.x = q.y = q.vx = q.vy = 0
+                q.el.style.transform = ""
+              }
+            }
+          }
+        }
+
+        function start() { if (!raf) raf = requestAnimationFrame(frame) }
+
+        anchor.addEventListener("pointerdown", function (e) {
+          if (e.button !== 0) return
+          var hit = e.target && e.target.closest ? e.target.closest(".ut-ch") : null
+          if (!hit) return
+          var found = find(hit)
+          if (!found) return
+          e.preventDefault()          // 링크의 네이티브 드래그(고스트 이미지)를 막는다
+          // 캡처는 있으면 좋은 것일 뿐이다 — 실패해도 드래그 자체는 성립해야 한다
+          try { anchor.setPointerCapture(e.pointerId) } catch (err) {}
+          active = { chain: found.chain, index: found.index, ox: e.clientX, oy: e.clientY, dx: 0, dy: 0, moved: 0 }
+          start()
+        })
+
+        anchor.addEventListener("pointermove", function (e) {
+          if (!active) return
+          active.dx = e.clientX - active.ox
+          active.dy = e.clientY - active.oy
+          active.moved = Math.max(active.moved, Math.hypot(active.dx, active.dy))
+        })
+
+        function release(e) {
+          if (!active) return
+          // 끌었으면 이동이 아니라 조작이다 — 뒤따르는 click을 한 번 삼킨다.
+          suppressClick = active.moved > DRAG_SLOP
+          active = null
+          try { if (anchor.hasPointerCapture(e.pointerId)) anchor.releasePointerCapture(e.pointerId) } catch (err) {}
+          start()
+        }
+        anchor.addEventListener("pointerup", release)
+        anchor.addEventListener("pointercancel", release)
+
+        anchor.addEventListener("click", function (e) {
+          if (!suppressClick) return
+          e.preventDefault()
+          suppressClick = false
+        })
+      }
     })()
   </script>
 
@@ -63,22 +205,34 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     /* 히어로 메뉴는 검은 히어로 위에 고정된다. 스크롤해 작품 그리드로 넘어가면
        흰 배경 위에 밝은 글자가 남아 읽히지 않고 작품도 가린다 — 그때는 숨긴다.
        (그리드 자체 메뉴는 데스크톱 전용이고, 모바일에서는 상단으로 되돌아가면 다시 나온다) */
+    /* #works는 이 스크립트보다 뒤에 있다 — 파싱 시점에 찾으면 null이라 관측이 통째로
+       건너뛰어진다. DOM이 다 만들어진 뒤에 붙인다. */
     ;(function () {
-      var menu = document.getElementById("home-hero-menu")
-      var hero = document.querySelector(".hero")
-      if (!menu || !hero || !("IntersectionObserver" in window)) return
-      if (!window.matchMedia("(max-width: 700px)").matches) return
-      var io = new IntersectionObserver(
-        function (entries) {
-          entries.forEach(function (e) {
-            menu.classList.toggle("is-past-hero", e.intersectionRatio < 0.12)
-          })
-        },
-        { threshold: [0, 0.12, 1] }
-      )
-      io.observe(hero)
+      function init() {
+        var menu = document.getElementById("home-hero-menu")
+        var works = document.getElementById("works")
+        if (!menu || !works || !("IntersectionObserver" in window)) return
+        if (!window.matchMedia("(max-width: 700px)").matches) return
+        /* 히어로는 fixed라 항상 뷰포트 안에 남는다 — 히어로 대신, 그 위를 덮고
+           올라오는 그리드가 화면을 얼마나 차지했는지로 판단한다. */
+        var io = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (e) {
+              /* 그리드 높이는 뷰포트와 다를 수 있어 ratio(자기 높이 기준)는 못 쓴다 —
+                 뷰포트를 절반 이상 덮었는지로 판단한다. */
+              menu.classList.toggle("is-past-hero", e.intersectionRect.height > window.innerHeight * 0.5)
+            })
+          },
+          { threshold: [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1] }
+        )
+        io.observe(works)
+      }
+      if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init)
+      else init()
     })()
   </script>
+
+  <div class="hero-spacer" aria-hidden="true"></div>
 
   <section id="works" class="work-archive" aria-label="Selected works">
     <WorkGrid current="home" />
@@ -340,12 +494,16 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     @media (max-width: 700px) {
       :global(html) { scroll-snap-type: y proximity; }
     }
+    /* 히어로는 화면에 고정되고, 그리드가 그 위를 덮으며 올라온다 —
+       한 문서가 통째로 밀려가는 롱페이지가 아니라 다음 페이지가 뜨는 전환감.
+       스냅 기준점은 히어로가 아니라 아래의 .hero-spacer가 맡는다: 고정/스티키 요소에
+       scroll-snap-align을 주면 기준점이 요소를 따라다녀 스크롤이 중간에 붙잡힌다. */
     .hero {
-      scroll-snap-align: start;
-      scroll-snap-stop: always;
-      position: relative;
+      position: fixed;
+      inset: 0;
+      z-index: 0;
       display: grid;
-      min-height: 100svh;
+      height: 100svh;
       overflow: hidden;
       place-items: center;
       color: var(--surface-2);
@@ -371,15 +529,55 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     .upcoming-ticker :global(.ut-tag:first-child) { margin-top: 0; }
     .upcoming-ticker :global(.ut-tag-now) { color: var(--surface); }
     .upcoming-ticker :global(.ut-dim) { color: var(--void-text-2); }
+    /* 탄성 드래그용으로 한 글자씩 쪼갠 조각.
+       transform이 먹으려면 inline-block이어야 하고, 공백도 사슬의 일부라
+       pre로 폭을 지켜야 단어 간격이 무너지지 않는다. */
+    .upcoming-ticker.is-elastic { cursor: grab; }
+    .upcoming-ticker.is-elastic:active { cursor: grabbing; }
+    .upcoming-ticker.is-elastic :global(.ut-ch) {
+      display: inline-block;
+      white-space: pre;
+      font-style: normal;
+      will-change: transform;
+    }
+    /* 드래그 중 텍스트 선택이 잡히면 파란 하이라이트가 끌려다닌다 */
+    .upcoming-ticker.is-elastic { user-select: none; -webkit-user-select: none; }
     .upcoming-ticker:hover :global(.ut-row) { color: var(--surface); }
     @media (max-width: 700px) {
       .upcoming-ticker { left: 16px; bottom: 18px; max-width: calc(100vw - 32px); }
     }
+    /* 고정된 히어로가 흐름에서 빠졌으므로, 히어로 한 화면 분량의 스크롤 길이와
+       스냅 기준점을 이 자리표시자가 대신 갖는다. */
+    .hero-spacer {
+      height: 100svh;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+    }
+    /* 히어로가 fixed로 화면 전체를 덮는 레이어가 되었으므로, 그리드 뒤에 오는 것들도
+       불투명하게 그 위에 올려야 한다 — 아니면 푸터 자리에 검은 히어로가 비친다. */
+    :global(body > footer) {
+      position: relative;
+      z-index: 1;
+      background: var(--surface);
+    }
     .work-archive {
       scroll-margin-top: 0;
       scroll-snap-align: start;
+      scroll-snap-stop: always;
       /* 두 번째 '페이지'로 성립하려면 자체가 한 화면을 차지해야 한다 */
       min-height: 100svh;
+      /* 고정된 히어로 위로 올라와 덮으려면 자체 배경과 위 레이어가 필요하다 */
+      position: relative;
+      z-index: 1;
+      background: var(--surface);
+    }
+    /* 모바일 그리드는 타일 비율 때문에 화면 전체를 쓰지 않는다(WorkGrid: 67svh).
+       한 화면짜리 '페이지'가 된 지금은 그대로 두면 그리드가 맨 위에 붙고 아래만 비어
+       잘린 인상이 된다 — 세로 중앙에 앉혀 위아래 여백을 같게 만든다.
+       높이는 78svh까지만 키운다: 더 키우면 타일이 길고 가늘어져 작품이 안 보인다. */
+    @media (max-width: 700px) {
+      .work-archive { display: grid; align-content: center; }
+      .work-archive :global(#packed) { height: 78svh; }
     }
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
   </style>
