@@ -437,9 +437,18 @@ const shareImage = "https://www.hwanyun.com/images/social/hwanyun-share-preview.
         }
         /* page는 문서 흐름 안에서 시작해 열릴 때만 고정, hero는 항상 히어로 위에 떠 있다 */
         .site-menu--page { position: relative; top: auto; left: auto; width: 100%; }
-        .site-menu--hero { position: fixed; inset: 0 0 auto; transition: opacity var(--dur-base) ease; }
-        /* 히어로를 벗어나면 숨긴다 — 흰 배경 위 밝은 글자는 읽히지 않고 작품을 가린다 */
-        .site-menu--hero.is-past-hero:not(.is-open) { opacity: 0; pointer-events: none; }
+        .site-menu--hero { position: fixed; inset: 0 0 auto; transition: color var(--dur-base) ease; }
+        /* 히어로를 벗어나면 숨기는 대신 잉크를 뒤집는다. 그리드는 이제 독립된 한 페이지라
+           숨기면 그 페이지에 내비게이션이 하나도 남지 않는다 — 모바일에서 grid variant는
+           표시되지 않으므로 이 메뉴가 유일하다.
+           색은 --chrome-fg 하나만 바꾼다: 토글은 얹힌 면의 색을 상속받게 되어 있다(위 참조).
+           워드마크도 그대로 둔다 — 접으면 좌측이 비어 컨트롤만 우측에 몰려 어색하고,
+           남겨두면 다른 페이지의 모바일 헤더와 같은 구성이 된다. 그리드 상단 흰 여백
+           안에 앉으므로 타일을 가리지도 않는다. */
+        .site-menu--hero.is-past-hero:not(.is-open) {
+          --chrome-fg: var(--text);
+          color: var(--text);
+        }
 
         .site-menu .menu-hamburger {
           display: block;
@@ -550,6 +559,8 @@ const shareImage = "https://www.hwanyun.com/images/social/hwanyun-share-preview.
         /* 터치 타깃 44px — 헤더 높이는 그대로 두고 눌리는 영역만 넓힌다 */
         .site-menu .lang-switch button { padding: 13px 4px; margin: -13px 0; }
         .site-menu--hero:not(.is-open) .name a { color: var(--void-text); }
+        /* 그리드로 넘어가면 흰 면 위다 — 워드마크도 어두운 잉크로 */
+        .site-menu--hero.is-past-hero:not(.is-open) .name a { color: var(--text); }
         .menu-search { display: none; grid-column: 1 / -1; margin: 16px 0 0; }
         .site-menu input[type="search"] { width: min(110px, 100%); }
         .site-menu.is-open .menu-search { display: block; }
