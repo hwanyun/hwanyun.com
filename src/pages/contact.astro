@@ -192,7 +192,7 @@ import Base from "../layouts/Base.astro"
            읽는 데 방해가 된다. 캐릭터 위치를 중심으로 한 정규분포로 두고
            좌표는 화면이 아니라 "캐릭터로부터의 거리"로 들고 있는다 —
            캐릭터가 움직이면 무리도 같이 간다. */
-        var mN = W < 700 ? 190 : 330
+        var mN = W < 700 ? 340 : 620
         motes = []
         for (var k = 0; k < mN; k++) {
           motes.push({
@@ -200,7 +200,7 @@ import Base from "../layouts/Base.astro"
             gy: gauss(),          // 캐릭터 기준 상하 (σ=1)
             // 깊이 — 음수면 캐릭터 앞, 양수면 뒤. 앞뒤 비율은 명시적으로 정한다.
             // 분포 하나로 섞어 두면 앞쪽이 10%밖에 안 나와 묻힌 느낌이 안 산다.
-            dz: Math.random() < 0.3
+            dz: Math.random() < 0.46
               ? -0.72 * Math.random()
               : Math.pow(Math.random(), 0.75) * 3.1,
             r: 0.5 + Math.random() * 0.9,
@@ -280,8 +280,8 @@ import Base from "../layouts/Base.astro"
         /* 평면이 아니라 부피여야 캐릭터가 그 안에 묻힌다. 입자마다 깊이를 주고
            원근으로 투영한다 — 가까운 것은 크고 흐릿하게(초점 밖), 먼 것은 작고
            옅게. 깊이가 음수인 입자는 캐릭터 위 레이어에 그려 앞을 지나간다. */
-        var SX = bodyH * 0.82   // 좌우 퍼짐
-        var SY = bodyH * 0.72   // 상하 퍼짐 — 머리끝부터 발밑까지 덮는다
+        var SX = bodyH * 0.76   // 좌우 퍼짐
+        var SY = bodyH * 0.68   // 상하 퍼짐 — 머리끝부터 발밑까지 덮는다
         var SPAN = bodyH * 2.2  // 위로 흐르다 되돌아오는 띠의 높이
         var FOCAL = bodyH * 1.7
         for (var k = 0; k < motes.length; k++) {
@@ -302,10 +302,10 @@ import Base from "../layouts/Base.astro"
           var front = az < 0
           // 앞의 것은 가까울수록 크고 옅어진다 — 렌즈에서 초점이 나간 알갱이.
           // 짙게 두면 얼굴을 덮어 캐릭터가 더러워진다.
-          var a = front ? 0.13 / s : 0.19 * Math.min(1, s)
+          var a = front ? 0.15 / s : 0.22 * Math.min(1, s)
           // 흐름 때문에 세로가 균일해지면 몸 주변이 헐거워진다. 몸 높이에서
           // 멀어질수록 옅게 해 무리의 중심을 캐릭터에 되돌린다.
-          a *= Math.max(0.22, 1 - Math.abs(oy) / (SY * 2.4))
+          a *= Math.max(0.3, 1 - Math.abs(oy) / (SY * 2.4))
           var rr = Math.min(4.5, m.r * s)
           if (a <= 0.004 || rr < 0.15) continue
           var g2 = front ? fxc : ctx
