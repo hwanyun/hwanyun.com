@@ -401,7 +401,14 @@ function toParagraphs(text: string): string {
             {data.exhibition.titleEn && <span data-language-content="en">{data.exhibition.titleEn}</span>}
             {data.exhibition.titleKr && <span data-language-content="ko" lang="ko">{data.exhibition.titleKr}</span>}
             {(data.exhibition.venue || data.exhibition.year) && (
-              <span class="exhibition-meta">{[data.exhibition.venue, data.exhibition.year].filter(Boolean).join(", ")}</span>
+              <span class="exhibition-meta">
+                <span data-language-content="en">
+                  {[data.exhibition.venueEn || data.exhibition.venue, data.exhibition.year].filter(Boolean).join(", ")}
+                </span>
+                <span data-language-content="ko" lang="ko">
+                  {[data.exhibition.venue, data.exhibition.year].filter(Boolean).join(", ")}
+                </span>
+              </span>
             )}
           </div>
         </div>
@@ -1247,9 +1254,16 @@ function toParagraphs(text: string): string {
       color: var(--text-4);
       margin-bottom: var(--space-2);
     }
-    .exhibition-title { display: flex; flex-wrap: wrap; gap: 0 10px; font-size: var(--fs-body); color: var(--text-2); }
-    .exhibition-title span + span::before { content: "·"; margin-right: 10px; color: var(--text-4); }
-    .exhibition-meta { font: inherit; color: inherit; }
+    .exhibition-title { font-size: var(--fs-body); color: var(--text-2); }
+    /* 장소·연도는 전시명과 같은 줄에 "·"로 잇지 않는다. 둘 다 길면 줄이 접히면서
+       구분자가 줄머리로 떨어지고, 무엇이 전시명이고 무엇이 장소인지도 흐려진다.
+       한 층 아래 작은 글자로 내리면 접혀도 모양이 무너지지 않고 위계도 분명해진다. */
+    .exhibition-meta {
+      display: block;
+      margin-top: 4px;
+      font-size: var(--fs-xs);
+      color: var(--text-4);
+    }
     .sponsors {
       clear: both;
       position: relative;
@@ -1265,9 +1279,13 @@ function toParagraphs(text: string): string {
     .sponsor { display: inline-flex; align-items: center; }
     .sponsor-name { font-size: var(--fs-body); color: var(--text-2); }
     /* 기관 로고는 남의 아이덴티티다 — 무채색 규칙의 예외로 원색을 그대로 둔다. */
+    /* 폭 상한이 140일 때 가로형 로고(VSLAB 4.2:1)는 140×33으로 상한을 꽉 채우는데,
+       세로형(KalmaLab 1.3:1)은 높이에 먼저 걸려 53×40에 그친다 — 면적이 두 배 넘게
+       벌어져 같은 줄에 놓으면 하나만 커 보인다. 폭 상한을 110으로 낮추면
+       가로형이 110×26이 되어 세로형과 면적이 얼추 맞는다. */
     .sponsor img {
       max-height: 40px;
-      max-width: 140px;
+      max-width: 110px;
       width: auto;
       display: block;
     }

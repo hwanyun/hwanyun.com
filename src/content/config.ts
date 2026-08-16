@@ -51,6 +51,9 @@ const works = defineCollection({
         titleEn: z.string().optional().default(""),
         titleKr: z.string().optional().default(""),
         venue: z.string().optional().default(""),
+        // 장소가 한국어로만 적히면 EN 화면에 한국어가 그대로 남는다.
+        // 영문 표기가 있으면 그쪽을 쓰고, 없으면 venue를 그대로 쓴다.
+        venueEn: z.string().optional().default(""),
         year: z.string().optional().default(""),
       })
       .optional(),

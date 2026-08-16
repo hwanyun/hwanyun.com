@@ -57,9 +57,10 @@ media:
   - { type: image, src: "/images/atypical-circuit/02.png", archive: true }
 exhibition:
   label: "Presented as part of"
-  titleEn: "13th Media Art Group Exhibition《빛장 — Noise》"
-  titleKr: "제13회 미디어아트 그룹전 《빛장 — Noise 노이즈》"
-  venue: "강남문화재단 역삼1문화센터 갤러리, 서울"
+  titleEn: "13th Media Art Group Exhibition — Noise"
+  titleKr: "제13회 미디어아트 그룹전 《빛장 — Noise》"
+  venue: "역삼1문화센터 갤러리, 서울"
+  venueEn: "Yeoksam 1 Culture Center Gallery, Seoul"
   year: "2026"
 sponsors:
   - { name: "VSLAB", logo: "/images/atypical-circuit/sponsors/vslab.png", url: "https://vslab.kr/" }
