@@ -28,13 +28,16 @@ textKr: |
   오작동을 보여주는 것을 넘어, 관찰자인 우리 자신 또한 이 견고한 구조를 교란하는 '노이즈의 일부'로서
   깊숙이 관여하고 있음을 자각하게 합니다.
 media:
-  - { type: image, src: "/images/atypical-circuit/05.jpg", width: half }
-  - { type: video, src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/%E1%84%92%E1%85%AA%E1%84%86%E1%85%A7%E1%86%AB%20%E1%84%80%E1%85%B5%E1%84%85%E1%85%A9%E1%86%A8%202026-07-19%20%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE%205.02.53.mov", width: full, layout: wide, align: right, ratio: "16:9", caption: "TouchDesigner interaction documentation" }
-  - { type: video, src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/videos/atypical-circuit.mp4", width: half, ratio: "9:16" }
-  - { type: video, src: "/videos/atypical-circuit-2.mp4", width: half, ratio: "9:16" }
-  - { type: image, src: "/images/atypical-circuit/03.jpg", width: half }
+  # 본문 — 공간을 먼저 세운다. 절반 폭 이미지로 시작하면 작품이 아니라 삽화로 열린다.
+  - { type: image, src: "/images/atypical-circuit/03.jpg", width: full, caption: "Installation view" }
+  - { type: video, src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/%E1%84%92%E1%85%AA%E1%84%86%E1%85%A7%E1%86%AB%20%E1%84%80%E1%85%B5%E1%84%85%E1%85%A9%E1%86%A8%202026-07-19%20%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE%205.02.53.mov", width: full, ratio: "16:9", caption: "TouchDesigner interaction documentation" }
+  # 시스템이 만들어 내는 화면 두 장 — 결과물의 어휘
   - { type: image, src: "/images/atypical-circuit/01.jpg", width: half, caption: "Generative visual pattern" }
   - { type: image, src: "/images/atypical-circuit/04.png", width: half, caption: "Generative visual pattern" }
-  - { type: image, src: "/images/atypical-circuit/02.png", width: third }
+  - { type: video, src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/videos/atypical-circuit.mp4", width: half, ratio: "9:16" }
+  - { type: video, src: "/videos/atypical-circuit-2.mp4", width: half, ratio: "9:16" }
+  - { type: image, src: "/images/atypical-circuit/05.jpg", width: half, align: left, caption: "Installation view" }
+  # 부록 — 인쇄물
+  - { type: image, src: "/images/atypical-circuit/02.png", archive: true }
 draft: false
 ---
