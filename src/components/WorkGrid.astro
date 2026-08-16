@@ -60,6 +60,53 @@ works.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
 <SeenTracker />
 
 <script is:inline>
+  /* 덮이는 동안의 등장 — 그리드가 히어로를 얼마나 덮었는지(0→1)를 진행도로 삼아
+     타일을 차례로 띄운다. 홈에서만 동작하며, 순서는 DOM 순서(= order 큐레이션)를 따른다.
+     스크롤에 매여 있으므로 되감으면 되감긴다 — 한 번 재생되고 마는 연출이 아니다. */
+  ;(function () {
+    var packed = document.getElementById("packed")
+    if (!packed) return
+    var works = document.getElementById("works")
+    if (!works) return // 홈이 아니면 아무것도 하지 않는다
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
+
+    var tiles = Array.prototype.slice.call(packed.querySelectorAll(".tile"))
+    if (!tiles.length) return
+    var STAGGER = 0.045  // 타일 간 시차 (진행도 단위)
+    var RAMP = 0.42      // 한 타일이 다 뜨는 데 걸리는 진행도 구간
+    packed.classList.add("revealing")
+
+    function frame() {
+      var r = works.getBoundingClientRect()
+      var vh = window.innerHeight || 1
+      // 그리드 상단이 화면 아래(vh)에 있으면 0, 화면 위(0)에 닿으면 1
+      var p = 1 - r.top / vh
+      if (p < 0) p = 0
+      else if (p > 1) p = 1
+
+      for (var i = 0; i < tiles.length; i++) {
+        var t = (p - i * STAGGER) / RAMP
+        if (t < 0) t = 0
+        else if (t > 1) t = 1
+        // ease-out — 끝에서 부드럽게 멎는다
+        tiles[i].style.setProperty("--reveal", (1 - Math.pow(1 - t, 3)).toFixed(3))
+      }
+      // 완전히 덮은 뒤에는 스크롤마다 계산하지 않는다
+      if (p >= 1) {
+        packed.classList.remove("revealing")
+        tiles.forEach(function (el) { el.style.removeProperty("--reveal") })
+        window.removeEventListener("scroll", onScroll)
+        window.removeEventListener("resize", onScroll)
+      }
+    }
+    function onScroll() { frame() }
+    window.addEventListener("scroll", onScroll, { passive: true })
+    window.addEventListener("resize", onScroll)
+    frame()
+  })()
+</script>
+
+<script is:inline>
   /* 썸네일 무음 루프 — 뷰포트 안에 있을 때만 재생한다.
      작품이 대부분 시간 기반이라 정지 이미지로는 전달되지 않는 것을 보완한다. */
   ;(function () {
@@ -427,11 +474,25 @@ works.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
     -webkit-tap-highlight-color: transparent;
     user-select: none;
   }
+  /* 등장 — 그리드가 히어로를 덮는 만큼 타일이 차례로 떠오른다.
+     스크롤 진행도(--reveal 0→1)를 스크립트가 타일마다 넣어 주고,
+     여기서는 그 값을 불투명도·이동·확대로만 옮긴다. 한 번 켜고 끝나는
+     애니메이션이 아니라 스크롤에 매여 있어야 '덮이는 동안'으로 읽힌다. */
   #packed.ready .tile {
-    opacity: 1;
+    opacity: var(--reveal, 1);
+    transform: translateY(calc((1 - var(--reveal, 1)) * 26px))
+               scale(calc(0.985 + var(--reveal, 1) * 0.015));
   }
   .tile {
     transition: opacity var(--dur-slow) ease;
+  }
+  /* 스크롤에 매인 값은 트랜지션하지 않는다 — 두 번 보간되면 뒤늦게 따라온다 */
+  #packed.revealing .tile { transition: none; }
+  #packed.revealing .card .cap { opacity: var(--reveal, 1); transition: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    #packed.ready .tile { opacity: 1; transform: none; }
+    #packed.revealing .card .cap { opacity: 1; }
   }
   #packed.animate .tile {
     transition:
@@ -568,7 +629,9 @@ works.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
     }
     .tile {
       position: absolute !important;
-      opacity: 1 !important;
+      /* 등장 진행도를 따른다 — 예전엔 1 !important라 --reveal이 무시됐다 */
+      opacity: var(--reveal, 1) !important;
+      transform: translateY(calc((1 - var(--reveal, 1)) * 20px));
       border: 1px solid var(--surface);
       margin: 0;
       overflow: hidden;

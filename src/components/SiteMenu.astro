@@ -51,7 +51,9 @@ if (showWorksSubmenu) {
 ---
 
 <nav class={`site-menu site-menu--${variant}`} id={menuId}>
-  <div class="name"><a href="/">HWANYUN</a></div>
+  {/* 히어로의 워드마크는 홈(구체)이 아니라 작업으로 보낸다 —
+      이미 홈에 있는 사람에게 홈 링크는 아무 데도 가지 않는 링크다. */}
+  <div class="name"><a href={variant === "hero" ? "/works/" : "/"}>HWANYUN</a></div>
   <button
     class="menu-hamburger"
     type="button"
