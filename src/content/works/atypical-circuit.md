@@ -46,6 +46,6 @@ exhibition:
   venue: "강남문화재단 역삼1문화센터 갤러리, 서울"
   year: "2026"
 sponsors:
-  - { name: "VSLAB", url: "https://vslab.kr/" }
+  - { name: "VSLAB", logo: "/images/atypical-circuit/sponsors/vslab.png", url: "https://vslab.kr/" }
 draft: false
 ---
