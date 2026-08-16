@@ -10,7 +10,11 @@ const {
   // 공유 카드 — 페이지가 자기 얼굴을 가질 수 있게 열어 둔다.
   // 전시 링크를 메신저에 붙일 때 사이트 기본 카드보다 포스터가 훨씬 많은 걸 말한다.
   image = "",
-  description = "Sound, installation, and interactive media.",
+  /* 작가 노트의 첫 문장에서 가져온다. "sound, installation, and interactive
+     media"는 수천 명이 똑같이 쓰는 분류표이고, 검색 결과와 메신저 카드에
+     실려 나가는 한 줄이 그 분류표면 이 사람이 누구인지 아무도 알 수 없다.
+     이미 쓰여 있는 문장이 있는데 쓰지 않고 있었다. */
+  description = "Sound, light, material, and the body alter one another — installations and interactive systems by HWANYUN.",
   imageAlt = "HWANYUN particle sphere forming the wordmark",
 } = Astro.props
 const canonicalUrl = new URL(Astro.url.pathname, "https://www.hwanyun.com").href

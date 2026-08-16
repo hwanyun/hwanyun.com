@@ -9,7 +9,7 @@ materials:
   - projection
 size: 3col
 category: work
-order: 2
+order: 3
 textEn: |
   Coexistence is an exhibition that asks how beings with different senses and conditions can relate, respond, and live together within a shared space. It regards people with disabilities not as beneficiaries of art and culture but as subjects of sensation and expression, exploring the possibilities of new perception at the meeting point of different artistic disciplines and bodily experiences.
 

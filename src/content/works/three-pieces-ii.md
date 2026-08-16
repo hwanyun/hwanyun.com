@@ -6,7 +6,7 @@ materials:
   - 3d-pen
 size: 1col
 category: work
-order: 4
+order: 5
 series:
   id: "three-pieces-untitled"
   label: "Three Pieces: Untitled"

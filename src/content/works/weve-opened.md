@@ -9,7 +9,7 @@ materials:
   - conductive-paint
 size: 2col
 category: work
-order: 9
+order: 10
 thumb: "/images/weve-opened/01.jpg"
 textEn: |
   WE'VE OPENED was a collaborative showcase by HWANYUN and Hannah Celli at GlogauAIR in Berlin. The project brought an interactive sound installation and a dining-room installation together inside the residency's street-facing showcase: a narrow window measuring 85 × 185 × 35 cm, placed in the wall of the building.

@@ -8,9 +8,9 @@ materials:
   - sensor
   - plastic-sheet
   - light
-size: 2col
+size: 3col
 category: work
-order: 11
+order: 2
 series:
   id: "three-pieces-untitled"
   label: "Three Pieces: Untitled"
