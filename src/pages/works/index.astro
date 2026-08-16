@@ -274,18 +274,33 @@ const showCounts = SHOWS.map((x) => ({
       -webkit-overflow-scrolling: touch;
       margin-inline: -16px;
       padding-inline: 16px;
+      /* 칩 바깥으로 넓힌 탭 영역(아래 ::after)이 잘리지 않게 위아래를 비워 둔다.
+         overflow-x를 auto로 두면 세로도 함께 잘리기 때문이다. */
+      padding-block: 5px;
       /* 가로 스크롤 막대는 자리만 차지하고 손가락에게는 쓸모가 없다 */
       scrollbar-width: none;
     }
     .material-filter::-webkit-scrollbar { display: none; }
+    /* 칩을 40px로 키웠더니 13px 글자가 알약 안에서 채움 40%밖에 안 돼 덩어리로
+       보였다. 필터 칩의 통상 크기는 32~36px에 14~15px 글자다. 알약은 34px로
+       줄이고 글자를 15px로 올려 채움을 44%로, 대신 손가락이 닿는 영역은
+       가상 요소로 위아래 5px씩 넓혀 44px를 유지한다 — 보이는 크기와 눌리는
+       크기를 분리하는 것은 Material이 32dp 칩에 쓰는 방법과 같다. */
     .material-filter a {
       flex: 0 0 auto;      /* 좁은 화면에서 글자가 접히지 않게 */
       /* grid로 두면 라벨과 개수가 세로로 쌓인다 — 둘은 한 줄이어야 한다 */
       display: flex;
       align-items: center;
       white-space: nowrap;
-      min-height: 40px;    /* 27px이던 손가락 타깃을 올린다 */
+      position: relative;
+      min-height: 34px;
       padding-block: 0;
+      font-size: var(--fs-sm);
+    }
+    .material-filter a::after {
+      content: "";
+      position: absolute;
+      inset: -5px 0;
     }
     .archive-head, li a { grid-template-columns: minmax(0, 1fr) 48px; gap: 8px; }
     .archive-head { font-size: var(--fs-sm); }
