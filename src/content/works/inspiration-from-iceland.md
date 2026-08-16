@@ -1,7 +1,13 @@
 ---
 title: "Inspiration from Iceland"
 year: "2017"
-medium: "Research / residency; field recording, interactive sound installation, Listhús"
+medium: "Research residency; field recording"
+exhibition:
+  label: "Produced during"
+  titleEn: "Listhús Artspace residency"
+  titleKr: "Listhús Artspace 레지던시"
+  venue: "Ólafsfjörður, Iceland"
+  year: "2017"
 materials:
   - field-recording
 size: 1col

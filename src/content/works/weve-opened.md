@@ -1,7 +1,7 @@
 ---
 title: "WE'VE OPENED"
 year: "2018"
-medium: "Showcase project; interactive dining installation, copper, conductive tape, electric wire, plastic film"
+medium: "Interactive dining installation; copper, conductive tape, electric wire, plastic film"
 materials:
   - copper
   - plastic-sheet
