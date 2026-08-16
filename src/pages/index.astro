@@ -92,7 +92,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       var mic = { on: false, level: 0, low: 0, high: 0 }
       window.__hyMic = mic
       var ctx = null, stream = null, analyser = null, raf = 0
-      var silentSince = 0, peak = 0, warned = false
+      var silentSince = 0, peak = 0, warned = false, floor = 0, vFloor = 0
       var freq, wave
 
       function setState(state) {
@@ -116,10 +116,41 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         for (var b = highStart; b < freq.length; b++) hi += freq[b]
         lo /= (lowEnd - 1) * 255
         hi /= (freq.length - highStart) * 255
+
+        /* 사람 목소리 대역(300Hz–3.4kHz)만 따로 잰다. 전체 rms로만 보면
+           에어컨·컴퓨터 팬 같은 저역 소음이 바닥을 밀어 올려 말소리가
+           그 위로 못 솟는다. 목소리가 사는 대역을 직접 보면 조용한 말도
+           또렷하게 잡힌다 — 전화기가 이 대역만 전송해도 말이 통하는 이유다. */
+        var vStart = Math.max(1, Math.round(300 / binHz))
+        var vEnd = Math.min(freq.length, Math.round(3400 / binHz))
+        var voice = 0
+        for (var v = vStart; v < vEnd; v++) voice += freq[v]
+        voice /= (vEnd - vStart) * 255
+        /* 방의 바닥 소음을 따라간다 — 조용해지면 빠르게 내려가고 올라갈 때는
+           아주 느리게. 말소리가 바닥을 끌어올려 스스로를 지우지 않게 한다. */
+        floor += (rms - floor) * (rms < floor ? .25 : .0015)
+
+        /* 선형으로 쓰면 박수(rms ~0.25)가 1.0을 채우는 동안 말소리(~0.03)는
+           0.1도 못 넘어 사실상 안 보인다. 바닥 위 여유분만 취해 0.10을
+           만점으로 잡고, 지수 0.6으로 눌러 작은 소리를 끌어올린다.
+           박수는 어차피 상한에 걸리므로 손해가 없다. */
+        /* 목소리 대역을 바닥 대비로 본다. 둘 중 큰 쪽을 쓰되 목소리 쪽에
+           힘을 실어, 말소리는 잘 잡고 박수·문 닫는 소리도 놓치지 않는다. */
+        vFloor += (voice - vFloor) * (voice < vFloor ? .25 : .0015)
+        /* 게이트(.035)는 방의 잡음이 넘지 못할 문턱이다 — 이게 없으면 조용한
+           방에서도 계속 떤다. 만점(.30)은 큰 목소리에 맞춘다: 낮게 잡으면
+           속삭임부터 박수까지 전부 최대치가 되어 강약이 사라진다.
+           결과 곡선 — 조용한 방 0 / 속삭임 .31 / 보통 말소리 .67 / 큰 소리 1 */
+        var vOver = Math.max(0, voice - vFloor - .035)
+        var vTarget = Math.pow(Math.min(1, vOver / .30), .7)
+
+        var over = Math.max(0, rms - floor * 1.8 - .008)
+        var target = Math.max(vTarget, Math.pow(Math.min(1, over / .14), .6))
+
         // 공격은 빠르게, 복귀는 느리게 — 소리가 치면 바로 반응하고 여운은 남는다
-        mic.level += ((Math.min(1, rms * 6.5)) - mic.level) * (rms * 3.2 > mic.level ? .5 : .06)
-        mic.low += (Math.min(1, lo * 2.4) - mic.low) * (lo * 2.4 > mic.low ? .4 : .05)
-        mic.high += (Math.min(1, hi * 3.4) - mic.high) * (hi * 3.4 > mic.high ? .5 : .07)
+        mic.level += (target - mic.level) * (target > mic.level ? .55 : .07)
+        mic.low += (Math.min(1, lo * 3.6) - mic.low) * (lo * 3.6 > mic.low ? .45 : .06)
+        mic.high += (Math.min(1, hi * 5.2) - mic.high) * (hi * 5.2 > mic.high ? .55 : .08)
         root.style.setProperty("--mic", mic.level.toFixed(3))
 
         var now = performance.now()
@@ -146,7 +177,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         if (stream) { stream.getTracks().forEach(function (t) { t.stop() }); stream = null }
         if (ctx) { ctx.close().catch(function () {}); ctx = null }
         mic.level = mic.low = mic.high = 0
-        silentSince = 0; peak = 0; warned = false
+        silentSince = 0; peak = 0; warned = false; floor = 0; vFloor = 0
         delete root.dataset.silent
         root.style.setProperty("--mic", "0")
         setState("idle")
