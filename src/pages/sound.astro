@@ -5,19 +5,36 @@ import Base from "../layouts/Base.astro"
 const sounds = (await getCollection("sounds", ({ data }) => !data.draft)).sort(
   (a, b) => (a.data.order ?? 0) - (b.data.order ?? 0)
 )
-const sections = [
-  { id: "works", title: "Sound Works", note: "Installations, spatial works, and their listening versions." },
-  { id: "scores", title: "Scores & Collaborations", note: "Sound composed for fashion, performance, and shared projects." },
-  { id: "archive", title: "Studies & Archive", note: "Field recordings, sketches, and independent recordings." },
+/* 섹션 셋으로 나눠 놨더니 4 / 1 / 12가 되었다. 회원이 하나뿐인 분류와
+   전체의 70%를 담은 분류는 둘 다 분류가 아니다. 목록은 하나로 펴고
+   성격은 필터로 고르게 한다 — Works 페이지의 재료 필터와 같은 어휘다. */
+const FILTERS = [
+  { id: "works", en: "Work soundtracks", ko: "작품 사운드" },
+  { id: "scores", en: "Commissions", ko: "커미션" },
+  { id: "archive", en: "Independent recordings", ko: "독립 녹음" },
 ]
-const grouped = (id: string) => sounds.filter((sound) => sound.data.section === id)
-const releases = (id: string) => {
-  const items = grouped(id)
-  return Array.from(new Map(items.map((item) => [item.data.project || item.data.title, item])).values()).map((lead) => ({
-    title: lead.data.project || lead.data.title,
-    tracks: items.filter((item) => (item.data.project || item.data.title) === (lead.data.project || lead.data.title)),
-  }))
-}
+
+// 같은 project를 가진 트랙들을 한 릴리스로 묶는다 (DOM 순서 = sounds 정렬 순서)
+const key = (s: (typeof sounds)[number]) => s.data.project || s.data.title
+const releases = Array.from(new Map(sounds.map((s) => [key(s), s])).values()).map((lead) => {
+  const tracks = sounds.filter((s) => key(s) === key(lead))
+  const secs = tracks.map((t) => t.data.duration).filter((d) => d > 0)
+  return {
+    title: key(lead),
+    section: lead.data.section,
+    tracks,
+    // 버전이 여러 개면 합계가 아니라 범위를 보여 준다. 셋 중 하나만 듣는 것이라
+    // 합계는 없는 시간을 요구하는 것처럼 읽힌다.
+    min: secs.length ? Math.min(...secs) : 0,
+    max: secs.length ? Math.max(...secs) : 0,
+  }
+})
+
+const clock = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`
+const span = (r: { min: number; max: number }) =>
+  !r.max ? "" : r.min === r.max ? clock(r.max) : `${clock(r.min)} – ${clock(r.max)}`
+
+const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section === f.id).length })).filter((f) => f.n > 0)
 ---
 
 <Base title="HWANYUN — Sound" current="sound">
@@ -33,42 +50,104 @@ const releases = (id: string) => {
       </div>
     </header>
 
-    {sections.map((section) => (
-      <section class="section" aria-labelledby={`${section.id}-title`}>
-        <div class="section-head">
-          <h2 id={`${section.id}-title`}>{section.title}</h2>
-          <p>{section.note}</p>
-        </div>
-        <ol class="release-list">
-          {releases(section.id).map((release, index) => (
-            <li class="release">
-              <details>
-                <summary>
-                  <span class="number">{String(index + 1).padStart(2, "0")}</span>
-                  <strong>{release.title}</strong>
-                  <span class="release-count">{release.tracks.length} {release.tracks.length === 1 ? "recording" : "recordings"}</span>
-                  <span class={`moving-tag ${release.tracks.some((sound) => sound.data.backdrop) ? "" : "is-empty"}`}>Moving image</span>
-                  <span class="expand" aria-hidden="true">+</span>
-                </summary>
-                <ol class="tracklist">
-                  {release.tracks.map((sound) => (
-                    <li id={`sound-${sound.slug}`} class="track" data-title={sound.data.title}>
-                      <span>{sound.data.title}</span>
-                      <span class="track-meta">
-                        {sound.data.year && <span>{sound.data.year}</span>}
-                        {sound.data.backdrop && <span class="moving-tag">Audio + moving image</span>}
-                      </span>
-                      {sound.data.audio && <button class="track-control" type="button" data-audio={sound.data.audio} data-backdrop={sound.data.backdrop} aria-label={`${sound.data.title} 재생`}><span aria-hidden="true"></span></button>}
-                    </li>
-                  ))}
-                </ol>
-              </details>
-            </li>
-          ))}
-        </ol>
-      </section>
-    ))}
+    <nav class="sound-filter" aria-label="Filter recordings">
+      <a href="/sound/" data-kind="">
+        <span data-language-content="en">All</span><span data-language-content="ko">전체</span>
+        <span class="sf-n">{releases.length}</span>
+      </a>
+      {counts.map((f) => (
+        <a href={`/sound/?kind=${f.id}`} data-kind={f.id}>
+          <span data-language-content="en">{f.en}</span><span data-language-content="ko">{f.ko}</span>
+          <span class="sf-n">{f.n}</span>
+        </a>
+      ))}
+    </nav>
+
+    <div class="list-head" aria-hidden="true">
+      <span data-language-content="en">RECORDING</span><span data-language-content="ko">녹음</span>
+      <span class="lh-len">
+        <span data-language-content="en">LENGTH</span><span data-language-content="ko">길이</span>
+      </span>
+    </div>
+
+    <ol class="release-list" id="release-list">
+      {releases.map((release) => (
+        <li class="release" data-kind={release.section}>
+          <details>
+            <summary>
+              <strong>{release.title}</strong>
+              {/* 배지가 있는 행과 없는 행에서 길이 열이 어긋나지 않게 한 칸에 묶는다 */}
+              <span class="rel-tags">
+                {release.tracks.length > 1 && (
+                  <span class="release-count">{release.tracks.length} versions</span>
+                )}
+                <span class={`moving-tag ${release.tracks.some((s) => s.data.backdrop) ? "" : "is-empty"}`}>Moving image</span>
+              </span>
+              {/* 16초와 20분이 같은 줄로 보이면 무엇을 여는 건지 알 수 없다 */}
+              <span class="release-len">{span(release)}</span>
+              <span class="expand" aria-hidden="true">+</span>
+            </summary>
+            <ol class="tracklist">
+              {release.tracks.map((sound) => (
+                <li id={`sound-${sound.slug}`} class="track" data-title={sound.data.title}>
+                  <span>{sound.data.title}</span>
+                  <span class="track-meta">
+                    {sound.data.backdrop && <span class="moving-tag">Audio + moving image</span>}
+                    {sound.data.duration > 0 && <span class="track-len">{clock(sound.data.duration)}</span>}
+                  </span>
+                  {sound.data.audio && <button class="track-control" type="button" data-audio={sound.data.audio} data-backdrop={sound.data.backdrop} aria-label={`${sound.data.title} 재생`}><span aria-hidden="true"></span></button>}
+                </li>
+              ))}
+            </ol>
+          </details>
+        </li>
+      ))}
+    </ol>
+    <p class="sf-empty" id="sf-empty" hidden>No recordings of this kind.</p>
   </main>
+
+  <script is:inline>
+    /* 정적 사이트라 쿼리 파라미터는 브라우저에서 해석한다.
+       Works 아카이브의 재료 필터와 같은 동작 — 이동 없이 상태만 바꾼다. */
+    ;(function () {
+      var list = document.getElementById("release-list")
+      var nav = document.querySelector(".sound-filter")
+      var empty = document.getElementById("sf-empty")
+      if (!list || !nav) return
+      var items = Array.prototype.slice.call(list.querySelectorAll(".release"))
+      var links = Array.prototype.slice.call(nav.querySelectorAll("a"))
+
+      function apply(kind) {
+        var shown = 0
+        items.forEach(function (li) {
+          var hit = !kind || li.getAttribute("data-kind") === kind
+          li.hidden = !hit
+          if (hit) shown++
+          // 걸러진 항목이 펼쳐진 채로 숨으면 다시 보일 때 열려 있다
+          if (!hit) { var d = li.querySelector("details"); if (d) d.open = false }
+        })
+        links.forEach(function (a) {
+          a.setAttribute("aria-current", (a.getAttribute("data-kind") || "") === kind ? "true" : "false")
+        })
+        if (empty) empty.hidden = shown !== 0
+      }
+
+      function fromURL() {
+        return new URLSearchParams(window.location.search).get("kind") || ""
+      }
+      apply(fromURL())
+
+      links.forEach(function (a) {
+        a.addEventListener("click", function (e) {
+          e.preventDefault()
+          var k = a.getAttribute("data-kind") || ""
+          history.pushState({ kind: k }, "", k ? "/sound/?kind=" + k : "/sound/")
+          apply(k)
+        })
+      })
+      window.addEventListener("popstate", function () { apply(fromURL()) })
+    })()
+  </script>
 
   <audio id="archive-player" preload="metadata"></audio>
   <div id="player-bar" hidden>
@@ -157,24 +236,43 @@ const releases = (id: string) => {
     #sound-archive { position: relative; z-index: 1; max-width: var(--content-w); margin: var(--desktop-header-clearance) 40px 100px var(--desktop-content-x); transition: color var(--dur-slow) ease; }
     /* Works archive의 소개 블록과 같은 데스크톱 읽기 규격 */
     .archive-head { max-width: 650px; margin-bottom: 84px; }
-    .eyebrow, .number, .release-count, .track span:last-child { font-size: var(--fs-2xs); letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
-    /* 섹션 제목이 곁다리 메타(번호·수량·태그)와 같은 11px 회색으로 묶여 있었다.
-       페이지를 셋으로 가르는 유일한 표지인데 가장 약하게 그려져,
-       세 묶음이 한 덩어리로 흘렀다. 한 단 올려 구분이 서게 한다. */
-    .section h2 { font-size: var(--fs-xs); letter-spacing: .1em; text-transform: uppercase; color: var(--text); }
+    .eyebrow, .release-count { font-size: var(--fs-2xs); letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
     h1 { margin: 8px 0 16px; font-weight: 300; font-size: var(--fs-display); line-height: 1.15; }
     /* 한 번에 한 언어만 보이므로 단을 나누지 않는다 */
     .intro-copy { display: block; }
     .intro { margin: 0; padding-top: 12px; border-top: 1px solid var(--text); font-size: var(--fs-body); line-height: 1.8; color: var(--text-2); }
     .intro[lang="ko"] { line-height: 1.85; }
-    .section { margin: 0 0 70px; }
-    .section-head { display: grid; grid-template-columns: 220px 1fr; gap: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--text); }
-    .section h2 { margin: 0; font-weight: 400; }
-    /* 설명문이 제목보다 컸다 — 위계가 뒤집혀 있었다 */
-    .section-head p { margin: 0; font-size: var(--fs-xs); line-height: 1.6; color: var(--text-3); }
+    /* 필터 알약 — Works 아카이브와 같은 규칙. 사이트 안에서 "고르는 일"은
+       어디서나 같은 모양이어야 한다. */
+    .sound-filter { display: flex; flex-wrap: wrap; gap: 6px 8px; margin: 0 0 22px; }
+    .sound-filter a {
+      font-size: var(--fs-xs); line-height: 1; padding: 6px 11px;
+      border: 1px solid var(--line-2); border-radius: 999px; color: var(--text-2);
+      transition: border-color var(--dur-fast) ease, color var(--dur-fast) ease, background var(--dur-fast) ease;
+    }
+    .sound-filter a:hover { border-color: var(--hover); color: var(--hover); }
+    .sound-filter a[aria-current="true"] { border-color: var(--text); background: var(--text); color: var(--surface); }
+    .sf-n { color: var(--text-4); margin-left: 3px; }
+    .sound-filter a[aria-current="true"] .sf-n { color: var(--line-2); }
+    .sf-empty { font-size: var(--fs-sm); color: var(--text-4); padding: 24px 2px; }
+
+    /* 목록 머리 — 오른쪽 숫자가 무엇인지 한 번은 말해 줘야 한다 */
+    .list-head {
+      display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 12px;
+      border-top: 1px solid var(--text); border-bottom: 1px solid var(--text);
+      padding: 5px 0 4px; font-size: var(--fs-2xs); letter-spacing: .08em; color: var(--text-3);
+    }
+    .list-head .lh-len { text-align: right; padding-right: 36px; }
+
     .release-list, .tracklist { list-style: none; padding: 0; margin: 0; }
     .release { border-bottom: 1px solid var(--line); }
-    summary { display: grid; grid-template-columns: 52px minmax(0,1fr) auto auto 24px; gap: 12px; align-items: baseline; padding: 16px 0; cursor: pointer; list-style: none; }
+    .release[hidden] { display: none; }
+    /* 길이 칸은 고정 폭이어야 한다. auto로 두면 "3:01"과 "2:10 – 4:56"이
+       각자 다른 자리에 서서 숫자 열이 흔들리고, 머리글과도 어긋난다. */
+    summary { display: grid; grid-template-columns: minmax(0,1fr) auto 104px 24px; gap: 12px; align-items: baseline; padding: 16px 0; cursor: pointer; list-style: none; }
+    .rel-tags { display: flex; align-items: baseline; justify-content: flex-end; gap: 14px; }
+    .release-len { text-align: right; font-size: var(--fs-sm); color: var(--text-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .track-len { font-size: var(--fs-xs); color: var(--text-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
     summary::-webkit-details-marker { display: none; }
     summary strong { font-weight: 400; }
     .expand { text-align: right; font-size: var(--fs-lead); font-weight: 300; line-height: .7; }
@@ -224,8 +322,8 @@ const releases = (id: string) => {
     .progress span { display: block; width: 0; height: 100%; background: var(--surface); transition: width var(--dur-fast) linear; }
     :global(body.has-backdrop) #sound-archive { color: var(--surface); text-shadow: 0 1px 12px rgba(0,0,0,.35); }
     :global(body.has-backdrop) #sound-archive, :global(body.has-backdrop) .menu, :global(body.has-backdrop) footer { opacity: 0; pointer-events: none; }
-    :global(body.has-backdrop) .section-head, :global(body.has-backdrop) .release { border-color: rgba(255,255,255,.48); }
-    :global(body.has-backdrop) .section h2, :global(body.has-backdrop) .section-head p, :global(body.has-backdrop) .release-count, :global(body.has-backdrop) .number, :global(body.has-backdrop) .track, :global(body.has-backdrop) .track-meta, :global(body.has-backdrop) .moving-tag { color: rgba(255,255,255,.78); }
+    :global(body.has-backdrop) .release { border-color: rgba(255,255,255,.48); }
+    :global(body.has-backdrop) .release-count, :global(body.has-backdrop) .number, :global(body.has-backdrop) .track, :global(body.has-backdrop) .track-meta, :global(body.has-backdrop) .moving-tag { color: rgba(255,255,255,.78); }
     :global(body.has-backdrop) .track.is-playing, :global(body.has-backdrop) summary strong { color: var(--surface); }
     @media (max-width: 700px) {
       #sound-archive { width: auto; margin: 24px 16px 80px; }
@@ -234,11 +332,12 @@ const releases = (id: string) => {
       .intro-copy { display: block; }
       .intro { font-size: var(--fs-sm); line-height: 1.78; }
       .intro[lang="ko"] { line-height: 1.85; }
-      .section { margin-bottom: 48px; }
-      .section-head { display: block; padding-bottom: 11px; }
-      .section-head p { margin-top: 7px; font-size: var(--fs-xs); line-height: 1.6; }
-      summary { grid-template-columns: 30px minmax(0,1fr) auto 18px; gap: 8px; padding: 13px 0; }
+      summary { grid-template-columns: minmax(0,1fr) auto 68px 18px; gap: 8px; padding: 13px 0; }
       summary strong { font-size: var(--fs-body); line-height: 1.25; }
+      .release-len { font-size: var(--fs-xs); }
+      .list-head { font-size: 9px; }
+      .list-head .lh-len { padding-right: 26px; }
+      .sound-filter { margin-bottom: 18px; }
       .release-count { display: none; }
       .moving-tag { font-size: 9px; }
       .track { grid-template-columns: minmax(0,1fr) auto 24px; gap: 10px; padding: 8px 0; font-size: var(--fs-xs); line-height: 1.45; }

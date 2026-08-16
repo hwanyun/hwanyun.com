@@ -107,6 +107,9 @@ const sounds = defineCollection({
     year: z.string().optional().default(""),
     url: z.string().optional().default(""), // 기존 SoundCloud 기록 보존용 — 페이지에서는 사용하지 않음
     audio: z.string().optional().default(""), // R2 또는 public/의 직접 재생 가능한 오디오 파일
+    // 재생 길이(초). 16초부터 20분까지 섞여 있는데 표시가 없으면
+    // 무엇을 클릭하는 건지 알 수 없다. 실측값을 넣어 둔다.
+    duration: z.number().optional().default(0),
     section: z.enum(["works", "scores", "archive"]).default("archive"),
     project: z.string().optional().default(""), // 여러 버전을 하나의 작업으로 묶는 제목
     works: z.array(z.string()).optional().default([]), // 연결할 작품 slug

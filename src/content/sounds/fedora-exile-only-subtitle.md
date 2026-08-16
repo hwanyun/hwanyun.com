@@ -2,6 +2,7 @@
 title: "Fedora – Exile (Only Subtitle Version)"
 year: ""
 audio: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/audio/fedora-exile-only-subtitle.mp3"
+duration: 130
 cover: ""
 size: 2col
 order: 8

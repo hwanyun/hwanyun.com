@@ -3,6 +3,7 @@ title: "J Moon AW15/16 — London Fashion Week"
 year: ""
 url: "https://soundcloud.com/hwanyun/j-moon-aw1516-london-fashion-week"
 audio: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/audio/j-moon-aw1516-london-fashion-week.mp3"
+duration: 246
 section: scores
 project: "J Moon"
 backdrop: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/videos/j-moon-aw1516-fashion-scout.mp4"
