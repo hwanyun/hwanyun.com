@@ -242,7 +242,7 @@ function toParagraphs(text: string): string {
     {
       mediaRows.length > 0 && (
         <div class="media-flow">
-          {mediaRows.map((row) => {
+          {(() => { let plate = 0; return mediaRows.map((row) => {
             const portraitRow = row.every(isPortrait)
             const solo = row.length === 1 ? row[0] : null
             // 세로 행은 자체 폭 규칙을 가지므로 solo 부분폭을 겹치지 않는다
@@ -258,9 +258,14 @@ function toParagraphs(text: string): string {
               .join(" ")
             return (
               <div class={rowClass}>
-                {row.map((m) =>
-                  m.type === "video" ? (
+                {row.map((m) => {
+                  // 도판 번호 — 흐름 전체를 관통하는 하나의 세기.
+                  // 번호가 있으면 사진은 스냅샷이 아니라 편집된 도판으로 읽힌다.
+                  plate += 1
+                  const n = String(plate).padStart(2, "0")
+                  return m.type === "video" ? (
                     <figure class="block is-video" data-ratio={m.ratio || "16:9"}>
+                      <span class="plate-n" aria-hidden="true">{n}</span>
                       <div class={`video ${useImmersiveMedia ? "video-preview" : ""}`} style={`aspect-ratio:${ratioValue[m.ratio] || "16 / 9"}`}>
                         {embedURL(m.src).kind === "iframe" ? (
                           <iframe src={embedURL(m.src).src} allow="autoplay; fullscreen; picture-in-picture" allowfullscreen frameborder="0" loading="lazy" tabindex={useImmersiveMedia ? "-1" : undefined} />
@@ -282,14 +287,15 @@ function toParagraphs(text: string): string {
                     </figure>
                   ) : (
                     <figure class="block">
+                      <span class="plate-n" aria-hidden="true">{n}</span>
                       <img src={m.src} alt={m.caption || data.title} loading="lazy" />
                       {m.caption && <figcaption>{m.caption}</figcaption>}
                     </figure>
                   )
-                )}
+                })}
               </div>
             )
-          })}
+          }) })()}
         </div>
       )
     }
@@ -750,16 +756,16 @@ function toParagraphs(text: string): string {
        행 패턴은 셋뿐 — 전체폭 / 2장 나란히(같은 높이) / 단독 부분폭.
        2장 행은 아래 스크립트가 실제 비율로 열 폭을 보정해
        두 장의 높이와 캡션 기선이 정확히 맞는다. 크롭은 어디에도 없다. */
+    /* ── 판형: 도판(plate) 조판 ──
+       사진이 흐르는 피드가 아니라 번호 붙은 도판이 한 점씩 걸린다.
+       도판 사이는 화면 높이의 1/6쯤 — 전시장의 걸음 간격이다. */
     .media-flow {
       clear: both;
       display: flex;
       flex-direction: column;
-      gap: 44px;
-      margin-top: 56px;
+      gap: 104px;
+      margin-top: 72px;
     }
-    /* 리듬 — 44px 일정 간격은 메트로놈이다. 전폭 도판(한 문장)이 끝난 뒤에는
-       더 크게 쉬어야 다음 묶음이 새 문단으로 읽힌다. */
-    .media-flow > .media-row.count-1:not(:last-child) { margin-bottom: 52px; }
     .media-row {
       display: grid;
       grid-template-columns: 1fr;
@@ -769,18 +775,30 @@ function toParagraphs(text: string): string {
     .media-row.count-2 { grid-template-columns: 1fr 1fr; }
     .media-row .block { grid-column: auto; margin: 0; min-width: 0; }
     .media-row .block img { display: block; width: 100%; height: auto; }
-    /* 도판은 화면을 넘지 않는다. 세로 사진이 전폭으로 확대되면 1070×1452 —
-       화면 두 배 높이가 되어 스크롤 두 번에 한 장이다. 도록이 세로 도판을
-       판형 가득 키우지 않는 것과 같은 이유로 높이를 화면의 82%에 묶고,
-       좁아진 폭만큼 좌우가 비면 그 여백이 곧 도판의 격이 된다. */
+    /* 단독 도판 — 화면을 넘지 않는 높이(78vh)로 서고, figure가 이미지 폭에
+       맞춰 줄어들어 중앙에 선다. 번호와 캡션이 컨테이너가 아니라 도판의
+       왼끝에 정렬되는 것이 핵심이다 — 좁아진 세로 사진 옆 허공에 번호가
+       떠 있으면 조판이 아니라 사고다. */
+    .media-row.count-1 .block:not(.is-video) {
+      width: fit-content;
+      max-width: 100%;
+      margin-inline: auto;
+    }
     .media-row.count-1 .block img {
       width: auto;
       max-width: 100%;
-      max-height: 82vh;
-      margin-inline: auto;
+      max-height: 78vh;
     }
-    .media-row.count-1 .block figcaption { text-align: center; }
-    .media-row figcaption { margin-top: 10px; font-size: var(--fs-xs); color: var(--text-3); letter-spacing: .01em; }
+    /* 도판 번호 — eyebrow와 같은 어휘. 번호가 사진을 도판으로 만든다. */
+    .plate-n {
+      display: block;
+      margin-bottom: 7px;
+      font-size: var(--fs-2xs);
+      letter-spacing: .14em;
+      color: var(--text-4);
+      font-variant-numeric: tabular-nums;
+    }
+    .media-row figcaption { margin-top: 10px; font-size: var(--fs-xs); color: var(--text-3); letter-spacing: .01em; max-width: 62ch; }
 
     /* 세로 미디어 행 — 화면을 다 먹지 않게 폭을 묶고 중앙 정렬 */
     .media-row.is-portrait-row { display: flex; justify-content: center; gap: 14px; }
@@ -802,7 +820,7 @@ function toParagraphs(text: string): string {
     .media-reveal.is-visible { opacity: 1; transform: none; }
 
     @media (max-width: 700px) {
-      .media-flow { gap: 28px; margin-top: 40px; }
+      .media-flow { gap: 56px; margin-top: 48px; }
       .media-row { gap: 8px; }
       .media-row.solo-half .block,
       .media-row.solo-third .block { width: 100%; }
