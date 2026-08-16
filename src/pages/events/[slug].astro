@@ -105,11 +105,14 @@ const fmtDate = (d: string) => {
     {/* 마크다운 본문은 프론트매터로 담기 어려운 보충 설명용으로 남겨 둔다 */}
     <div class="body body-md"><Content /></div>
 
+    {/* 작품 페이지와 같은 판형 — 번호 붙은 도판. 사이트 어디서든
+        사진은 같은 규율로 걸린다. */}
     {
       data.images && data.images.length > 0 && (
         <div class="ev-media">
-          {data.images.map((m) => (
+          {data.images.map((m, i) => (
             <figure>
+              <span class="plate-n" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
               <img src={m.src} alt={m.captionEn || m.caption || data.title} loading="lazy" />
               {m.caption && (
                 <figcaption>
@@ -179,9 +182,16 @@ const fmtDate = (d: string) => {
     .body :global(p) { margin: 0 0 1.15em; }
     .body :global([lang="ko"] p) { line-height: 1.85; }
     .body-md:empty { display: none; }
-    .ev-media { margin: 34px 0 0; display: grid; gap: 18px; }
-    .ev-media img { width: 100%; display: block; }
-    .ev-media figcaption { font-size: var(--fs-xs); color: var(--text-3); margin-top: 5px; }
+    /* 작품 페이지의 도판 판형과 같은 규율 — 번호, 높이 상한, 도판 왼끝 정렬 */
+    .ev-media { margin: 48px 0 0; display: grid; gap: 72px; }
+    .ev-media figure { margin: 0; width: fit-content; max-width: 100%; margin-inline: auto; }
+    .ev-media img { display: block; width: auto; max-width: 100%; max-height: 78vh; }
+    .ev-media .plate-n {
+      display: block; margin-bottom: 7px;
+      font-size: var(--fs-2xs); letter-spacing: .14em; color: var(--text-4);
+      font-variant-numeric: tabular-nums;
+    }
+    .ev-media figcaption { font-size: var(--fs-xs); color: var(--text-3); margin-top: 10px; letter-spacing: .01em; }
     .ev-cta {
       display: inline-block; margin-top: 34px; padding: 12px 22px;
       border: 1px solid var(--text); color: var(--text); text-decoration: none; font-size: var(--fs-sm);
