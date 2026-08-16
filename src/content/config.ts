@@ -91,7 +91,10 @@ const works = defineCollection({
       .array(
         z.object({
           name: z.string(),
-          logo: z.string(),
+          // 로고 파일이 없는 후원처도 이름만으로 크레딧에 남는다.
+          // 렌더러는 이미 그 경우를 이름 표기로 처리하고 있었는데
+          // 스키마만 필수로 잡고 있어 logo: "" 를 강제하고 있었다.
+          logo: z.string().optional().default(""),
           url: z.string().optional().default(""),
         })
       )
