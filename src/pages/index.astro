@@ -549,10 +549,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         const mic = (window as any).__hyMic
         const audioLevel = mic && mic.on ? mic.level : 0
         const audioHigh = mic && mic.on && !reduceMotion ? mic.high : 0
-        // 저역은 구체 전체를 미세하게 민다 — 낮은 소리는 방을 흔드는 소리다
         const audioLow = mic && mic.on && !reduceMotion ? mic.low : 0
-        const swayX = Math.sin(time * .0021) * audioLow * size * .035
-        const swayY = Math.cos(time * .0017) * audioLow * size * .022
         const globeRadius = size * .38 * (1 + audioLevel * .28)
         // 데스크톱은 커서가 얹혀 있는 동안, 모바일은 손가락이 닿아 있는 동안
         const repelling = isInside && hasPointer && !reduceMotion
@@ -563,8 +560,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
           const rotatedY = particle.sphereY * cosTilt - rotatedZ * sinTilt
           const depth = particle.sphereY * sinTilt + rotatedZ * cosTilt
           const perspective = 2.8 / (3.3 - depth)
-          const driftX = centerX + swayX + rotatedX * globeRadius * perspective
-          const driftY = centerY + swayY + rotatedY * globeRadius * perspective
+          const driftX = centerX + rotatedX * globeRadius * perspective
+          const driftY = centerY + rotatedY * globeRadius * perspective
           const destinationX = isInside ? particle.targetX : driftX
           const destinationY = isInside ? particle.targetY : driftY
           // 이름이 모인 뒤에는 커서가 글자를 밀어낸다. 반발은 감쇠 안에서 더해야 한다 —
@@ -584,10 +581,16 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
               pushY = (deltaY / distance) * push
             }
           }
-          // 고역 산란 — 구체 상태에서만. 이름은 읽혀야 하므로 흔들지 않는다.
-          if (audioHigh > .02 && !isInside) {
-            pushX += (Math.random() - .5) * audioHigh * 4.2
-            pushY += (Math.random() - .5) * audioHigh * 4.2
+          /* 소리는 개별 입자를 민다 — 커서가 미는 것과 같은 문법이다.
+             덩어리를 통째로 움직이면 구도가 흔들릴 뿐 "반응"으로 보이지 않는다.
+             저역은 바깥으로(구체가 부푸는 방향), 고역은 무작위로(산란). */
+          if (!isInside && (audioLow > .02 || audioHigh > .02)) {
+            const ox = particle.x - centerX
+            const oy = particle.y - centerY
+            const od = Math.hypot(ox, oy) || .001
+            const bloom = audioLow * 5.2
+            pushX += (ox / od) * bloom + (Math.random() - .5) * audioHigh * 5.4
+            pushY += (oy / od) * bloom + (Math.random() - .5) * audioHigh * 5.4
           }
           particle.vx = (particle.vx + (destinationX - particle.x) * (isInside ? .025 : .024) + pushX) * .8
           particle.vy = (particle.vy + (destinationY - particle.y) * (isInside ? .025 : .024) + pushY) * .8
