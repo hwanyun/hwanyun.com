@@ -8,7 +8,19 @@ const { active = "about" } = Astro.props
 <header class="bio-head">
   <p class="eyebrow">BIO</p>
   <h1>Bio</h1>
-  <p class="intro">Curriculum vitae and artist's statement.</p>
+  {/* "Curriculum vitae and artist's statement"는 이 페이지에 무엇이 들어
+      있는지를 말할 뿐 이 사람이 누구인지는 말하지 않는다 — 게다가 바로 아래
+      두 탭이 이미 하는 말이다. 작가 노트의 첫 문장으로 바꾼다. */}
+  <p class="intro">
+    <span data-language-content="en" lang="en">
+      Sound, light, material, and the body alter one another. Installations and
+      interactive systems built from that exchange.
+    </span>
+    <span data-language-content="ko" lang="ko">
+      소리와 빛, 물질과 신체가 서로의 상태를 바꾼다. 그 주고받음에서 만들어지는
+      설치와 인터랙티브 시스템.
+    </span>
+  </p>
 
   <nav class="bionav" aria-label="Bio sections">
     <a href="/cv" class={active === "cv" ? "on" : ""} aria-current={active === "cv" ? "page" : undefined}>CV</a>

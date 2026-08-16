@@ -71,7 +71,20 @@ function fmt(start: string, end: string) {
     </ul>
 
     {/* 진행 중 + 예정을 한 리스트에. 진행 중인 항목은 날짜가 "Until …"로 바뀐다. */}
+    {/* 아래 'Past'에는 제목이 있는데 위 묶음만 라벨이 없어, 목록이 무엇인지
+        모른 채 읽다가 'Past'를 만나서야 앞의 것이 예정이었음을 알게 된다.
+        진행 중인 전시가 있으면 제목이 그 사실까지 말한다. */}
     <section id="ev-next" aria-label="Exhibitions and events" hidden>
+      <h2 class="ev-secth" id="ev-next-th">
+        <span class="th-soon">
+          <span data-language-content="en">Upcoming</span>
+          <span data-language-content="ko">예정</span>
+        </span>
+        <span class="th-now">
+          <span data-language-content="en">Now on &amp; upcoming</span>
+          <span data-language-content="ko">진행 중 · 예정</span>
+        </span>
+      </h2>
       <ul class="ev-list" id="ev-next-list"></ul>
     </section>
 
@@ -125,6 +138,11 @@ function fmt(start: string, end: string) {
         var nextList = document.getElementById("ev-next-list")
         next.forEach(function (li) { nextList.appendChild(li) })
         document.getElementById("ev-next").hidden = false
+        // 진행 중인 전시가 하나라도 있으면 제목이 그것까지 말한다
+        var th = document.getElementById("ev-next-th")
+        if (th && next.some(function (li) { return li.classList.contains("ev-on") })) {
+          th.classList.add("has-now")
+        }
       } else {
         document.getElementById("ev-empty").hidden = false
       }
@@ -189,6 +207,12 @@ function fmt(start: string, end: string) {
     .ev-empty { color: var(--text-4); font-size: var(--fs-sm); padding: 26px 4px; }
     .ev-pool { display: none; }
     .ev-secth { font-size: var(--fs-xs); letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-4); margin: 46px 0 8px; font-weight: 500; }
+    /* 첫 묶음의 제목은 목록 바로 위에 붙는다 — 위쪽 여백은 머리글이 가진다 */
+    #ev-next .ev-secth { margin-top: 0; }
+    /* 두 문구 중 하나만. 언어 전환은 그 안에서 다시 갈린다. */
+    #ev-next-th .th-now { display: none; }
+    #ev-next-th.has-now .th-soon { display: none; }
+    #ev-next-th.has-now .th-now { display: inline; }
     #ev-upcoming .ev-secth { margin-top: 0; }
     .ev-list-past .ev-title { color: var(--text-2); }
     .ev-list-past .ev-date { color: var(--text-4); }

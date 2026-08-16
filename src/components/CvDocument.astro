@@ -7,6 +7,27 @@ const { data, korean = false } = Astro.props
 <article class="page">
   <BioNav active="cv" />
 
+  {/* PDF는 파일로 만들어 두면 CV를 고칠 때마다 낡는다. 인쇄 스타일시트로
+      두면 늘 지금 데이터를 인쇄한다 — 브라우저의 "PDF로 저장"이 곧 파일이다. */}
+  <div class="cv-actions">
+    <button type="button" id="cv-print">
+      <span data-language-content="en">Download PDF</span>
+      <span data-language-content="ko">PDF로 저장</span>
+    </button>
+  </div>
+
+  {/* 화면에서는 페이지 머리(BioNav)가 이름을 대신하지만, 인쇄물은 한 장으로
+      떨어져 나가 혼자 돌아다닌다. 누구의 이력서인지, 어디서 왔는지가 종이에
+      찍혀 있어야 한다. */}
+  <header class="print-head" aria-hidden="true">
+    <div class="ph-name">HWANYUN</div>
+    <div class="ph-meta">
+      <span data-language-content="en">Sound, light, material, and the body alter one another.</span>
+      <span data-language-content="ko">소리와 빛, 물질과 신체가 서로의 상태를 바꾼다.</span>
+    </div>
+    <div class="ph-contact">hwanyun.lab@gmail.com · www.hwanyun.com · @hwanyun.lab</div>
+  </header>
+
   <div class="cv">
     {
       data.sections.map((sec) => (
@@ -57,6 +78,23 @@ const { data, korean = false } = Astro.props
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
   }
+
+  /* 화면에서는 숨어 있다가 인쇄될 때만 나오는 문서 머리 */
+  .print-head { display: none; }
+
+  .cv-actions { margin: 0 0 30px; }
+  .cv-actions button {
+    padding: 6px 13px;
+    border: 1px solid var(--line-2);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-2);
+    font: 400 var(--fs-xs)/1 var(--sans);
+    cursor: pointer;
+    transition: border-color var(--dur-fast) ease, color var(--dur-fast) ease;
+  }
+  .cv-actions button:hover { border-color: var(--hover); color: var(--hover); }
+
   @media (max-width: 700px) {
     .page { margin: 0; padding: 0 16px 64px; font-size: var(--fs-sm); line-height: 1.65; }
     .cv-section { margin-bottom: 30px; }
@@ -65,4 +103,63 @@ const { data, korean = false } = Astro.props
     .year { font-size: var(--fs-sm); line-height: 1.4; color: var(--text-3); }
     .text { font-size: var(--fs-sm); line-height: 1.65; }
   }
+  /* ── 인쇄 = PDF ──
+     브라우저의 "PDF로 저장"이 곧 파일이다. 파일을 따로 만들어 두면
+     CV를 고칠 때마다 낡지만, 이건 늘 지금 데이터를 인쇄한다. */
+  @media print {
+    /* 화면의 크롬은 종이에 있을 이유가 없다 */
+    :global(.site-menu), :global(.lang-corner), :global(body > footer),
+    :global(.cursor-dot), :global(.bio-head), .cv-actions { display: none !important; }
+
+    :global(html), :global(body) { background: #fff; }
+    .page {
+      margin: 0;
+      max-width: none;
+      font-size: 8.5pt;
+      line-height: 1.38;
+      color: #000;
+    }
+    .print-head {
+      display: block;
+      margin: 0 0 10pt;
+      padding-bottom: 6pt;
+      border-bottom: 1.2pt solid #000;
+    }
+    .ph-name { font-size: 19pt; font-weight: 600; letter-spacing: .02em; line-height: 1.1; }
+    .ph-meta { margin-top: 4pt; font-size: 9pt; color: #333; }
+    .ph-contact { margin-top: 3pt; font-size: 8.4pt; color: #555; font-variant-numeric: tabular-nums; }
+
+    .cv-section { margin: 0 0 7.5pt; }
+    .cv-title {
+      font-size: 8.8pt;
+      font-weight: 600;
+      margin: 0 0 3pt;
+      padding-bottom: 2pt;
+      border-bottom: .6pt solid #000;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .row { grid-template-columns: 72pt 1fr; gap: 9pt; padding: 0.9pt 0; }
+    .year { color: #444; }
+    .text { color: #000; }
+
+    /* 한 항목이 페이지 경계에서 반으로 잘리면 이력서가 아니라 사고로 보인다.
+       섹션 제목만 남고 내용이 다음 장으로 넘어가는 것도 막는다. */
+    .row { break-inside: avoid; page-break-inside: avoid; }
+    .cv-section { break-inside: avoid-page; }
+    .cv-title { break-after: avoid; page-break-after: avoid; }
+  }
+
+  @page {
+    size: A4;
+    margin: 13mm 15mm 12mm;
+  }
+
 </style>
+
+<script is:inline>
+  ;(function () {
+    var b = document.getElementById("cv-print")
+    if (b) b.addEventListener("click", function () { window.print() })
+  })()
+</script>
