@@ -654,7 +654,10 @@ const shareImage = new URL(
              간격이 위계를 유지한다. */
           font-size: var(--fs-lead);
         }
-        .site-menu .name a { display: block; }
+        /* 워드마크도 홈으로 가는 링크다 — 33px이라 헤더에서 유일하게 기준 미달이었다.
+           글자 크기는 그대로 두고 눌리는 영역만 넓힌다. */
+        .site-menu .name a { display: block; position: relative; }
+        .site-menu .name a::after { content: ""; position: absolute; inset: -6px 0; }
 
         /* 열린 메뉴는 내용만큼 내려오는 불투명 패널이고, 나머지는 스크림이 받는다.
            원래 문제는 높이가 아니라 배경이 50% 투명이라 뒤의 필터 칩과 작품
@@ -754,8 +757,10 @@ const shareImage = new URL(
           justify-self: end;
           margin: 0 14px 0 0;
         }
-        /* 터치 타깃 44px — 헤더 높이는 그대로 두고 눌리는 영역만 넓힌다 */
-        .site-menu .lang-switch button { padding: 13px 4px; margin: -13px 0; }
+        /* 터치 타깃 44px — 헤더 높이는 그대로 두고 눌리는 영역만 넓힌다.
+           13px일 때 실측 37px이었다: 글자(11px)에 위아래 13px씩이라 37px. 44를
+           채우려면 16px씩 필요하다. */
+        .site-menu .lang-switch button { padding: 16px 6px; margin: -16px 0; }
         .site-menu--hero:not(.is-open) .name a { color: var(--void-text); }
         /* 그리드로 넘어가면 흰 면 위다 — 워드마크도 어두운 잉크로 */
         .site-menu--hero.is-past-hero:not(.is-open) .name a { color: var(--text); }

@@ -1325,7 +1325,11 @@ function toParagraphs(text: string): string {
          붙을 것과 떨어질 것을 세 단으로 가른다:
            같은 묶음 안 10px · 묶음과 묶음 사이 34px · 큰 마디 56px
          재료 태그와 연작은 둘 다 '다른 작품으로 가는 통로'라 한 묶음이다. */
-      .materials { margin-bottom: 10px; }
+      /* 재료·형태 태그도 /works 칩과 같은 규칙 — 27px이던 타깃을 44px로.
+         알약은 그대로 두고 눌리는 영역만 넓힌다. */
+      .materials { margin-bottom: 10px; padding-block: 5px; }
+      .materials a { position: relative; }
+      .materials a::after { content: ""; position: absolute; inset: -8px 0; }
       .series-link { margin: 0 0 34px; font-size: var(--fs-xs); }
       .textcols .col {
         width: 100%;

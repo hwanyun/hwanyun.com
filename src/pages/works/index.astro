@@ -303,6 +303,9 @@ const showCounts = SHOWS.map((x) => ({
       inset: -5px 0;
     }
     .archive-head, li a { grid-template-columns: minmax(0, 1fr) 48px; gap: 8px; }
+    /* 아카이브에서 가장 중요한 링크인데 32px로 이 페이지에서 가장 작았다.
+       구분선이 있는 목록 행이라 44px가 늘어져 보이지도 않는다. */
+    li a { min-height: 44px; align-items: center; padding: 4px 0; }
     .archive-head { font-size: var(--fs-sm); }
     time { font-size: var(--fs-xs); }
     li span { font-size: var(--fs-body); }
