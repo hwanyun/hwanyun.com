@@ -7,6 +7,7 @@ materials:
 series:
   id: "intuition-untitled"
   label: "Intuition: Untitled"
+  index: 2
 size: 1col
 category: work
 order: 7

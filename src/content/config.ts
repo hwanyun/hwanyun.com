@@ -12,6 +12,9 @@ const works = defineCollection({
       .object({
         id: z.string(),
         label: z.string(),
+        // 연작 안에서의 순번. order는 홈 그리드 패킹 순서라 연작의 차례와 무관하다
+        // (Three Pieces가 II, III, I 순으로 읽히던 이유).
+        index: z.number().optional(),
       })
       .optional(),
     size: z.enum(["1col", "2col", "3col"]).default("2col"),

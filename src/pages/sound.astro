@@ -157,7 +157,11 @@ const releases = (id: string) => {
     #sound-archive { position: relative; z-index: 1; max-width: var(--content-w); margin: var(--desktop-header-clearance) 40px 100px var(--desktop-content-x); transition: color var(--dur-slow) ease; }
     /* Works archive의 소개 블록과 같은 데스크톱 읽기 규격 */
     .archive-head { max-width: 650px; margin-bottom: 84px; }
-    .eyebrow, .section h2, .number, .release-count, .track span:last-child { font-size: var(--fs-2xs); letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
+    .eyebrow, .number, .release-count, .track span:last-child { font-size: var(--fs-2xs); letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
+    /* 섹션 제목이 곁다리 메타(번호·수량·태그)와 같은 11px 회색으로 묶여 있었다.
+       페이지를 셋으로 가르는 유일한 표지인데 가장 약하게 그려져,
+       세 묶음이 한 덩어리로 흘렀다. 한 단 올려 구분이 서게 한다. */
+    .section h2 { font-size: var(--fs-xs); letter-spacing: .1em; text-transform: uppercase; color: var(--text); }
     h1 { margin: 8px 0 16px; font-weight: 300; font-size: var(--fs-display); line-height: 1.15; }
     /* 한 번에 한 언어만 보이므로 단을 나누지 않는다 */
     .intro-copy { display: block; }
@@ -166,7 +170,8 @@ const releases = (id: string) => {
     .section { margin: 0 0 70px; }
     .section-head { display: grid; grid-template-columns: 220px 1fr; gap: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--text); }
     .section h2 { margin: 0; font-weight: 400; }
-    .section-head p { margin: 0; font-size: var(--fs-sm); color: var(--text-3); }
+    /* 설명문이 제목보다 컸다 — 위계가 뒤집혀 있었다 */
+    .section-head p { margin: 0; font-size: var(--fs-xs); line-height: 1.6; color: var(--text-3); }
     .release-list, .tracklist { list-style: none; padding: 0; margin: 0; }
     .release { border-bottom: 1px solid var(--line); }
     summary { display: grid; grid-template-columns: 52px minmax(0,1fr) auto auto 24px; gap: 12px; align-items: baseline; padding: 16px 0; cursor: pointer; list-style: none; }
@@ -204,6 +209,10 @@ const releases = (id: string) => {
     .track-control span, .pause span { display: block; width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 7px solid currentColor; margin-left: 2px; }
     .track.is-playing .track-control span, .pause.is-playing span { width: 7px; height: 9px; border: 0; border-left: 2px solid currentColor; border-right: 2px solid currentColor; margin-left: 0; }
     .track-control:hover { color: var(--hover); }
+    /* display를 지정한 요소에는 [hidden]이 먹지 않는다. 이걸 빠뜨려서
+       재생 전에도 검은 바가 화면 하단을 가로질러 "0:00 / 0:00"을 띄우고 있었다 —
+       조용한 흰 페이지에서 가장 큰 요소가 아무 말도 하지 않는 상태였다. */
+    #player-bar[hidden] { display: none; }
     #player-bar { position: fixed; z-index: 5; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: minmax(180px, 1fr) auto; gap: 12px 24px; padding: 13px 18px 10px; background: var(--text); color: var(--surface); font-size: var(--fs-sm); }
     .player-track { display: flex; gap: 14px; min-width: 0; }
     .now-playing { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

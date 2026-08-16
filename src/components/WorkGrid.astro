@@ -173,7 +173,11 @@ works.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
     var input = document.getElementById("search")
     var none = document.getElementById("noresult")
     var tiles = Array.prototype.slice.call(grid.querySelectorAll(".tile"))
-    var SHARE = 0.4 // hover 시 해당 셀이 차지할 목표 면적 비율
+    /* hover 시 해당 셀이 차지할 목표 면적 비율.
+       0.4는 한 칸이 화면의 절반 가까이를 삼켜 나머지 열한 작품을 납작하게 눌렀다.
+       커서를 옮길 때마다 격자 전체가 출렁여 무엇을 보는 중인지 놓친다.
+       0.22면 지목은 분명한데 이웃이 제 모양을 잃지 않는다. */
+    var SHARE = 0.22
     var proximityRemeasure = null // 근접 반응이 타일 좌표를 다시 재도록 하는 훅
 
     // 각 셀을 leaf 객체로 (DOM 순서 = 패킹 순서)

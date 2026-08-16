@@ -10,6 +10,7 @@ order: 4
 series:
   id: "three-pieces-untitled"
   label: "Three Pieces: Untitled"
+  index: 2
 draft: false
 thumb: "/images/three-pieces-ii/01.jpg"
 textEn: |

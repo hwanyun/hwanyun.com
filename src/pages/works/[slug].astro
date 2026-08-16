@@ -18,7 +18,9 @@ const allSounds = await getCollection("sounds", ({ data }) => !data.draft)
 const seriesWorks = data.series
   ? allWorks
       .filter((item) => item.data.series?.id === data.series?.id)
-      .sort((a, b) => a.data.order - b.data.order)
+      // 연작은 제 순번대로 읽혀야 한다. order는 홈 그리드 패킹 순서라
+      // 그대로 쓰면 I·II·III가 II·III·I로 나온다.
+      .sort((a, b) => (a.data.series?.index ?? a.data.order) - (b.data.series?.index ?? b.data.order))
   : []
 const relatedSounds = allSounds
   .filter((sound) => sound.data.works.includes(work.slug))
@@ -581,15 +583,20 @@ function toParagraphs(text: string): string {
       margin: var(--desktop-header-clearance) 40px 100px var(--desktop-content-x);
       position: relative;
     }
+    /* 상단은 세 겹으로만 읽혀야 한다: 제목 / 캡션 한 줄 / 통로(재료·연작).
+       매체와 재료를 각각 한 줄씩 쓰면 캡션 하나가 두 층으로 보이고,
+       바로 아래 재료 태그까지 더해져 본문 전에 다섯 겹이 쌓였다. */
     .entry_title {
       font-size: var(--fs-display);
       font-weight: 300;
       line-height: 1.25;
-      margin-bottom: 22px;
+      margin-bottom: 14px;
     }
-    .meta { font-size: var(--fs-body); font-weight: 400; line-height: 1.6; color: var(--text-2); margin: 0 0 34px; }
-    .meta .medium-type { display: block; color: var(--text); }
-    .meta .medium-materials { display: block; margin-top: 8px; font-size: var(--fs-body); color: var(--text-3); }
+    .meta { font-size: var(--fs-body); font-weight: 400; line-height: 1.6; color: var(--text-2); margin: 0 0 18px; }
+    .meta .medium-type { color: var(--text); }
+    .meta .medium-materials { color: var(--text-3); }
+    /* 가운뎃점으로 잇되 줄이 바뀌면 점이 줄머리에 남지 않게 붙여 둔다 */
+    .meta .medium-materials::before { content: " · "; color: var(--text-4); }
 
     /* 재료 태그 — 같은 재료를 쓴 작품으로 가는 통로.
        회로의 접점을 연상시키되 사이트의 흑백 톤은 유지한다. */
@@ -597,7 +604,7 @@ function toParagraphs(text: string): string {
       display: flex;
       flex-wrap: wrap;
       gap: 6px 8px;
-      margin: -22px 0 34px;
+      margin: 0 0 26px;
     }
     .material-tag {
       font-size: var(--fs-xs);
@@ -652,7 +659,7 @@ function toParagraphs(text: string): string {
       display: inline-flex;
       flex-direction: column;
       gap: 2px;
-      margin: -14px 0 30px;
+      margin: 0 0 30px;
       font-size: var(--fs-sm);
       line-height: 1.4;
       color: var(--text-2);
@@ -1071,15 +1078,15 @@ function toParagraphs(text: string): string {
       .entry_title {
         font-size: clamp(25px, 7vw, 32px);
         line-height: 1.22;
-        margin-bottom: 15px;
+        margin-bottom: 11px;
       }
       .meta {
-        margin-bottom: 24px;
+        margin-bottom: 14px;
         font-size: var(--fs-sm);
         line-height: 1.6;
       }
-      .meta .medium-materials { margin-top: 5px; font-size: var(--fs-xs); line-height: 1.55; }
-      .series-link { margin: -5px 0 24px; font-size: var(--fs-xs); }
+      .materials { margin-bottom: 20px; }
+      .series-link { margin: 0 0 24px; font-size: var(--fs-xs); }
       .textcols .col {
         width: 100%;
         margin: 0 0 26px;

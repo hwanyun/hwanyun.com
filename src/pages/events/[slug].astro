@@ -41,7 +41,14 @@ const fmtDate = (d: string) => {
 }
 ---
 
-<Base title={`HWANYUN — ${data.title}`} current="events">
+{/* 전시 링크는 메신저로 돌아다닌다 — 사이트 기본 카드보다 포스터가 훨씬 많은 걸 말한다 */}
+<Base
+  title={`HWANYUN — ${data.title}`}
+  current="events"
+  image={data.thumb}
+  imageAlt={`${data.title} — ${whereKr}`}
+  description={data.summaryEn || data.summary}
+>
   <article class="ev-detail">
     <a class="back" href="/events/">← Events</a>
     <h1>{data.title}</h1>

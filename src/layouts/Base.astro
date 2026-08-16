@@ -3,9 +3,21 @@ import SiteMenu from "../components/SiteMenu.astro"
 
 // chrome: 첫 화면이 어두운 페이지만 "dark"를 명시한다. 잊으면 밝은 배경 기준으로
 // 안전하게 폴백하므로, 페이지가 자기 이름을 알릴 필요가 없다.
-const { title = "HWANYUN", current = "", chrome = "light" } = Astro.props
+const {
+  title = "HWANYUN",
+  current = "",
+  chrome = "light",
+  // 공유 카드 — 페이지가 자기 얼굴을 가질 수 있게 열어 둔다.
+  // 전시 링크를 메신저에 붙일 때 사이트 기본 카드보다 포스터가 훨씬 많은 걸 말한다.
+  image = "",
+  description = "Sound, installation, and interactive media.",
+  imageAlt = "HWANYUN particle sphere forming the wordmark",
+} = Astro.props
 const canonicalUrl = new URL(Astro.url.pathname, "https://www.hwanyun.com").href
-const shareImage = "https://www.hwanyun.com/images/social/hwanyun-share-preview.png"
+const shareImage = new URL(
+  image || "/images/social/hwanyun-share-preview.png",
+  "https://www.hwanyun.com"
+).href
 ---
 
 <!doctype html>
@@ -27,18 +39,18 @@ const shareImage = "https://www.hwanyun.com/images/social/hwanyun-share-preview.
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0a0b0d" />
     <title>{title}</title>
-    <meta name="description" content="HWANYUN — sound, installation, and interactive media." />
+    <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="HWANYUN" />
     <meta property="og:title" content={title} />
-    <meta property="og:description" content="Sound, installation, and interactive media." />
+    <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:image" content={shareImage} />
-    <meta property="og:image:alt" content="HWANYUN particle sphere" />
+    <meta property="og:image:alt" content={imageAlt} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content="Sound, installation, and interactive media." />
+    <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={shareImage} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     {/* Pretendard Variable 셀프호스트 — 동적 서브셋(unicode-range)이라

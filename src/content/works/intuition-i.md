@@ -14,6 +14,7 @@ order: 3
 series:
   id: "intuition-untitled"
   label: "Intuition: Untitled"
+  index: 1
 draft: false
 thumb: "/images/intuition-i/thumbnail.png"
 textEn: |
