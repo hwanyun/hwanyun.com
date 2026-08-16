@@ -621,13 +621,13 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
              구체는 형태도 크기도 그대로고 표면만 살아난다.
              파문처럼 퍼져 나가지 않는다: 소리가 나는 동안 전부가 함께 떤다. */
           if (!isInside && audioLevel > .012) {
-            const tremor = audioLevel * 6.2 + audioHigh * 4.4
+            const tremor = audioLevel * 9.3 + audioHigh * 6.6
             pushX += (Math.random() - .5) * tremor
             pushY += (Math.random() - .5) * tremor
           }
           // 이름일 때도 떨되, 글자가 읽히는 선까지만
           if (isInside && audioLevel > .015 && !reduceMotion) {
-            const t2 = audioLevel * 4.4
+            const t2 = audioLevel * 6.6
             pushX += (Math.random() - .5) * t2
             pushY += (Math.random() - .5) * t2
           }
