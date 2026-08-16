@@ -556,14 +556,31 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       color: var(--void-text); text-decoration: none;
     }
     .ut-list { display: block; }
+    /* 히어로는 화면 전체가 비어 있고 시선은 구체로 간다. 구석의 13px은
+       대비가 충분해도 읽히지 않는다 — 안 보이는 건 대비가 아니라 크기 문제다. */
     .upcoming-ticker :global(.ut-row) {
-      display: block; font-size: var(--fs-xs); line-height: 1.5; letter-spacing: .01em;
+      display: block; font-size: var(--fs-sm); line-height: 1.55; letter-spacing: .01em;
     }
     .upcoming-ticker :global(.ut-tag) {
-      display: block; margin: 10px 0 3px;
+      display: block; margin: 13px 0 4px;
       color: var(--void-label); letter-spacing: .16em; font-size: var(--fs-2xs);
     }
     .upcoming-ticker :global(.ut-tag:first-child) { margin-top: 0; }
+    /* 점 하나가 천천히 숨을 쉰다. 깜빡임이 아니라 호흡이라 주변시에는 걸리고
+       정면으로 보면 조용하다 — Events 목록의 'NOW ON' 점과 같은 어휘다. */
+    .upcoming-ticker :global(.ut-tag::before) {
+      content: ""; display: inline-block;
+      width: 5px; height: 5px; margin-right: 8px; vertical-align: 1px;
+      border-radius: 50%; background: currentColor;
+      animation: ut-breathe 2.6s ease-in-out infinite;
+    }
+    @keyframes ut-breathe {
+      0%, 100% { opacity: .3; }
+      50% { opacity: 1; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .upcoming-ticker :global(.ut-tag::before) { animation: none; opacity: 1; }
+    }
     .upcoming-ticker :global(.ut-tag-now) { color: var(--surface); }
     .upcoming-ticker :global(.ut-dim) { color: var(--void-text-2); }
     /* 탄성 드래그용으로 한 글자씩 쪼갠 조각.

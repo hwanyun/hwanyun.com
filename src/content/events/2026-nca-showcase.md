@@ -28,6 +28,8 @@ textEn: |
   〈무제 (無諸)〉 lays a circular mandala, woven from data, across the floor of the gallery. It blooms along the path of whoever walks in, grows for as long as they stay, and collapses when they leave. No finished form is preserved. When the next person enters, the mandala begins again from nothing.
 
   What remains is not a shape but a sensation. 諸行無常 — all things arise and pass away. Making and vanishing are not two opposing ends but a single closed circle, and the visitor is not someone watching it from outside but the hand that draws it.
+roleKr: "팀 프로젝트 · 팀장"
+roleEn: "Team project · Team lead"
 thumb: "/images/events/2026-nca-showcase.jpg"
 externalUrl: "https://www.ncakocca.kr"
 externalLabel: "NCA 공식 누리집"
