@@ -3,6 +3,7 @@ import { getCollection } from "astro:content"
 import Base from "../../layouts/Base.astro"
 import { materialLabel } from "../../data/materials"
 import SeenTracker from "../../components/SeenTracker.astro"
+import { logoBox } from "../../lib/logoSize"
 
 export async function getStaticPaths() {
   const works = await getCollection("works", ({ data }) => !data.draft)
@@ -436,17 +437,28 @@ function toParagraphs(text: string): string {
         <div class="sponsors">
           <div class="sponsors-label">Exhibition Sponsors</div>
           <div class="sponsors-row">
-            {data.sponsors.map((s) =>
-              s.url ? (
-                <a href={s.url} target="_blank" rel="noopener" class="sponsor">
-                  {s.logo ? <img src={s.logo} alt={s.name} loading="lazy" /> : <span class="sponsor-name">{s.name}</span>}
-                </a>
+            {data.sponsors.map((s) => {
+              /* 크기는 빌드 때 파일에서 읽어 면적을 맞춘 값이다 — 박스 상한만으로는
+                 가로형이 세로형보다 두 배 넓은 면적을 차지한다. logoSize.ts 참조. */
+              const box = s.logo ? logoBox(s.logo) : null
+              const mark = s.logo ? (
+                <img
+                  src={s.logo}
+                  alt={s.name}
+                  loading="lazy"
+                  width={box?.width}
+                  height={box?.height}
+                  style={box ? `width:${box.width}px;height:${box.height}px` : undefined}
+                />
               ) : (
-                <span class="sponsor">
-                  {s.logo ? <img src={s.logo} alt={s.name} loading="lazy" /> : <span class="sponsor-name">{s.name}</span>}
-                </span>
+                <span class="sponsor-name">{s.name}</span>
               )
-            )}
+              return s.url ? (
+                <a href={s.url} target="_blank" rel="noopener" class="sponsor">{mark}</a>
+              ) : (
+                <span class="sponsor">{mark}</span>
+              )
+            })}
           </div>
         </div>
       )
@@ -1279,14 +1291,12 @@ function toParagraphs(text: string): string {
     .sponsor { display: inline-flex; align-items: center; }
     .sponsor-name { font-size: var(--fs-body); color: var(--text-2); }
     /* 기관 로고는 남의 아이덴티티다 — 무채색 규칙의 예외로 원색을 그대로 둔다. */
-    /* 폭 상한이 140일 때 가로형 로고(VSLAB 4.2:1)는 140×33으로 상한을 꽉 채우는데,
-       세로형(KalmaLab 1.3:1)은 높이에 먼저 걸려 53×40에 그친다 — 면적이 두 배 넘게
-       벌어져 같은 줄에 놓으면 하나만 커 보인다. 폭 상한을 110으로 낮추면
-       가로형이 110×26이 되어 세로형과 면적이 얼추 맞는다. */
+    /* 실제 크기는 빌드 때 면적을 맞춰 계산한 인라인 값이 정한다(logoSize.ts).
+       여기 상한은 그 계산이 실패했을 때(파일을 못 읽는 등)만 받는 안전장치이므로,
+       계산값을 다시 자르지 않도록 헬퍼의 상한과 같은 값으로 둔다. */
     .sponsor img {
-      max-height: 40px;
-      max-width: 110px;
-      width: auto;
+      max-height: 48px;
+      max-width: 150px;
       display: block;
     }
 
