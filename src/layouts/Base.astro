@@ -637,15 +637,22 @@ const shareImage = new URL(
         /* 손가락으로 누르는 항목은 44px 이상이어야 한다(iOS HIG 44pt / Material 48dp).
            마진으로 벌리면 줄 간격만 늘고 누를 수 있는 영역은 그대로다 —
            패딩으로 키워 글자 주변까지 실제 타깃이 되게 한다. */
+        /* 높이는 min-height 하나로만 잡는다. 패딩을 겹쳐 주면 글자 높이(25px)에
+           위아래 10px씩이 더해져 46px가 되고, 그만큼 목록이 늘어져 보인다.
+           44px는 손가락 타깃의 하한이므로 여기서 더 줄이지는 않는다. */
         .site-menu > a {
           display: none;
           grid-column: 1 / -1;
           width: fit-content;
           margin-top: 0;
-          padding: 10px 0;
+          padding: 0;
           min-height: 44px;
           align-content: center;
-          font-size: var(--fs-body);
+          /* 18px 글자를 44px 행에 넣으면 위아래로 23px이 남아 목록이 늘어져
+             보인다. 44px는 손가락 타깃의 하한이라 줄일 수 없으니 글자를 키워
+             행을 채운다. 워드마크와 같은 크기지만 굵기(500 대 400)와 헤더
+             간격이 위계를 유지한다. */
+          font-size: var(--fs-lead);
         }
         .site-menu .name a { display: block; }
 
@@ -676,14 +683,14 @@ const shareImage = new URL(
           grid-column: 1 / -1;
           width: fit-content;
           margin-top: 0;
-          padding: 10px 0;
+          padding: 0;
           min-height: 44px;
           align-content: center;
           border: 0;
           color: inherit;
           background: transparent;
           font: inherit;
-          font-size: var(--fs-body);
+          font-size: var(--fs-lead);
           line-height: 1.4;
         }
         .site-menu.is-open .work-links {
