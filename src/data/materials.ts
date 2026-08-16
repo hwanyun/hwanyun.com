@@ -21,7 +21,7 @@ export const MATERIALS = [
   { id: "interactive", en: "Interactive", ko: "인터랙티브" },
   { id: "copper", en: "Copper", ko: "구리" },
   { id: "sensor", en: "Sensor", ko: "센서" },
-  { id: "plastic-sheet", en: "Plastic sheet", ko: "플라스틱 시트" },
+  { id: "polycarbonate", en: "Polycarbonate", ko: "폴리카보네이트" },
   { id: "speaker", en: "Speaker", ko: "스피커" },
   { id: "conductive-paint", en: "Conductive paint & tape", ko: "전도성 도료·테이프" },
   { id: "projection", en: "Projection", ko: "프로젝션" },

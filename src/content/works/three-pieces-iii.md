@@ -4,6 +4,7 @@ year: "2018"
 medium: "Cyanotype prints; light-sensitive paper"
 materials:
   - light
+showType: solo
 size: 1col
 category: work
 order: 9

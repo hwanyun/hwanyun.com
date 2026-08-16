@@ -4,7 +4,8 @@ year: "2016"
 medium: "Sound installation; ultrasonic/vibration speakers, polyvinyl, soundtrack player"
 materials:
   - speaker
-  - plastic-sheet
+  - polycarbonate
+showType: group
 size: 2col
 category: sound
 order: 7

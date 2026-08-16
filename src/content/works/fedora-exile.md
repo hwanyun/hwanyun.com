@@ -5,6 +5,7 @@ medium: "Video installation; original sound composition sourced from sewing reco
 materials:
   - field-recording
   - moving-image
+showType: group
 size: 2col
 category: work
 order: 11

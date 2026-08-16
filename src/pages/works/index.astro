@@ -16,6 +16,16 @@ const materialCounts = MATERIALS.map((m) => ({
   ...m,
   count: works.filter((w) => w.data.materials.includes(m.id)).length,
 })).filter((m) => m.count > 0)
+
+// 전시 형태 — 재료와 다른 축이므로 필터 바에서도 줄을 나눈다
+const SHOWS = [
+  { id: "solo", en: "Solo exhibition", ko: "개인전" },
+  { id: "group", en: "Group exhibition", ko: "단체전" },
+]
+const showCounts = SHOWS.map((x) => ({
+  ...x,
+  count: works.filter((w) => w.data.showType === x.id).length,
+})).filter((x) => x.count > 0)
 ---
 
 <Base title="Works — HWANYUN" current="works">
@@ -37,6 +47,8 @@ const materialCounts = MATERIALS.map((m) => ({
     </header>
 
     {/* 재료 필터 — 같은 재료를 쓴 작품끼리 회로처럼 이어 보여 준다 */}
+    {/* 두 축을 한 줄에 섞으면 "구리 4"와 "개인전 5"가 같은 종류로 보인다.
+        재료(무엇으로 만들었는가)와 전시 형태(어떻게 보였는가)는 줄을 나눈다. */}
     <nav class="material-filter" aria-label="Filter by material">
       <a href="/works/" class="mf-all" data-material="">All works <span class="mf-n">{works.length}</span></a>
       {
@@ -47,12 +59,21 @@ const materialCounts = MATERIALS.map((m) => ({
         ))
       }
     </nav>
+    {showCounts.length > 0 && (
+      <nav class="material-filter show-filter" aria-label="Filter by exhibition format">
+        {showCounts.map((x) => (
+          <a href={`/works/?show=${x.id}`} data-show={x.id}>
+            {x.en} <span class="mf-n">{x.count}</span>
+          </a>
+        ))}
+      </nav>
+    )}
 
     <section class="archive-list" aria-label="Works by year">
       <div class="archive-head" aria-hidden="true"><span>WORKS</span><span>YEAR</span></div>
       <ol id="work-list">
         {works.map((work) => (
-          <li data-materials={work.data.materials.join(" ")} data-slug={work.slug}>
+          <li data-materials={work.data.materials.join(" ")} data-show={work.data.showType || ""} data-slug={work.slug}>
             <a href={`/works/${work.slug}`}>
               <time>{work.data.year}</time><span>{work.data.title}</span>
             </a>
@@ -76,40 +97,58 @@ const materialCounts = MATERIALS.map((m) => ({
     var empty = document.getElementById("mf-empty")
     if (!list || !nav) return
     var items = Array.prototype.slice.call(list.querySelectorAll("li"))
-    var links = Array.prototype.slice.call(nav.querySelectorAll("a"))
+    /* 두 축(재료 / 전시 형태)의 알약을 모두 모은다. 한 번에 하나만 걸리게
+       해 "구리이면서 개인전" 같은 교집합을 만들지 않는다 — 열두 점짜리
+       아카이브에서 교집합은 대개 0이나 1이라 길이 막힌다. */
+    var navs = Array.prototype.slice.call(document.querySelectorAll(".material-filter"))
+    var links = []
+    navs.forEach(function (n) {
+      links = links.concat(Array.prototype.slice.call(n.querySelectorAll("a")))
+    })
 
-    function apply(material) {
+    function apply(kind, value) {
       var shown = 0
       items.forEach(function (li) {
-        var mats = (li.getAttribute("data-materials") || "").split(" ")
-        var hit = !material || mats.indexOf(material) !== -1
+        var hit
+        if (!value) hit = true
+        else if (kind === "show") hit = li.getAttribute("data-show") === value
+        else hit = (li.getAttribute("data-materials") || "").split(" ").indexOf(value) !== -1
         li.hidden = !hit
         if (hit) shown++
       })
       // 필터가 걸린 동안에만 트레이스를 그린다
-      list.classList.toggle("is-tracing", !!material)
+      list.classList.toggle("is-tracing", !!value)
       links.forEach(function (a) {
-        a.setAttribute("aria-current", a.getAttribute("data-material") === material ? "true" : "false")
+        var av = a.getAttribute("data-show") !== null
+          ? { k: "show", v: a.getAttribute("data-show") }
+          : { k: "material", v: a.getAttribute("data-material") || "" }
+        var on = value ? (av.k === kind && av.v === value) : av.v === ""
+        a.setAttribute("aria-current", on ? "true" : "false")
       })
       if (empty) empty.hidden = shown !== 0
     }
 
     function fromURL() {
-      return new URLSearchParams(window.location.search).get("material") || ""
+      var q = new URLSearchParams(window.location.search)
+      var sh = q.get("show")
+      if (sh) return ["show", sh]
+      return ["material", q.get("material") || ""]
     }
-    apply(fromURL())
+    apply.apply(null, fromURL())
 
     links.forEach(function (a) {
       a.addEventListener("click", function (e) {
         // 같은 페이지 안에서의 상태 변경 — 전체 리로드를 피한다
         e.preventDefault()
-        var m = a.getAttribute("data-material") || ""
-        history.pushState({ material: m }, "", m ? "/works/?material=" + m : "/works/")
-        apply(m)
+        var isShow = a.getAttribute("data-show") !== null
+        var kind = isShow ? "show" : "material"
+        var v = (isShow ? a.getAttribute("data-show") : a.getAttribute("data-material")) || ""
+        history.pushState({ kind: kind, value: v }, "", v ? "/works/?" + kind + "=" + v : "/works/")
+        apply(kind, v)
       })
     })
-    window.addEventListener("popstate", function () { apply(fromURL()) })
-    window.__hyApplyMaterial = apply
+    window.addEventListener("popstate", function () { apply.apply(null, fromURL()) })
+    window.__hyApplyMaterial = function (m) { apply("material", m) }
   })()
 
 </script>
@@ -132,8 +171,11 @@ const materialCounts = MATERIALS.map((m) => ({
     display: flex;
     flex-wrap: wrap;
     gap: 6px 8px;
-    margin: 0 0 26px;
+    margin: 0 0 10px;
   }
+  /* 다른 축이므로 줄을 나누고, 마지막 줄이 목록과 거리를 갖는다 */
+  .show-filter { margin-bottom: 26px; }
+  .show-filter a { border-style: dashed; }
   .material-filter a {
     font-size: var(--fs-xs);
     line-height: 1;

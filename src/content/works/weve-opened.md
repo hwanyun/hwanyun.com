@@ -5,8 +5,9 @@ medium: "Interactive dining installation; copper, conductive tape, electric wire
 materials:
   - interactive
   - copper
-  - plastic-sheet
+  - polycarbonate
   - conductive-paint
+showType: group
 size: 2col
 category: work
 order: 10

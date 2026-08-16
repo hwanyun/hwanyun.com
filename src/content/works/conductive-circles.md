@@ -6,6 +6,7 @@ materials:
   - interactive
   - copper
   - projection
+showType: group
 size: 2col
 category: work
 order: 6

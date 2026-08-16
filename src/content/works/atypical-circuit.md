@@ -6,6 +6,7 @@ materials:
   - interactive
   - sensor
   - speaker
+showType: group
 size: 3col
 category: work
 order: 1

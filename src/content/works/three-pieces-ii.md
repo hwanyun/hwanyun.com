@@ -4,6 +4,7 @@ year: "2018"
 medium: "Hanging 3D drawing; ABS filament, 3D pen, wood, fabric"
 materials:
   - 3d-pen
+showType: solo
 size: 1col
 category: work
 order: 5

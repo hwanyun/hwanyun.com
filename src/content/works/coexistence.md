@@ -5,8 +5,9 @@ medium: "Interactive visual installation with live performance; polycarbonate, s
 materials:
   - interactive
   - sensor
-  - plastic-sheet
+  - polycarbonate
   - projection
+showType: group
 size: 3col
 category: work
 order: 3

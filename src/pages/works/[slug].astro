@@ -158,8 +158,15 @@ function toParagraphs(text: string): string {
     }
 
     {
-      data.materials.length > 0 && (
-        <nav class="materials" aria-label="Materials">
+      (data.materials.length > 0 || data.showType) && (
+        <nav class="materials" aria-label="Materials and exhibition format">
+          {/* 전시 형태는 재료가 아니다 — 같은 줄에 서되 점 없이 테두리만으로
+              구분해, 무엇으로 만들었는가와 어떻게 보였는가를 갈라 놓는다. */}
+          {data.showType && (
+            <a class="material-tag is-show" href={`/works/?show=${data.showType}`}>
+              {data.showType === "solo" ? "Solo exhibition" : "Group exhibition"}
+            </a>
+          )}
           {data.materials.map((m) => (
             <a class="material-tag" href={`/works/?material=${m}`}>
               {materialLabel(m)}
@@ -702,6 +709,10 @@ function toParagraphs(text: string): string {
       transition: background var(--dur-fast) ease;
     }
     .material-tag:hover { border-color: var(--hover); color: var(--hover); }
+    /* 전시 형태 — 재료 태그의 접점(점)을 쓰지 않는다. 재료 그래프의 노드가
+       아니라 다른 축이기 때문이다. */
+    .material-tag.is-show::before { display: none; }
+    .material-tag.is-show { padding-left: 11px; color: var(--text); border-color: var(--line); }
     .material-tag:hover::before { background: var(--hover); }
 
     /* 같은 재료의 작품 — 작품 페이지의 막다른 골목을 없앤다 */
@@ -1266,9 +1277,11 @@ function toParagraphs(text: string): string {
         width: calc(100% - 32px);
         margin: 24px 16px 0;
       }
+      /* 데스크톱은 제목:형태 = 38:18 ≈ 2.1인데 모바일은 26:15 ≈ 1.75로
+         제목이 덜 선다. 비율을 되찾는다. */
       .entry_title {
-        font-size: clamp(25px, 7vw, 32px);
-        line-height: 1.22;
+        font-size: clamp(28px, 8vw, 34px);
+        line-height: 1.2;
         margin-bottom: 11px;
       }
       .meta {
@@ -1276,9 +1289,16 @@ function toParagraphs(text: string): string {
         font-size: var(--fs-sm);
         line-height: 1.5;
       }
-      .meta .medium-materials { margin-top: 2px; font-size: var(--fs-xs); line-height: 1.55; }
-      .materials { margin-bottom: 20px; }
-      .series-link { margin: 0 0 24px; font-size: var(--fs-xs); }
+      /* 형태와 재료는 한 캡션이다 — 데스크톱처럼 크기는 같게 두고 색으로만
+         가른다. 모바일에서만 13px로 줄였더니 캡션이 두 층으로 갈라지고,
+         아래 재료 태그(13px)와 같은 크기가 되어 통로와도 구분이 사라졌다. */
+      .meta .medium-materials { margin-top: 2px; line-height: 1.5; }
+      /* 간격이 전부 24px 안팎이라 열 개 구역이 한 뭉텅이로 읽혔다.
+         붙을 것과 떨어질 것을 세 단으로 가른다:
+           같은 묶음 안 10px · 묶음과 묶음 사이 34px · 큰 마디 56px
+         재료 태그와 연작은 둘 다 '다른 작품으로 가는 통로'라 한 묶음이다. */
+      .materials { margin-bottom: 10px; }
+      .series-link { margin: 0 0 34px; font-size: var(--fs-xs); }
       .textcols .col {
         width: 100%;
         margin: 0 0 26px;
@@ -1313,14 +1333,17 @@ function toParagraphs(text: string): string {
       .focus-next { right: 4px; }
       .post-gallery-divider { margin-top: 48px; }
       /* 모바일도 같은 4:1 — 블록 24px, 라벨 6px */
-      .related-materials, .related-sounds, .external-links, .exhibition-credit { margin-top: var(--space-3); }
+      /* 하단 구역들 — 관련 작품 / 관련 사운드 / 읽을거리 / 전시 크레딧은
+         서로 성격이 다르다. 24px로 이어 붙이면 목록 하나로 보인다. */
+      .related-materials, .related-sounds, .external-links, .exhibition-credit { margin-top: 40px; }
       .related-materials-label, .related-sounds-label, .external-links-label, .exhibition-label, .sponsors-label { margin-bottom: var(--space-1); font-size: var(--fs-2xs); }
       .related-sounds-list, .external-links-list { display: grid; gap: 9px; }
       .related-sounds-list a, .external-links-list a { justify-content: space-between; font-size: var(--fs-xs); }
       .exhibition-title { font-size: var(--fs-sm); line-height: 1.6; }
       .exhibition-title span + span::before { content: none; }
       .exhibition-meta { width: 100%; color: var(--text-3); }
-      .sponsors { margin-top: var(--space-3); }
+      /* 후원은 남의 아이덴티티다 — 앞 구역과 더 떼어 크레딧임을 분명히 한다 */
+      .sponsors { margin-top: 48px; }
       .sponsors-row { gap: 20px; }
       .sponsor-name { font-size: var(--fs-sm); }
     }

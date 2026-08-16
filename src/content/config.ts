@@ -27,6 +27,11 @@ const works = defineCollection({
     thumbVideo: z.string().optional().default(""),
     // 재료 태그 — 작품들을 잇는 그래프의 간선. 어휘는 src/data/materials.ts에서 고정한다.
     materials: z.array(z.enum(MATERIAL_IDS)).optional().default([]),
+    /* 전시 형태 — 개인전이냐 단체전이냐. 재료 어휘에 섞지 않는다:
+       재료는 "무엇으로 만들었는가"이고 이건 "어떻게 보였는가"라 축이 다르다.
+       큐레이터가 이력을 읽을 때 가장 먼저 보는 구분이기도 하다.
+       레지던시 리서치처럼 어느 쪽도 아닌 작업은 비워 둔다. */
+    showType: z.enum(["solo", "group"]).optional(),
 
     // 세부 페이지 텍스트 (레퍼런스처럼 EN/KR 2단)
     textEn: z.string().optional().default(""),

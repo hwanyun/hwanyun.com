@@ -6,8 +6,9 @@ materials:
   - interactive
   - copper
   - sensor
-  - plastic-sheet
+  - polycarbonate
   - light
+showType: solo
 size: 3col
 category: work
 order: 2

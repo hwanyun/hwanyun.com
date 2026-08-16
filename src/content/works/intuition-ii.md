@@ -4,6 +4,7 @@ year: "2017"
 medium: "Sculpture (34\"); ABS filament, 3D pen"
 materials:
   - 3d-pen
+showType: solo
 series:
   id: "intuition-untitled"
   label: "Intuition: Untitled"
