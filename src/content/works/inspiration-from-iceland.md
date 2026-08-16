@@ -24,27 +24,18 @@ textKr: |
 
   레지던시 기간에는 그곳의 바람과 물, 주변의 공기에서 들리는 소리를 직접 채집했다. 현장 녹음과 지형을 만졌던 촉각의 기억은 〈Intuition: Untitled I〉과 〈Intuition: Untitled II〉의 출발점이 되었다. 터치에 반응하는 인터랙션을 통해 두 작업은 아이슬란드 자연과의 만남을 소리로 옮긴다. 관객의 손길은 접촉, 거리, 움직임을 통해 풍경의 조용한 밀도를 함께 듣고 느끼는 경험을 만든다.
 media:
-  # 본문 — 풍경에서 만나 도구를 거쳐 프로토타입에 이르는 순서.
-  # 22장 중 7장. 나머지는 아래 archive로 접힌다.
-  - { type: image, src: "/images/inspiration-from-iceland/14.jpg", width: full,
-      caption: "Olafsfjordur, the fjord at low light" }
-  # 도구와 프로토타입은 한 행에 나란히 — 재료와 그 재료가 된 것
-  - { type: image, src: "/images/inspiration-from-iceland/03.jpg", width: half,
-      caption: "Tools and components carried to the residency" }
-  - { type: image, src: "/images/inspiration-from-iceland/04.jpg", width: half,
-      caption: "Sensor and patterned panels, first wiring test" }
-  - { type: image, src: "/images/inspiration-from-iceland/08.jpg", width: full,
-      caption: "Aurora over the town" }
-  - { type: image, src: "/images/inspiration-from-iceland/02.jpg", width: half,
-      caption: "Stripe intervention on the studio building" }
-  - { type: image, src: "/images/inspiration-from-iceland/13.jpg", width: half,
-      caption: "The mountain from the residency window" }
-  - { type: image, src: "/images/inspiration-from-iceland/21.jpg", width: half, align: left,
-      caption: "Ground texture, late autumn" }
-  # 부록 — 레지던시 기간의 기록. 본문 흐름에서 빠져 하단에 접힌다.
+  # 페어는 종횡비를 맞춘다 — 모양이 다른 두 장을 나란히 세우면 행마다
+  # 기하가 새로 시작해 눈이 자리를 못 잡는다. 여기서는 1.33과 0.75만 짝짓는다.
+  - { type: image, src: "/images/inspiration-from-iceland/14.jpg", width: full, caption: "Olafsfjordur, the fjord at low light" }
+  - { type: image, src: "/images/inspiration-from-iceland/03.jpg", width: full, caption: "Tools and components carried to the residency" }
+  - { type: image, src: "/images/inspiration-from-iceland/04.jpg", width: half, caption: "Sensor and patterned panels, first wiring test" }
+  - { type: image, src: "/images/inspiration-from-iceland/06.jpg", width: half, caption: "The working kit, opened" }
+  - { type: image, src: "/images/inspiration-from-iceland/08.jpg", width: full, caption: "Aurora over the town" }
+  - { type: image, src: "/images/inspiration-from-iceland/13.jpg", width: half, caption: "The mountain from the residency window" }
+  - { type: image, src: "/images/inspiration-from-iceland/17.jpg", width: half, caption: "Ground and wall, late autumn" }
+  - { type: image, src: "/images/inspiration-from-iceland/02.jpg", width: half, align: left, caption: "Stripe intervention on the studio building" }
   - { type: image, src: "/images/inspiration-from-iceland/01.jpg", archive: true }
   - { type: image, src: "/images/inspiration-from-iceland/05.jpg", archive: true }
-  - { type: image, src: "/images/inspiration-from-iceland/06.jpg", archive: true }
   - { type: image, src: "/images/inspiration-from-iceland/07.jpg", archive: true }
   - { type: image, src: "/images/inspiration-from-iceland/09.jpg", archive: true }
   - { type: image, src: "/images/inspiration-from-iceland/10.jpg", archive: true }
@@ -52,9 +43,9 @@ media:
   - { type: image, src: "/images/inspiration-from-iceland/12.jpg", archive: true }
   - { type: image, src: "/images/inspiration-from-iceland/15.jpg", archive: true }
   - { type: image, src: "/images/inspiration-from-iceland/16.jpg", archive: true }
-  - { type: image, src: "/images/inspiration-from-iceland/17.jpg", archive: true }
   - { type: image, src: "/images/inspiration-from-iceland/18.jpg", archive: true }
   - { type: image, src: "/images/inspiration-from-iceland/19.jpg", archive: true }
   - { type: image, src: "/images/inspiration-from-iceland/20.jpg", archive: true }
+  - { type: image, src: "/images/inspiration-from-iceland/21.jpg", archive: true }
   - { type: image, src: "/images/inspiration-from-iceland/22.jpg", archive: true }
 ---

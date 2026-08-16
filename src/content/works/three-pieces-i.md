@@ -32,16 +32,13 @@ externalLinks:
   - title: "GlogauAIR — Meet the Artist: Hwan Yun"
     url: "https://glogauair.net/activity/meet-the-artist-hwan-yun/"
 media:
-  # 본문 — 두 작업이 한 공간에서 맺는 관계부터 세운다. 10장 중 7장.
   - { type: image, src: "/images/three-pieces-i/02.jpg", width: full, caption: "The wall work and the table work in relation" }
-  # 벽의 폴리카보네이트와 테이블의 구리 — 두 축을 나란히 놓는다
   - { type: image, src: "/images/three-pieces-i/10.jpg", width: half, caption: "Polycarbonate wall work, sound turned into light" }
   - { type: image, src: "/images/three-pieces-i/01.jpg", width: half, caption: "Copper surface on the table, colour cast across it" }
   - { type: image, src: "/images/three-pieces-i/08.jpg", width: full, caption: "Touch on the copper strings returns as sound" }
   - { type: image, src: "/images/three-pieces-i/06.jpg", width: half, caption: "Wiring and boards beneath the table" }
-  - { type: image, src: "/images/three-pieces-i/09.jpg", width: half, caption: "Visitors gathered at the table" }
-  - { type: image, src: "/images/three-pieces-i/03.jpg", width: half, align: left, caption: "Installation view" }
-  # 부록
+  - { type: image, src: "/images/three-pieces-i/03.jpg", width: half, caption: "Installation view" }
+  - { type: image, src: "/images/three-pieces-i/09.jpg", width: half, align: left, caption: "Visitors gathered at the table" }
   - { type: image, src: "/images/three-pieces-i/04.jpg", archive: true }
   - { type: image, src: "/images/three-pieces-i/05.jpg", archive: true }
   - { type: image, src: "/images/three-pieces-i/07.jpg", archive: true }

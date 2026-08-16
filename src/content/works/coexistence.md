@@ -28,18 +28,15 @@ textKr: |
 thumb: "/images/coexistence/coexistence-thumbnail.png"
 thumbVideo: "/videos/loops/coexistence.mp4"
 media:
-  # 본문 — 공간, 물성, 그리고 그 위에서 벌어진 연주.
   - { type: image, src: "/images/coexistence/01.jpg", width: full, caption: "Installation view" }
-  # 빛이 꺼진 패널과 그 위를 만지는 관객 — 물성과 사용을 한 행에
-  - { type: image, src: "/images/coexistence/03.jpg", width: half, caption: "The folded panel without projection" }
+  - { type: image, src: "/images/coexistence/03.webp", width: full, caption: "The folded panel without projection" }
   - { type: image, src: "/images/coexistence/06.jpeg", width: half, caption: "A visitor engaging with the interactive projection" }
+  - { type: image, src: "/images/coexistence/08.jpeg", width: half, caption: "Performance and audience" }
   - { type: video, src: "/videos/coexistence-1.mp4", width: full, ratio: "16:9", caption: "Live performance documentation" }
   - { type: video, src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/videos/coexistence-3.mp4", width: half, ratio: "9:16", caption: "Live performance documentation" }
   - { type: video, src: "/videos/coexistence-2.mp4", width: half, ratio: "9:16", caption: "Live performance documentation" }
-  - { type: image, src: "/images/coexistence/02.jpg", width: half, caption: "Live violin performance in the exhibition space" }
-  - { type: image, src: "/images/coexistence/08.jpeg", width: half, caption: "Performance and audience" }
-  # 부록
-  - { type: image, src: "/images/coexistence/04.jpg", archive: true }
+  - { type: image, src: "/images/coexistence/02.jpg", width: half, align: left, caption: "Live violin performance in the exhibition space" }
+  - { type: image, src: "/images/coexistence/04.webp", archive: true }
   - { type: image, src: "/images/coexistence/05.jpeg", archive: true }
   - { type: image, src: "/images/coexistence/07.jpeg", archive: true }
   - { type: image, src: "/images/coexistence/09.jpeg", archive: true }

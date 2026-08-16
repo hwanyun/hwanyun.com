@@ -30,10 +30,12 @@ processNote:
   textEn: "Cyanotype is a photographic printing process in which an object is placed directly on light-sensitive paper. Exposure to light and subsequent washing produce an image in characteristic blue tones."
   textKr: "사이아노타입은 감광지 위에 대상을 직접 올리고 빛을 쬐어 이미지를 남기는 사진 인화 기법이다. 노광과 세척을 거치면 특유의 푸른 색조가 나타난다."
 media:
-  - { type: image, src: "/images/three-pieces-iii/01.jpg", width: full, layout: hero, caption: "Installation view, 24 cyanotypes" }
-  - { type: image, src: "/images/three-pieces-iii/03.png", width: full, layout: wide, align: right, caption: "Cyanotype sequence" }
-  - { type: image, src: "/images/three-pieces-iii/04.jpg", width: half, layout: standard, align: left, caption: "Detail of the cyanotype prints" }
-  - { type: image, src: "/images/three-pieces-iii/02.jpg", width: half, layout: portrait, align: right }
+  # 네 점뿐이라 페어를 만들 짝이 없다. 단독 도판을 좌우로 번갈아 놓아
+  # 리듬을 만든다 — 도록이 소품을 다루는 방식이다.
+  - { type: image, src: "/images/three-pieces-iii/01.jpg", width: full, caption: "Installation view, 24 cyanotypes" }
+  - { type: image, src: "/images/three-pieces-iii/04.jpg", width: half, align: left, caption: "Detail of the cyanotype prints" }
+  - { type: image, src: "/images/three-pieces-iii/03.png", width: full, caption: "Cyanotype sequence" }
+  - { type: image, src: "/images/three-pieces-iii/02.jpg", width: half, align: right, caption: "Detail" }
 exhibition:
   titleEn: "Open Studios"
   venue: "GlogauAIR Berlin"
