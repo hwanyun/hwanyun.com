@@ -192,18 +192,20 @@ import Base from "../layouts/Base.astro"
            읽는 데 방해가 된다. 캐릭터 위치를 중심으로 한 정규분포로 두고
            좌표는 화면이 아니라 "캐릭터로부터의 거리"로 들고 있는다 —
            캐릭터가 움직이면 무리도 같이 간다. */
-        var mN = W < 700 ? 60 : 110
+        var mN = W < 700 ? 190 : 330
         motes = []
         for (var k = 0; k < mN; k++) {
           motes.push({
             gx: gauss(),          // 캐릭터 기준 좌우 (σ=1)
             gy: gauss(),          // 캐릭터 기준 상하 (σ=1)
+            // 깊이 — 음수면 캐릭터 앞, 양수면 뒤. 앞뒤 비율은 명시적으로 정한다.
+            // 분포 하나로 섞어 두면 앞쪽이 10%밖에 안 나와 묻힌 느낌이 안 산다.
+            dz: Math.random() < 0.3
+              ? -0.72 * Math.random()
+              : Math.pow(Math.random(), 0.75) * 3.1,
             r: 0.5 + Math.random() * 0.9,
             sp: 0.12 + Math.random() * 0.35,
             ph: Math.random() * 6.28,
-            // 일부는 캐릭터 앞에 둔다. 전부 뒤에 있으면 몸통에 가려
-            // 감싸는 게 아니라 뒤에 깔린 배경이 된다.
-            front: Math.random() < 0.34,
           })
         }
       }
@@ -236,7 +238,6 @@ import Base from "../layouts/Base.astro"
           lastFootX = fX
         }
         var PUSH_R = Math.max(150, W * 0.16) // 영향 반경
-        var nearFoot = [] // 발과 이어 그릴 후보
 
         for (var i = 0; i < ground.length; i++) {
           var p = ground[i]
@@ -261,7 +262,6 @@ import Base from "../layouts/Base.astro"
             sy += dyf * inv * push * push * 9
             r += push * 1.1
             alpha += push * 0.3
-            if (push > 0.45 && nearFoot.length < 26) nearFoot.push({ x: sx, y: sy + wob, w: push })
           }
 
           ctx.beginPath()
@@ -270,44 +270,48 @@ import Base from "../layouts/Base.astro"
           ctx.fill()
         }
 
-        // 발과 지면을 잇는다 — 접지(接地). 전도성 재료를 쓰는 작업의 문법.
-        if (ms0 && nearFoot.length) {
-          for (var nf = 0; nf < nearFoot.length; nf++) {
-            var g = nearFoot[nf]
-            ctx.beginPath()
-            ctx.moveTo(fX, fY)
-            ctx.lineTo(g.x, g.y)
-            ctx.strokeStyle = "rgba(17,17,17," + g.w * 0.12 + ")"
-            ctx.lineWidth = 0.5
-            ctx.stroke()
-          }
-        }
-
         /* 공중의 먼지 — 캐릭터를 감싸는 층. 히어로와 같은 입자의 결을 유지하되
            위치는 캐릭터에 매여 있다. 마스코트가 아직 안 떴으면 화면 중앙을 쓴다. */
-        var bodyH = ms0 ? Math.max(80, fY - ms0.handY) : H * 0.28
+        /* 손과 발 사이는 몸 전체가 아니다 — 손은 머리끝에서 대략 7할 되는 지점이라
+           그 중점을 쓰면 무리의 중심이 몸 중심보다 아래로 처지고 머리·어깨가 빈다. */
+        var bodyH = ms0 ? Math.max(110, (fY - ms0.handY) * 1.45) : H * 0.4
         var mcx = ms0 ? fX : W / 2
-        var mcy = ms0 ? (fY + ms0.handY) / 2 : H * 0.46
-        var SX = bodyH * 0.95   // 좌우 퍼짐
-        var SY = bodyH * 0.8    // 상하 퍼짐
-        var SPAN = bodyH * 2.4  // 위로 흐르다 되돌아오는 띠의 높이
+        var mcy = ms0 ? fY - bodyH * 0.5 : H * 0.42
+        /* 평면이 아니라 부피여야 캐릭터가 그 안에 묻힌다. 입자마다 깊이를 주고
+           원근으로 투영한다 — 가까운 것은 크고 흐릿하게(초점 밖), 먼 것은 작고
+           옅게. 깊이가 음수인 입자는 캐릭터 위 레이어에 그려 앞을 지나간다. */
+        var SX = bodyH * 0.82   // 좌우 퍼짐
+        var SY = bodyH * 0.72   // 상하 퍼짐 — 머리끝부터 발밑까지 덮는다
+        var SPAN = bodyH * 2.2  // 위로 흐르다 되돌아오는 띠의 높이
+        var FOCAL = bodyH * 1.7
         for (var k = 0; k < motes.length; k++) {
           var m = motes[k]
+          var az = m.dz * FOCAL
+          var s = FOCAL / (FOCAL + az)          // 원근 배율
+          if (s <= 0.04) continue
           var ox = m.gx * SX + (reduce ? 0 : Math.sin(t * 0.5 + m.ph) * 7)
           var oy = m.gy * SY
           if (!reduce) {
             // 띠 안에서 위로 흐르고 넘치면 아래로 되돌아온다
             oy = ((oy - t * 12 * m.sp + SPAN * 1.5) % SPAN) - SPAN / 2
           }
-          // 가장자리는 잘리지 않고 흩어져 사라진다
-          var d = Math.sqrt((ox / SX) * (ox / SX) + (oy / SY) * (oy / SY))
-          var a = 0.15 * Math.max(0, 1 - d / 2.6)
-          if (a <= 0.004) continue
-          // 앞에 있는 것은 더 옅게 — 짙으면 얼굴을 더럽힌다
-          var g2 = m.front ? fxc : ctx
+          var px = mcx + ox * s
+          var py = mcy + oy * s
+          if (px < -8 || px > W + 8 || py < -8 || py > H + 8) continue
+
+          var front = az < 0
+          // 앞의 것은 가까울수록 크고 옅어진다 — 렌즈에서 초점이 나간 알갱이.
+          // 짙게 두면 얼굴을 덮어 캐릭터가 더러워진다.
+          var a = front ? 0.13 / s : 0.19 * Math.min(1, s)
+          // 흐름 때문에 세로가 균일해지면 몸 주변이 헐거워진다. 몸 높이에서
+          // 멀어질수록 옅게 해 무리의 중심을 캐릭터에 되돌린다.
+          a *= Math.max(0.22, 1 - Math.abs(oy) / (SY * 2.4))
+          var rr = Math.min(4.5, m.r * s)
+          if (a <= 0.004 || rr < 0.15) continue
+          var g2 = front ? fxc : ctx
           g2.beginPath()
-          g2.arc(mcx + ox, mcy + oy, m.r, 0, Math.PI * 2)
-          g2.fillStyle = "rgba(17,17,17," + (m.front ? a * 0.6 : a).toFixed(3) + ")"
+          g2.arc(px, py, rr, 0, Math.PI * 2)
+          g2.fillStyle = "rgba(17,17,17," + a.toFixed(3) + ")"
           g2.fill()
         }
 
