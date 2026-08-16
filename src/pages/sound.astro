@@ -246,8 +246,8 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
        어디서나 같은 모양이어야 한다. */
     .sound-filter { display: flex; flex-wrap: wrap; gap: 6px 8px; margin: 0 0 22px; }
     .sound-filter a {
-      /* 칩은 UI — 15로 통일 (works 필터와 같은 규칙) */
-      font-size: var(--fs-sm); line-height: 1; padding: 6px 11px;
+      /* 칩은 도구 — 콘텐츠보다 조용하게, works 필터와 같은 13 */
+      font-size: var(--fs-xs); line-height: 1; padding: 6px 11px;
       border: 1px solid var(--line-2); border-radius: 999px; color: var(--text-2);
       transition: border-color var(--dur-fast) ease, color var(--dur-fast) ease, background var(--dur-fast) ease;
     }
@@ -349,7 +349,7 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
         overflow-x: auto;
         overscroll-behavior-x: contain;
         margin-inline: -16px;
-        padding: 5px 16px;
+        padding: 7px 16px;
         scrollbar-width: none;
       }
       .sound-filter::-webkit-scrollbar { display: none; }
@@ -359,11 +359,10 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
         align-items: center;
         white-space: nowrap;
         position: relative;
-        min-height: 34px;
+        min-height: 30px;
         padding-block: 0;
-        font-size: var(--fs-sm);
       }
-      .sound-filter a::after { content: ""; position: absolute; inset: -5px 0; }
+      .sound-filter a::after { content: ""; position: absolute; inset: -7px 0; }
       .release-count { display: none; }
       .moving-tag { font-size: var(--fs-2xs); }
       /* 재생 버튼이 21×21이라 손가락으로 겨누기 어려웠다. 원 자체를 키우면
