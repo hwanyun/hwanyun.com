@@ -725,10 +725,14 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
          전환감은 유지하면서 등장 애니메이션이 보일 구간이 생긴다. */
       scroll-snap-type: y proximity;
     }
-    /* 모바일은 그리드 아래 푸터가 있어 mandatory면 마지막 영역에 닿지 못한다.
-       proximity로 완화 — 전환감은 유지하되 끝까지 스크롤이 된다. */
+    /* 모바일에서는 그리드가 어중간하게 걸친 채 멈추는 일이 잦다 — 화면이
+       좁아 손가락 한 번의 관성이 화면 높이에 못 미치기 때문이다. 히어로와
+       그리드 두 지점에만 mandatory로 붙이고, 그 아래(푸터 등)는 스냅
+       대상에서 빼 끝까지 스크롤되게 둔다. */
     @media (max-width: 700px) {
-      :global(html) { scroll-snap-type: y proximity; }
+      :global(html) { scroll-snap-type: y mandatory; }
+      .hero-spacer, .work-archive { scroll-snap-stop: always; }
+      :global(body > footer) { scroll-snap-align: none; }
     }
     /* 히어로는 화면에 고정되고, 그리드가 그 위를 덮으며 올라온다 —
        한 문서가 통째로 밀려가는 롱페이지가 아니라 다음 페이지가 뜨는 전환감.
@@ -797,7 +801,9 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     .upcoming-ticker.is-elastic { user-select: none; -webkit-user-select: none; }
     .upcoming-ticker:hover :global(.ut-row) { color: var(--surface); }
     @media (max-width: 700px) {
-      .upcoming-ticker { left: 16px; bottom: 18px; max-width: calc(100vw - 32px); }
+      /* 우하단은 '위로' 버튼 자리다(38px + 여백). 티커가 폭 전체를 쓰면
+         버튼이 전시 정보를 덮는다 — 전시가 밀리는 쪽이 훨씬 나쁜 손해다. */
+      .upcoming-ticker { left: 16px; bottom: 18px; max-width: calc(100vw - 32px - 52px); }
     }
 
     /* LISTEN — 티커와 같은 층위의 조용한 컨트롤, 우하단.
@@ -920,6 +926,9 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         display: grid;
         align-content: center;
         padding-top: var(--mobile-header-h, 58px);
+        /* 스냅이 붙을 때 고정 헤더 아래로 정확히 떨어지게 한다 */
+        scroll-margin-top: 0;
+        min-height: 100svh;
       }
       .work-archive :global(#packed) { height: 72svh; }
     }

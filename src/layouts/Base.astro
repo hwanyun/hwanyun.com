@@ -75,9 +75,38 @@ const shareImage = new URL(
     </nav>
     <slot />
     <div class="cursor-dot" aria-hidden="true"></div>
+
+    {/* 위로 — 긴 페이지(작품 상세는 도판이 일곱 겹이다)에서 상단으로 돌아갈
+        방법이 없었다. 스크롤이 한 화면을 넘어가면 나타난다. */}
+    <button type="button" class="to-top" id="to-top" hidden aria-label="Back to top">
+      <span aria-hidden="true">↑</span>
+    </button>
     <footer>
       © 2014–<span id="footer-year">{new Date().getFullYear()}</span> HWANYUN
     </footer>
+
+    <script is:inline>
+      /* 위로 — 한 화면 넘게 내려가면 나타난다. 홈은 히어로가 fixed라
+         스크롤 위치가 곧 그리드의 덮임 정도이므로 같은 기준이 그대로 통한다. */
+      ;(function () {
+        var btn = document.getElementById("to-top")
+        if (!btn) return
+        var shown = false
+        function upd() {
+          var want = window.scrollY > window.innerHeight * .9
+          if (want === shown) return
+          shown = want
+          btn.hidden = !want
+        }
+        window.addEventListener("scroll", upd, { passive: true })
+        window.addEventListener("resize", upd)
+        btn.addEventListener("click", function () {
+          var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" })
+        })
+        upd()
+      })()
+    </script>
 
     <script is:inline>
       /* 빌드 시점 연도가 박히면 재배포 없이 해가 바뀔 때 낡는다. 브라우저에서 보정한다. */
@@ -331,6 +360,36 @@ const shareImage = new URL(
       .site-menu .lang-switch { display: none; }
       a { color: var(--text); text-decoration: none; }
       a:hover { color: var(--hover); }
+
+      /* 위로 — 우하단. 사이트의 조용한 어휘를 따른다: 얇은 선, 색 하나로만 반응.
+         푸터가 하단에 있으므로 그보다 위에 뜨고, 홈에서는 검은 히어로 위에
+         올 수 있으니 문맥색(--chrome-fg)을 쓴다. */
+      .to-top {
+        position: fixed;
+        right: 22px;
+        bottom: 26px;
+        z-index: 40;
+        width: 40px;
+        height: 40px;
+        display: grid;
+        place-items: center;
+        padding: 0;
+        border: 1px solid color-mix(in srgb, var(--chrome-fg, var(--text)) 26%, transparent);
+        border-radius: 50%;
+        background: color-mix(in srgb, var(--surface) 82%, transparent);
+        color: var(--chrome-fg, var(--text));
+        font-size: var(--fs-sm);
+        line-height: 1;
+        cursor: pointer;
+        transition: border-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+      }
+      .to-top[hidden] { display: none; }
+      .to-top:hover { border-color: var(--hover); color: var(--hover); }
+      /* 홈의 검은 히어로 위에서는 배경도 어둡게 — 흰 원이 뜨면 구체를 가린다 */
+      body[data-chrome="dark"] .to-top { background: color-mix(in srgb, var(--void) 72%, transparent); }
+      @media (max-width: 700px) {
+        .to-top { right: 16px; bottom: 18px; width: 38px; height: 38px; }
+      }
 
       .cursor-dot { display: none; }
       @media (pointer: fine) {
