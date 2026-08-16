@@ -105,7 +105,14 @@ const { data, korean = false } = Astro.props
   }
   /* ── 인쇄 = PDF ──
      브라우저의 "PDF로 저장"이 곧 파일이다. 파일을 따로 만들어 두면
-     CV를 고칠 때마다 낡지만, 이건 늘 지금 데이터를 인쇄한다. */
+     CV를 고칠 때마다 낡지만, 이건 늘 지금 데이터를 인쇄한다.
+
+     조판 원칙: 한 장은 목표가 아니라 결과다.
+     이력이 늘어 두 장이 되면 그대로 두 장으로 간다. 억지로 맞추려고
+     활자를 줄이면 읽히지 않는 이력서가 되고, 읽히지 않는 한 장보다
+     읽히는 두 장이 낫다. 아래 크기(9.2pt/1.45)가 하한선이니 넘치면
+     활자가 아니라 내용을 손보거나 두 장을 받아들인다.
+     대신 어디서 잘리든 항목이 반으로 갈라지지 않게 break 규칙을 건다. */
   @media print {
     /* 화면의 크롬은 종이에 있을 이유가 없다 */
     :global(.site-menu), :global(.lang-corner), :global(body > footer),
@@ -115,8 +122,8 @@ const { data, korean = false } = Astro.props
     .page {
       margin: 0;
       max-width: none;
-      font-size: 8.5pt;
-      line-height: 1.38;
+      font-size: 9.2pt;
+      line-height: 1.45;
       color: #000;
     }
     .print-head {
@@ -129,17 +136,17 @@ const { data, korean = false } = Astro.props
     .ph-meta { margin-top: 4pt; font-size: 9pt; color: #333; }
     .ph-contact { margin-top: 3pt; font-size: 8.4pt; color: #555; font-variant-numeric: tabular-nums; }
 
-    .cv-section { margin: 0 0 7.5pt; }
+    .cv-section { margin: 0 0 9.5pt; }
     .cv-title {
-      font-size: 8.8pt;
+      font-size: 9.2pt;
       font-weight: 600;
-      margin: 0 0 3pt;
+      margin: 0 0 4pt;
       padding-bottom: 2pt;
       border-bottom: .6pt solid #000;
       letter-spacing: .04em;
       text-transform: uppercase;
     }
-    .row { grid-template-columns: 72pt 1fr; gap: 9pt; padding: 0.9pt 0; }
+    .row { grid-template-columns: 76pt 1fr; gap: 10pt; padding: 1.4pt 0; }
     .year { color: #444; }
     .text { color: #000; }
 
