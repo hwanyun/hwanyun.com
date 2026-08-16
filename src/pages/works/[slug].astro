@@ -583,20 +583,19 @@ function toParagraphs(text: string): string {
       margin: var(--desktop-header-clearance) 40px 100px var(--desktop-content-x);
       position: relative;
     }
-    /* 상단은 세 겹으로만 읽혀야 한다: 제목 / 캡션 한 줄 / 통로(재료·연작).
-       매체와 재료를 각각 한 줄씩 쓰면 캡션 하나가 두 층으로 보이고,
-       바로 아래 재료 태그까지 더해져 본문 전에 다섯 겹이 쌓였다. */
+    /* 전시 캡션(월 라벨) 순서를 그대로 따른다 — 제목 / 성향 / 재료.
+       세 줄이 각각 한 층으로 보이면 안 되고 하나의 캡션 덩어리로 읽혀야 하므로,
+       안쪽 행간은 좁히고 대신 아래 재료 태그 앞에서 크게 띄운다.
+       그 간격이 "여기까지가 캡션, 여기부터는 통로"를 가른다. */
     .entry_title {
       font-size: var(--fs-display);
       font-weight: 300;
       line-height: 1.25;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
-    .meta { font-size: var(--fs-body); font-weight: 400; line-height: 1.6; color: var(--text-2); margin: 0 0 18px; }
-    .meta .medium-type { color: var(--text); }
-    .meta .medium-materials { color: var(--text-3); }
-    /* 가운뎃점으로 잇되 줄이 바뀌면 점이 줄머리에 남지 않게 붙여 둔다 */
-    .meta .medium-materials::before { content: " · "; color: var(--text-4); }
+    .meta { font-size: var(--fs-body); font-weight: 400; line-height: 1.45; color: var(--text-2); margin: 0 0 30px; }
+    .meta .medium-type { display: block; color: var(--text); }
+    .meta .medium-materials { display: block; margin-top: 3px; color: var(--text-3); }
 
     /* 재료 태그 — 같은 재료를 쓴 작품으로 가는 통로.
        회로의 접점을 연상시키되 사이트의 흑백 톤은 유지한다. */
@@ -1081,10 +1080,11 @@ function toParagraphs(text: string): string {
         margin-bottom: 11px;
       }
       .meta {
-        margin-bottom: 14px;
+        margin-bottom: 24px;
         font-size: var(--fs-sm);
-        line-height: 1.6;
+        line-height: 1.5;
       }
+      .meta .medium-materials { margin-top: 2px; font-size: var(--fs-xs); line-height: 1.55; }
       .materials { margin-bottom: 20px; }
       .series-link { margin: 0 0 24px; font-size: var(--fs-xs); }
       .textcols .col {
