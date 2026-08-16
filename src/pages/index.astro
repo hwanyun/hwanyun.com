@@ -28,8 +28,131 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     <canvas id="particle-canvas" class="hero__field" aria-hidden="true"></canvas>
     <h1 id="hero-title" class="sr-only">HWANYUN</h1>
     <a id="upcoming-ticker" class="upcoming-ticker" href="/events/" hidden draggable="false" aria-label="Upcoming events"><span class="ut-list" id="ut-track"></span></a>
+
+    {/* 방 안의 소리에 구체가 반응한다 — 명시적으로 켜는 층.
+        신뢰는 문구가 아니라 구조로 준다: 이 사이트는 정적 페이지라 소리를
+        받을 서버 자체가 없고, 분석은 브라우저 안에서 끝나며, 끄는 순간
+        브라우저(OS)가 관리하는 녹음 표시등이 꺼진다 — 표시등은 사이트가
+        속일 수 없는 증인이다. */}
+    <div id="listen" class="listen">
+      <button type="button" id="listen-btn" aria-pressed="false">
+        <span class="ls-dot" aria-hidden="true"></span>
+        <span class="ls-label" id="listen-label">LISTEN</span>
+      </button>
+      <div class="ls-note" id="listen-note" hidden>
+        <p>
+          <span data-language-content="en">The sphere responds to the sound of your room. Audio never leaves this device — nothing is recorded, stored, or sent; this is a static page with no server to send it to. Loudness is read in the browser and discarded. Your browser shows its own mic indicator, and it turns off the moment you stop.</span>
+          <span data-language-content="ko" lang="ko">구체가 지금 계신 곳의 소리에 반응합니다. 소리는 이 기기를 떠나지 않습니다 — 녹음·저장·전송이 없고, 이 사이트는 정적 페이지라 소리를 받을 서버 자체가 없습니다. 브라우저 안에서 밝기만 읽고 바로 버립니다. 마이크 사용 중에는 브라우저가 직접 표시등을 켜고, 끄는 순간 함께 꺼집니다.</span>
+        </p>
+        <div class="ls-actions">
+          <button type="button" id="listen-start">
+            <span data-language-content="en">Turn on</span>
+            <span data-language-content="ko">켜기</span>
+          </button>
+          <button type="button" id="listen-cancel">
+            <span data-language-content="en">Not now</span>
+            <span data-language-content="ko">닫기</span>
+          </button>
+        </div>
+      </div>
+    </div>
   </section>
   <script type="application/json" id="ev-data" is:inline set:html={JSON.stringify(upEvents)}></script>
+
+  <script is:inline>
+    /* 마이크 → 입자. 오디오는 이 함수 밖으로 나가지 않는다:
+       스트림은 어떤 노드에도 연결되지 않은 분석기에서 끝나고(스피커로도
+       안 간다), 매 프레임 숫자 셋(level/low/high)만 남기고 버린다.
+       탭이 숨거나 페이지를 떠나면 즉시 트랙을 놓는다 — 브라우저 표시등이
+       꺼지는 것으로 사용자가 직접 확인할 수 있다. */
+    ;(function () {
+      var root = document.getElementById("listen")
+      var btn = document.getElementById("listen-btn")
+      var note = document.getElementById("listen-note")
+      var startBtn = document.getElementById("listen-start")
+      var cancelBtn = document.getElementById("listen-cancel")
+      if (!root || !btn) return
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { root.hidden = true; return }
+
+      var mic = { on: false, level: 0, low: 0, high: 0 }
+      window.__hyMic = mic
+      var ctx = null, stream = null, analyser = null, raf = 0
+      var freq, wave
+
+      function setState(state) { root.dataset.state = state; btn.setAttribute("aria-pressed", String(state === "on")) }
+
+      function analyse() {
+        analyser.getByteTimeDomainData(wave)
+        analyser.getByteFrequencyData(freq)
+        var sum = 0
+        for (var i = 0; i < wave.length; i++) { var d = (wave[i] - 128) / 128; sum += d * d }
+        var rms = Math.sqrt(sum / wave.length)
+        // 저역: ~250Hz 아래, 고역: ~2kHz 위 (bin폭 = sampleRate/fftSize)
+        var binHz = ctx.sampleRate / analyser.fftSize
+        var lowEnd = Math.max(2, Math.round(250 / binHz))
+        var highStart = Math.round(2000 / binHz)
+        var lo = 0, hi = 0
+        for (var a = 1; a < lowEnd; a++) lo += freq[a]
+        for (var b = highStart; b < freq.length; b++) hi += freq[b]
+        lo /= (lowEnd - 1) * 255
+        hi /= (freq.length - highStart) * 255
+        // 공격은 빠르게, 복귀는 느리게 — 소리가 치면 바로 반응하고 여운은 남는다
+        mic.level += ((Math.min(1, rms * 3.2)) - mic.level) * (rms * 3.2 > mic.level ? .5 : .06)
+        mic.low += (Math.min(1, lo * 2.4) - mic.low) * (lo * 2.4 > mic.low ? .4 : .05)
+        mic.high += (Math.min(1, hi * 3.4) - mic.high) * (hi * 3.4 > mic.high ? .5 : .07)
+        root.style.setProperty("--mic", mic.level.toFixed(3))
+        raf = requestAnimationFrame(analyse)
+      }
+
+      function stop() {
+        mic.on = false
+        if (raf) { cancelAnimationFrame(raf); raf = 0 }
+        if (stream) { stream.getTracks().forEach(function (t) { t.stop() }); stream = null }
+        if (ctx) { ctx.close().catch(function () {}); ctx = null }
+        mic.level = mic.low = mic.high = 0
+        root.style.setProperty("--mic", "0")
+        setState("idle")
+      }
+
+      function start() {
+        navigator.mediaDevices.getUserMedia({
+          audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
+        }).then(function (s) {
+          stream = s
+          ctx = new (window.AudioContext || window.webkitAudioContext)()
+          analyser = ctx.createAnalyser()
+          analyser.fftSize = 512
+          analyser.smoothingTimeConstant = .55
+          // destination에 연결하지 않는다 — 소리는 분석기에서 끝난다
+          ctx.createMediaStreamSource(s).connect(analyser)
+          freq = new Uint8Array(analyser.frequencyBinCount)
+          wave = new Uint8Array(analyser.fftSize)
+          mic.on = true
+          note.hidden = true
+          setState("on")
+          analyse()
+          // 기기에서 마이크가 뽑히는 등 트랙이 밖에서 끝나면 UI도 따라간다
+          s.getTracks().forEach(function (t) { t.onended = stop })
+        }).catch(function () {
+          note.hidden = true
+          setState("denied")
+          setTimeout(function () { if (root.dataset.state === "denied") setState("idle") }, 2600)
+        })
+      }
+
+      btn.addEventListener("click", function () {
+        if (mic.on) { stop(); return }
+        note.hidden = !note.hidden
+      })
+      startBtn.addEventListener("click", start)
+      cancelBtn.addEventListener("click", function () { note.hidden = true })
+
+      /* 화면을 보고 있지 않으면 들을 이유가 없다 */
+      document.addEventListener("visibilitychange", function () { if (document.hidden && mic.on) stop() })
+      window.addEventListener("pagehide", function () { if (mic.on) stop() })
+    })()
+  </script>
+
   <script is:inline>
     ;(function () {
       var el = document.getElementById("upcoming-ticker")
@@ -401,7 +524,12 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         const sinRotation = Math.sin(rotation)
         const cosTilt = Math.cos(tilt)
         const sinTilt = Math.sin(tilt)
-        const globeRadius = size * .38
+        /* 방의 소리 — 음량은 구체의 호흡(반지름), 고역은 표면의 산란.
+           마이크를 켠 사람에게만 존재하는 층이고, 값은 이미 감쇠되어 온다. */
+        const mic = (window as any).__hyMic
+        const audioLevel = mic && mic.on ? mic.level : 0
+        const audioHigh = mic && mic.on && !reduceMotion ? mic.high : 0
+        const globeRadius = size * .38 * (1 + audioLevel * .17)
         // 데스크톱은 커서가 얹혀 있는 동안, 모바일은 손가락이 닿아 있는 동안
         const repelling = isInside && hasPointer && !reduceMotion
 
@@ -432,13 +560,18 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
               pushY = (deltaY / distance) * push
             }
           }
+          // 고역 산란 — 구체 상태에서만. 이름은 읽혀야 하므로 흔들지 않는다.
+          if (audioHigh > .02 && !isInside) {
+            pushX += (Math.random() - .5) * audioHigh * 2.6
+            pushY += (Math.random() - .5) * audioHigh * 2.6
+          }
           particle.vx = (particle.vx + (destinationX - particle.x) * (isInside ? .025 : .024) + pushX) * .8
           particle.vy = (particle.vy + (destinationY - particle.y) * (isInside ? .025 : .024) + pushY) * .8
           particle.x += particle.vx
           particle.y += particle.vy
           context.beginPath()
           const pointSize = isInside ? 1.1 : .52 + (depth + 1) * .48
-          const brightness = isInside ? .96 : .26 + (depth + 1) * .34
+          const brightness = isInside ? .96 : Math.min(.9, .26 + (depth + 1) * .34 + audioLevel * .18)
           context.arc(particle.x, particle.y, pointSize, 0, Math.PI * 2)
           context.fillStyle = `rgba(255, 255, 255, ${brightness})`
           context.fill()
@@ -599,6 +732,57 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     .upcoming-ticker:hover :global(.ut-row) { color: var(--surface); }
     @media (max-width: 700px) {
       .upcoming-ticker { left: 16px; bottom: 18px; max-width: calc(100vw - 32px); }
+    }
+
+    /* LISTEN — 티커와 같은 층위의 조용한 컨트롤, 우하단.
+       점 하나가 상태를 말한다: 꺼짐=빈 원, 켜짐=음량으로 부푸는 점. */
+    .listen {
+      position: absolute; right: 22px; bottom: 26px; z-index: 2;
+      display: flex; flex-direction: column; align-items: flex-end; gap: 10px;
+    }
+    .listen button { background: none; border: 0; padding: 0; cursor: pointer; font: inherit; }
+    #listen-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--void-label); font-size: var(--fs-2xs); letter-spacing: .16em;
+    }
+    #listen-btn:hover { color: var(--surface); }
+    .ls-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      border: 1px solid currentColor; background: transparent;
+      transition: background var(--dur-base) ease;
+    }
+    /* 켜지면 점이 음량으로 숨 쉰다 — 반응한다는 사실 자체가 상태 표시다 */
+    .listen[data-state="on"] .ls-dot {
+      background: currentColor;
+      transform: scale(calc(1 + var(--mic, 0) * 1.6));
+    }
+    .listen[data-state="on"] #listen-btn { color: var(--surface); }
+    .listen[data-state="denied"] #listen-btn { color: var(--void-text-2); }
+
+    .ls-note {
+      max-width: 300px; padding: 14px 16px;
+      background: rgba(10, 11, 13, .92);
+      border: 1px solid var(--void-line);
+      color: var(--void-text);
+      font-size: var(--fs-xs); line-height: 1.6;
+      text-align: left;
+    }
+    .ls-note p { margin: 0 0 12px; color: var(--void-text-2); }
+    .ls-actions { display: flex; gap: 14px; }
+    .ls-actions button {
+      font-size: var(--fs-2xs); letter-spacing: .1em; text-transform: uppercase;
+      color: var(--void-text); border-bottom: 1px solid var(--void-line);
+      padding-bottom: 2px;
+    }
+    .ls-actions button:hover { color: var(--surface); border-color: var(--surface); }
+    #listen-cancel { color: var(--void-text-2); }
+
+    @media (max-width: 700px) {
+      .listen { right: 16px; bottom: 18px; }
+      .ls-note { max-width: min(300px, calc(100vw - 32px)); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .listen[data-state="on"] .ls-dot { transform: none; }
     }
     /* 고정된 히어로가 흐름에서 빠졌으므로, 히어로 한 화면 분량의 스크롤 길이와
        스냅 기준점을 이 자리표시자가 대신 갖는다. */
