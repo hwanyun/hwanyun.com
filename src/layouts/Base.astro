@@ -63,6 +63,11 @@ const shareImage = new URL(
     <slot name="head" />
   </head>
   <body data-chrome={chrome}>
+    {/* 모바일 메뉴 뒤를 덮는 스크림. 패널은 내용만큼만 열리고 나머지는 이 층이
+        어둡게 받는다 — 페이지 맥락이 남아 어디에 있었는지 알 수 있고, 여기를
+        탭하면 닫힌다는 것도 관습으로 읽힌다. 메뉴 안에 두면(가상 요소로 두면)
+        탭이 메뉴를 향한 것으로 잡혀 바깥 클릭 닫기가 걸리지 않는다. */}
+    <div class="menu-scrim" hidden></div>
     <slot name="menu">
       <SiteMenu variant="page" current={current} />
     </slot>
@@ -177,9 +182,13 @@ const shareImage = new URL(
            시트 안에서 손가락을 움직였을 때 뒤 목록이 따라 스크롤되고, 닫았을 때
            보던 자리를 잃는다. 위치를 기억했다가 닫을 때 그대로 돌려놓는다. */
         var scrollLock = 0
-        function lockScroll() {
+        /* 위치는 반드시 is-open을 붙이기 전에 읽어 넘겨야 한다. 열린 메뉴는
+           position: fixed라 헤더가 흐름에서 빠지고, 그만큼(69px) 문서가 짧아지면
+           브라우저가 스크롤을 최댓값으로 잘라낸다 — 그 뒤에 읽으면 이미 밀린
+           값이라 닫을 때 보던 자리보다 그만큼 위로 돌아간다. */
+        function lockScroll(at) {
           if (document.body.dataset.menuLocked) return
-          scrollLock = window.scrollY
+          scrollLock = typeof at === "number" ? at : window.scrollY
           document.body.dataset.menuLocked = "1"
           document.body.style.position = "fixed"
           document.body.style.top = -scrollLock + "px"
@@ -195,16 +204,33 @@ const shareImage = new URL(
         }
         var isMobileMenu = function () { return window.matchMedia("(max-width: 700px)").matches }
 
+        var scrim = document.querySelector(".menu-scrim")
+        function showScrim() {
+          if (!scrim) return
+          scrim.hidden = false
+          // hidden을 떼자마자 같은 프레임에 클래스를 붙이면 전환이 생략된다
+          requestAnimationFrame(function () { scrim.classList.add("is-visible") })
+        }
+        function hideScrim() {
+          if (!scrim) return
+          scrim.classList.remove("is-visible")
+          scrim.hidden = true
+        }
+
         Array.prototype.forEach.call(menus, function (menu) {
           var toggle = menu.querySelector(".menu-hamburger")
           var workLink = menu.querySelector(".works-toggle")
 
           if (toggle) {
             toggle.addEventListener("click", function () {
+              var at = window.scrollY   // 클래스를 붙이기 전의 위치 (lockScroll 주석 참조)
               var isOpen = menu.classList.toggle("is-open")
               toggle.setAttribute("aria-expanded", String(isOpen))
               toggle.setAttribute("aria-label", isOpen ? "Close navigation" : "Open navigation")
-              if (isMobileMenu()) { isOpen ? lockScroll() : unlockScroll() }
+              if (isMobileMenu()) {
+                if (isOpen) { lockScroll(at); showScrim() }
+                else { unlockScroll(); hideScrim() }
+              }
             })
           }
 
@@ -225,15 +251,16 @@ const shareImage = new URL(
             if (toggle) toggle.setAttribute("aria-expanded", "false")
             if (workLink) workLink.setAttribute("aria-expanded", "false")
             unlockScroll()
+            hideScrim()
           })
 
           /* 링크를 눌러 페이지를 떠나면 잠금이 남는다 — bfcache로 돌아왔을 때
              스크롤이 묶인 채로 열린다. 떠나기 전에 반드시 푼다. */
           menu.addEventListener("click", function (event) {
             var link = event.target.closest ? event.target.closest("a[href]") : null
-            if (link && !link.classList.contains("works-toggle")) unlockScroll()
+            if (link && !link.classList.contains("works-toggle")) { unlockScroll(); hideScrim() }
           })
-          window.addEventListener("pagehide", unlockScroll)
+          window.addEventListener("pagehide", function () { unlockScroll(); hideScrim() })
 
           // 다른 페이지에서 "Works"로 넘어온 경우 메뉴를 펼친 상태로 연다.
           if (window.location.hash === "#menu-works") {
@@ -609,18 +636,18 @@ const shareImage = new URL(
         }
         .site-menu .name a { display: block; }
 
-        /* 열린 메뉴는 화면을 덮는 시트다.
-           이전에는 높이가 내용만큼(302px)이고 배경이 50% 투명이라, 뒤의 필터 칩과
-           작품 목록이 글자 사이로 비쳐 읽기 어려웠고 메뉴가 페이지 위에 인쇄된
-           것처럼 보였다. 모바일 내비게이션의 표준은 둘 중 하나다 — 뒤를 덮는
-           불투명 시트, 또는 어둡게 깔린 스크림 위의 패널. 여기서는 항목이 최대
-           19개(작품 아코디언 포함)라 전자가 맞는다. */
+        /* 열린 메뉴는 내용만큼 내려오는 불투명 패널이고, 나머지는 스크림이 받는다.
+           원래 문제는 높이가 아니라 배경이 50% 투명이라 뒤의 필터 칩과 작품
+           목록이 글자 사이로 비친 것이었다. 화면을 통째로 덮어 해결할 수도 있지만
+           항목이 다섯 개뿐이라 빈 흰 화면만 300px 넘게 남는다 — 페이지를 가리는
+           대가로 얻는 게 없다. 맥락을 스크림 너머로 남긴다.
+           작품 아코디언이 펼쳐져 길어지면 패널 자신이 스크롤한다. */
         .site-menu.is-open {
           position: fixed;
-          inset: 0;
+          inset: 0 0 auto;
           padding-bottom: max(22px, env(safe-area-inset-bottom));
           background: var(--surface);
-          /* 내용이 화면보다 길어지면 시트 자신이 스크롤한다 */
+          max-height: 88dvh;
           overflow-y: auto;
           -webkit-overflow-scrolling: touch;
           overscroll-behavior: contain;
@@ -684,6 +711,17 @@ const shareImage = new URL(
 
         /* 코너 토글은 데스크톱 전용 — 모바일에서는 헤더 안의 lang-switch가 그 역할을 한다 */
         .lang-corner { display: none; }
+
+        /* 패널 바로 아래 층. 페이지를 지우지 않고 뒤로 물린다. */
+        .menu-scrim {
+          position: fixed;
+          inset: 0;
+          z-index: 29;
+          background: rgba(0, 0, 0, .45);
+          opacity: 0;
+          transition: opacity var(--dur-base) ease;
+        }
+        .menu-scrim.is-visible { opacity: 1; }
         /* 언어는 햄버거를 열지 않아도 보여야 한다. 크롬이 영문 고정이라,
            패널 안에만 두면 한국어가 있다는 사실 자체가 드러나지 않는다.
            같은 그리드 안(이름 | EN/KO | ☰)이라 정렬에 매직 넘버가 필요 없다. */
