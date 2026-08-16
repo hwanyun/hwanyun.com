@@ -173,6 +173,28 @@ const shareImage = new URL(
         var menus = document.querySelectorAll(".site-menu")
         if (!menus.length) return
 
+        /* 시트가 열려 있는 동안 뒤 페이지는 움직이지 않아야 한다. 잠그지 않으면
+           시트 안에서 손가락을 움직였을 때 뒤 목록이 따라 스크롤되고, 닫았을 때
+           보던 자리를 잃는다. 위치를 기억했다가 닫을 때 그대로 돌려놓는다. */
+        var scrollLock = 0
+        function lockScroll() {
+          if (document.body.dataset.menuLocked) return
+          scrollLock = window.scrollY
+          document.body.dataset.menuLocked = "1"
+          document.body.style.position = "fixed"
+          document.body.style.top = -scrollLock + "px"
+          document.body.style.width = "100%"
+        }
+        function unlockScroll() {
+          if (!document.body.dataset.menuLocked) return
+          delete document.body.dataset.menuLocked
+          document.body.style.position = ""
+          document.body.style.top = ""
+          document.body.style.width = ""
+          window.scrollTo(0, scrollLock)
+        }
+        var isMobileMenu = function () { return window.matchMedia("(max-width: 700px)").matches }
+
         Array.prototype.forEach.call(menus, function (menu) {
           var toggle = menu.querySelector(".menu-hamburger")
           var workLink = menu.querySelector(".works-toggle")
@@ -182,6 +204,7 @@ const shareImage = new URL(
               var isOpen = menu.classList.toggle("is-open")
               toggle.setAttribute("aria-expanded", String(isOpen))
               toggle.setAttribute("aria-label", isOpen ? "Close navigation" : "Open navigation")
+              if (isMobileMenu()) { isOpen ? lockScroll() : unlockScroll() }
             })
           }
 
@@ -201,7 +224,16 @@ const shareImage = new URL(
             menu.classList.remove("is-open", "works-open")
             if (toggle) toggle.setAttribute("aria-expanded", "false")
             if (workLink) workLink.setAttribute("aria-expanded", "false")
+            unlockScroll()
           })
+
+          /* 링크를 눌러 페이지를 떠나면 잠금이 남는다 — bfcache로 돌아왔을 때
+             스크롤이 묶인 채로 열린다. 떠나기 전에 반드시 푼다. */
+          menu.addEventListener("click", function (event) {
+            var link = event.target.closest ? event.target.closest("a[href]") : null
+            if (link && !link.classList.contains("works-toggle")) unlockScroll()
+          })
+          window.addEventListener("pagehide", unlockScroll)
 
           // 다른 페이지에서 "Works"로 넘어온 경우 메뉴를 펼친 상태로 연다.
           if (window.location.hash === "#menu-works") {
@@ -529,6 +561,8 @@ const shareImage = new URL(
           color: var(--text);
         }
 
+        /* 아이콘은 28×24지만 누르는 영역은 44×44여야 한다. 패딩으로 넓히고
+           같은 만큼 마진으로 당겨, 헤더 높이는 그대로 두고 타깃만 키운다. */
         .site-menu .menu-hamburger {
           display: block;
           grid-column: 3;
@@ -536,7 +570,9 @@ const shareImage = new URL(
           justify-self: end;
           width: 28px;
           height: 24px;
-          padding: 0;
+          padding: 10px 8px;
+          margin: -10px -8px;
+          box-sizing: content-box;
           border: 0;
           border-radius: 0;
           color: inherit;
@@ -558,32 +594,51 @@ const shareImage = new URL(
           align-self: center;
           font-size: var(--fs-lead);
         }
+        /* 손가락으로 누르는 항목은 44px 이상이어야 한다(iOS HIG 44pt / Material 48dp).
+           마진으로 벌리면 줄 간격만 늘고 누를 수 있는 영역은 그대로다 —
+           패딩으로 키워 글자 주변까지 실제 타깃이 되게 한다. */
         .site-menu > a {
           display: none;
           grid-column: 1 / -1;
           width: fit-content;
-          margin-top: 10px;
+          margin-top: 0;
+          padding: 10px 0;
+          min-height: 44px;
+          align-content: center;
           font-size: var(--fs-body);
         }
         .site-menu .name a { display: block; }
 
+        /* 열린 메뉴는 화면을 덮는 시트다.
+           이전에는 높이가 내용만큼(302px)이고 배경이 50% 투명이라, 뒤의 필터 칩과
+           작품 목록이 글자 사이로 비쳐 읽기 어려웠고 메뉴가 페이지 위에 인쇄된
+           것처럼 보였다. 모바일 내비게이션의 표준은 둘 중 하나다 — 뒤를 덮는
+           불투명 시트, 또는 어둡게 깔린 스크림 위의 패널. 여기서는 항목이 최대
+           19개(작품 아코디언 포함)라 전자가 맞는다. */
         .site-menu.is-open {
           position: fixed;
-          inset: 0 0 auto;
-          padding-bottom: 22px;
-          background: rgba(255, 255, 255, .50);
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
+          inset: 0;
+          padding-bottom: max(22px, env(safe-area-inset-bottom));
+          background: var(--surface);
+          /* 내용이 화면보다 길어지면 시트 자신이 스크롤한다 */
+          overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
+          overscroll-behavior: contain;
+          align-content: start;
         }
         .site-menu.is-open > a { display: block; }
+        /* 열려 있음을 아이콘으로도 알린다 — aria-label만 바뀌고 ☰ 그대로였다 */
+        .site-menu.is-open .menu-hamburger::after { content: "✕"; }
         /* 아코디언이 열리면 평범한 Works 링크는 감추고 토글이 그 자리를 대신한다 */
         .site-menu.is-open .menu-works-link { display: none; }
         .site-menu.is-open .works-toggle {
-          display: block;
+          display: grid;
           grid-column: 1 / -1;
           width: fit-content;
-          margin-top: 10px;
-          padding: 0;
+          margin-top: 0;
+          padding: 10px 0;
+          min-height: 44px;
+          align-content: center;
           border: 0;
           color: inherit;
           background: transparent;
@@ -594,7 +649,8 @@ const shareImage = new URL(
         .site-menu.is-open .work-links {
           display: grid;
           grid-column: 1 / -1;
-          gap: 7px;
+          /* 항목 자체가 패딩으로 40px를 확보하므로 간격을 더 두면 늘어지기만 한다 */
+          gap: 0;
           max-height: 0;
           margin: 0;
           padding: 0 0 0 13px;
@@ -612,9 +668,14 @@ const shareImage = new URL(
           opacity: 1;
           pointer-events: auto;
         }
+        /* 작품 목록은 한 화면에 여러 개가 보여야 하므로 44px까지는 못 키운다.
+           대신 40px로 올려 손가락이 옆 항목을 건드리지 않을 만큼은 확보한다. */
         .site-menu.is-open .work-links a {
-          display: block;
+          display: grid;
           margin: 0;
+          padding: 6px 0;
+          min-height: 40px;
+          align-content: center;
           color: var(--text-2);
           font-size: var(--fs-xs);
           line-height: 1.35;
@@ -641,8 +702,11 @@ const shareImage = new URL(
         /* 그리드로 넘어가면 흰 면 위다 — 워드마크도 어두운 잉크로 */
         .site-menu--hero.is-past-hero:not(.is-open) .name a { color: var(--text); }
         .menu-search { display: none; grid-column: 1 / -1; margin: 16px 0 0; }
+        /* 헤더에 접혀 있을 때는 110px이 맞지만, 시트가 열리면 화면 폭을 다 쓴다 —
+           좁은 입력란은 타이핑도 어렵고 시트 안에서 미완성처럼 보인다. */
         .site-menu input[type="search"] { width: min(110px, 100%); }
         .site-menu.is-open .menu-search { display: block; }
+        .site-menu.is-open input[type="search"] { width: 100%; padding: 10px 0; }
       }
     </style>
   </body>
