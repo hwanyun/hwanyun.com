@@ -98,6 +98,9 @@ const shareImage = "https://www.hwanyun.com/images/social/hwanyun-share-preview.
           document.querySelectorAll("[data-lang-choice]").forEach(function (b) {
             b.setAttribute("aria-pressed", String(b.getAttribute("data-lang-choice") === lang))
           })
+          /* 스크립트가 만든 UI에는 위의 언어 전환 CSS가 닿지 않는다.
+             그런 곳들이 스스로 다시 그릴 수 있게 알린다. */
+          document.dispatchEvent(new CustomEvent("hy:lang", { detail: lang }))
         }
         paint(document.documentElement.dataset.lang || "en")
 

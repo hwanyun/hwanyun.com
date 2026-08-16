@@ -119,18 +119,55 @@ const sounds = defineCollection({
 const events = defineCollection({
   type: "content", // 본문(마크다운) = 상세 설명
   schema: z.object({
+    // 제목은 언어와 무관하게 하나로 둔다 — 〈무제 (無諸)〉처럼 번역이
+    // 작품을 훼손하는 경우가 있어 작가가 영문 제목을 두지 않기로 했다.
     title: z.string(),
     dateStart: z.string(), // "2026-09-10" (필수)
     dateEnd: z.string().optional().default(""), // 종료일(기간 전시)
+    // 시간·장소는 언어별로 갈린다. 비워 두면 한국어 값을 그대로 쓴다.
     timeNote: z.string().optional().default(""), // 예: "19:00 오프닝"
+    timeNoteEn: z.string().optional().default(""),
     venue: z.string().optional().default(""),
+    venueEn: z.string().optional().default(""),
     city: z.string().optional().default(""),
-    summary: z.string().optional().default(""), // 한 줄 소개
+    cityEn: z.string().optional().default(""),
+    // 장르 — 목록이 아니라 상세에서 한 줄로 성격을 알린다
+    genre: z.string().optional().default(""),
+    genreEn: z.string().optional().default(""),
+    summary: z.string().optional().default(""), // 한 줄 소개(국문)
+    summaryEn: z.string().optional().default(""),
+    // 상세 본문 — works 컬렉션과 같은 방식으로 언어별 필드에 담는다.
+    // 마크다운 본문에 두 언어를 함께 쓰면 언어 전환이 닿지 못한다.
+    textKr: z.string().optional().default(""),
+    textEn: z.string().optional().default(""),
+    // 팀 작업에서 내가 맡은 자리
+    roleKr: z.string().optional().default(""),
+    roleEn: z.string().optional().default(""),
     thumb: z.string().optional().default(""), // 카드/하이라이트 이미지
     externalUrl: z.string().optional().default(""), // 예매·기관 외부 링크
     externalLabel: z.string().optional().default(""), // 버튼 문구(비우면 기본값)
+    // 공식 안내와 보도 — 같은 형식으로 모아 둔다.
+    // kind로 '공식'과 '보도'만 구분하고 나머지 표기는 동일하게 간다.
+    links: z
+      .array(
+        z.object({
+          kind: z.enum(["official", "press"]).default("press"),
+          publisher: z.string(), // 매체 또는 기관
+          title: z.string(),
+          url: z.string(),
+          date: z.string().optional().default(""), // "2026-08-10"
+        })
+      )
+      .optional()
+      .default([]),
     images: z
-      .array(z.object({ src: z.string(), caption: z.string().optional().default("") }))
+      .array(
+        z.object({
+          src: z.string(),
+          caption: z.string().optional().default(""),
+          captionEn: z.string().optional().default(""),
+        })
+      )
       .optional()
       .default([]),
     order: z.number().default(100), // 같은 날짜 내 정렬 보조

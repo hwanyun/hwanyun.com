@@ -23,7 +23,22 @@ function fmt(start: string, end: string) {
   }
   return `${sd} ${s[0]}`
 }
-const where = [data.venue, data.city].filter(Boolean).join(", ")
+// 영문 값이 비어 있으면 국문 값을 그대로 쓴다 — 두 언어를 나란히 찍지 않는다
+const whereKr = [data.venue, data.city].filter(Boolean).join(", ")
+const whereEn = [data.venueEn || data.venue, data.cityEn || data.city].filter(Boolean).join(", ")
+const timeEn = data.timeNoteEn || data.timeNote
+
+// 본문은 빈 줄 기준으로 문단을 나눈다
+const paras = (t: string) => t.trim().split(/\n\s*\n/).filter(Boolean)
+const bodyKr = paras(data.textKr || "")
+const bodyEn = paras(data.textEn || "")
+
+// 공식 안내를 먼저, 그다음 보도. 같은 서식으로 이어 붙인다.
+const links = [...data.links].sort((a, b) => (a.kind === "official" ? -1 : 0) - (b.kind === "official" ? -1 : 0))
+const fmtDate = (d: string) => {
+  const p = d.split("-").map(Number)
+  return p[0] ? `${p[2]} ${MONTHS[p[1] - 1]} ${p[0]}` : d
+}
 ---
 
 <Base title={`HWANYUN — ${data.title}`} current="events">
@@ -32,20 +47,59 @@ const where = [data.venue, data.city].filter(Boolean).join(", ")
     <h1>{data.title}</h1>
     <p class="meta">
       <span class="d">{fmt(data.dateStart, data.dateEnd)}</span>
-      {data.timeNote && <span class="tn">{data.timeNote}</span>}
-      {where && <span class="w">{where}</span>}
+      {data.timeNote && (
+        <span class="tn">
+          <span data-language-content="en">{timeEn}</span>
+          <span data-language-content="ko">{data.timeNote}</span>
+        </span>
+      )}
+      {whereKr && (
+        <span class="w">
+          <span data-language-content="en">{whereEn}</span>
+          <span data-language-content="ko">{whereKr}</span>
+        </span>
+      )}
+      {data.genre && (
+        <span class="g">
+          <span data-language-content="en">{data.genreEn || data.genre}</span>
+          <span data-language-content="ko">{data.genre}</span>
+        </span>
+      )}
     </p>
-    {data.summary && <p class="summary">{data.summary}</p>}
 
-    <div class="body"><Content /></div>
+    {
+      data.summary && (
+        <p class="summary">
+          <span data-language-content="en">{data.summaryEn || data.summary}</span>
+          <span data-language-content="ko">{data.summary}</span>
+        </p>
+      )
+    }
+
+    {
+      (bodyEn.length > 0 || bodyKr.length > 0) && (
+        <div class="body">
+          <div data-language-content="en">{bodyEn.map((p) => <p>{p}</p>)}</div>
+          <div data-language-content="ko" lang="ko">{bodyKr.map((p) => <p>{p}</p>)}</div>
+        </div>
+      )
+    }
+
+    {/* 마크다운 본문은 프론트매터로 담기 어려운 보충 설명용으로 남겨 둔다 */}
+    <div class="body body-md"><Content /></div>
 
     {
       data.images && data.images.length > 0 && (
         <div class="ev-media">
           {data.images.map((m) => (
             <figure>
-              <img src={m.src} alt={m.caption || data.title} loading="lazy" />
-              {m.caption && <figcaption>{m.caption}</figcaption>}
+              <img src={m.src} alt={m.captionEn || m.caption || data.title} loading="lazy" />
+              {m.caption && (
+                <figcaption>
+                  <span data-language-content="en">{m.captionEn || m.caption}</span>
+                  <span data-language-content="ko">{m.caption}</span>
+                </figcaption>
+              )}
             </figure>
           ))}
         </div>
@@ -53,9 +107,40 @@ const where = [data.venue, data.city].filter(Boolean).join(", ")
     }
 
     {
-      data.externalUrl && (
+      links.length > 0 && (
+        <section class="ev-links" aria-label="Coverage and information">
+          <h2 class="ev-lh">
+            <span data-language-content="en">Coverage &amp; information</span>
+            <span data-language-content="ko">보도 및 안내</span>
+          </h2>
+          <ul>
+            {links.map((l) => (
+              <li>
+                <a href={l.url} target="_blank" rel="noopener">
+                  <span class="lk-pub">
+                    {l.publisher}
+                    {l.kind === "official" && (
+                      <span class="lk-tag">
+                        <span data-language-content="en">Official</span>
+                        <span data-language-content="ko">공식</span>
+                      </span>
+                    )}
+                  </span>
+                  <span class="lk-title">{l.title}</span>
+                  <span class="lk-date">{l.date ? fmtDate(l.date) : ""}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    {
+      data.externalUrl && links.length === 0 && (
         <a class="ev-cta" href={data.externalUrl} target="_blank" rel="noopener">
-          {data.externalLabel || "자세히 보기 · Details"} ↗
+          <span data-language-content="en">{data.externalLabel || "Details"} ↗</span>
+          <span data-language-content="ko">{data.externalLabel || "자세히 보기"} ↗</span>
         </a>
       )
     }
@@ -73,7 +158,9 @@ const where = [data.venue, data.city].filter(Boolean).join(", ")
     .meta .d { color: var(--text); }
     .summary { font-size: var(--fs-body); line-height: 1.6; color: var(--text-2); margin: 0 0 28px; max-width: 560px; }
     .body { font-size: var(--fs-body); line-height: 1.8; color: var(--text-2); max-width: 620px; }
-    .body :global(p) { margin: 0 0 1em; }
+    .body :global(p) { margin: 0 0 1.15em; }
+    .body :global([lang="ko"] p) { line-height: 1.85; }
+    .body-md:empty { display: none; }
     .ev-media { margin: 34px 0 0; display: grid; gap: 18px; }
     .ev-media img { width: 100%; display: block; }
     .ev-media figcaption { font-size: var(--fs-xs); color: var(--text-3); margin-top: 5px; }
@@ -83,9 +170,41 @@ const where = [data.venue, data.city].filter(Boolean).join(", ")
       transition: background var(--dur-base) ease, color var(--dur-base) ease;
     }
     .ev-cta:hover { background: var(--text); color: var(--surface); }
+
+    /* 보도·안내 — 작업 목록과 같은 규칙(얇은 선, 색 하나로만 반응)을 따른다.
+       버튼을 여러 개 세우면 페이지의 조용함이 깨진다. */
+    .ev-links { margin-top: 54px; }
+    .ev-lh {
+      font-size: var(--fs-xs); letter-spacing: .08em; text-transform: uppercase;
+      color: var(--text-4); font-weight: 500; margin: 0 0 4px;
+    }
+    .ev-links ul { list-style: none; margin: 0; padding: 0; }
+    .ev-links li { border-top: 1px solid var(--line); }
+    .ev-links li:last-child { border-bottom: 1px solid var(--line); }
+    .ev-links a {
+      display: grid; grid-template-columns: 118px 1fr auto; gap: 16px;
+      align-items: baseline; padding: 13px 2px;
+      color: var(--text); text-decoration: none;
+      transition: color var(--dur-fast) var(--ease);
+    }
+    .ev-links a:hover { color: var(--hover); }
+    .lk-pub { font-size: var(--fs-sm); color: var(--text-3); }
+    .lk-title { font-size: var(--fs-sm); line-height: 1.45; }
+    .lk-date { font-size: var(--fs-xs); color: var(--text-4); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .ev-links a:hover .lk-pub, .ev-links a:hover .lk-date { color: var(--hover); }
+    .lk-tag {
+      display: inline-block; margin-left: 6px; padding: 1px 5px;
+      border: 1px solid var(--line-2); border-radius: 2px;
+      font-size: var(--fs-2xs); color: var(--text-4); vertical-align: 1px;
+    }
+
     @media (max-width: 700px) {
       .ev-detail { margin: 0 16px 80px; padding-top: 8px; max-width: none; }
       .ev-detail h1 { font-size: var(--fs-lead); }
+      .ev-links a { grid-template-columns: 1fr auto; gap: 3px 12px; padding: 14px 2px; }
+      .lk-pub { grid-column: 1; }
+      .lk-date { grid-column: 2; grid-row: 1; }
+      .lk-title { grid-column: 1 / -1; }
     }
   </style>
 </Base>

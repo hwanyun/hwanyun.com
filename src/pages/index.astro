@@ -6,7 +6,18 @@ import { getCollection } from "astro:content"
 
 // 홈 하이라이트용 이벤트 데이터 (가장 가까운 미래 일정은 클라이언트에서 오늘 기준으로 선택)
 const upEvents = (await getCollection("events", ({ data }) => !data.draft))
-  .map((e) => ({ slug: e.slug, title: e.data.title, start: e.data.dateStart, end: e.data.dateEnd || e.data.dateStart, venue: e.data.venue, city: e.data.city }))
+  .map((e) => ({
+    slug: e.slug,
+    title: e.data.title,
+    start: e.data.dateStart,
+    end: e.data.dateEnd || e.data.dateStart,
+    venue: e.data.venue,
+    city: e.data.city,
+    // 이 줄은 스크립트가 만들기 때문에 언어 전환 CSS가 닿지 않는다.
+    // 두 벌을 다 넘겨 주고 스크립트가 현재 언어를 보고 고른다.
+    venueEn: e.data.venueEn || e.data.venue,
+    cityEn: e.data.cityEn || e.data.city,
+  }))
   .sort((a, b) => a.start.localeCompare(b.start))
 ---
 
@@ -30,6 +41,10 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") }
       var today = new Date(); today.setHours(0, 0, 0, 0)
       var M = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+      var elastic = null
+
+      function render() {
+      if (elastic) { elastic.destroy(); elastic = null }
       var nowItems = []   // 진행 중 (시작함 · 아직 안 끝남)
       var soonItems = []  // 예정 (아직 시작 전)
       for (var i = 0; i < evs.length; i++) {
@@ -38,7 +53,9 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         var start = new Date(evs[i].start + "T00:00:00")
         var s = evs[i].start.split("-").map(Number)
         var date = s[2] + " " + M[s[1] - 1]
-        var where = [evs[i].venue, evs[i].city].filter(Boolean).join(", ")
+        var ko = document.documentElement.getAttribute("data-lang") === "ko"
+        var where = (ko ? [evs[i].venue, evs[i].city] : [evs[i].venueEn, evs[i].cityEn])
+          .filter(Boolean).join(", ")
         var item = esc(evs[i].title) + '<span class="ut-dim"> · ' + date + (where ? " · " + esc(where) : "") + "</span>"
         if (!isNaN(start) && start <= today) nowItems.push(item)
         else soonItems.push(item)
@@ -56,16 +73,25 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       }
       track.innerHTML = html
       el.hidden = false
-      makeElastic(track, el)
+      elastic = makeElastic(track, el)
+      }
+
+      render()
+      // 언어를 바꾸면 장소 표기가 달라진다 — 다시 그린다
+      document.addEventListener("hy:lang", render)
 
       /* 글자를 끌면 그 글자가 커서를 따라오고, 이웃 글자가 감쇠하며 끌려온다.
          놓으면 스프링으로 제자리에 튕겨 돌아간다 — 히어로 입자와 같은
          "커서=힘, 놓으면 복원" 문법을 하단 한 줄까지 잇는다.
          데스크톱 전용: 터치에서는 드래그가 스크롤과 충돌하고, 이 줄은 모바일에서
          화면 하단 좁은 영역이라 조작 대상이 되기 어렵다. */
+      /* 다시 그릴 때를 대비해 teardown을 돌려준다. 리스너를 남긴 채 다시 붙이면
+         한 번의 드래그가 두 번 처리되고, 옛 rAF가 떨어져 나간 노드를 계속 만진다. */
       function makeElastic(root, anchor) {
-        if (!window.matchMedia("(min-width: 701px)").matches) return
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
+        if (!window.matchMedia("(min-width: 701px)").matches) return null
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return null
+        var ctrl = new AbortController()
+        var on = { signal: ctrl.signal }
 
         var FOLLOW = 9                        // 0(뻣뻣) – 20(느슨): 이웃이 따라오는 범위
         var SIGMA = Math.max(1, FOLLOW / 3)
@@ -84,7 +110,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
             }))
           }
         })
-        if (!chains.length) return
+        if (!chains.length) return null
         anchor.classList.add("is-elastic")
 
         var active = null
@@ -172,14 +198,14 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
           try { anchor.setPointerCapture(e.pointerId) } catch (err) {}
           active = { chain: found.chain, index: found.index, ox: e.clientX, oy: e.clientY, dx: 0, dy: 0, moved: 0 }
           start()
-        })
+        }, on)
 
         anchor.addEventListener("pointermove", function (e) {
           if (!active) return
           active.dx = e.clientX - active.ox
           active.dy = e.clientY - active.oy
           active.moved = Math.max(active.moved, Math.hypot(active.dx, active.dy))
-        })
+        }, on)
 
         function release(e) {
           if (!active) return
@@ -189,14 +215,22 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
           try { if (anchor.hasPointerCapture(e.pointerId)) anchor.releasePointerCapture(e.pointerId) } catch (err) {}
           start()
         }
-        anchor.addEventListener("pointerup", release)
-        anchor.addEventListener("pointercancel", release)
+        anchor.addEventListener("pointerup", release, on)
+        anchor.addEventListener("pointercancel", release, on)
 
         anchor.addEventListener("click", function (e) {
           if (!suppressClick) return
           e.preventDefault()
           suppressClick = false
-        })
+        }, on)
+
+        return {
+          destroy: function () {
+            ctrl.abort()
+            if (raf) { cancelAnimationFrame(raf); raf = 0 }
+            anchor.classList.remove("is-elastic")
+          },
+        }
       }
     })()
   </script>

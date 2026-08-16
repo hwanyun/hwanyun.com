@@ -30,7 +30,10 @@ function fmt(start: string, end: string) {
     <header class="events-head">
       <p class="eyebrow">EVENTS</p>
       <h1>Events</h1>
-      <p class="intro">Exhibitions, performances, and screenings.</p>
+      <p class="intro">
+        <span data-language-content="en">Exhibitions, performances, and screenings.</span>
+        <span data-language-content="ko" lang="ko">전시, 공연, 상영 일정.</span>
+      </p>
     </header>
 
     {/* 모든 일정을 한 곳에 렌더링해 두고, 아래 스크립트가 오늘 날짜 기준으로
@@ -51,7 +54,12 @@ function fmt(start: string, end: string) {
                 <span class="ev-title">{e.data.title}</span>
                 {(e.data.venue || e.data.city) && (
                   <span class="ev-where">
-                    {[e.data.venue, e.data.city].filter(Boolean).join(", ")}
+                    <span data-language-content="en">
+                      {[e.data.venueEn || e.data.venue, e.data.cityEn || e.data.city].filter(Boolean).join(", ")}
+                    </span>
+                    <span data-language-content="ko">
+                      {[e.data.venue, e.data.city].filter(Boolean).join(", ")}
+                    </span>
                   </span>
                 )}
               </span>
@@ -72,7 +80,10 @@ function fmt(start: string, end: string) {
       <div id="ev-past-groups"></div>
     </section>
 
-    <p class="ev-empty" id="ev-empty" hidden>No upcoming events.</p>
+    <p class="ev-empty" id="ev-empty" hidden>
+      <span data-language-content="en">No upcoming events.</span>
+      <span data-language-content="ko" lang="ko">예정된 일정이 없습니다.</span>
+    </p>
   </main>
 
   <script is:inline>
