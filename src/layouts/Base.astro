@@ -255,10 +255,18 @@ const shareImage = new URL(
           })
 
           /* 링크를 눌러 페이지를 떠나면 잠금이 남는다 — bfcache로 돌아왔을 때
-             스크롤이 묶인 채로 열린다. 떠나기 전에 반드시 푼다. */
+             스크롤이 묶인 채로 열린다. 떠나기 전에 반드시 푼다.
+             패널도 그 자리에서 닫는다: 다음 페이지가 도착할 때까지 열린 채
+             남아 있으면, 탭했는데 아무 일도 안 일어난 것처럼 보인다. */
           menu.addEventListener("click", function (event) {
             var link = event.target.closest ? event.target.closest("a[href]") : null
-            if (link && !link.classList.contains("works-toggle")) { unlockScroll(); hideScrim() }
+            if (link && !link.classList.contains("works-toggle")) {
+              menu.classList.remove("is-open", "works-open")
+              if (toggle) { toggle.setAttribute("aria-expanded", "false"); toggle.setAttribute("aria-label", "Open navigation") }
+              if (workLink) workLink.setAttribute("aria-expanded", "false")
+              unlockScroll()
+              hideScrim()
+            }
           })
           window.addEventListener("pagehide", function () { unlockScroll(); hideScrim() })
 
