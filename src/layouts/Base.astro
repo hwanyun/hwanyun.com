@@ -627,10 +627,13 @@ const shareImage = new URL(
         /* 이름·언어·닫기(정체성과 조작)와 그 아래 목적지 목록은 다른 묶음인데
            간격이 0이라 한 덩어리로 붙어 읽혔다. 헤더 행에 아래 여백을 준다.
            셋 다 같은 값을 받아야 한다 — 하나에만 주면 그 항목의 바깥 상자만
-           커지고, align-self: center가 그 상자를 기준으로 삼아 혼자 위로 뜬다. */
+           커지고, align-self: center가 그 상자를 기준으로 삼아 혼자 위로 뜬다.
+           값은 12px으로는 부족했다 — 글자 기준 간격이 27px가 되어 항목 사이
+           간격(25px)과 같아지고, 워드마크가 헤더가 아니라 목록의 첫 항목처럼
+           읽혔다. 묶음을 가르는 간격은 묶음 안의 간격보다 뚜렷이 넓어야 한다. */
         .site-menu.is-open .name,
-        .site-menu.is-open .lang-switch { margin-bottom: var(--space-2); }
-        .site-menu.is-open .menu-hamburger { margin-bottom: calc(var(--space-2) - 10px); }
+        .site-menu.is-open .lang-switch { margin-bottom: var(--space-3); }
+        .site-menu.is-open .menu-hamburger { margin-bottom: calc(var(--space-3) - 10px); }
         /* 손가락으로 누르는 항목은 44px 이상이어야 한다(iOS HIG 44pt / Material 48dp).
            마진으로 벌리면 줄 간격만 늘고 누를 수 있는 영역은 그대로다 —
            패딩으로 키워 글자 주변까지 실제 타깃이 되게 한다. */
