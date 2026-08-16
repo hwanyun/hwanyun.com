@@ -26,6 +26,11 @@ textEn: |
   The work responds to sound, movement, and the presence of visitors, turning them into visual change. Sound here is not background but an agent that moves the space and generates image. Live performance by visually impaired musicians entered into real-time relation with the work, revealing how a sense that cannot be seen constructs a space and reaches others.
 
   Taking "not every disability is visible" as its motto, the exhibition treated the line between disabled and non-disabled not as a fixed division but as a place where different modes of perception meet to make a single scene.
+thumb: "/images/events/2022-coexistence.jpg"
+images:
+  - src: "/images/events/2022-coexistence.jpg"
+    caption: "《공존 — 서로 도와서 함께 존재하는》 포스터. 제호 아래에 점자가 함께 찍혀 있다."
+    captionEn: "Poster for Coexistence — existing together by helping one another. Braille is set beneath the title."
 links:
   - kind: "press"
     publisher: "새부천신문"
