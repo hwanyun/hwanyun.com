@@ -3,6 +3,7 @@ title: "WE'VE OPENED"
 year: "2018"
 medium: "Interactive dining installation; copper, conductive tape, electric wire, plastic film"
 materials:
+  - interactive
   - copper
   - plastic-sheet
   - conductive-paint

@@ -3,6 +3,7 @@ title: "Intuition: Untitled I"
 year: "2017"
 medium: "Interactive sound installation; electric paint, hanji (traditional Korean paper), sensors, copper, electric wires, speakers"
 materials:
+  - interactive
   - copper
   - sensor
   - speaker

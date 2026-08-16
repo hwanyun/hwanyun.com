@@ -3,6 +3,7 @@ title: "Coexistence (공존)"
 year: "2022"
 medium: "Interactive visual installation with live performance; polycarbonate, sensors, sound"
 materials:
+  - interactive
   - sensor
   - plastic-sheet
   - projection

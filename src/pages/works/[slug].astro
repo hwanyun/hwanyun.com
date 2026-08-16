@@ -40,8 +40,8 @@ const relatedByMaterial = allWorks
 
 const useImmersiveMedia = work.slug !== "fedora-exile"
 
-// 신호 파형 판형 — 시범. 승인되면 전 작품으로 확장한다.
-const useWaveform = work.slug === "three-pieces-ii"
+// 신호 파형 판형 — 기록의 흐름을 하나의 신호로 조판한다.
+const useWaveform = true
 
 // 영상 URL을 임베드 가능한 형태로 정규화 (YouTube/Vimeo는 일반 링크를 붙여도 됨)
 function embedURL(url: string): { kind: "iframe" | "file"; src: string } {
@@ -244,7 +244,7 @@ function toParagraphs(text: string): string {
          VIDEO/IMAGES 타입 라벨은 관람자의 관심사가 아니므로 없다. -->
     {
       mediaRows.length > 0 && (
-        <div class="media-flow">
+        <div class={`media-flow${mediaRows.length < 2 ? " single" : ""}`}>
           {(() => { let plate = 0; let wave = 0; return mediaRows.map((row) => {
             const portraitRow = row.every(isPortrait)
             const solo = row.length === 1 ? row[0] : null
@@ -252,8 +252,15 @@ function toParagraphs(text: string): string {
             const soloPartial = solo && !portraitRow && (solo.width ?? "full") !== "full"
             // 파형의 진폭 — 단독 전폭 도판만 좌/우로 번갈아 센다.
             // DOM 순서(nth-child)로 세면 페어가 끼었을 때 같은 쪽에 연달아 선다.
+            // 첫 도판(01)은 축 위에 선다 — 첫 장은 작품의 선언이라 비켜 서지
+            // 않는다. 음악의 첫 박이 정박이듯, 신호는 정지 상태에서 출발한다.
+            const isFirstRow = plate === 0
+            /* 단독 도판은 전폭이든 부분폭이든 모두 교대에 참여한다.
+               부분폭만 MD의 align을 따르게 두면 작은 도판이 죄다 왼쪽에
+               몰려 파형이 한쪽으로 치우친다(실제로 그랬다). 파형이 켜지면
+               좌우는 흐름이 정하고, align은 파형이 꺼진 경우의 값이 된다. */
             const waveSide =
-              useWaveform && row.length === 1 && !portraitRow && !soloPartial
+              useWaveform && !isFirstRow && row.length === 1 && !portraitRow
                 ? (wave++ % 2 === 0 ? "wave-l" : "wave-r")
                 : ""
             const rowClass = [
@@ -809,6 +816,11 @@ function toParagraphs(text: string): string {
     }
     /* 시범: 파형 판형이 켜진 페이지 */
     #entry[data-waveform] .media-flow { position: relative; margin-top: 88px; }
+    /* 도판이 하나뿐이면 신호가 없다 — 축선과 접점을 그리지 않는다.
+       한 점 위아래로 뻗은 선은 파형이 아니라 고아다. */
+    #entry[data-waveform] .media-flow.single::before,
+    #entry[data-waveform] .media-flow.single::after,
+    #entry[data-waveform] .media-flow.single .media-row::before { display: none; }
     #entry[data-waveform] .media-flow::before {
       content: "";
       position: absolute;
@@ -853,8 +865,8 @@ function toParagraphs(text: string): string {
        명시적 align이 있는 부분폭 행은 제 규칙을 지킨다. */
     #entry[data-waveform] .media-row.wave-l .block { margin-left: 0; margin-right: auto; }
     #entry[data-waveform] .media-row.wave-r .block { margin-left: auto; margin-right: 0; }
-    #entry[data-waveform] .media-row.wave-l .block:not(.is-video),
-    #entry[data-waveform] .media-row.wave-r .block:not(.is-video) { max-width: 84%; }
+    #entry[data-waveform] .media-row.wave-l:not(.solo-half):not(.solo-third) .block:not(.is-video),
+    #entry[data-waveform] .media-row.wave-r:not(.solo-half):not(.solo-third) .block:not(.is-video) { max-width: 84%; }
     #entry[data-waveform] .media-row.wave-l .block.is-video,
     #entry[data-waveform] .media-row.wave-r .block.is-video { width: 84%; }
     .media-row {
@@ -895,11 +907,18 @@ function toParagraphs(text: string): string {
     .media-row.is-portrait-row { display: flex; justify-content: center; gap: 14px; }
     .media-row.is-portrait-row .block { width: min(340px, 38vw); }
 
-    /* 단독 부분폭 — half는 2/3, third는 2/5. align을 따른다 */
-    .media-row.solo-half .block { width: 66%; }
-    .media-row.solo-third .block { width: 40%; }
-    .media-row.align-right .block { margin-left: auto; }
-    .media-row.align-center .block { margin-inline: auto; }
+    /* 단독 부분폭 — half는 2/3, third는 2/5. align을 따른다.
+       count-1의 fit-content 규칙과 특정도가 같으므로 순서로 이긴다 —
+       이 블록이 뒤에 있어야 작은 도판이 전폭으로 부풀지 않는다.
+       파형에서는 이 작은 도판들이 좌우로 비켜 서며 진폭의 일부가 된다. */
+    .media-row.solo-half .block,
+    .media-row.count-1.solo-half .block:not(.is-video) { width: 66%; max-width: 66%; margin-inline: 0; }
+    .media-row.solo-third .block,
+    .media-row.count-1.solo-third .block:not(.is-video) { width: 40%; max-width: 40%; margin-inline: 0; }
+    .media-row.align-right .block,
+    .media-row.count-1.align-right .block:not(.is-video) { margin-left: auto; margin-right: 0; }
+    .media-row.align-center .block,
+    .media-row.count-1.align-center .block:not(.is-video) { margin-inline: auto; }
 
     /* 스크롤 리빌 — 있는 듯 없는 듯.
        블러·큰 이동은 작품보다 연출이 먼저 보이게 하므로 쓰지 않는다. */

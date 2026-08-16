@@ -3,6 +3,7 @@ title: "Three Pieces: Untitled I"
 year: "2018"
 medium: "Interactive sound and light installation; sensors, polycarbonate, copper, wire"
 materials:
+  - interactive
   - copper
   - sensor
   - plastic-sheet

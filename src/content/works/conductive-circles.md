@@ -3,6 +3,7 @@ title: "Conductive Circles"
 year: "2018"
 medium: "Interactive sound & visual installation; copper, 3D mapping"
 materials:
+  - interactive
   - copper
   - projection
 size: 2col

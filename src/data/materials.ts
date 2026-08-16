@@ -10,8 +10,15 @@
  *
  * `sound`는 의도적으로 넣지 않았다. 12작품 중 7개에 해당해 거의 전부를 연결하므로
  * 내비게이션 기능을 못 한다. 사운드는 재료가 아니라 실천의 층위다.
+ *
+ * `interactive`는 밀도가 비슷한데도(12중 6) 넣었다. 이건 내비게이션이 아니라
+ * 정체성의 문제다 — 관객의 개입으로 작품이 성립하는가는 이 작업 전체를 가르는
+ * 축이고, 아카이브를 절반으로 나누는 유효한 질문이기도 하다. 그래서 맨 앞에 둔다.
+ * (이 목록은 순수한 재료만이 아니다 — projection·light·moving image처럼
+ * 매체와 방식도 이미 함께 있다.)
  */
 export const MATERIALS = [
+  { id: "interactive", en: "Interactive", ko: "인터랙티브" },
   { id: "copper", en: "Copper", ko: "구리" },
   { id: "sensor", en: "Sensor", ko: "센서" },
   { id: "plastic-sheet", en: "Plastic sheet", ko: "플라스틱 시트" },
