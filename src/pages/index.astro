@@ -46,6 +46,10 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
             들리는 크기를 막대로 보여 주면 "켜졌다"와 "조용하다"가 구분된다. */}
         <span class="ls-meter" aria-hidden="true"><i></i></span>
       </button>
+      <p class="ls-silent" id="listen-silent">
+        <span data-language-content="en">The microphone is open but no sound is coming in. Check that the right input device is selected and the tab is not muted.</span>
+        <span data-language-content="ko" lang="ko">마이크는 열렸는데 소리가 들어오지 않습니다. 입력 장치가 맞게 선택돼 있는지, 탭이 음소거는 아닌지 확인해 주세요.</span>
+      </p>
       <p class="ls-error" id="listen-error">
         <span data-language-content="en">Your browser is blocking the microphone. Allow it from the lock icon in the address bar, then try again.</span>
         <span data-language-content="ko" lang="ko">브라우저가 마이크를 차단하고 있습니다. 주소창의 자물쇠 아이콘에서 허용한 뒤 다시 시도해 주세요.</span>
@@ -85,12 +89,10 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       if (!root || !btn) return
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { root.hidden = true; return }
 
-      /* pulses — 소리가 "터지는" 순간마다 하나씩. 구체는 이걸 파문으로 답한다.
-         연속 음량이 아니라 사건을 넘겨야 대화가 된다. */
-      var mic = { on: false, level: 0, low: 0, high: 0, pulses: [] }
+      var mic = { on: false, level: 0, low: 0, high: 0 }
       window.__hyMic = mic
       var ctx = null, stream = null, analyser = null, raf = 0
-      var base = 0, lastPulse = 0
+      var silentSince = 0, peak = 0, warned = false
       var freq, wave
 
       function setState(state) {
@@ -115,22 +117,25 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         lo /= (lowEnd - 1) * 255
         hi /= (freq.length - highStart) * 255
         // 공격은 빠르게, 복귀는 느리게 — 소리가 치면 바로 반응하고 여운은 남는다
-        mic.level += ((Math.min(1, rms * 3.2)) - mic.level) * (rms * 3.2 > mic.level ? .5 : .06)
+        mic.level += ((Math.min(1, rms * 6.5)) - mic.level) * (rms * 3.2 > mic.level ? .5 : .06)
         mic.low += (Math.min(1, lo * 2.4) - mic.low) * (lo * 2.4 > mic.low ? .4 : .05)
         mic.high += (Math.min(1, hi * 3.4) - mic.high) * (hi * 3.4 > mic.high ? .5 : .07)
         root.style.setProperty("--mic", mic.level.toFixed(3))
 
-        /* 온셋 검출 — 최근 평균보다 뚜렷하게 솟을 때만 사건으로 친다.
-           음량 자체를 쓰면 방 소음에도 계속 반응해 수다스러워진다. */
-        base += (mic.level - base) * .04
         var now = performance.now()
-        if (mic.level > base * 1.55 + .035 && now - lastPulse > 140) {
-          lastPulse = now
-          mic.pulses.push({ t0: now, amp: Math.min(1, (mic.level - base) * 2.4) })
-          if (mic.pulses.length > 5) mic.pulses.shift()
+
+        /* 죽은 스트림 감지 — 조용한 방과 구분해야 한다. 조용해도 마이크는
+           미세한 잡음을 낸다(rms > 0). 완전한 0이 이어지면 그건 방이 조용한
+           게 아니라 신호가 안 들어오는 것이다. 나중에 소리가 들어오면 거둔다. */
+        if (rms > peak) peak = rms
+        if (peak > 1e-5) {
+          if (root.dataset.silent) delete root.dataset.silent
+        } else if (!warned && silentSince && now - silentSince > 2500) {
+          warned = true
+          root.dataset.silent = "true"
+          console.warn("[LISTEN] stream is open but delivering digital silence. AudioContext:",
+            ctx.state, "— check OS input device / tab mute")
         }
-        // 다 퍼진 파문은 버린다
-        while (mic.pulses.length && now - mic.pulses[0].t0 > 1100) mic.pulses.shift()
 
         raf = requestAnimationFrame(analyse)
       }
@@ -141,8 +146,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         if (stream) { stream.getTracks().forEach(function (t) { t.stop() }); stream = null }
         if (ctx) { ctx.close().catch(function () {}); ctx = null }
         mic.level = mic.low = mic.high = 0
-        mic.pulses.length = 0
-        base = 0
+        silentSince = 0; peak = 0; warned = false
+        delete root.dataset.silent
         root.style.setProperty("--mic", "0")
         setState("idle")
       }
@@ -157,13 +162,25 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
           analyser.fftSize = 512
           analyser.smoothingTimeConstant = .55
           // destination에 연결하지 않는다 — 소리는 분석기에서 끝난다
-          ctx.createMediaStreamSource(s).connect(analyser)
+          var srcNode = ctx.createMediaStreamSource(s)
+          srcNode.connect(analyser)
+          /* AudioContext는 자동재생 정책 때문에 suspended로 태어날 수 있다.
+             그러면 분석기에 무음만 들어와 아무 반응이 없다 — 권한은 허용됐는데
+             조용한 것처럼 보이는 가장 흔한 실패다. 명시적으로 깨운다.
+             (getUserMedia 이후는 제스처 문맥 밖이라 브라우저가 특히 까다롭다) */
+          if (ctx.state === "suspended") ctx.resume()
+          // 일부 브라우저는 소스가 GC되면 그래프가 끊긴다 — 참조를 붙들어 둔다
+          mic._src = srcNode
           freq = new Uint8Array(analyser.frequencyBinCount)
           wave = new Uint8Array(analyser.fftSize)
           mic.on = true
           note.hidden = true
           setState("on")
           analyse()
+          /* 켜졌는데 정말로 무음만 들어오면 사용자는 원인을 알 수 없다.
+             1.6초 동안 한 번도 흔들리지 않으면 그 사실을 알린다. */
+          silentSince = performance.now()
+          peak = 0
           // 기기에서 마이크가 뽑히는 등 트랙이 밖에서 끝나면 UI도 따라간다
           s.getTracks().forEach(function (t) { t.onended = stop })
         }).catch(function (err) {
@@ -568,21 +585,6 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         const audioLevel = mic && mic.on ? mic.level : 0
         const audioHigh = mic && mic.on && !reduceMotion ? mic.high : 0
         const audioLow = mic && mic.on && !reduceMotion ? mic.low : 0
-        /* 파문 — 중심에서 바깥으로 번지며 지나가는 자리의 입자만 민다.
-           동시에 다 흔들리면 잡음이고, 순서대로 전해져야 전도(傳導)다.
-           속도 .30px/ms, 폭 34px, 1.1초에 걸쳐 감쇠. */
-        const pulses = mic && mic.on && !reduceMotion ? mic.pulses : null
-        const pulseState = []
-        if (pulses) {
-          for (let i = 0; i < pulses.length; i++) {
-            const age = time - pulses[i].t0
-            if (age < 0 || age > 1100) continue
-            pulseState.push({
-              front: age * .30,
-              amp: pulses[i].amp * (1 - age / 1100) * 15,
-            })
-          }
-        }
         const globeRadius = size * .38
         // 데스크톱은 커서가 얹혀 있는 동안, 모바일은 손가락이 닿아 있는 동안
         const repelling = isInside && hasPointer && !reduceMotion
@@ -614,26 +616,14 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
               pushY = (deltaY / distance) * push
             }
           }
-          /* 말이 오가는 동안의 낮은 술렁임 — 듣고 있다는 기척.
-             파문이 답이라면 이건 숨소리다. */
-          if (!isInside && audioLevel > .015) {
-            const murmur = audioLevel * 1.1 + audioHigh * .9
-            pushX += (Math.random() - .5) * murmur
-            pushY += (Math.random() - .5) * murmur
-          }
-          /* 파문이 지나간다 — 파면 근처의 입자만, 바깥 방향으로 */
-          if (pulseState.length && !isInside) {
-            const ox = particle.x - centerX
-            const oy = particle.y - centerY
-            const od = Math.hypot(ox, oy) || .001
-            for (let i = 0; i < pulseState.length; i++) {
-              const gap = (od - pulseState[i].front) / 34
-              if (gap < -3 || gap > 3) continue
-              const band = Math.exp(-gap * gap)
-              const kick = pulseState[i].amp * band
-              pushX += (ox / od) * kick
-              pushY += (oy / od) * kick
-            }
+          /* 각자 제자리에서 바르르 떤다. 매 프레임 무작위 변위를 주면
+             스프링이 곧바로 되당기므로 이동이 아니라 진동이 된다 —
+             구체는 형태도 크기도 그대로고 표면만 살아난다.
+             파문처럼 퍼져 나가지 않는다: 소리가 나는 동안 전부가 함께 떤다. */
+          if (!isInside && audioLevel > .012) {
+            const tremor = audioLevel * 3.1 + audioHigh * 2.2
+            pushX += (Math.random() - .5) * tremor
+            pushY += (Math.random() - .5) * tremor
           }
           // 이름일 때도 떨되, 글자가 읽히는 선까지만
           if (isInside && audioLevel > .015 && !reduceMotion) {
@@ -838,6 +828,12 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       transition: width 90ms linear;
     }
     /* 표시는 상태가 결정한다 — JS가 따로 숨기면 둘이 어긋날 수 있다 */
+    .ls-silent { display: none; }
+    .listen[data-silent="true"] .ls-silent { display: block; }
+    .ls-silent {
+      max-width: 260px; margin: 0; text-align: right;
+      font-size: var(--fs-2xs); line-height: 1.5; color: var(--void-text-2);
+    }
     .ls-error { display: none; }
     .listen[data-state="denied"] .ls-error { display: block; }
     .ls-error {
@@ -877,10 +873,15 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     #listen-cancel { color: var(--void-text-2); }
 
     @media (max-width: 700px) {
-      /* 하단은 티커가 폭 전체를 쓴다 — LISTEN은 그 위층으로 올린다 */
-      .listen { right: 16px; bottom: 96px; }
-      .ls-note { max-width: calc(100vw - 32px); }
-      .ls-error { max-width: calc(100vw - 32px); }
+      /* 하단은 티커가 폭 전체(100vw - 32px)를 쓴다. 같은 층에 두면 LISTEN이
+         티커를 덮어 전시 정보가 눌린다 — 아예 반대편 끝, 헤더 아래로 옮긴다.
+         안내문은 아래로 펼쳐지므로 화면 밖으로 나가지 않는다. */
+      .listen {
+        right: 16px; left: auto;
+        top: calc(var(--mobile-header-h, 67px) + 12px); bottom: auto;
+        align-items: flex-end;
+      }
+      .ls-note, .ls-error, .ls-silent { max-width: calc(100vw - 32px); }
     }
     @media (prefers-reduced-motion: reduce) {
       .listen[data-state="on"] .ls-dot { transform: none; }
