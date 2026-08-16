@@ -11,6 +11,12 @@ category: work
 order: 5
 thumb: "/images/conductive-circles/home.png"
 thumbVideo: "/videos/loops/conductive-circles.mp4"
+exhibition:
+  label: "Produced during"
+  titleEn: "KalmaLab workshop — VJing and 3D Mapping Techniques"
+  titleKr: "KalmaLab 워크숍 — VJing과 3D 매핑"
+  venue: "GlogauAIR, Berlin"
+  year: "2018"
 textEn: |
   Presenting the outcome of a 4-day KalmaLab workshop at GlogauAIR, Berlin,
   participants were introduced to the live performance possibilities of
