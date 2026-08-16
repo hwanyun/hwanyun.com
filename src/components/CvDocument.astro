@@ -41,10 +41,15 @@ const { data, korean = false } = Astro.props
     padding-bottom: 6px;
     border-bottom: 1px solid var(--text);
   }
+  /* 연도 열은 가장 긴 값이 들어가고도 여백이 남아야 한다.
+     110px일 때 "2026 – Present"(글자 폭 120px)가 열을 넘쳐 본문과의
+     실제 간격이 6px까지 좁아졌다 — 다른 행은 24~30px였으니 이 줄만
+     붙어 보인 게 아니라 실제로 붙어 있었다. nowrap이라 줄바꿈으로
+     피하지도 못하고 그대로 밀고 나온다. */
   .row {
     display: grid;
-    grid-template-columns: 110px 1fr;
-    gap: 16px;
+    grid-template-columns: 132px 1fr;
+    gap: 20px;
     padding: 4px 0;
   }
   .year {
