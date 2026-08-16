@@ -13,21 +13,36 @@ order: 1
 thumb: "/images/atypical-circuit/04.png"
 thumbVideo: "/videos/loops/atypical-circuit.mp4"
 textEn: |
-  This work explores the tension between perfectly controlled systems and their
-  inevitable decay. In Atypical Circuit, noise operates not as an error, but as
-  a visceral audiovisual language. As the ultrasonic sensor detects the viewer's
-  presence, the ordered visuals and sounds distort into unpredictable digital
-  glitches and sonic ruptures. Moving beyond a mere display of system
-  malfunction, this unsettling interaction reveals a deeper truth: we, the
-  observers, are ultimately implicated as part of the noise itself, actively
-  participating in the disruption of the rigid structures that surround us.
+  Atypical Circuit is a generative and interactive media installation, shown in
+  the 13th Media Art Group Exhibition Noise at Yeoksam 1 Culture Center Gallery
+  in Seoul. A flat screen and a loudspeaker hold an ordered audiovisual state;
+  an ultrasonic sensor, wired through an Arduino, measures the distance between
+  that system and whoever approaches it.
+
+  The work begins with the tension between a controlled system and its decay.
+  Generative visuals built in TouchDesigner and sound running in Ableton Live
+  remain composed only while the space in front of the sensor stays empty. As a
+  viewer comes closer, the measured distance feeds back into both: the image
+  breaks into digital glitches, the sound tears into ruptures. Noise here is not
+  a malfunction added on top of the work — it is the work registering a body.
+
+  Nothing distorts without someone present. Whoever watches the system break is
+  also the reason it breaks, standing inside the circuit as part of its noise.
 textKr: |
-  이 작품은 완벽하게 통제된 시스템과 그 이면에 존재하는 필연적인 붕괴 사이의 긴장을 탐구합니다.
-  <비정형의 회로>에서 노이즈는 단순한 오류가 아닌 생생한 시청각 언어로 작동합니다. 초음파 센서가
-  관객의 거리를 감지하는 순간, 정돈되어 있던 화면과 사운드는 예측 불가능한 디지털 글리치와
-  파열음으로 왜곡되며 기괴하게 숨을 쉽니다. 이 불쾌하고도 매혹적인 상호작용은 단순히 기계의
-  오작동을 보여주는 것을 넘어, 관찰자인 우리 자신 또한 이 견고한 구조를 교란하는 '노이즈의 일부'로서
-  깊숙이 관여하고 있음을 자각하게 합니다.
+  〈비정형의 회로 Atypical Circuit〉는 서울 역삼1문화센터 갤러리에서 열린
+  제13회 미디어아트 그룹전 《빛장 — Noise》에서 선보인 생성형·인터랙티브
+  미디어 설치다. 평면 스크린과 스피커가 정돈된 시청각 상태를 유지하고,
+  아두이노에 연결된 초음파 센서가 그 시스템과 다가오는 사람 사이의 거리를
+  측정한다.
+
+  작업은 통제된 시스템과 그 붕괴 사이의 긴장에서 출발한다. TouchDesigner로 만든
+  생성형 영상과 Ableton Live에서 구동되는 사운드는 센서 앞이 비어 있는 동안에만
+  질서를 유지한다. 관객이 다가서면 측정된 거리가 화면과 소리에 되먹임된다 —
+  이미지는 디지털 글리치로 부서지고, 사운드는 파열음으로 찢어진다. 여기서
+  노이즈는 작품 위에 얹힌 오작동이 아니라, 작품이 신체를 감지했다는 기록이다.
+
+  아무도 없으면 아무것도 일그러지지 않는다. 시스템이 무너지는 것을 지켜보는
+  사람이 곧 무너짐의 원인이며, 관객은 회로 안에 노이즈의 일부로 서 있게 된다.
 media:
   # 본문 — 공간을 먼저 세운다. 절반 폭 이미지로 시작하면 작품이 아니라 삽화로 열린다.
   - { type: image, src: "/images/atypical-circuit/03.jpg", width: full, caption: "Installation view" }
