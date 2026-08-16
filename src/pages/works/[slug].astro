@@ -40,6 +40,9 @@ const relatedByMaterial = allWorks
 
 const useImmersiveMedia = work.slug !== "fedora-exile"
 
+// 신호 파형 판형 — 시범. 승인되면 전 작품으로 확장한다.
+const useWaveform = work.slug === "three-pieces-ii"
+
 // 영상 URL을 임베드 가능한 형태로 정규화 (YouTube/Vimeo는 일반 링크를 붙여도 됨)
 function embedURL(url: string): { kind: "iframe" | "file"; src: string } {
   const yt = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]+)/)
@@ -140,7 +143,7 @@ function toParagraphs(text: string): string {
 ---
 
 <Base title={`HWANYUN — ${data.title}`}>
-  <div id="entry" data-media-prototype={useImmersiveMedia ? "true" : undefined}>
+  <div id="entry" data-media-prototype={useImmersiveMedia ? "true" : undefined} data-waveform={useWaveform ? "true" : undefined}>
     <div class="entry_title">{data.title}{yr}</div>
 
     {
@@ -242,14 +245,21 @@ function toParagraphs(text: string): string {
     {
       mediaRows.length > 0 && (
         <div class="media-flow">
-          {(() => { let plate = 0; return mediaRows.map((row) => {
+          {(() => { let plate = 0; let wave = 0; return mediaRows.map((row) => {
             const portraitRow = row.every(isPortrait)
             const solo = row.length === 1 ? row[0] : null
             // 세로 행은 자체 폭 규칙을 가지므로 solo 부분폭을 겹치지 않는다
             const soloPartial = solo && !portraitRow && (solo.width ?? "full") !== "full"
+            // 파형의 진폭 — 단독 전폭 도판만 좌/우로 번갈아 센다.
+            // DOM 순서(nth-child)로 세면 페어가 끼었을 때 같은 쪽에 연달아 선다.
+            const waveSide =
+              useWaveform && row.length === 1 && !portraitRow && !soloPartial
+                ? (wave++ % 2 === 0 ? "wave-l" : "wave-r")
+                : ""
             const rowClass = [
               "media-row",
               `count-${row.length}`,
+              waveSide,
               portraitRow ? "is-portrait-row" : "",
               soloPartial ? `solo-${solo.width} align-${solo.align || "left"}` : "",
               useImmersiveMedia ? "media-reveal" : "",
@@ -566,6 +576,32 @@ function toParagraphs(text: string): string {
   </script>
 
   <script is:inline>
+    /* 신호 파형 재생헤드 — 화면 가운데가 재생 위치다. 지나온 구간의 선이
+       채워지고, 접점이 켜진다. rAF 게이팅 없이 스크롤에서 직접 계산한다 —
+       행 십여 개의 사각형 측정은 스크롤마다 해도 저렴하고, 게이팅은 한 번
+       막히면 영영 멈추는 함정이 있다(홈 리빌에서 겪었다). */
+    ;(function () {
+      var flow = document.querySelector("#entry[data-waveform] .media-flow")
+      if (!flow) return
+      var rows = Array.prototype.slice.call(flow.querySelectorAll(".media-row"))
+      function upd() {
+        var r = flow.getBoundingClientRect()
+        var head = window.innerHeight * 0.5 - r.top // flow 좌표계의 재생헤드 y
+        var p = Math.max(0, Math.min(1, head / r.height))
+        flow.style.setProperty("--played", (p * 100).toFixed(2) + "%")
+        for (var i = 0; i < rows.length; i++) {
+          var rr = rows[i].getBoundingClientRect()
+          var nodeY = rr.top - r.top - 56 // 접점은 행 위 여백 속에 있다
+          rows[i].classList.toggle("is-fired", head >= nodeY)
+        }
+      }
+      window.addEventListener("scroll", upd, { passive: true })
+      window.addEventListener("resize", upd)
+      upd()
+    })()
+  </script>
+
+  <script is:inline>
     /* 2장 행: 실제 비율로 열 폭을 배분해 두 장의 높이·캡션 기선을 정확히 맞춘다.
        크롭 없이 저스티파이 — 도록 조판의 핵심. */
     ;(function () {
@@ -756,9 +792,14 @@ function toParagraphs(text: string): string {
        행 패턴은 셋뿐 — 전체폭 / 2장 나란히(같은 높이) / 단독 부분폭.
        2장 행은 아래 스크립트가 실제 비율로 열 폭을 보정해
        두 장의 높이와 캡션 기선이 정확히 맞는다. 크롭은 어디에도 없다. */
-    /* ── 판형: 도판(plate) 조판 ──
-       사진이 흐르는 피드가 아니라 번호 붙은 도판이 한 점씩 걸린다.
-       도판 사이는 화면 높이의 1/6쯤 — 전시장의 걸음 간격이다. */
+    /* ── 판형: 신호 파형 ──
+       기록의 흐름이 하나의 신호다. 가느다란 세로선(신호선)이 지면을 관통하고,
+       도판들은 파형의 진폭처럼 좌우로 번갈아 걸린다. 페어는 선을 사이에 두고
+       양쪽에 선다. 스크롤 위치가 재생헤드다 — 지나온 구간의 선이 채워지고,
+       도판 앞 접점이 켜진다. 사운드 페이지의 재생 바, Works 목록의 회로
+       트레이스와 같은 문법이다.
+       도판은 선 위에 놓이므로 선은 도판 사이 여백에서만 보인다 —
+       회로가 부품 아래를 지나는 것과 같다. */
     .media-flow {
       clear: both;
       display: flex;
@@ -766,6 +807,56 @@ function toParagraphs(text: string): string {
       gap: 104px;
       margin-top: 72px;
     }
+    /* 시범: 파형 판형이 켜진 페이지 */
+    #entry[data-waveform] .media-flow { position: relative; margin-top: 88px; }
+    #entry[data-waveform] .media-flow::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: -44px;
+      bottom: 0;
+      width: 1px;
+      background: var(--line-2);
+    }
+    /* 재생된 구간 — 스크롤 스크립트가 --played를 채운다 */
+    #entry[data-waveform] .media-flow::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: -44px;
+      width: 1px;
+      height: var(--played, 0%);
+      max-height: calc(100% + 44px);
+      background: var(--text-2);
+    }
+    /* 접점 — 각 도판 위 여백 한가운데. 재생헤드가 지나면 채워진다.
+       시아노타입의 '노출된' 접점(Works 목록 is-seen)과 같은 어휘. */
+    #entry[data-waveform] .media-row { position: relative; }
+    #entry[data-waveform] .media-row::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: -56px;
+      transform: translateX(-50%);
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      border: 1px solid var(--line-2);
+      background: var(--surface);
+      z-index: 1;
+      transition: background var(--dur-base) ease, border-color var(--dur-base) ease;
+    }
+    #entry[data-waveform] .media-row.is-fired::before { background: var(--text-2); border-color: var(--text-2); }
+    /* 도판이 선을 덮도록 위 레이어에 둔다 */
+    #entry[data-waveform] .media-row .block { position: relative; z-index: 1; }
+    /* 파형의 진폭 — 단독 도판은 좌/우로 번갈아 선다. 페어와 세로 행,
+       명시적 align이 있는 부분폭 행은 제 규칙을 지킨다. */
+    #entry[data-waveform] .media-row.wave-l .block { margin-left: 0; margin-right: auto; }
+    #entry[data-waveform] .media-row.wave-r .block { margin-left: auto; margin-right: 0; }
+    #entry[data-waveform] .media-row.wave-l .block:not(.is-video),
+    #entry[data-waveform] .media-row.wave-r .block:not(.is-video) { max-width: 84%; }
+    #entry[data-waveform] .media-row.wave-l .block.is-video,
+    #entry[data-waveform] .media-row.wave-r .block.is-video { width: 84%; }
     .media-row {
       display: grid;
       grid-template-columns: 1fr;
