@@ -37,8 +37,19 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     <div id="listen" class="listen">
       <button type="button" id="listen-btn" aria-pressed="false">
         <span class="ls-dot" aria-hidden="true"></span>
-        <span class="ls-label" id="listen-label">LISTEN</span>
+        <span class="ls-label">
+          <span class="ls-off">LISTEN</span>
+          <span class="ls-on">LISTENING</span>
+          <span class="ls-bad">MIC BLOCKED</span>
+        </span>
+        {/* 켜졌는데 방이 조용하면 아무 일도 안 일어난 것처럼 보인다.
+            들리는 크기를 막대로 보여 주면 "켜졌다"와 "조용하다"가 구분된다. */}
+        <span class="ls-meter" aria-hidden="true"><i></i></span>
       </button>
+      <p class="ls-error" id="listen-error">
+        <span data-language-content="en">Your browser is blocking the microphone. Allow it from the lock icon in the address bar, then try again.</span>
+        <span data-language-content="ko" lang="ko">브라우저가 마이크를 차단하고 있습니다. 주소창의 자물쇠 아이콘에서 허용한 뒤 다시 시도해 주세요.</span>
+      </p>
       <div class="ls-note" id="listen-note" hidden>
         <p>
           <span data-language-content="en">The sphere responds to the sound of your room. Audio never leaves this device — nothing is recorded, stored, or sent; this is a static page with no server to send it to. Loudness is read in the browser and discarded. Your browser shows its own mic indicator, and it turns off the moment you stop.</span>
@@ -79,7 +90,11 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       var ctx = null, stream = null, analyser = null, raf = 0
       var freq, wave
 
-      function setState(state) { root.dataset.state = state; btn.setAttribute("aria-pressed", String(state === "on")) }
+      function setState(state) {
+        root.dataset.state = state
+        btn.setAttribute("aria-pressed", String(state === "on"))
+      }
+      setState("idle")
 
       function analyse() {
         analyser.getByteTimeDomainData(wave)
@@ -133,15 +148,20 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
           analyse()
           // 기기에서 마이크가 뽑히는 등 트랙이 밖에서 끝나면 UI도 따라간다
           s.getTracks().forEach(function (t) { t.onended = stop })
-        }).catch(function () {
+        }).catch(function (err) {
           note.hidden = true
           setState("denied")
-          setTimeout(function () { if (root.dataset.state === "denied") setState("idle") }, 2600)
+          // 무엇이 막았는지 알아야 고칠 수 있다 — 사용자가 콘솔에서 확인하거나
+          // 나에게 알려 줄 수 있게 남긴다.
+          console.warn("[LISTEN] microphone unavailable:", err && err.name, err && err.message)
         })
       }
 
       btn.addEventListener("click", function () {
         if (mic.on) { stop(); return }
+        // 차단된 뒤 다시 누르면 곧바로 재시도한다 — 설정을 고치고 온 사람에게
+        // 안내문을 한 번 더 읽히는 건 무례하다.
+        if (root.dataset.state === "denied") { start(); return }
         note.hidden = !note.hidden
       })
       startBtn.addEventListener("click", start)
@@ -529,7 +549,11 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         const mic = (window as any).__hyMic
         const audioLevel = mic && mic.on ? mic.level : 0
         const audioHigh = mic && mic.on && !reduceMotion ? mic.high : 0
-        const globeRadius = size * .38 * (1 + audioLevel * .17)
+        // 저역은 구체 전체를 미세하게 민다 — 낮은 소리는 방을 흔드는 소리다
+        const audioLow = mic && mic.on && !reduceMotion ? mic.low : 0
+        const swayX = Math.sin(time * .0021) * audioLow * size * .035
+        const swayY = Math.cos(time * .0017) * audioLow * size * .022
+        const globeRadius = size * .38 * (1 + audioLevel * .28)
         // 데스크톱은 커서가 얹혀 있는 동안, 모바일은 손가락이 닿아 있는 동안
         const repelling = isInside && hasPointer && !reduceMotion
 
@@ -539,8 +563,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
           const rotatedY = particle.sphereY * cosTilt - rotatedZ * sinTilt
           const depth = particle.sphereY * sinTilt + rotatedZ * cosTilt
           const perspective = 2.8 / (3.3 - depth)
-          const driftX = centerX + rotatedX * globeRadius * perspective
-          const driftY = centerY + rotatedY * globeRadius * perspective
+          const driftX = centerX + swayX + rotatedX * globeRadius * perspective
+          const driftY = centerY + swayY + rotatedY * globeRadius * perspective
           const destinationX = isInside ? particle.targetX : driftX
           const destinationY = isInside ? particle.targetY : driftY
           // 이름이 모인 뒤에는 커서가 글자를 밀어낸다. 반발은 감쇠 안에서 더해야 한다 —
@@ -562,8 +586,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
           }
           // 고역 산란 — 구체 상태에서만. 이름은 읽혀야 하므로 흔들지 않는다.
           if (audioHigh > .02 && !isInside) {
-            pushX += (Math.random() - .5) * audioHigh * 2.6
-            pushY += (Math.random() - .5) * audioHigh * 2.6
+            pushX += (Math.random() - .5) * audioHigh * 4.2
+            pushY += (Math.random() - .5) * audioHigh * 4.2
           }
           particle.vx = (particle.vx + (destinationX - particle.x) * (isInside ? .025 : .024) + pushX) * .8
           particle.vy = (particle.vy + (destinationY - particle.y) * (isInside ? .025 : .024) + pushY) * .8
@@ -745,6 +769,29 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       display: inline-flex; align-items: center; gap: 8px;
       color: var(--void-label); font-size: var(--fs-2xs); letter-spacing: .16em;
     }
+    /* 상태마다 한 문구만 */
+    .ls-on, .ls-bad, .ls-meter { display: none; }
+    .listen[data-state="on"] .ls-off { display: none; }
+    .listen[data-state="on"] .ls-on { display: inline; }
+    .listen[data-state="on"] .ls-meter { display: block; }
+    .listen[data-state="denied"] .ls-off { display: none; }
+    .listen[data-state="denied"] .ls-bad { display: inline; }
+    /* 들리는 크기 — 켜졌는데 조용한 것과 안 켜진 것을 구분해 준다 */
+    .ls-meter {
+      width: 34px; height: 2px; background: var(--void-line); overflow: hidden;
+    }
+    .ls-meter i {
+      display: block; height: 100%; background: var(--surface);
+      width: calc(var(--mic, 0) * 100%);
+      transition: width 90ms linear;
+    }
+    /* 표시는 상태가 결정한다 — JS가 따로 숨기면 둘이 어긋날 수 있다 */
+    .ls-error { display: none; }
+    .listen[data-state="denied"] .ls-error { display: block; }
+    .ls-error {
+      max-width: 260px; margin: 0; text-align: right;
+      font-size: var(--fs-2xs); line-height: 1.5; color: var(--void-text-2);
+    }
     #listen-btn:hover { color: var(--surface); }
     .ls-dot {
       width: 7px; height: 7px; border-radius: 50%;
@@ -778,8 +825,10 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     #listen-cancel { color: var(--void-text-2); }
 
     @media (max-width: 700px) {
-      .listen { right: 16px; bottom: 18px; }
-      .ls-note { max-width: min(300px, calc(100vw - 32px)); }
+      /* 하단은 티커가 폭 전체를 쓴다 — LISTEN은 그 위층으로 올린다 */
+      .listen { right: 16px; bottom: 96px; }
+      .ls-note { max-width: calc(100vw - 32px); }
+      .ls-error { max-width: calc(100vw - 32px); }
     }
     @media (prefers-reduced-motion: reduce) {
       .listen[data-state="on"] .ls-dot { transform: none; }
