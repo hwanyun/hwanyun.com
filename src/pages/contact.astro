@@ -187,17 +187,32 @@ import Base from "../layouts/Base.astro"
           })
         }
 
+        /* 공중의 입자는 캐릭터를 감싸야 한다. 화면 전체에 균일하게 뿌리면
+           캐릭터와 아무 관계가 없는 벽지가 되고, 왼쪽 연락처 위까지 덮어
+           읽는 데 방해가 된다. 캐릭터 위치를 중심으로 한 정규분포로 두고
+           좌표는 화면이 아니라 "캐릭터로부터의 거리"로 들고 있는다 —
+           캐릭터가 움직이면 무리도 같이 간다. */
         var mN = W < 700 ? 60 : 110
         motes = []
         for (var k = 0; k < mN; k++) {
           motes.push({
-            x: Math.random() * W,
-            y: Math.random() * H * 0.72,
+            gx: gauss(),          // 캐릭터 기준 좌우 (σ=1)
+            gy: gauss(),          // 캐릭터 기준 상하 (σ=1)
             r: 0.5 + Math.random() * 0.9,
             sp: 0.12 + Math.random() * 0.35,
             ph: Math.random() * 6.28,
+            // 일부는 캐릭터 앞에 둔다. 전부 뒤에 있으면 몸통에 가려
+            // 감싸는 게 아니라 뒤에 깔린 배경이 된다.
+            front: Math.random() < 0.34,
           })
         }
+      }
+
+      // Box-Muller — 가운데가 촘촘하고 바깥으로 성글어지는 분포
+      function gauss() {
+        var u = 1 - Math.random()
+        var v = Math.random()
+        return Math.sqrt(-2 * Math.log(u)) * Math.cos(6.28318 * v)
       }
 
       function draw(time) {
@@ -268,16 +283,32 @@ import Base from "../layouts/Base.astro"
           }
         }
 
-        // 공중의 먼지 — 히어로와 같은 입자의 결을 유지하는 층
+        /* 공중의 먼지 — 캐릭터를 감싸는 층. 히어로와 같은 입자의 결을 유지하되
+           위치는 캐릭터에 매여 있다. 마스코트가 아직 안 떴으면 화면 중앙을 쓴다. */
+        var bodyH = ms0 ? Math.max(80, fY - ms0.handY) : H * 0.28
+        var mcx = ms0 ? fX : W / 2
+        var mcy = ms0 ? (fY + ms0.handY) / 2 : H * 0.46
+        var SX = bodyH * 0.95   // 좌우 퍼짐
+        var SY = bodyH * 0.8    // 상하 퍼짐
+        var SPAN = bodyH * 2.4  // 위로 흐르다 되돌아오는 띠의 높이
         for (var k = 0; k < motes.length; k++) {
           var m = motes[k]
-          var my = reduce ? m.y : m.y - ((t * 12 * m.sp) % (H * 0.72))
-          if (my < 0) my += H * 0.72
-          var mx = m.x + (reduce ? 0 : Math.sin(t * 0.5 + m.ph) * 7)
-          ctx.beginPath()
-          ctx.arc(mx, my, m.r, 0, Math.PI * 2)
-          ctx.fillStyle = "rgba(17,17,17,.10)"
-          ctx.fill()
+          var ox = m.gx * SX + (reduce ? 0 : Math.sin(t * 0.5 + m.ph) * 7)
+          var oy = m.gy * SY
+          if (!reduce) {
+            // 띠 안에서 위로 흐르고 넘치면 아래로 되돌아온다
+            oy = ((oy - t * 12 * m.sp + SPAN * 1.5) % SPAN) - SPAN / 2
+          }
+          // 가장자리는 잘리지 않고 흩어져 사라진다
+          var d = Math.sqrt((ox / SX) * (ox / SX) + (oy / SY) * (oy / SY))
+          var a = 0.15 * Math.max(0, 1 - d / 2.6)
+          if (a <= 0.004) continue
+          // 앞에 있는 것은 더 옅게 — 짙으면 얼굴을 더럽힌다
+          var g2 = m.front ? fxc : ctx
+          g2.beginPath()
+          g2.arc(mcx + ox, mcy + oy, m.r, 0, Math.PI * 2)
+          g2.fillStyle = "rgba(17,17,17," + (m.front ? a * 0.6 : a).toFixed(3) + ")"
+          g2.fill()
         }
 
         /* ── 캐릭터의 행동에 대한 반응 ──
