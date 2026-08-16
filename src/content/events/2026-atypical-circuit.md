@@ -30,6 +30,11 @@ textEn: |
   Noise and light proliferating beneath a rigid system act as atypical symptoms resisting controlled order; meeting the chance interventions that disturb the circuit, they produce an unpredictable creative rupture. These non-linear fragments, born of "intended error", open a fissure in the smoothly domesticated surface of perception and bring the viewer face to face with raw sensation outside control.
 
   Shown as one of ten artists in the 13th Media Art Group Exhibition《빛장 — Noise》, organised by VSLAB. The exhibition took noise as an inquiry into the boundary between digital sound and visual art; this work answered with sensors and glitch.
+thumb: "/images/events/2026-atypical-circuit.jpg"
+images:
+  - src: "/images/events/2026-atypical-circuit.jpg"
+    caption: "제13회 미디어아트 그룹전 《빛장 — Noise 노이즈》 포스터"
+    captionEn: "13th Media Art Group Exhibition《빛장 — Noise》— poster"
 links:
   - kind: "official"
     publisher: "VSLAB"
