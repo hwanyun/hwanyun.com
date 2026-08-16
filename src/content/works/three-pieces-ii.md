@@ -30,17 +30,19 @@ textKr: |
 
   작업은 관객의 시선을 하나의 형상에 고정하지 않는다. 서로 얽힌 선과 빈틈, 그 사이에 드리운 그림자는 보는 이마다 다른 연상과 생각을 불러낸다. 누군가는 풍경을, 누군가는 몸이나 생명체의 흔적을 발견할 수 있지만, 그 형상은 끝내 하나의 이름으로 정리되지 않는다. 감각이 해석보다 먼저 작동하는 이 순간, 작품은 관객 각자의 직관 속에서 열려 있고 계속해서 새로운 모습으로 만들어진다.
 media:
-  - { type: video, src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/videos/three-pieces-ii.m4v", width: half, layout: portrait, ratio: "9:16", caption: "Video documentation" }
-  - { type: image, src: "/images/three-pieces-ii/01.jpg", width: full, layout: hero, caption: "Installation view" }
-  - { type: image, src: "/images/three-pieces-ii/07.jpg", width: half, layout: portrait, align: right, caption: "View through the hanging drawing" }
-  - { type: image, src: "/images/three-pieces-ii/04.jpg", width: full, layout: wide, align: left, caption: "Detail of the ABS-filament drawing" }
-  - { type: image, src: "/images/three-pieces-ii/05.jpg", width: full, layout: wide, align: right }
-  - { type: image, src: "/images/three-pieces-ii/02.jpg", width: third, layout: detail, align: left }
-  - { type: image, src: "/images/three-pieces-ii/03.jpg", width: half, layout: standard, align: right }
-  - { type: image, src: "/images/three-pieces-ii/06.jpg", width: third, layout: detail, align: left }
-  - { type: image, src: "/images/three-pieces-ii/08.jpg", width: third, layout: detail, align: right }
-  - { type: image, src: "/images/three-pieces-ii/09.jpg", width: half, layout: standard, align: left }
-  - { type: image, src: "/images/three-pieces-ii/10.jpg", width: third, layout: detail, align: right }
+  # 본문 — 공간에 세우고, 사람 옆에 두어 크기를 알리고, 재료로 들어간다. 10장 중 7장.
+  - { type: image, src: "/images/three-pieces-ii/10.jpg", width: full, caption: "Installation view — hanging drawings and their shadows" }
+  - { type: image, src: "/images/three-pieces-ii/02.jpg", width: half, caption: "Drawn filament, detail" }
+  - { type: image, src: "/images/three-pieces-ii/09.jpg", width: half, caption: "The line closing into a mesh" }
+  # 사람이 함께 서 있는 한 장 — 크기는 설명이 아니라 비교로 전해진다
+  - { type: image, src: "/images/three-pieces-ii/07.jpg", width: full, caption: "A visitor standing among the hanging works" }
+  - { type: image, src: "/images/three-pieces-ii/05.jpg", width: half, caption: "The shadow cast onto the floor" }
+  - { type: image, src: "/images/three-pieces-ii/08.jpg", width: half, caption: "Edge of the panel against the wall" }
+  - { type: image, src: "/images/three-pieces-ii/01.jpg", width: half, align: left, caption: "Installation view, corner" }
+  # 부록 — 전시 텍스트와 세부 기록
+  - { type: image, src: "/images/three-pieces-ii/03.jpg", archive: true }
+  - { type: image, src: "/images/three-pieces-ii/04.jpg", archive: true }
+  - { type: image, src: "/images/three-pieces-ii/06.jpg", archive: true }
 exhibition:
   titleEn: "Open Studios"
   venue: "GlogauAIR Berlin"

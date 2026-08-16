@@ -74,6 +74,9 @@ const works = defineCollection({
           align: z.enum(["left", "right"]).optional(),
           ratio: z.enum(["16:9", "4:3", "1:1", "21:9", "9:16"]).default("16:9"), // 영상 비율
           span: z.number().optional(), // 사진 모듈 그리드에서 차지할 칸 수(1~3). 없으면 비율로 자동
+          // 도록의 부록. true면 본문 흐름에서 빠지고 하단 "Archive"에 작게 접힌다.
+          // 본문은 역할이 있는 5–8장만 남긴다 — 장수가 늘수록 한 장의 무게가 준다.
+          archive: z.boolean().optional().default(false),
           caption: z.string().optional().default(""),
           noteLabel: z.string().optional().default(""),
           noteEn: z.string().optional().default(""),

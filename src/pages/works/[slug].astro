@@ -69,7 +69,11 @@ const ratioNum: Record<string, number> = {
   "9:16": 9 / 16,
 }
 
-const media = data.media ?? []
+/* 도록의 본문과 부록 — archive로 표시된 사진은 본문 흐름에서 빠져
+   하단에 작게 접힌다. 본문은 역할이 있는 5–8장만 남는다. */
+const allMedia = data.media ?? []
+const media = allMedia.filter((m) => !m.archive)
+const archiveMedia = allMedia.filter((m) => m.archive && m.type === "image")
 const galleryMedia = data.mediaFirst && !useImmersiveMedia ? media.slice(1) : media
 const hasText = data.textEn || data.textKr
 
@@ -297,6 +301,29 @@ function toParagraphs(text: string): string {
             <figure class="block"><div class="ph" style="padding-bottom:120%" /></figure>
           </div>
         </div>
+      )
+    }
+
+    {
+      archiveMedia.length > 0 && (
+        <details class="media-archive">
+          <summary>
+            <span class="ma-label">
+              Archive
+              <span class="ma-n">{archiveMedia.length}</span>
+            </span>
+            <span class="ma-expand" aria-hidden="true">+</span>
+          </summary>
+          {/* 부록은 균일한 작은 그리드 — 본문과 달리 위계 없이 전부 같은 크기.
+              여기서는 기록이 목적이고, 말하는 것은 위의 본문이다. */}
+          <div class="ma-grid">
+            {archiveMedia.map((m) => (
+              <figure>
+                <img src={m.src} alt={m.caption || `${data.title} — archive`} loading="lazy" />
+              </figure>
+            ))}
+          </div>
+        </details>
       )
     }
 
@@ -768,11 +795,34 @@ function toParagraphs(text: string): string {
       .media-row.is-portrait-row .block { width: min(78vw, 340px); }
     }
 
+    /* 도록의 부록 — 본문에서 걷어낸 기록 사진들. 접혀 있고, 펼치면
+       위계 없는 균일 그리드. 본문의 어휘(얇은 선, 색 하나 반응)를 따른다. */
+    .media-archive { clear: both; margin: 56px 0 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .media-archive summary {
+      display: flex; align-items: baseline; justify-content: space-between;
+      padding: 14px 2px; cursor: pointer; list-style: none;
+      transition: color var(--dur-fast) var(--ease);
+    }
+    .media-archive summary::-webkit-details-marker { display: none; }
+    .media-archive summary:hover { color: var(--hover); }
+    .ma-label { font-size: var(--fs-xs); letter-spacing: .08em; text-transform: uppercase; }
+    .ma-n { color: var(--text-4); margin-left: 6px; font-variant-numeric: tabular-nums; }
+    .ma-expand { font-size: var(--fs-lead); font-weight: 300; line-height: .7; }
+    .media-archive[open] .ma-expand { transform: rotate(45deg); }
+    .ma-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+      gap: 6px; padding: 2px 0 18px;
+    }
+    .ma-grid figure { margin: 0; }
+    .ma-grid img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; }
+
     .post-gallery-divider {
       clear: both;
       margin: 72px 0 0;
       border-top: 1px solid var(--line);
     }
+    /* 부록이 있으면 경계선이 겹으로 생긴다 — 부록의 아래선이 그 역할을 대신한다 */
+    .media-archive + .post-gallery-divider { border-top: 0; margin-top: 56px; }
 
     /* 12열 그리드: 자료의 역할과 여백을 함께 조절한다. */
     .block { position: relative; grid-column: span 5; }
