@@ -689,8 +689,12 @@ function toParagraphs(text: string): string {
        세 줄이 각각 한 층으로 보이면 안 되고 하나의 캡션 덩어리로 읽혀야 하므로,
        안쪽 행간은 좁히고 대신 아래 재료 태그 앞에서 크게 띄운다.
        그 간격이 "여기까지가 캡션, 여기부터는 통로"를 가른다. */
+    /* 작품 제목은 display(38)가 아니라 title(30)이다. 38은 페이지 제목(Works,
+       Sound…)의 크기 — 작품이 같은 크기를 쓰면 "아카이브의 한 항목"이 아니라
+       또 하나의 페이지 제목처럼 읽히고, 30은 그동안 거의 안 쓰이는 죽은
+       단계였다. 이벤트 상세(.ev-detail h1)가 이미 title을 쓰고 있다. */
     .entry_title {
-      font-size: var(--fs-display);
+      font-size: var(--fs-title);
       font-weight: 300;
       line-height: 1.25;
       margin-bottom: 12px;
@@ -708,7 +712,8 @@ function toParagraphs(text: string): string {
       margin: 0 0 26px;
     }
     .material-tag {
-      font-size: var(--fs-xs);
+      /* 칩은 UI — 15로 통일 (아카이브 필터와 같은 규칙) */
+      font-size: var(--fs-sm);
       line-height: 1;
       padding: 6px 11px;
       border: 1px solid var(--line-2);
@@ -1305,10 +1310,11 @@ function toParagraphs(text: string): string {
         width: calc(100% - 32px);
         margin: 24px 16px 0;
       }
-      /* 데스크톱은 제목:형태 = 38:18 ≈ 2.1인데 모바일은 26:15 ≈ 1.75로
-         제목이 덜 선다. 비율을 되찾는다. */
+      /* 모바일 제목 반응 곡선은 사이트 공통 clamp 한 벌(25px, 7vw, 32px)을 쓴다 —
+         이 페이지만 28/8vw/34로 달랐다. 페이지 제목보다 위계가 낮아진 것은
+         데스크톱(38→30)과 같은 방향이다. */
       .entry_title {
-        font-size: clamp(28px, 8vw, 34px);
+        font-size: clamp(25px, 7vw, 32px);
         line-height: 1.2;
         margin-bottom: 11px;
       }

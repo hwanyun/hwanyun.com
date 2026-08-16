@@ -177,7 +177,9 @@ const showCounts = SHOWS.map((x) => ({
   .show-filter { margin-bottom: 26px; }
   .show-filter a { border-style: dashed; }
   .material-filter a {
-    font-size: var(--fs-xs);
+    /* 칩은 UI다 — UI·메타는 15로 통일한다. 모바일(15)과 데스크톱(13)이
+       같은 요소인데 크기가 달라 스케일이 흔들려 보이던 지점. */
+    font-size: var(--fs-sm);
     line-height: 1;
     padding: 6px 11px;
     border: 1px solid var(--line-2);

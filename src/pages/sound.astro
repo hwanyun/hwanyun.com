@@ -246,7 +246,8 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
        어디서나 같은 모양이어야 한다. */
     .sound-filter { display: flex; flex-wrap: wrap; gap: 6px 8px; margin: 0 0 22px; }
     .sound-filter a {
-      font-size: var(--fs-xs); line-height: 1; padding: 6px 11px;
+      /* 칩은 UI — 15로 통일 (works 필터와 같은 규칙) */
+      font-size: var(--fs-sm); line-height: 1; padding: 6px 11px;
       border: 1px solid var(--line-2); border-radius: 999px; color: var(--text-2);
       transition: border-color var(--dur-fast) ease, color var(--dur-fast) ease, background var(--dur-fast) ease;
     }
