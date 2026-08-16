@@ -56,6 +56,8 @@ const { active = "about" } = Astro.props
     line-height: 1.8;
     color: var(--text-2);
   }
+  /* 한글은 행간을 더 — sound·works의 intro와 같은 규칙 */
+  .intro [lang="ko"] { line-height: 1.85; }
   .bionav {
     display: flex;
     gap: 18px;

@@ -252,7 +252,9 @@ const showCounts = SHOWS.map((x) => ({
   .archive-head span:last-child { text-align: right; }
   li { border-bottom: 1px solid var(--text-3); }
   li a { align-items: baseline; padding: 5px 0 6px; }
-  time { grid-column: 2; grid-row: 1; text-align: right; font-size: var(--fs-sm); font-weight: 300; letter-spacing: 0.025em; }
+  /* 숫자 열은 고정폭 숫자로 — 비례폭이면 연도마다 폭이 달라 오른쪽 열이 떨린다.
+     CV의 연도 열이 이미 쓰는 규칙이다. */
+  time { grid-column: 2; grid-row: 1; text-align: right; font-size: var(--fs-sm); font-weight: 300; letter-spacing: 0.025em; font-variant-numeric: tabular-nums; }
   li span { grid-column: 1; grid-row: 1; font-size: var(--fs-body); font-weight: 300; line-height: 1.16; letter-spacing: 0.012em; }
   li a:hover { color: var(--hover); }
   @media (max-width: 700px) {
@@ -304,8 +306,11 @@ const showCounts = SHOWS.map((x) => ({
     }
     .archive-head, li a { grid-template-columns: minmax(0, 1fr) 48px; gap: 8px; }
     /* 아카이브에서 가장 중요한 링크인데 32px로 이 페이지에서 가장 작았다.
-       구분선이 있는 목록 행이라 44px가 늘어져 보이지도 않는다. */
-    li a { min-height: 44px; align-items: center; padding: 4px 0; }
+       구분선이 있는 목록 행이라 44px가 늘어져 보이지도 않는다.
+       높이는 패딩으로 채운다 — center 정렬로 채우면 제목(18px)과 연도(13px)의
+       베이스라인이 2.3px 어긋난다. 크기가 다른 글자가 한 줄에 서는 곳은
+       베이스라인 정렬이 조판의 기본이고, 데스크톱도 그렇게 서 있다. */
+    li a { align-items: baseline; padding: 10px 0; }
     .archive-head { font-size: var(--fs-sm); }
     time { font-size: var(--fs-xs); }
     li span { font-size: var(--fs-body); }

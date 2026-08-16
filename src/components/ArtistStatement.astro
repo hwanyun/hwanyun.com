@@ -41,6 +41,11 @@ const paragraphs = korean
   h2 { font-size: var(--fs-sm); font-weight: 500; margin: 0 0 10px; }
   section { margin: 0 0 40px; }
   p { margin: 0 0 1em; }
+  /* 사이트 규칙: 한글 본문은 라틴보다 행간을 더 준다(1.8 → 1.85).
+     받침이 줄의 아래를 채워 같은 행간이면 라틴보다 빽빽하게 읽힌다 —
+     sound·works의 intro가 이미 따르는 규칙인데 이 문서만 빠져 있었다. */
+  :global([lang="ko"]) .page p,
+  .page :global(p[lang="ko"]) { line-height: 1.85; }
   .sign { font-weight: 500; letter-spacing: .02em; }
   @media (max-width: 700px) {
     .page { margin: 0; padding: 0 16px 64px; font-size: var(--fs-sm); line-height: 1.75; }
