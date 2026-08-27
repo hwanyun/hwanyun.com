@@ -13,7 +13,10 @@ export async function getStaticPaths() {
 const { work } = Astro.props
 const { data } = work
 const { Content } = await work.render()
-const yr = data.year ? ` (${data.year})` : ""
+/* 제목이 이미 괄호로 끝나면(〈무제 (無諸)〉, 〈Coexistence (공존)〉) 연도를 또
+   괄호로 붙여 "무제 (無諸) (2026)"처럼 겹친다. 그때는 쉼표로 잇는다 —
+   "Title, Year"도 미술계의 표준 표기다. */
+const yr = data.year ? (data.title.trim().endsWith(")") ? `, ${data.year}` : ` (${data.year})`) : ""
 const allWorks = await getCollection("works", ({ data }) => !data.draft)
 const allSounds = await getCollection("sounds", ({ data }) => !data.draft)
 const seriesWorks = data.series
