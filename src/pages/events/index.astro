@@ -88,15 +88,17 @@ function fmt(start: string, end: string) {
       <ul class="ev-list" id="ev-next-list"></ul>
     </section>
 
-    <section id="ev-past" aria-label="Past" hidden>
-      <h2 class="ev-secth">Past</h2>
-      <div id="ev-past-groups"></div>
-    </section>
-
+    {/* 예정이 없다는 안내는 예정이 놓일 자리에 있어야 한다 — 지난 일정 뒤에
+        두면 목록을 다 지나친 맨 끝에서야 나타나 안내 구실을 못 한다. */}
     <p class="ev-empty" id="ev-empty" hidden>
       <span data-language-content="en">No upcoming events.</span>
       <span data-language-content="ko" lang="ko">예정된 일정이 없습니다.</span>
     </p>
+
+    <section id="ev-past" aria-label="Past" hidden>
+      <h2 class="ev-secth">Past</h2>
+      <div id="ev-past-groups"></div>
+    </section>
   </main>
 
   <script is:inline>
