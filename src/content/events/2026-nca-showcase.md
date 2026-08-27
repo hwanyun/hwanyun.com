@@ -8,9 +8,9 @@ venue: "콘텐츠문화광장 스튜디오1"
 venueEn: "Studio 1, Contents Culture Square"
 city: "서울"
 cityEn: "Seoul"
-genre: "관객 참여형 미디어아트"
-genreEn: "Participatory media art"
-summary: "관객의 움직임을 따라 피어나고 무너지는 데이터 만다라. 티베트의 모래 만다라 의식에서 출발한 관객 참여형 설치."
+genre: "이머시브·인터랙티브 미디어아트"
+genreEn: "Immersive and interactive media art"
+summary: "관객의 움직임을 따라 피어나고 무너지는 데이터 만다라. 티베트의 모래 만다라 의식에서 출발한 이머시브·인터랙티브 설치."
 summaryEn: "A mandala of data that blooms and collapses with the movement of those who enter it — an installation that begins with the Tibetan sand-mandala rite."
 textKr: |
   티베트 불교의 승려들은 며칠에 걸쳐 색모래로 만다라를 그린다. 그리고 완성된 순간, 그것을 손으로 쓸어 허문다. 오래 걸려 만든 것을 남기지 않는 이 의식은 존재가 머무르지 않는다는 사실을 눈앞에서 보여 준다.
