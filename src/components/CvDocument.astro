@@ -20,7 +20,7 @@ const { data, korean = false } = Astro.props
       떨어져 나가 혼자 돌아다닌다. 누구의 이력서인지, 어디서 왔는지가 종이에
       찍혀 있어야 한다. */}
   <header class="print-head" aria-hidden="true">
-    <div class="ph-name">HWANYUN</div>
+    <div class="ph-name">{data.name || "HWANYUN"}</div>
     <div class="ph-meta">
       <span data-language-content="en">Sound, light, material, and the body alter one another.</span>
       <span data-language-content="ko">소리와 빛, 물질과 신체가 서로의 상태를 바꾼다.</span>
