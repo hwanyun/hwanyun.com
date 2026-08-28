@@ -143,5 +143,10 @@ media:
     archive: true
     caption: "무제(無諸) — 모든 것은 생겨나고 사라진다 / Everything Comes and Goes"
     captionEn: "무제(無諸) — Everything Comes and Goes"
+  - type: image
+    src: "/images/events/2026-nca-showcase.jpg"
+    archive: true
+    caption: "2026 뉴콘텐츠아카데미 쇼케이스 포스터"
+    captionEn: "2026 New Content Academy Showcase poster"
 draft: false
 ---
