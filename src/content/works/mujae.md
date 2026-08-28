@@ -11,7 +11,7 @@ size: 3col
 category: work
 order: 1
 showType: group
-thumb: "/images/mujae/01.jpg"
+thumb: "/images/mujae/02-sign-scene.jpg"
 textEn: |
   Countless flyers and signs are created and disappear from the streets of everyday
   life. New flyers cover old ones, while signs are removed and replaced. The urban
@@ -103,11 +103,45 @@ exhibition:
   venueEn: "Studio 1, Contents Culture Square, Seoul"
   year: "2026"
 media:
+  # 도록 순서 = 작품의 순환 그대로: 간판 씬 설치 전경(공간) → 전단지 사이클 영상 →
+  # 간판 사이클 영상 → 소멸(활자 산란) → 만다라 패턴(소스) → 컨트롤 화면(프로세스)
   - type: image
-    src: "/images/mujae/01.jpg"
+    src: "/images/mujae/02-sign-scene.jpg"
     width: full
     layout: hero
-    caption: "무제 (無諸), 2026"
-    captionEn: "무제 (無諸), 2026"
+    caption: "설치 전경 — 간판 씬. 프로젝터 4대, 360° 벽과 바닥"
+    captionEn: "Installation view — sign scene. Four projectors across the 360° wall and floor"
+  - type: video
+    src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/videos/mujae-flyer.mp4"
+    width: full
+    ratio: "16:9"
+    caption: "전단지 사이클 — 산란에서 만다라로, 그리고 소멸"
+    captionEn: "Flyer cycle — from scatter to mandala, and its dissolution"
+  - type: video
+    src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/videos/mujae-sign.mp4"
+    width: full
+    ratio: "16:9"
+    caption: "간판 사이클 — 건물의 간판이 활자로 부서져 바닥의 만다라로 모인다"
+    captionEn: "Sign cycle — signboards break into letterforms and gather into the floor mandala"
+  - type: image
+    src: "/images/mujae/03-dissolve.jpg"
+    width: half
+    caption: "소멸 — 활자가 벽과 바닥으로 흩어진다"
+    captionEn: "Dissolution — letterforms scatter across the walls and floor"
+  - type: image
+    src: "/images/mujae/01.jpg"
+    width: half
+    caption: "데이터로 짜인 만다라 패턴"
+    captionEn: "The mandala pattern, woven from data"
+  - type: image
+    src: "/images/mujae/04-control.jpg"
+    width: full
+    caption: "컨트롤 — Slamtec S2E 트래커, TouchDesigner, Ableton Live"
+    captionEn: "Control — Slamtec S2E tracker, TouchDesigner, Ableton Live"
+  - type: image
+    src: "/images/mujae/poster.png"
+    archive: true
+    caption: "무제(無諸) — 모든 것은 생겨나고 사라진다 / Everything Comes and Goes"
+    captionEn: "무제(無諸) — Everything Comes and Goes"
 draft: false
 ---
