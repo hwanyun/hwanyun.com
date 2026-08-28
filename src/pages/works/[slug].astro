@@ -874,8 +874,10 @@ function toParagraphs(text: string): string {
        컬럼의 선은 끈다 — 안 그러면 선이 두 번 그어진다. */
     .work-subtitle {
       max-width: 62ch;
-      margin: 0 0 26px;
-      padding-top: 12px;
+      /* 부제는 선의 꼬리가 아니라 본문의 머리다 — 선과는 넉넉히(26px),
+         본문과는 가깝게(12px). 붙는 쪽이 소속을 말한다. */
+      margin: 0 0 12px;
+      padding-top: 26px;
       border-top: 1px solid var(--text);
       font-size: var(--fs-body);
       color: var(--text-3);
