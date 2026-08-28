@@ -820,7 +820,8 @@ function toParagraphs(text: string): string {
     }
     /* 한 번에 한 언어만 보이므로 단을 나누지 않는다 */
     .process-note-cols { display: block; }
-    .process-note p { margin: 0; font-size: var(--fs-sm); line-height: 1.75; }
+    /* YAML 블록의 빈 줄이 단락 구분이다 — pre-line이 없으면 한 덩어리로 뭉개진다 */
+    .process-note p { margin: 0; font-size: var(--fs-sm); line-height: 1.75; white-space: pre-line; }
 
     /* 미디어 — 홈 그리드처럼 220/380/540 크기가 여백 있게 흐름 */
     .media {

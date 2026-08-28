@@ -9,7 +9,7 @@ materials:
 showType: group
 size: 2col
 category: work
-order: 6
+order: 7
 thumb: "/images/conductive-circles/home.png"
 thumbVideo: "/videos/loops/conductive-circles.mp4"
 exhibition:

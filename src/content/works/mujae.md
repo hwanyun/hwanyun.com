@@ -1,53 +1,100 @@
 ---
 title: "무제 (無諸)"
 year: "2026"
-medium: "Immersive and interactive media installation; floor projection, motion tracking, TouchDesigner, generative image dataset"
+medium: "Immersive and interactive media installation; LiDAR sensor, four projectors (360° wall and floor), 4-channel sound, TouchDesigner, Ableton Live, flyer and sign image archive"
 materials:
   - interactive
   - projection
   - sensor
   - moving-image
-size: 2col
+size: 3col
 category: work
-order: 2
+order: 1
 showType: group
 thumb: "/images/mujae/01.jpg"
 textEn: |
-  Tibetan Buddhist monks spend days drawing a mandala in coloured sand. The moment
-  it is finished, they sweep it away by hand. The rite keeps nothing of what took so
-  long to make, and in doing so it shows plainly that nothing stays.
+  Countless flyers and signs are created and disappear from the streets of everyday
+  life. New flyers cover old ones, while signs are removed and replaced. The urban
+  landscape is constantly changing, accumulating traces of each passing era.
 
-  We live in the opposite tempo. Most of the world's data was made in the last few
-  years, and algorithms copy and pour out new images by the second. When generation
-  never stops, disappearance becomes hard to see — and once disappearance is
-  invisible, generation stops being an event at all.
+  Creation and disappearance may seem like opposites, but they are part of the same
+  cycle. This work visualizes that cycle through the structure of a mandala. Flyers
+  and signs are not merely elements of the urban background; they form a visual
+  language that carries traces of people's lives, desires, and the times they
+  inhabit. By reorganizing these familiar images within the mandala, the work
+  presents them not as relics of the past, but as a cultural landscape that remains
+  alive and in motion.
 
-  〈무제 (無諸)〉 lays a circular mandala, woven from data, across the floor of the
-  gallery. It blooms along the path of whoever walks in, grows for as long as they
-  stay, and collapses when they leave. No finished form is preserved. When the next
-  person enters, the mandala begins again from nothing.
+  The work also asks: What are we creating today? What is disappearing, and what
+  will take its place? There is no single answer, as each answer leads to another
+  question.
 
-  What remains is not a shape but a sensation. 諸行無常 — all things arise and pass
-  away. Making and vanishing are not two opposing ends but a single closed circle,
-  and the visitor is not someone watching it from outside but the hand that draws it.
+  The title Untitled reflects this idea. Rather than simply indicating the absence
+  of a title, it evokes the Buddhist concept of impermanence — the understanding
+  that all things are constantly changing and cannot be fixed within a single
+  definition. The cycle of creation and disappearance may refer to flyers and
+  signs, to eras and cultures, or to our individual lives. Ultimately, the meaning
+  of the work is recreated by each viewer, setting another cycle in motion.
 textKr: |
-  티베트 불교의 승려들은 며칠에 걸쳐 색모래로 만다라를 그린다. 그리고 완성된 순간,
-  그것을 손으로 쓸어 허문다. 오래 걸려 만든 것을 남기지 않는 이 의식은 존재가
-  머무르지 않는다는 사실을 눈앞에서 보여 준다.
+  일상의 거리에는 수많은 전단지와 간판이 만들어지고 사라진다. 새로운 전단지가
+  기존의 전단지를 덮고, 간판은 철거되거나 교체되며 또 다른 간판으로 채워진다.
+  거리의 풍경은 끊임없이 생성과 소멸을 반복하며 시대의 흔적을 쌓아간다.
 
-  지금 우리는 정반대의 시간을 산다. 전 세계 데이터의 대부분이 최근 몇 해 사이에
-  만들어졌고, 알고리즘은 1초 단위로 새로운 이미지를 복제해 쏟아낸다. 생성이 멈추지
-  않는 시대에는 소멸이 잘 보이지 않는다. 그리고 소멸이 보이지 않으면, 생성도 더는
-  사건이 되지 못한다.
+  우리는 흔히 생성에서 시작해 소멸로 끝난다고 생각하지만, 생성과 소멸은 서로의
+  반대가 아니라 하나의 순환이다. 이 작업은 그러한 순환을 만다라의 구조로
+  시각화한다. 전단지와 간판은 단순한 도시의 배경이 아니라, 누군가의 삶과 욕망,
+  그리고 시대의 흔적을 담고 있는 시각 언어이다. 익숙해서 지나치던 이미지들은
+  만다라 속에서 새로운 질서를 이루며, 오래된 것이 아니라 지금도 살아 움직이는
+  하나의 문화적 풍경으로 다시 읽힌다.
 
-  〈무제 (無諸)〉는 전시장 바닥에 데이터로 짜인 원형 만다라를 놓는다. 관객이 걸어
-  들어오면 그 움직임을 따라 패턴이 피어나고, 머무는 만큼 자라다가, 떠나면 무너진다.
-  완성된 형태는 보존되지 않는다. 다음 사람이 들어오면 만다라는 처음부터 다시
-  시작한다.
+  작품은 동시에 질문을 던진다. 우리가 오늘 만들어내는 것은 무엇이며, 무엇은
+  사라지고, 그 자리는 또 무엇으로 채워질 것인가. 그 답은 하나로 정해질 수 없으며,
+  또 다른 질문을 만들어낸다.
 
-  남는 것은 형태가 아니라 감각이다. 제행무상(諸行無常), 모든 것은 생겨나고 사라진다.
-  생성과 소멸은 대립하는 두 끝이 아니라 맞닿아 있는 하나의 원이며, 관객은 그 원의
-  바깥에서 보는 사람이 아니라 원을 그리는 손이 된다.
+  〈무제〉라는 제목 또한 이러한 의미를 담고 있다. 여기서 '무제'는 단순히 제목이
+  없다는 뜻이 아니라, 모든 것은 끊임없이 변하며 어느 하나로 규정될 수 없다는
+  제행무상의 의미를 내포한다. 동시에 이 작품은 하나의 정해진 해석을 제시하지
+  않는다. 생성과 소멸의 순환은 전단지와 간판일 수도 있고, 시대와 문화, 혹은
+  각자의 삶일 수도 있다. 결국 작품의 의미는 관람자마다 다르게 생성되며, 그 해석
+  또한 또 하나의 순환을 시작한다.
+
+processNote:
+  label: "System note"
+  textEn: |
+    The work is staged in a circular room 3.7 m across — three edge-blended
+    projectors wrap the wall, a fourth draws the mandala on the floor, and four
+    speakers surround the space. A LiDAR sensor watches a 2 m trigger zone at
+    the centre; its tracking travels from TouchDesigner over OSC into Ableton
+    Live, which returns four channels of sound.
+
+    The mandala follows the number of people inside the zone, after the
+    traditional rite in which a mandala is completed by several practitioners
+    together. An empty room holds drifting particles over a low, disordered
+    drone. One visitor gathers them into a first ring, with a single melodic
+    line rising from the speaker nearest their point of entry. Two extend its
+    form, adding harmonic layers that move through the room with them. Three or
+    more complete it, as chorus and ambience fill all four channels. Then, if
+    everyone stays — fifteen seconds of standing together before the finished
+    mandala — it dissolves, the sound receding until only overtones remain,
+    and the cycle begins again with the next material. Both sound scenes,
+    flyer and sign, are tuned in D just intonation at 60 BPM: one beat per
+    second, clock time rather than musical time.
+  textKr: |
+    작품은 지름 3.7m의 원형 공간에 놓인다. 엣지 블렌딩된 프로젝터 세 대가 벽을
+    두르고, 한 대가 바닥에 만다라를 그리며, 스피커 네 대가 공간을 감싼다. 중앙
+    지름 2m의 트리거 존을 라이다 센서가 지켜보고, 그 추적값은 TouchDesigner에서
+    OSC를 거쳐 Ableton Live로 흘러 4채널 사운드로 되돌아온다.
+
+    만다라는 존 안의 인원수를 따른다 — 여러 명의 수행자가 함께 만다라를
+    완성하는 전통 의식에서 착안한 인터랙션이다. 빈 방은 무질서한 저중역 드론
+    위에 떠도는 파티클을 유지한다. 한 명이 들어서면 파티클이 모여 첫 고리를
+    이루고, 진입한 방향의 스피커에서 단선율이 떠오른다. 두 명은 형태를
+    확장하며, 위치를 따라 움직이는 화음 레이어가 더해진다. 세 명 이상이 모이면
+    만다라가 완성되고 4채널 전체에 코러스와 앰비언트가 찬다. 그리고 완성된
+    만다라 앞에 모두가 15초를 함께 머무르면 — 소멸이 시작된다. 배음만 남기고
+    멀어지는 소리와 함께 만다라는 사라지고, 순환은 다음 소재로 다시 시작된다.
+    전단지와 간판, 두 사운드 씬 모두 D 순정률, 60 BPM으로 조율되어 1비트가
+    1초와 같다. 음악의 시간이 아니라 시계의 시간으로 숨 쉰다.
 exhibition:
   label: "Presented as part of"
   titleEn: "2026 New Content Academy Showcase"

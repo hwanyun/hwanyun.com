@@ -9,7 +9,7 @@ materials:
 showType: group
 size: 3col
 category: work
-order: 1
+order: 2
 thumb: "/images/atypical-circuit/04.png"
 thumbVideo: "/videos/loops/atypical-circuit.mp4"
 textEn: |
