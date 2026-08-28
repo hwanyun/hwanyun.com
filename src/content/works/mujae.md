@@ -148,5 +148,8 @@ media:
     archive: true
     caption: "2026 뉴콘텐츠아카데미 쇼케이스 포스터"
     captionEn: "2026 New Content Academy Showcase poster"
+sponsors:
+  - { name: "Korea Creative Content Agency (KOCCA)", url: "https://www.kocca.kr" }
+  - { name: "Ministry of Culture, Sports and Tourism", url: "https://www.mcst.go.kr" }
 draft: false
 ---
