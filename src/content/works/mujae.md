@@ -1,5 +1,9 @@
 ---
 title: "무제 Mujae (無諸)"
+subtitle: "모든 것은 생겨나고 사라진다"
+subtitleEn: "Everything Comes and Goes"
+collaboration: "윤병환 & 이인선 — 팀 프로젝트"
+collaborationEn: "HWANYUN & Inseon Lee — team project"
 year: "2026"
 medium: "Immersive and interactive media installation; LiDAR sensor, four projectors (360° wall and floor), 4-channel sound, TouchDesigner, Ableton Live, flyer and sign image archive"
 materials:

@@ -157,6 +157,18 @@ function toParagraphs(text: string): string {
           {mediumParts.length > 1 && (
             <span class="medium-materials">{mediumParts.slice(1).join("; ")}</span>
           )}
+          {data.collaboration && (
+            <span class="medium-collab">
+              {data.collaborationEn && data.collaborationEn !== data.collaboration ? (
+                <>
+                  <span data-language-content="en">{data.collaborationEn}</span>
+                  <span data-language-content="ko" lang="ko">{data.collaboration}</span>
+                </>
+              ) : (
+                data.collaboration
+              )}
+            </span>
+          )}
         </p>
       )
     }
@@ -252,6 +264,22 @@ function toParagraphs(text: string): string {
       )
     }
 
+
+    {/* 전시 부제 — 본문 앞의 에피그래프. 제목이 이름이라면 이 한 줄은 명제다. */}
+    {
+      data.subtitle && (
+        <p class="work-subtitle">
+          {data.subtitleEn && data.subtitleEn !== data.subtitle ? (
+            <>
+              <span data-language-content="en">{data.subtitleEn}</span>
+              <span data-language-content="ko" lang="ko">{data.subtitle}</span>
+            </>
+          ) : (
+            data.subtitle
+          )}
+        </p>
+      )
+    }
 
     <!-- 한 번에 한 언어만 보인다 (전역 EN/KO 토글). 본문은 제 폭을 쓴다. -->
     <div class="textcols">
@@ -752,6 +780,7 @@ function toParagraphs(text: string): string {
     .meta { font-size: var(--fs-body); font-weight: 400; line-height: 1.45; color: var(--text-2); margin: 0 0 30px; }
     .meta .medium-type { display: block; color: var(--text); }
     .meta .medium-materials { display: block; margin-top: 3px; color: var(--text-3); }
+    .meta .medium-collab { display: block; margin-top: 3px; color: var(--text-3); }
 
     /* 재료 태그 — 같은 재료를 쓴 작품으로 가는 통로.
        회로의 접점을 연상시키되 사이트의 흑백 톤은 유지한다. */
@@ -840,6 +869,18 @@ function toParagraphs(text: string): string {
     .series-link:hover > span { color: var(--hover); }
 
     /* EN/KR 2단 — 본문 가독성만 개선(두께 400 / 16px / 넓은 줄간격) */
+    /* 부제 = 본문 묶음의 머리 한 줄. 본문 컬럼이 이고 있던 구분선을 부제가
+       이어받아, 선 아래에서 본문보다 한 발 앞에 조용히 선다. 뒤따르는 본문
+       컬럼의 선은 끈다 — 안 그러면 선이 두 번 그어진다. */
+    .work-subtitle {
+      max-width: 62ch;
+      margin: 0 0 26px;
+      padding-top: 12px;
+      border-top: 1px solid var(--text);
+      font-size: var(--fs-body);
+      color: var(--text-3);
+    }
+    .work-subtitle + .textcols .col { border-top: 0; padding-top: 0; }
     .textcols::after { content: ""; display: block; clear: both; }
     .textcols .col {
       /* 병기를 걷어냈으므로 단을 나누지 않는다 — 62ch에서 한글·라틴 모두 잘 읽힌다 */

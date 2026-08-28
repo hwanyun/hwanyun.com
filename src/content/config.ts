@@ -6,6 +6,12 @@ const works = defineCollection({
   type: "content", // 본문(마크다운)은 선택적 부가 설명
   schema: z.object({
     title: z.string(),
+    // 전시 부제 — 본문이 시작되기 전 에피그래프 한 줄로 놓인다
+    subtitle: z.string().optional().default(""),
+    subtitleEn: z.string().optional().default(""),
+    // 협업 크레딧 — 매체 표기 아래 한 줄 (CV의 공동 저자 표기와 짝)
+    collaboration: z.string().optional().default(""),
+    collaborationEn: z.string().optional().default(""),
     year: z.string().optional().default(""),
     medium: z.string().optional().default(""),
     series: z
