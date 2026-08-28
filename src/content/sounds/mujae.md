@@ -1,10 +1,10 @@
 ---
-title: "무제 (無諸) — 3-minute cycle"
+title: "무제 Mujae (無諸) — 3-minute cycle"
 year: "2026"
 audio: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/audio/mujae-3min.m4a"
 duration: 179
 section: "works"
-project: "무제 (無諸)"
+project: "무제 Mujae (無諸)"
 works:
   - mujae
 cover: "/images/mujae/01.jpg"

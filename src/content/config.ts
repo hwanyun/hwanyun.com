@@ -86,6 +86,7 @@ const works = defineCollection({
           // 본문은 역할이 있는 5–8장만 남긴다 — 장수가 늘수록 한 장의 무게가 준다.
           archive: z.boolean().optional().default(false),
           caption: z.string().optional().default(""),
+          captionEn: z.string().optional().default(""), // 영문 화면용 — 없으면 caption 그대로
           noteLabel: z.string().optional().default(""),
           noteEn: z.string().optional().default(""),
           noteKr: z.string().optional().default(""),

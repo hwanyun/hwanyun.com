@@ -209,7 +209,18 @@ function toParagraphs(text: string): string {
                   <video src={embedURL(media[0].src).src} controls playsinline />
                 )}
               </div>
-              {media[0].caption && <figcaption>{media[0].caption}</figcaption>}
+              {media[0].caption && (
+                <figcaption>
+                  {media[0].captionEn && media[0].captionEn !== media[0].caption ? (
+                    <>
+                      <span data-language-content="en">{media[0].captionEn}</span>
+                      <span data-language-content="ko" lang="ko">{media[0].caption}</span>
+                    </>
+                  ) : (
+                    media[0].caption
+                  )}
+                </figcaption>
+              )}
               {(media[0].noteEn || media[0].noteKr) && (
                 <div class="media-note">
                   {media[0].noteLabel && <div class="media-note-label">{media[0].noteLabel}</div>}
@@ -223,7 +234,18 @@ function toParagraphs(text: string): string {
           ) : (
             <figure class={`block ${defaultLayout(media[0], 0)} ${media[0].align ? `align-${media[0].align}` : ""}`}>
               <img src={media[0].src} alt={media[0].caption || data.title} loading="lazy" />
-              {media[0].caption && <figcaption>{media[0].caption}</figcaption>}
+              {media[0].caption && (
+                <figcaption>
+                  {media[0].captionEn && media[0].captionEn !== media[0].caption ? (
+                    <>
+                      <span data-language-content="en">{media[0].captionEn}</span>
+                      <span data-language-content="ko" lang="ko">{media[0].caption}</span>
+                    </>
+                  ) : (
+                    media[0].caption
+                  )}
+                </figcaption>
+              )}
             </figure>
           )}
         </div>
@@ -302,7 +324,18 @@ function toParagraphs(text: string): string {
                         )}
                         {useImmersiveMedia && <button class="video-play" type="button" aria-label={`Play ${m.caption || data.title}`}><span aria-hidden="true"></span></button>}
                       </div>
-                      {m.caption && <figcaption>{m.caption}</figcaption>}
+                      {m.caption && (
+                <figcaption>
+                  {m.captionEn && m.captionEn !== m.caption ? (
+                    <>
+                      <span data-language-content="en">{m.captionEn}</span>
+                      <span data-language-content="ko" lang="ko">{m.caption}</span>
+                    </>
+                  ) : (
+                    m.caption
+                  )}
+                </figcaption>
+              )}
                       {(m.noteEn || m.noteKr) && (
                         <div class="media-note">
                           {m.noteLabel && <div class="media-note-label">{m.noteLabel}</div>}
@@ -317,7 +350,18 @@ function toParagraphs(text: string): string {
                     <figure class="block">
                       <span class="plate-n" aria-hidden="true">{n}</span>
                       <img src={m.src} alt={m.caption || data.title} loading="lazy" />
-                      {m.caption && <figcaption>{m.caption}</figcaption>}
+                      {m.caption && (
+                <figcaption>
+                  {m.captionEn && m.captionEn !== m.caption ? (
+                    <>
+                      <span data-language-content="en">{m.captionEn}</span>
+                      <span data-language-content="ko" lang="ko">{m.caption}</span>
+                    </>
+                  ) : (
+                    m.caption
+                  )}
+                </figcaption>
+              )}
                     </figure>
                   )
                 })}
@@ -379,23 +423,6 @@ function toParagraphs(text: string): string {
       )
     }
 
-    {
-      relatedByMaterial.length > 0 && (
-        <section class="related-materials" aria-labelledby="related-materials-title">
-          <div id="related-materials-title" class="related-materials-label">Related by material</div>
-          <ul class="related-materials-list">
-            {relatedByMaterial.map((r) => (
-              <li>
-                <a href={`/works/${r.work.slug}/`}>
-                  <span class="rm-title">{r.work.data.title}</span>
-                  <span class="rm-shared">{r.shared.map((m) => materialLabel(m)).join(" · ")}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )
-    }
 
     {
       data.exhibition && (
@@ -464,6 +491,26 @@ function toParagraphs(text: string): string {
             })}
           </div>
         </div>
+      )
+    }
+
+    {/* 작품에서 나가는 통로는 도록의 맨 끝이다 — 크레딧(전시·후원)이 작품의
+        기록이라면, 재료로 이어지는 다른 작품은 다음 페이지로의 문이다. */}
+    {
+      relatedByMaterial.length > 0 && (
+        <section class="related-materials" aria-labelledby="related-materials-title">
+          <div id="related-materials-title" class="related-materials-label">Related by material</div>
+          <ul class="related-materials-list">
+            {relatedByMaterial.map((r) => (
+              <li>
+                <a href={`/works/${r.work.slug}/`}>
+                  <span class="rm-title">{r.work.data.title}</span>
+                  <span class="rm-shared">{r.shared.map((m) => materialLabel(m)).join(" · ")}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
       )
     }
   </div>

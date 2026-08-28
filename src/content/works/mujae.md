@@ -1,5 +1,5 @@
 ---
-title: "무제 (無諸)"
+title: "무제 Mujae (無諸)"
 year: "2026"
 medium: "Immersive and interactive media installation; LiDAR sensor, four projectors (360° wall and floor), 4-channel sound, TouchDesigner, Ableton Live, flyer and sign image archive"
 materials:
@@ -149,7 +149,7 @@ media:
     caption: "2026 뉴콘텐츠아카데미 쇼케이스 포스터"
     captionEn: "2026 New Content Academy Showcase poster"
 sponsors:
-  - { name: "Korea Creative Content Agency (KOCCA)", url: "https://www.kocca.kr" }
-  - { name: "Ministry of Culture, Sports and Tourism", url: "https://www.mcst.go.kr" }
+  - { name: "Korea Creative Content Agency (KOCCA)", logo: "/images/mujae/sponsors/kocca.png", url: "https://www.kocca.kr" }
+  - { name: "Ministry of Culture, Sports and Tourism", logo: "/images/mujae/sponsors/mcst.png", url: "https://www.mcst.go.kr" }
 draft: false
 ---
