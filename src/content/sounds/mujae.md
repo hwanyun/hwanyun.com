@@ -7,6 +7,7 @@ section: "works"
 project: "무제 Mujae (無諸)"
 works:
   - mujae
+backdrop: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/videos/mujae-backdrop.mp4"
 cover: "/images/mujae/01.jpg"
 size: 2col
 order: 0
