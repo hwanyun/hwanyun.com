@@ -28,4 +28,4 @@ Read this file before changing or deploying the site.
   uncached — Cloudflare labels it "not recommended for production" — so never reintroduce it.
 - Never commit R2 credentials, API tokens, or private bucket URLs.
 
-For the detailed rationale and current migration state, read `CLOUDFLARE_R2_MIGRATION.md`; for deployment verification, read `PROJECT_CONTEXT.md`.
+For the detailed rationale and current migration state, read `CLOUDFLARE_R2_MIGRATION.md`; for deployment verification, read `PROJECT_CONTEXT.md`. For video encoding standards and tools, read `VIDEO_PIPELINE.md` before touching any video.
