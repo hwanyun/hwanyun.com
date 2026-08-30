@@ -305,25 +305,9 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
     .track-meta { display: flex; justify-content: flex-end; align-items: center; gap: 12px; min-width: 0; }
     .moving-tag { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-2xs); letter-spacing: .08em; line-height: 1; text-transform: uppercase; color: var(--text-3); white-space: nowrap; }
     .moving-tag.is-empty { visibility: hidden; }
-    .moving-tag::before {
-      content: "";
-      width: 18px;
-      height: 9px;
-      border: 1px solid rgba(0, 0, 0, .48);
-      border-radius: 1px;
-      background:
-        repeating-linear-gradient(90deg, transparent 0 3px, rgba(255,255,255,.72) 3px 4px),
-        linear-gradient(90deg, #ff4d67 0%, #ffad48 18%, #f7ed53 35%, #58d891 52%, #4fa6f8 70%, #7c6df2 85%, #d862d6 100%);
-      background-size: auto, 220% 100%;
-      background-position: 0 0, 0 0;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.25);
-      opacity: .72;
-    }
-    .track.is-playing .moving-tag::before {
-      opacity: 1;
-      animation: moving-spectrum var(--dur-slow) linear infinite;
-    }
-    @keyframes moving-spectrum { to { background-position: 0 0, 220% 0; } }
+    /* 무지개 필름 아이콘이 붙어 있었다 — 회색 마이크로 타이포 사이에서 혼자
+       유채색이라 목록 전체의 톤을 깼다. 미니멀한 작가 사이트들의 어법대로
+       글자만 조용히 둔다. 표기는 A/V(사운드아트 쪽 표준 — Ikeda의 [A/V]). */
     .track.is-playing { color: var(--text); }
     .track-control, .player-actions button { display: grid; place-items: center; border: 1px solid currentColor; border-radius: 50%; background: transparent; color: currentColor; cursor: pointer; }
     .track-control { width: 22px; height: 22px; padding: 0; }
