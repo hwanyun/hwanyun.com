@@ -145,6 +145,7 @@ media:
   # 매번 다르게 오므로 타임코드는 붙이지 않는다.
   - type: video
     src: "https://media.hwanyun.com/videos/mujae-floor-sync.mp4"
+    srcMobile: "https://media.hwanyun.com/videos/mujae-floor-sync-sm.mp4"
     width: full
     ratio: "1:1"
     caption: "바닥 — 한 순환의 처음부터 끝까지. 사운드 아카이브의 3분과 같은 시간을 지난다"
@@ -208,6 +209,7 @@ media:
     captionEn: "Three or more again — the same cycle repeats in the other material"
   - type: video
     src: "https://media.hwanyun.com/videos/mujae-wall-sync.mp4"
+    srcMobile: "https://media.hwanyun.com/videos/mujae-wall-sync-sm.mp4"
     width: full
     ratio: "24:5"
     caption: "벽면 — 같은 순환을 360°로 편 띠. 바닥과 같은 순간을 함께 지난다"

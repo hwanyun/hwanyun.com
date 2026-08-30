@@ -8,6 +8,7 @@ project: "무제 Mujae (無諸)"
 works:
   - mujae
 backdrop: "https://media.hwanyun.com/videos/mujae-floor-sync.mp4"
+backdropMobile: "https://media.hwanyun.com/videos/mujae-floor-sync-sm.mp4"
 cover: "/images/mujae/cover-floor.jpg"
 size: 2col
 order: 1

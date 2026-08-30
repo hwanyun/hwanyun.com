@@ -95,7 +95,7 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
                     {sound.data.backdrop && <span class="moving-tag">Audio + moving image</span>}
                     {sound.data.duration > 0 && <span class="track-len">{clock(sound.data.duration)}</span>}
                   </span>
-                  {sound.data.audio && <button class="track-control" type="button" data-audio={sound.data.audio} data-backdrop={sound.data.backdrop} aria-label={`${sound.data.title} 재생`}><span aria-hidden="true"></span></button>}
+                  {sound.data.audio && <button class="track-control" type="button" data-audio={sound.data.audio} data-backdrop={sound.data.backdrop} data-backdrop-sm={sound.data.backdropMobile} aria-label={`${sound.data.title} 재생`}><span aria-hidden="true"></span></button>}
                 </li>
               ))}
             </ol>
@@ -210,7 +210,10 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
       player.src = button.dataset.audio
       clearBackdrop()
       if (button.dataset.backdrop) {
-        backdrop.src = button.dataset.backdrop
+        /* 백드롭은 전체화면이라 폰에서 가장 무겁다. 좁은 화면에는 경량본이
+           있으면 그쪽을 쓴다 — 표시 폭이 작아 해상도 차이는 보이지 않는다. */
+        var narrow = window.matchMedia("(max-width: 700px)").matches
+        backdrop.src = (narrow && button.dataset.backdropSm) || button.dataset.backdrop
         backdrop.currentTime = 0
         backdrop.play().catch(() => {})
         backdropTitle.textContent = button.closest(".track").dataset.title

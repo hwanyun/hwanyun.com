@@ -222,7 +222,7 @@ function toParagraphs(text: string): string {
                 {embedURL(media[0].src).kind === "iframe" ? (
                   <iframe src={embedURL(media[0].src).src} allow="autoplay; fullscreen; picture-in-picture" allowfullscreen frameborder="0" loading="lazy" />
                 ) : (
-                  <video src={embedURL(media[0].src).src} controls playsinline />
+                  <video src={embedURL(media[0].src).src} data-src-sm={media[0].srcMobile ? embedURL(media[0].srcMobile).src : undefined} controls playsinline />
                 )}
               </div>
               {media[0].caption && (
@@ -360,7 +360,7 @@ function toParagraphs(text: string): string {
                         {embedURL(m.src).kind === "iframe" ? (
                           <iframe src={embedURL(m.src).src} allow="autoplay; fullscreen; picture-in-picture" allowfullscreen frameborder="0" loading="lazy" tabindex={useImmersiveMedia ? "-1" : undefined} />
                         ) : (
-                          <video src={embedURL(m.src).src} controls={!useImmersiveMedia} preload={useImmersiveMedia ? "metadata" : undefined} muted={useImmersiveMedia} playsinline />
+                          <video src={embedURL(m.src).src} data-src-sm={m.srcMobile ? embedURL(m.srcMobile).src : undefined} controls={!useImmersiveMedia} preload={useImmersiveMedia ? "metadata" : undefined} muted={useImmersiveMedia} playsinline />
                         )}
                         {useImmersiveMedia && <button class="video-play" type="button" aria-label={`Play ${m.caption || data.title}`}><span aria-hidden="true"></span></button>}
                       </div>
@@ -1565,6 +1565,27 @@ function toParagraphs(text: string): string {
   </style>
 
   <SeenTracker slug={work.slug} />
+
+  {/* 좁은 화면에는 경량본을 준다. 폰의 표시 폭은 400px 남짓이라 데스크톱
+      해상도가 보이지도 않는데 파일은 그대로 다 받느라 재생이 끊긴다.
+      preload가 시작되기 전에 갈아 끼워야 하므로 문서 파싱 중에 실행한다. */}
+  <script is:inline>
+    ;(function () {
+      if (!window.matchMedia("(max-width: 700px)").matches) return
+      var swap = function () {
+        document.querySelectorAll("video[data-src-sm]").forEach(function (v) {
+          var sm = v.getAttribute("data-src-sm")
+          if (!sm || v.currentSrc === sm) return
+          var t = v.currentTime, playing = !v.paused
+          v.src = sm
+          if (t) v.currentTime = t
+          if (playing) v.play().catch(function () {})
+        })
+      }
+      swap()
+      document.addEventListener("DOMContentLoaded", swap)
+    })()
+  </script>
 
   <script is:inline>
     ;(function () {

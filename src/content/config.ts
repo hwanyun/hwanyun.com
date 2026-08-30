@@ -83,6 +83,10 @@ const works = defineCollection({
         z.object({
           type: z.enum(["image", "video"]).default("image"),
           src: z.string(), // 이미지 경로 또는 영상 URL(YouTube/Vimeo/mp4)
+          /* 좁은 화면용 경량본. 폰의 표시 폭은 400px 남짓이라 데스크톱용
+             해상도가 필요 없는데, 파일은 그대로 다 받느라 끊긴다.
+             지정하면 좁은 화면에서 이쪽을 재생한다. */
+          srcMobile: z.string().optional().default(""),
           width: z.enum(["full", "half", "third"]).default("full"),
           layout: z.enum(["hero", "wide", "standard", "detail", "portrait"]).optional(),
           align: z.enum(["left", "right"]).optional(),
@@ -137,6 +141,8 @@ const sounds = defineCollection({
     project: z.string().optional().default(""), // 여러 버전을 하나의 작업으로 묶는 제목
     works: z.array(z.string()).optional().default([]), // 연결할 작품 slug
     backdrop: z.string().optional().default(""), // 해당 트랙 재생 시 보여 줄 배경 영상
+    // 좁은 화면용 경량본 — 백드롭은 전체화면이라 폰에서 부담이 가장 크다
+    backdropMobile: z.string().optional().default(""),
     cover: z.string().optional().default(""), // 그리드 커버 이미지
     size: z.enum(["1col", "2col", "3col"]).default("2col"), // 그리드 카드 폭
     order: z.number().default(0),
