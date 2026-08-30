@@ -15,7 +15,11 @@ size: 3col
 category: work
 order: 1
 showType: group
-thumb: "/images/mujae/02-sign-scene.jpg"
+thumb: "/images/mujae/cycle/floor-04-complete.jpg"
+# 그리드 루프는 바닥의 원형 만다라다. 설치 전경은 공간을 알려 주지만 작품이
+# 무엇을 하는지는 보여 주지 못한다 — 이 작업에서 눈에 남는 것은 고리가 자라는
+# 원이고, 정지 이미지 한 장으로는 그 자람이 전달되지 않는다.
+thumbVideo: "/videos/loops/mujae.mp4"
 textEn: |
   Countless flyers and signs are created and disappear from the streets of everyday
   life. New flyers cover old ones, while signs are removed and replaced. The urban
@@ -120,13 +124,13 @@ media:
     caption: "설치 전경 — 간판 씬. 프로젝터 4대, 360° 벽과 바닥"
     captionEn: "Installation view — sign scene. Four projectors across the 360° wall and floor"
   - type: video
-    src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/videos/mujae-flyer.mp4"
+    src: "https://media.hwanyun.com/videos/mujae-flyer.mp4"
     width: full
     ratio: "16:9"
     caption: "전단지 사이클 — 산란에서 만다라로, 그리고 소멸"
     captionEn: "Flyer cycle — from scatter to mandala, and its dissolution"
   - type: video
-    src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/videos/mujae-sign.mp4"
+    src: "https://media.hwanyun.com/videos/mujae-sign.mp4"
     width: full
     ratio: "16:9"
     caption: "간판 사이클 — 건물의 간판이 활자로 부서져 바닥의 만다라로 모인다"
@@ -140,7 +144,7 @@ media:
   # 정확한 이름이다. 같은 인원이라도 어디로 들어와 어떻게 움직였느냐에 따라
   # 매번 다르게 오므로 타임코드는 붙이지 않는다.
   - type: video
-    src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/videos/mujae-floor-sync.mp4"
+    src: "https://media.hwanyun.com/videos/mujae-floor-sync.mp4"
     width: full
     ratio: "1:1"
     caption: "바닥 — 한 순환의 처음부터 끝까지. 사운드 아카이브의 3분과 같은 시간을 지난다"
@@ -203,7 +207,7 @@ media:
     caption: "다시 3명 이상 — 같은 순환이 다른 소재에서 되풀이된다"
     captionEn: "Three or more again — the same cycle repeats in the other material"
   - type: video
-    src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/videos/mujae-wall-sync.mp4"
+    src: "https://media.hwanyun.com/videos/mujae-wall-sync.mp4"
     width: full
     ratio: "24:5"
     caption: "벽면 — 같은 순환을 360°로 편 띠. 바닥과 같은 순간을 함께 지난다"

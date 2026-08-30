@@ -2,7 +2,7 @@
 title: "Fedora-exile (Original Version)"
 year: ""
 url: "https://soundcloud.com/hwanyun/fedora-exil-original-version"
-audio: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/audio/fedora-exile-original.mp3"
+audio: "https://media.hwanyun.com/audio/fedora-exile-original.mp3"
 duration: 296
 section: works
 project: "Fedora – Exile"

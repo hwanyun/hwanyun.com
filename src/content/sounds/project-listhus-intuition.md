@@ -2,7 +2,7 @@
 title: "Project: Listhús — Intuition"
 year: ""
 url: "https://soundcloud.com/hwanyun/project-listhus-intuition"
-audio: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/audio/project-listhus-intuition.mp3"
+audio: "https://media.hwanyun.com/audio/project-listhus-intuition.mp3"
 duration: 86
 section: works
 project: "Intuition"

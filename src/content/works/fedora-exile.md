@@ -19,7 +19,7 @@ exhibition:
 mediaFirst: true
 media:
   - type: video
-    src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/videos/fedora-exile.mp4"
+    src: "https://media.hwanyun.com/videos/fedora-exile.mp4"
     width: full
     layout: hero
     ratio: "16:9"

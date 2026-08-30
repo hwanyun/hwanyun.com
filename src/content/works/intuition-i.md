@@ -34,13 +34,13 @@ media:
   # 아이가 손을 뻗는 장 — 크기와 사용법이 한 번에 전해진다
   - { type: image, src: "/images/intuition-i/04.jpg", width: half, caption: "A visitor reaching to touch a panel" }
   - { type: image, src: "/images/intuition-i/02.jpg", width: half, caption: "Installation view with the interface" }
-  - { type: video, src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/intuition-i-03.mp4", width: full, ratio: "16:9", caption: "Interactive sound installation documentation" }
+  - { type: video, src: "https://media.hwanyun.com/intuition-i-03.mp4", width: full, ratio: "16:9", caption: "Interactive sound installation documentation" }
   - { type: image, src: "/images/intuition-i/03.jpg", width: half, caption: "Copper wires and speakers on the pedestal" }
   - { type: image, src: "/images/intuition-i/05.jpg", width: half, caption: "The interface, detail" }
-  - { type: video, src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/intuition-i-02.mov", width: half, align: left, ratio: "9:16", caption: "Touch interaction documentation" }
+  - { type: video, src: "https://media.hwanyun.com/intuition-i-02.mov", width: half, align: left, ratio: "9:16", caption: "Touch interaction documentation" }
   # 이 작업이 시작된 곳 — Inspiration from Iceland의 현장
   - { type: image, src: "/images/intuition-i/06.jpg", width: half, caption: "Olafsfjordur, where the work began" }
-  - { type: video, src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/intuition-i-01.mp4", width: half, ratio: "16:9", caption: "Interactive sound installation documentation" }
+  - { type: video, src: "https://media.hwanyun.com/intuition-i-01.mp4", width: half, ratio: "16:9", caption: "Interactive sound installation documentation" }
   # 부록 — 전시 텍스트
   - { type: image, src: "/images/intuition-i/07.jpg", archive: true }
   - { type: image, src: "/images/intuition-i/08.jpg", archive: true }

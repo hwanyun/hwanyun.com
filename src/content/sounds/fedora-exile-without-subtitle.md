@@ -1,7 +1,7 @@
 ---
 title: "Fedora – Exile (Without Subtitle Version)"
 year: ""
-audio: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/audio/fedora-exile-without-subtitle.mp3"
+audio: "https://media.hwanyun.com/audio/fedora-exile-without-subtitle.mp3"
 duration: 255
 cover: ""
 size: 2col
