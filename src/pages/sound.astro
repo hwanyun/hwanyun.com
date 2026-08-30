@@ -76,12 +76,13 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
           <details>
             <summary>
               <strong>{release.title}</strong>
-              {/* 배지가 있는 행과 없는 행에서 길이 열이 어긋나지 않게 한 칸에 묶는다 */}
+              {/* 배지가 있는 행과 없는 행에서 길이 열이 어긋나지 않게 한 칸에 묶는다.
+                  영상 여부는 표시하지 않는다 — 19개 중 2개를 위해 모든 행이 열을
+                  하나 유지할 이유가 없고, 재생하면 화면이 바뀌어 스스로 드러난다. */}
               <span class="rel-tags">
                 {release.tracks.length > 1 && (
                   <span class="release-count">{release.tracks.length} versions</span>
                 )}
-                <span class={`moving-tag ${release.tracks.some((s) => s.data.backdrop) ? "" : "is-empty"}`}>A/V</span>
               </span>
               {/* 16초와 20분이 같은 줄로 보이면 무엇을 여는 건지 알 수 없다 */}
               <span class="release-len">{span(release)}</span>
@@ -92,7 +93,6 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
                 <li id={`sound-${sound.slug}`} class="track" data-title={sound.data.title}>
                   <span>{sound.data.title}</span>
                   <span class="track-meta">
-                    {sound.data.backdrop && <span class="moving-tag">A/V</span>}
                     {sound.data.duration > 0 && <span class="track-len">{clock(sound.data.duration)}</span>}
                   </span>
                   {sound.data.audio && <button class="track-control" type="button" data-audio={sound.data.audio} data-backdrop={sound.data.backdrop} data-backdrop-sm={sound.data.backdropMobile} aria-label={`${sound.data.title} 재생`}><span aria-hidden="true"></span></button>}
@@ -303,11 +303,6 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
     .tracklist { padding: 0 36px 14px 64px; }
     .track { display: grid; grid-template-columns: minmax(0,1fr) minmax(130px, 220px) 26px; gap: 14px; align-items: center; padding: 7px 0; font-size: var(--fs-sm); color: var(--text-3); }
     .track-meta { display: flex; justify-content: flex-end; align-items: center; gap: 12px; min-width: 0; }
-    .moving-tag { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-2xs); letter-spacing: .08em; line-height: 1; text-transform: uppercase; color: var(--text-3); white-space: nowrap; }
-    .moving-tag.is-empty { visibility: hidden; }
-    /* 무지개 필름 아이콘이 붙어 있었다 — 회색 마이크로 타이포 사이에서 혼자
-       유채색이라 목록 전체의 톤을 깼다. 미니멀한 작가 사이트들의 어법대로
-       글자만 조용히 둔다. 표기는 A/V(사운드아트 쪽 표준 — Ikeda의 [A/V]). */
     .track.is-playing { color: var(--text); }
     .track-control, .player-actions button { display: grid; place-items: center; border: 1px solid currentColor; border-radius: 50%; background: transparent; color: currentColor; cursor: pointer; }
     .track-control { width: 22px; height: 22px; padding: 0; }
@@ -330,7 +325,7 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
     :global(body.has-backdrop) #sound-archive { color: var(--surface); text-shadow: 0 1px 12px rgba(0,0,0,.35); }
     :global(body.has-backdrop) #sound-archive, :global(body.has-backdrop) .menu, :global(body.has-backdrop) footer { opacity: 0; pointer-events: none; }
     :global(body.has-backdrop) .release { border-color: rgba(255,255,255,.48); }
-    :global(body.has-backdrop) .release-count, :global(body.has-backdrop) .number, :global(body.has-backdrop) .track, :global(body.has-backdrop) .track-meta, :global(body.has-backdrop) .moving-tag { color: rgba(255,255,255,.78); }
+    :global(body.has-backdrop) .release-count, :global(body.has-backdrop) .number, :global(body.has-backdrop) .track, :global(body.has-backdrop) .track-meta { color: rgba(255,255,255,.78); }
     :global(body.has-backdrop) .track.is-playing, :global(body.has-backdrop) summary strong { color: var(--surface); }
     @media (max-width: 700px) {
       #sound-archive { width: auto; margin: 24px 16px 80px; }
