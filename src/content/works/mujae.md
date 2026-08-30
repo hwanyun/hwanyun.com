@@ -115,34 +115,21 @@ exhibition:
   venueEn: "Studio 1, Contents Culture Square, Seoul"
   year: "2026"
 media:
-  # 도록 순서 = 작품의 순환 그대로: 간판 씬 설치 전경(공간) → 전단지 사이클 영상 →
-  # 간판 사이클 영상 → 소멸(활자 산란) → 만다라 패턴(소스) → 컨트롤 화면(프로세스)
+  # 순서 = 작품을 이해하는 순서. 설치 전경으로 공간을 세우고, 시스템이
+  # 직접 그린 화면(바닥→벽면)으로 작품이 무엇을 하는지 보이고, 전시 기록
+  # 영상으로 그것이 공간 안에서 어떻게 보였는지 잇는다.
+  #
+  # 기록 영상을 앞에 두었더니 첫인상이 어두운 전시장 촬영으로 정해졌다.
+  # 화질이 가장 좋고 작품의 논리가 가장 또렷한 자료가 시스템 렌더이므로
+  # 그쪽이 먼저 온다. 기록 영상은 화질이 아니라 '공간 안의 작품'이라는
+  # 역할로 뒤를 받친다.
+
   - type: image
     src: "/images/mujae/02-sign-scene.jpg"
     width: full
     layout: hero
     caption: "설치 전경 — 간판 씬. 프로젝터 4대, 360° 벽과 바닥"
     captionEn: "Installation view — sign scene. Four projectors across the 360° wall and floor"
-  - type: video
-    src: "https://media.hwanyun.com/videos/mujae-flyer.mp4"
-    width: full
-    ratio: "16:9"
-    caption: "전단지 사이클 — 산란에서 만다라로, 그리고 소멸"
-    captionEn: "Flyer cycle — from scatter to mandala, and its dissolution"
-  - type: video
-    src: "https://media.hwanyun.com/videos/mujae-sign.mp4"
-    width: full
-    ratio: "16:9"
-    caption: "간판 사이클 — 건물의 간판이 활자로 부서져 바닥의 만다라로 모인다"
-    captionEn: "Sign cycle — signboards break into letterforms and gather into the floor mandala"
-  # ── 두 면, 한 순환 ──
-  # 면마다 영상을 먼저 놓고 그 뒤에 그 면의 설명과 국면들을 붙인다. 바닥과 벽은
-  # 같은 인원수에 함께 반응하지만 다른 것을 만들기 때문에, 설명이 서로 붙어
-  # 있으면 어느 쪽 이야기인지 흐려진다.
-  #
-  # 캡션은 인원수를 앞세운다 — 방을 미는 것이 인원수이므로 그게 각 장면의 가장
-  # 정확한 이름이다. 같은 인원이라도 어디로 들어와 어떻게 움직였느냐에 따라
-  # 매번 다르게 오므로 타임코드는 붙이지 않는다.
   - type: video
     src: "https://media.hwanyun.com/videos/mujae-floor-sync.mp4"
     srcMobile: "https://media.hwanyun.com/videos/mujae-floor-sync-sm.mp4"
@@ -250,6 +237,39 @@ media:
     width: full
     caption: "벽면, 3명 이상 — 활자가 다시 건물의 간판으로 정렬한다"
     captionEn: "Wall, three or more — letterforms realign into the facades they came from"
+  - type: video
+    src: "https://media.hwanyun.com/videos/mujae-flyer.mp4"
+    width: full
+    ratio: "16:9"
+    caption: "전시장에서 — 전단지 사이클. 360° 벽과 바닥이 함께 도는 것을 카메라로 기록했다"
+    captionEn: "In the room — the flyer cycle, filmed as the 360° wall and floor turn together"
+    noteLabel: "전시 기록"
+    noteEn: >
+      The two videos above are what the system draws. These two are what the
+      room looked like with it running — filmed in a dark space with a
+      projector as the only light, so they carry the grain and the colour cast
+      of that condition. They are kept for what the renders cannot show: the
+      scale of the room, the curve of the wall, a body standing inside it.
+    noteKr: >
+      위의 두 영상은 시스템이 그리는 화면이고, 아래 둘은 그것이 켜진 방이
+      어떻게 보였는지의 기록이다. 프로젝터만이 광원인 어두운 공간에서
+      찍어 노이즈와 색 편향이 함께 남았다. 그럼에도 남겨 두는 것은 렌더가
+      보여 줄 수 없는 것 때문이다 — 방의 크기, 벽이 휘는 정도, 그 안에
+      서 있는 몸.
+  - type: video
+    src: "https://media.hwanyun.com/videos/mujae-sign.mp4"
+    width: full
+    ratio: "16:9"
+    caption: "전시장에서 — 간판 사이클. 건물의 간판이 활자로 부서져 바닥의 만다라로 모인다"
+    captionEn: "In the room — the sign cycle: signboards break into letterforms and gather into the floor mandala"
+  # ── 두 면, 한 순환 ──
+  # 면마다 영상을 먼저 놓고 그 뒤에 그 면의 설명과 국면들을 붙인다. 바닥과 벽은
+  # 같은 인원수에 함께 반응하지만 다른 것을 만들기 때문에, 설명이 서로 붙어
+  # 있으면 어느 쪽 이야기인지 흐려진다.
+  #
+  # 캡션은 인원수를 앞세운다 — 방을 미는 것이 인원수이므로 그게 각 장면의 가장
+  # 정확한 이름이다. 같은 인원이라도 어디로 들어와 어떻게 움직였느냐에 따라
+  # 매번 다르게 오므로 타임코드는 붙이지 않는다.
   - type: image
     src: "/images/mujae/03-dissolve.jpg"
     width: half
