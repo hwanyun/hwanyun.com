@@ -10,7 +10,7 @@ showType: group
 size: 3col
 category: work
 order: 2
-thumb: "/images/atypical-circuit/04.png"
+thumb: "/images/atypical-circuit/06.jpg"
 thumbVideo: "/videos/loops/atypical-circuit.mp4"
 textEn: |
   Atypical Circuit is a generative and interactive media installation, shown in
