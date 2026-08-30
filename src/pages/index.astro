@@ -477,6 +477,13 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
 
   <div class="hero-spacer" aria-hidden="true"></div>
 
+  {/* 스냅 기준점은 아카이브 자체가 아니라 그 꼭대기의 이 표식이 갖는다.
+      작품이 늘면 그리드는 한 단씩 길어져 한 화면을 넘어서는데, 그때 높은
+      요소에 mandatory 스냅이 걸려 있으면 아카이브 안을 스크롤할 때마다
+      맨 위로 되끌려 내려갈 수가 없다. 높이 0인 표식이면 커튼은 그대로
+      제자리에 붙고, 그 아래로는 자유롭게 흐른다. */}
+  <div class="archive-snap" aria-hidden="true"></div>
+
   <section id="works" class="work-archive" aria-label="Selected works">
     <WorkGrid current="home" />
   </section>
@@ -762,7 +769,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
        대상에서 빼 끝까지 스크롤되게 둔다. */
     @media (max-width: 700px) {
       :global(html) { scroll-snap-type: y mandatory; }
-      .hero-spacer, .work-archive { scroll-snap-stop: always; }
+      .hero-spacer, .archive-snap { scroll-snap-stop: always; }
       :global(body > footer) { scroll-snap-align: none; }
     }
     /* 히어로는 화면에 고정되고, 그리드가 그 위를 덮으며 올라온다 —
@@ -936,9 +943,15 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       z-index: 1;
       background: var(--surface);
     }
-    .work-archive {
+    .archive-snap {
+      height: 0;
       scroll-margin-top: 0;
       scroll-snap-align: start;
+      position: relative;
+      z-index: 1;
+    }
+    .work-archive {
+      scroll-margin-top: 0;
       /* 두 번째 '페이지'로 성립하려면 자체가 한 화면을 차지해야 한다 */
       min-height: 100svh;
       /* 고정된 히어로 위로 올라와 덮으려면 자체 배경과 위 레이어가 필요하다 */
@@ -961,7 +974,9 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         scroll-margin-top: 0;
         min-height: 100svh;
       }
-      .work-archive :global(#packed) { height: 72svh; }
+      /* 모바일 홈은 한 단을 72svh의 3분의 1로 잡는다. 고정값으로 두면
+         WorkGrid가 계산한 단수를 덮어써 작품이 늘어도 그리드가 자라지 않는다. */
+      .work-archive :global(#packed) { height: calc(var(--grid-rows, 3) * 72svh / 3); }
     }
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
   </style>

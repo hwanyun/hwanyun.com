@@ -12,9 +12,26 @@ let works = await getCollection("works", ({ data }) => !data.draft)
 if (filter) works = works.filter((w) => w.data.category === filter)
 works.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
 
+/* 그리드가 자라는 방식 — 작품이 늘수록 아래로 길어진다.
+   패킹은 상자를 재귀로 이분할하므로, 상자 크기를 고정해 두면 작품이 늘 때마다
+   기존 칸이 더 잘게 쪼개진다. 13점에서 알맞던 밀도가 20점에서는 우표만 해지고,
+   결국 어느 작품도 보이지 않는다. 그래서 상자의 높이를 총 weight에 비례시킨다.
+
+   한 단은 화면의 3분의 1이고, WEIGHT_PER_ROW는 지금 한 단에 담기는 양이다
+   (13점·weight 22.9 ÷ 3단). 이 값으로 나누므로 현재 배치는 정확히 3단 =
+   한 화면 그대로이고, 이 변경으로 지금 화면은 달라지지 않는다.
+
+   반올림하지 않는 것이 요점이다. 정수 단으로 끊으면 한 점을 더할 때 갑자기
+   3분의 1 화면이 튀어나오고, 그 다음 네 점은 아무 변화가 없다. 비례로 두면
+   한 점마다 조금씩 내려가고 칸 크기는 대체로 그대로 유지된다. */
+const WEIGHT_PER_ROW = 22.9 / 3
+const MIN_ROWS = 3
+const totalWeight = works.reduce((sum, w) => sum + (WEIGHT[w.data.size] ?? 1.7), 0)
+const gridRows = Math.max(MIN_ROWS, Math.round((totalWeight / WEIGHT_PER_ROW) * 1000) / 1000)
+
 ---
 
-<div id="packed">
+<div id="packed" style={`--grid-rows:${gridRows}`}>
   <SiteMenu variant="grid" current={current} />
 
   <!-- 직사각형 그리드 (메뉴 컬럼 오른쪽, 좌우·상하 여백 안쪽) -->
@@ -454,7 +471,8 @@ works.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
   #packed {
     position: relative;
     width: 100%;
-    height: 100svh;
+    /* 한 단 = 화면의 3분의 1. 작품이 쌓이면 단이 늘어 그리드가 길어진다 */
+    height: calc(var(--grid-rows, 3) * 100svh / 3);
   }
 
   /* 직사각형 그리드: 좌측 메뉴 컬럼 + 우측 여백 안쪽, 상하 여백 */
@@ -621,7 +639,7 @@ works.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
        다만 화면을 통째로(100svh) 쓰면 타일이 길고 가늘어져 작품이 안 보인다.
        높이를 2/3로 줄이면 같은 폭에 더 납작한 비율이 나와 훨씬 읽힌다. */
     #packed {
-      height: 67svh;
+      height: calc(var(--grid-rows, 3) * 67svh / 3);
       margin: 0;
       width: 100%;
       background: var(--text);
