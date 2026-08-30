@@ -29,6 +29,8 @@ const seriesWorks = data.series
 const relatedSounds = allSounds
   .filter((sound) => sound.data.works.includes(work.slug))
   .sort((a, b) => a.data.order - b.data.order)
+// 페이지에 깔아 둘 소리 — 연결된 사운드 중 재생 가능한 첫 트랙
+const ambientSound = relatedSounds.find((sound) => sound.data.audio)
 
 // 재료로 이어지는 다른 작품 — 작품 페이지가 막다른 골목이 되지 않게 한다.
 // 공유 재료가 많은 순, 같으면 최근작 순.
@@ -65,6 +67,7 @@ const ratioValue: Record<string, string> = {
   "4:3": "4 / 3",
   "1:1": "1 / 1",
   "21:9": "21 / 9",
+  "24:5": "24 / 5",
   "9:16": "9 / 16",
 }
 // 종횡비 숫자값 — justified 행에서 flex-grow(폭 배분)에 사용
@@ -73,6 +76,7 @@ const ratioNum: Record<string, number> = {
   "4:3": 4 / 3,
   "1:1": 1,
   "21:9": 21 / 9,
+  "24:5": 24 / 5,
   "9:16": 9 / 16,
 }
 
@@ -294,8 +298,16 @@ function toParagraphs(text: string): string {
       data.processNote && (data.processNote.textEn || data.processNote.textKr) && (
         <aside class="process-note" aria-label={data.processNote.label}>
           <div class="process-note-cols">
-            {data.processNote.textEn && <p data-language-content="en">{data.processNote.textEn}</p>}
-            {data.processNote.textKr && <p data-language-content="ko" lang="ko">{data.processNote.textKr}</p>}
+            {data.processNote.textEn && (
+              <div data-language-content="en">
+                {data.processNote.textEn.split(/\n+/).filter(Boolean).map((para) => <p>{para}</p>)}
+              </div>
+            )}
+            {data.processNote.textKr && (
+              <div data-language-content="ko" lang="ko">
+                {data.processNote.textKr.split(/\n+/).filter(Boolean).map((para) => <p>{para}</p>)}
+              </div>
+            )}
           </div>
         </aside>
       )
@@ -390,6 +402,17 @@ function toParagraphs(text: string): string {
                   )}
                 </figcaption>
               )}
+                      {/* 노트는 영상에만 달려 있었다 — 사이클 아카이브처럼
+                          여러 장이 하나의 설명을 공유하는 묶음은 첫 장에 단다 */}
+                      {(m.noteEn || m.noteKr) && (
+                        <div class="media-note">
+                          {m.noteLabel && <div class="media-note-label">{m.noteLabel}</div>}
+                          <div class="media-note-cols">
+                            <p data-language-content="en">{m.noteEn}</p>
+                            <p data-language-content="ko" lang="ko">{m.noteKr}</p>
+                          </div>
+                        </div>
+                      )}
                     </figure>
                   )
                 })}
@@ -430,6 +453,26 @@ function toParagraphs(text: string): string {
             ))}
           </div>
         </details>
+      )
+    }
+
+    {/* 작품에 딸린 사운드를 페이지에 깔아 둔다. 설치작업은 소리 안에서 보는
+        것이라 무음의 도판만으로는 절반만 전해진다. 다만 방문자가 청하지 않은
+        소리이므로 (1) 언제나 보이는 정지 컨트롤을 두고, (2) 한 번 끄면 이
+        세션 동안 다시 켜지 않으며, (3) 브라우저가 자동재생을 막으면 —
+        기본 설정의 Chrome·Safari가 그렇다 — 억지로 뚫지 않고 버튼으로 남는다. */}
+    {
+      ambientSound && (
+        <div class="ambient" data-src={ambientSound.data.audio} data-key={`ambient-${Astro.params.slug}`} hidden>
+          <button class="ambient-toggle" type="button" aria-pressed="false">
+            <span class="ambient-icon" aria-hidden="true"></span>
+            <span class="ambient-text">
+              <span class="ambient-state" data-language-content="en">Sound</span>
+              <span class="ambient-state" data-language-content="ko">사운드</span>
+              <span class="ambient-title">{ambientSound.data.title}</span>
+            </span>
+          </button>
+        </div>
       )
     }
 
@@ -910,8 +953,10 @@ function toParagraphs(text: string): string {
     }
     /* 한 번에 한 언어만 보이므로 단을 나누지 않는다 */
     .process-note-cols { display: block; }
-    /* YAML 블록의 빈 줄이 단락 구분이다 — pre-line이 없으면 한 덩어리로 뭉개진다 */
-    .process-note p { margin: 0; font-size: var(--fs-sm); line-height: 1.75; white-space: pre-line; }
+    /* 단락은 실제 <p>로 나눈다. pre-line으로 줄바꿈을 흉내 내면 YAML이 80자에
+       맞춰 접은 줄까지 화면에 찍혀, 폭이 좁은 모바일에서 문장이 토막 난다. */
+    .process-note p { margin: 0 0 1em; font-size: var(--fs-sm); line-height: 1.75; }
+    .process-note p:last-child { margin-bottom: 0; }
 
     /* 미디어 — 홈 그리드처럼 220/380/540 크기가 여백 있게 흐름 */
     .media {
@@ -1321,6 +1366,40 @@ function toParagraphs(text: string): string {
       margin: var(--space-4) 0 0;
       padding-top: 0;
     }
+    /* 청하지 않은 소리를 켜는 쪽이므로, 끄는 길이 늘 화면에 보여야 한다.
+       스크롤-투-톱 FAB이 오른쪽에 있으니 왼쪽 아래에 둔다. */
+    .ambient { position: fixed; left: 18px; bottom: 18px; z-index: 60; }
+    .ambient[hidden] { display: none; }
+    .ambient-toggle {
+      display: inline-flex; align-items: center; gap: 9px;
+      max-width: min(70vw, 340px);
+      padding: 8px 15px 8px 12px;
+      border: 1px solid var(--line-2); border-radius: 999px;
+      background: var(--surface); color: var(--text-2);
+      font: 400 var(--fs-xs)/1.2 var(--sans); text-align: left;
+      cursor: pointer;
+      transition: border-color var(--dur-fast) ease, color var(--dur-fast) ease;
+    }
+    .ambient-toggle:hover { border-color: var(--hover); color: var(--hover); }
+    .ambient-icon {
+      flex: none; width: 9px; height: 9px; border-radius: 50%;
+      background: currentColor; opacity: .35;
+      transition: opacity var(--dur-fast) ease;
+    }
+    .ambient.is-playing .ambient-icon { opacity: 1; animation: ambient-pulse 2.6s ease-in-out infinite; }
+    @keyframes ambient-pulse { 0%, 100% { opacity: 1 } 50% { opacity: .3 } }
+    .ambient-text { display: flex; gap: 7px; min-width: 0; }
+    .ambient-state { flex: none; }
+    .ambient-title {
+      color: var(--text-4); min-width: 0;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    @media (prefers-reduced-motion: reduce) { .ambient.is-playing .ambient-icon { animation: none } }
+    @media (max-width: 700px) {
+      .ambient { left: 12px; bottom: 12px; }
+      .ambient-title { display: none; }
+    }
+
     .related-sounds {
       clear: both;
       position: relative;
@@ -1486,4 +1565,66 @@ function toParagraphs(text: string): string {
   </style>
 
   <SeenTracker slug={work.slug} />
+
+  <script is:inline>
+    ;(function () {
+      var box = document.querySelector(".ambient")
+      if (!box) return
+      var btn = box.querySelector(".ambient-toggle")
+      var key = box.dataset.key
+      var audio = new Audio(box.dataset.src)
+      audio.loop = true
+      audio.preload = "auto"
+      audio.volume = 0.72
+
+      /* 한 번 끈 방문자에게 페이지를 옮길 때마다 다시 소리를 들이밀지 않는다 */
+      var muted = false
+      try { muted = sessionStorage.getItem(key) === "off" } catch (e) {}
+
+      var setState = function (on) {
+        box.classList.toggle("is-playing", on)
+        btn.setAttribute("aria-pressed", on ? "true" : "false")
+        btn.querySelectorAll(".ambient-state").forEach(function (el) {
+          var ko = el.dataset.languageContent === "ko"
+          el.textContent = on ? (ko ? "사운드 켜짐" : "Sound on") : (ko ? "사운드 재생" : "Play sound")
+        })
+      }
+      var start = function () {
+        return audio.play().then(function () { setState(true); return true },
+                                 function () { setState(false); return false })
+      }
+      var stop = function () { audio.pause(); setState(false) }
+
+      box.hidden = false
+      setState(false)
+
+      btn.addEventListener("click", function () {
+        if (audio.paused) {
+          try { sessionStorage.removeItem(key) } catch (e) {}
+          start()
+        } else {
+          try { sessionStorage.setItem(key, "off") } catch (e) {}
+          stop()
+        }
+      })
+
+      if (muted) return
+
+      /* 자동재생을 시도하되 뚫지는 않는다. 기본 설정의 Chrome·Safari는
+         제스처 없는 오디오를 막으므로, 막히면 방문자의 첫 동작에 한 번만
+         편승하고 그마저 실패하면 버튼으로 남는다. */
+      start().then(function (ok) {
+        if (ok) return
+        var armed = ["pointerdown", "keydown", "touchstart", "wheel"]
+        var onFirst = function () {
+          armed.forEach(function (t) { document.removeEventListener(t, onFirst) })
+          try { if (sessionStorage.getItem(key) === "off") return } catch (e) {}
+          start()
+        }
+        armed.forEach(function (t) { document.addEventListener(t, onFirst, { once: false, passive: true }) })
+      })
+
+      window.addEventListener("pagehide", stop)
+    })()
+  </script>
 </Base>

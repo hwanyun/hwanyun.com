@@ -64,7 +64,11 @@ textKr: |
 
 processNote:
   label: "System note"
-  textEn: |
+  # 시스템 노트는 pre-line으로 그려진다 — 빈 줄이 단락 구분이 되는 대신
+  # 줄바꿈도 그대로 남는다. 여기서 |(리터럴)를 쓰면 80자에 맞춰 접은 원문의
+  # 줄이 화면에도 찍혀, 폭이 좁은 모바일에서 문장이 토막 난다.
+  # >(접기)는 빈 줄만 단락으로 남기고 나머지는 이어 붙인다.
+  textEn: >
     The work is staged in a circular room 3.7 m across — three edge-blended
     projectors wrap the wall, a fourth draws the mandala on the floor, and four
     speakers surround the space. A LiDAR sensor watches a 2 m trigger zone at
@@ -83,7 +87,7 @@ processNote:
     and the cycle begins again with the next material. Both sound scenes,
     flyer and sign, are tuned in D just intonation at 60 BPM: one beat per
     second, clock time rather than musical time.
-  textKr: |
+  textKr: >
     작품은 지름 3.7m의 원형 공간에 놓인다. 엣지 블렌딩된 프로젝터 세 대가 벽을
     두르고, 한 대가 바닥에 만다라를 그리며, 스피커 네 대가 공간을 감싼다. 중앙
     지름 2m의 트리거 존을 라이다 센서가 지켜보고, 그 추적값은 TouchDesigner에서
@@ -127,6 +131,119 @@ media:
     ratio: "16:9"
     caption: "간판 사이클 — 건물의 간판이 활자로 부서져 바닥의 만다라로 모인다"
     captionEn: "Sign cycle — signboards break into letterforms and gather into the floor mandala"
+  # ── 두 면, 한 순환 ──
+  # 면마다 영상을 먼저 놓고 그 뒤에 그 면의 설명과 국면들을 붙인다. 바닥과 벽은
+  # 같은 인원수에 함께 반응하지만 다른 것을 만들기 때문에, 설명이 서로 붙어
+  # 있으면 어느 쪽 이야기인지 흐려진다.
+  #
+  # 캡션은 인원수를 앞세운다 — 방을 미는 것이 인원수이므로 그게 각 장면의 가장
+  # 정확한 이름이다. 같은 인원이라도 어디로 들어와 어떻게 움직였느냐에 따라
+  # 매번 다르게 오므로 타임코드는 붙이지 않는다.
+  - type: video
+    src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/videos/mujae-floor-sync.mp4"
+    width: full
+    ratio: "1:1"
+    caption: "바닥 — 한 순환의 처음부터 끝까지. 사운드 아카이브의 3분과 같은 시간을 지난다"
+    captionEn: "Floor — one full cycle, start to end, over the same three minutes as the sound archive"
+    noteLabel: "바닥 · 생성과 소멸"
+    noteEn: >
+      A single projector draws the mandala on the floor, and it has only two
+      movements. Gathering, extending, completing are not separate stages —
+      they are all creation; only the fifteen seconds of standing together turn
+      the room towards disappearance. What pushes it either way is the number of
+      people in the 2 m zone at the centre. A LiDAR sensor counts them, and that
+      count decides how far the mandala has come into being and how many of the
+      four channels are sounding. Nothing here is played back, so the frames
+      that follow are named by the count that made them.
+    noteKr: >
+      바닥에는 프로젝터 한 대가 만다라를 그리고, 그 화면에는 두 움직임밖에 없다.
+      모이고, 번지고, 완성되는 것은 따로 있는 단계가 아니라 전부 생성이다. 방을
+      소멸 쪽으로 돌려세우는 것은 함께 머무른 15초뿐이다. 어느 쪽으로든 방을
+      미는 것은 중앙 지름 2m 존 안의 인원수다 — 라이다 센서가 세는 그 수가
+      만다라가 어디까지 생성되었는지, 네 채널 중 몇 개가 울리는지를 정한다.
+      재생되는 것은 없으므로 아래 국면들은 그것을 만든 인원수로 이름 붙였다.
+  - type: image
+    src: "/images/mujae/cycle/floor-01-scatter.jpg"
+    width: third
+    caption: "0명 — 파티클이 무질서하게 떠돌고 저중역 드론만 깔린다"
+    captionEn: "Nobody — particles drift in disorder over a low drone"
+  - type: image
+    src: "/images/mujae/cycle/floor-02-first-ring.jpg"
+    width: third
+    caption: "1명 — 파티클이 모여 첫 고리를 이루고, 진입한 방향의 스피커에서 단선율이 떠오른다"
+    captionEn: "One person — particles gather into a first ring; a single melodic line rises from the speaker nearest their point of entry"
+  - type: image
+    src: "/images/mujae/cycle/floor-03-extend.jpg"
+    width: third
+    caption: "2명 — 고리가 바깥으로 번지고, 두 사람의 위치를 따라 움직이는 화음 레이어가 더해진다"
+    captionEn: "Two people — the rings spread outward, and harmonic layers move with where the two of them stand"
+  - type: image
+    src: "/images/mujae/cycle/floor-04-complete.jpg"
+    width: third
+    caption: "3명 이상 — 만다라가 완성되고 4채널 전체에 코러스와 앰비언트가 찬다"
+    captionEn: "Three or more — the mandala completes and chorus and ambience fill all four channels"
+  - type: image
+    src: "/images/mujae/cycle/floor-05-dissolve.jpg"
+    width: third
+    caption: "모두가 15초를 함께 머무른 뒤 — 소멸이 시작되어 바깥 고리부터 색이 빠진다"
+    captionEn: "After everyone has stayed fifteen seconds — disappearance begins, colour draining from the outermost ring inward"
+  - type: image
+    src: "/images/mujae/cycle/floor-06-empty.jpg"
+    width: third
+    caption: "소멸이 끝나면 — 만다라는 사라지고 배음만 남는다"
+    captionEn: "When disappearance ends — the mandala is gone and only overtones remain"
+  - type: image
+    src: "/images/mujae/cycle/floor-07-next.jpg"
+    width: third
+    caption: "다시 0명 — 전단지가 물러난 자리에 간판의 활자가 들어선다"
+    captionEn: "Back to nobody — sign letterforms enter where the flyers left"
+  - type: image
+    src: "/images/mujae/cycle/floor-08-sign.jpg"
+    width: third
+    caption: "다시 3명 이상 — 같은 순환이 다른 소재에서 되풀이된다"
+    captionEn: "Three or more again — the same cycle repeats in the other material"
+  - type: video
+    src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/videos/mujae-wall-sync.mp4"
+    width: full
+    ratio: "24:5"
+    caption: "벽면 — 같은 순환을 360°로 편 띠. 바닥과 같은 순간을 함께 지난다"
+    captionEn: "Wall — the same cycle laid out across 360°, moving through the same moments as the floor"
+    noteLabel: "벽면 · 구성"
+    noteEn: >
+      Three edge-blended projectors wrap the wall of the 3.7 m room, so the
+      image closes on itself and has no edge to stand outside of. The band above
+      is that full circle cut open and laid flat, which is why it reads almost
+      five times wider than it is tall. Floor and wall answer the same count at
+      the same moment, but they make different things of it: the floor composes
+      a mandala to be looked down at, while the wall keeps the material at eye
+      level as a horizon the viewer is standing inside.
+    noteKr: >
+      지름 3.7m 공간의 벽은 엣지 블렌딩된 프로젝터 세 대가 두른다. 이미지가
+      제자리로 돌아와 닫히므로 바깥에 설 수 있는 가장자리가 없다. 위 띠는 그
+      원을 한 번 잘라 펼친 것이고, 높이의 다섯 배 가까이 넓은 이유가 그것이다.
+      바닥과 벽은 같은 순간의 같은 인원수에 함께 반응하지만 서로 다른 것을
+      만든다 — 바닥이 내려다보는 만다라로 모으는 것을, 벽은 눈높이에 남겨
+      관객이 그 안에 서 있는 지평으로 둔다.
+  - type: image
+    src: "/images/mujae/cycle/wall-01-scatter.jpg"
+    width: full
+    caption: "벽면, 0명 — 소재가 띠 전체에 흩어져 있다"
+    captionEn: "Wall, nobody — the material lies scattered across the whole band"
+  - type: image
+    src: "/images/mujae/cycle/wall-02-bloom.jpg"
+    width: full
+    caption: "벽면, 사람이 늘수록 — 색이 오르고 띠가 두터워진다"
+    captionEn: "Wall, as the count rises — colour rises and the band thickens"
+  - type: image
+    src: "/images/mujae/cycle/wall-03-dense.jpg"
+    width: full
+    caption: "벽면, 다른 소재에서 — 간판 활자가 벽을 가득 채운다"
+    captionEn: "Wall, in the other material — sign letterforms fill the wall"
+  - type: image
+    src: "/images/mujae/cycle/wall-04-sign.jpg"
+    width: full
+    caption: "벽면, 3명 이상 — 활자가 다시 건물의 간판으로 정렬한다"
+    captionEn: "Wall, three or more — letterforms realign into the facades they came from"
   - type: image
     src: "/images/mujae/03-dissolve.jpg"
     width: half
