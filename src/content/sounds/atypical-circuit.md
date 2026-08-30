@@ -10,7 +10,7 @@ works:
 backdrop: "/videos/atypical-circuit-audiovisual.mp4"
 cover: "/images/atypical-circuit/06.jpg"
 size: 2col
-order: 0
+order: 2
 draft: false
 ---
 일곱 개의 신디사이저 성부가 99, 162, 88, 120, 68, 125, 16박 길이의 루프로 돈다.

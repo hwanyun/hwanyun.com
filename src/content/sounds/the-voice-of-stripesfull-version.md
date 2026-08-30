@@ -9,6 +9,6 @@ project: "The Voice of Stripes"
 works: ["the-voice-of-stripes"]
 cover: "/images/sounds/the-voice-of-stripesfull-version.jpg"
 size: 2col
-order: 1
+order: 4
 draft: false
 ---

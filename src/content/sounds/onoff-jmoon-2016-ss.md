@@ -8,6 +8,6 @@ section: scores
 project: "J Moon"
 cover: "/images/sounds/onoff-jmoon-2016-ss.jpg"
 size: 2col
-order: 10
+order: 15
 draft: false
 ---

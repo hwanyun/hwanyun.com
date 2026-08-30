@@ -11,7 +11,7 @@ materials:
 showType: solo
 size: 3col
 category: work
-order: 3
+order: 4
 series:
   id: "three-pieces-untitled"
   label: "Three Pieces: Untitled"

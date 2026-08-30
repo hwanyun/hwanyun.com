@@ -10,7 +10,7 @@ works:
 backdrop: "/videos/atypical-circuit-sensor.mp4"
 cover: "/images/atypical-circuit/09.jpg"
 size: 2col
-order: 1
+order: 3
 draft: false
 ---
 같은 시스템에, 다가오는 신체가 있는 상태. 초음파 거리값이 120–200cm, 60–120cm,

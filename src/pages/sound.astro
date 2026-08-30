@@ -383,7 +383,11 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
       }
       .sound-filter a::after { content: ""; position: absolute; inset: -7px 0; }
       .release-count { display: none; }
-      .moving-tag { font-size: var(--fs-2xs); }
+      /* 요약 행의 태그는 글자까지 펼쳐져 있었다. 대문자 자간(.08em)이 붙은
+         'MOVING IMAGE' 한 덩어리가 제목 열을 100px 넘게 잠식해 「무제 Mujae
+         (無諸)」가 괄호만 다음 줄로 떨어졌다. 트랙 행에서 이미 쓰던 방식대로
+         아이콘만 남긴다 — 글자는 DOM에 남아 읽히고, 자리만 내준다. */
+      .rel-tags .moving-tag { width: 18px; overflow: hidden; gap: 0; font-size: 0; }
       /* 재생 버튼이 21×21이라 손가락으로 겨누기 어려웠다. 원 자체를 키우면
          목록이 무거워지므로 눌리는 영역만 넓힌다 — 다만 넓힌 영역이 이웃 행을
          침범하면 위아래 경계에서 엉뚱한 트랙이 눌린다. 행 여백을 11px로 올려

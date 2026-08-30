@@ -12,7 +12,7 @@ materials:
 showType: solo
 size: 2col
 category: sound
-order: 5
+order: 9
 series:
   id: "intuition-untitled"
   label: "Intuition: Untitled"

@@ -9,6 +9,6 @@ project: "Intuition"
 works: ["intuition-i"]
 cover: "/images/sounds/project-listhus-intuition.jpg"
 size: 3col
-order: 12
+order: 17
 draft: false
 ---

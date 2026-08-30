@@ -9,6 +9,6 @@ project: "The Voice of Stripes"
 works: ["the-voice-of-stripes"]
 cover: "/images/sounds/the-voice-of-stripesultrasonic-version.jpg"
 size: 1col
-order: 3
+order: 6
 draft: false
 ---

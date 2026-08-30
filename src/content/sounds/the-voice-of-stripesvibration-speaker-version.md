@@ -9,6 +9,6 @@ project: "The Voice of Stripes"
 works: ["the-voice-of-stripes"]
 cover: "/images/sounds/the-voice-of-stripesvibration-speaker-version.jpg"
 size: 3col
-order: 2
+order: 5
 draft: false
 ---
