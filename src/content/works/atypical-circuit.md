@@ -118,8 +118,7 @@ media:
   # 전시 기록 — 화면이 실제로 놓였던 공간과 관객의 자리
   - { type: image, src: "/images/atypical-circuit/03.jpg", width: full, caption: "Installation view" }
   - { type: video, src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/%E1%84%92%E1%85%AA%E1%84%86%E1%85%A7%E1%86%AB%20%E1%84%80%E1%85%B5%E1%84%85%E1%85%A9%E1%86%A8%202026-07-19%20%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE%205.02.53.mov", width: full, ratio: "16:9", caption: "TouchDesigner interaction documentation" }
-  - { type: image, src: "/images/atypical-circuit/01.jpg", width: half, caption: "Generative visual pattern" }
-  - { type: image, src: "/images/atypical-circuit/04.png", width: half, caption: "Generative visual pattern" }
+  - { type: image, src: "/images/atypical-circuit/04.png", width: half, align: right, caption: "Generative visual pattern" }
   - { type: video, src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/videos/atypical-circuit.mp4", width: half, ratio: "9:16" }
   - { type: video, src: "/videos/atypical-circuit-2.mp4", width: half, ratio: "9:16" }
   - { type: image, src: "/images/atypical-circuit/05.jpg", width: half, align: left, caption: "Installation view" }
