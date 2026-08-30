@@ -107,23 +107,23 @@ textKr: |
   이 값은 사운드가 하는 모든 일보다 앞선 첫 번째 노이즈 단에 실린다. 다가오는
   신체가 형상 위에 왜곡을 덧입히는 대신 형상을 뿌리에서부터 흔드는 이유다.
 media:
-  # 본문 — 공간을 먼저 세운다. 절반 폭 이미지로 시작하면 작품이 아니라 삽화로 열린다.
-  - { type: image, src: "/images/atypical-circuit/03.jpg", width: full, caption: "Installation view" }
-  - { type: video, src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/%E1%84%92%E1%85%AA%E1%84%86%E1%85%A7%E1%86%AB%20%E1%84%80%E1%85%B5%E1%84%85%E1%85%A9%E1%86%A8%202026-07-19%20%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE%205.02.53.mov", width: full, ratio: "16:9", caption: "TouchDesigner interaction documentation" }
-  # 시스템이 만들어 내는 화면 두 장 — 결과물의 어휘
-  - { type: image, src: "/images/atypical-circuit/01.jpg", width: half, caption: "Generative visual pattern" }
-  - { type: image, src: "/images/atypical-circuit/04.png", width: half, caption: "Generative visual pattern" }
-  - { type: video, src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/videos/atypical-circuit.mp4", width: half, ratio: "9:16" }
-  - { type: video, src: "/videos/atypical-circuit-2.mp4", width: half, ratio: "9:16" }
-  - { type: image, src: "/images/atypical-circuit/05.jpg", width: half, align: left, caption: "Installation view" }
-  # 2026-08 기록 — 사운드가 만든 질서, 그리고 근접이 무너뜨린 상태
+  # 2026-08 기록 — 시스템을 직접 구동해 뽑은 자료. 해상도와 계조가 가장 좋아
+  # 작품의 첫인상을 맡긴다. 사운드가 만든 질서를 먼저 보이고, 그다음 붕괴.
   - { type: video, src: "/videos/atypical-circuit-audiovisual.mp4", width: full, ratio: "16:9", caption: "Seven loops, no two of the same length" }
   - { type: image, src: "/images/atypical-circuit/06.jpg", width: half, align: right, caption: "Composed state" }
   - { type: image, src: "/images/atypical-circuit/07.jpg", width: half, caption: "Composed state" }
   - { type: video, src: "/videos/atypical-circuit-sensor.mp4", width: full, ratio: "16:9", caption: "Proximity response — three distance bands, weighted by nearness" }
   - { type: image, src: "/images/atypical-circuit/08.jpg", width: half, align: left, caption: "Onset of interference" }
   - { type: image, src: "/images/atypical-circuit/09.jpg", width: half, caption: "Full collapse at closest range" }
-  # 부록 — 인쇄물
+  # 전시 기록 — 화면이 실제로 놓였던 공간과 관객의 자리
+  - { type: image, src: "/images/atypical-circuit/03.jpg", width: full, caption: "Installation view" }
+  - { type: video, src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/%E1%84%92%E1%85%AA%E1%84%86%E1%85%A7%E1%86%AB%20%E1%84%80%E1%85%B5%E1%84%85%E1%85%A9%E1%86%A8%202026-07-19%20%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE%205.02.53.mov", width: full, ratio: "16:9", caption: "TouchDesigner interaction documentation" }
+  - { type: image, src: "/images/atypical-circuit/01.jpg", width: half, caption: "Generative visual pattern" }
+  - { type: image, src: "/images/atypical-circuit/04.png", width: half, caption: "Generative visual pattern" }
+  - { type: video, src: "https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev/videos/atypical-circuit.mp4", width: half, ratio: "9:16" }
+  - { type: video, src: "/videos/atypical-circuit-2.mp4", width: half, ratio: "9:16" }
+  - { type: image, src: "/images/atypical-circuit/05.jpg", width: half, align: left, caption: "Installation view" }
+  # 부록 — 인쇄물과 여분 프레임
   - { type: image, src: "/images/atypical-circuit/02.png", archive: true }
   - { type: image, src: "/images/atypical-circuit/10.jpg", archive: true }
   - { type: image, src: "/images/atypical-circuit/11.jpg", archive: true }
