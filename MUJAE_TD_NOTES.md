@@ -67,3 +67,54 @@ crop 설정: `cropbottom=0.3248`, `croptop=0.5312` (fraction)
 - `stop_playback`은 토글이다.
 - 실시간 캡처는 프레임을 유실한다(어제 8569/10800). 비실시간 렌더로 갈 것.
 - `.cook(force=True)`로는 Movie File Out이 기록하지 않는다 — 타임라인이 실제로 전진해야 한다.
+
+## 비실시간 프레임 정확 렌더 (2026-08-30 확립)
+
+실시간 캡처는 프레임을 유실한다(어제 10800 중 8569만 기록). 아래 절차는
+300프레임 시험에서 **정확히 300프레임 / 5.000s / 60fps**를 냈다.
+
+핵심은 **순서**다. `record=True` 전에 첫 프레임을 세팅하고 쿡해야 한다 —
+그러지 않으면 실시간 재생분이 앞뒤로 섞여 들어간다(2140프레임이 나왔었다).
+
+```python
+import time
+root = op('/project1'); mfo = root.op('nr_mfo')
+tl = op('/local/time'); out2 = root.op('out2')
+
+prev_rt, prev_play, start_f = project.realTime, tl.par.play.eval(), tl.frame
+
+tl.par.play = 0            # 재생 먼저 정지
+project.realTime = False   # 주의: realTime (대문자 T)
+mfo.par.record = False
+
+tl.frame = start_f         # 첫 프레임 세팅 후
+out2.cook(force=True)      # 쿡하고
+mfo.par.record = True      # 그 다음 녹화 시작
+for i in range(N):
+    tl.frame = start_f + i
+    out2.cook(force=True)
+    mfo.cook(force=True)
+mfo.par.record = False
+
+project.realTime = prev_rt; tl.par.play = prev_play
+```
+
+- 속도: 실시간의 약 1.5배 시간. 3분(10765프레임)이면 **약 5분**.
+- `absTime.frame`은 읽기 전용 — `/local/time`의 `.frame`을 쓴다.
+- moviefileoutTOP `nr_mfo`: codec=hap, fps=60. 300프레임에 887MB(=3분이면 ~30GB)
+  이므로 본 렌더는 디스크 여유를 먼저 확인할 것.
+
+## OP 타입·파라미터 실제 이름 (헷갈림 주의)
+
+- `geoCOMP`가 아니라 **`geometryCOMP`**. `create()`에 문자열 대신
+  `getattr(td,'geometryCOMP')` 형태로 넘긴다.
+- circleSOP: `divs`(divisions 아님), `radx/rady`
+- tubeSOP: `rad1/rad2`(radx1 아님), `height`, `rows`, `cols`, `cap`
+- `project.realTime` (realtime 아님)
+
+## 설치 뷰 프로토타입 (미완, iv_ 접두어)
+
+`iv_geo_floor`(circleSOP 반경1.85) + `iv_geo_wall`(tubeSOP 반경1.85 높이2.4)
++ `iv_cam`(perspective) + `iv_light` + `iv_render`(1280×720) + `iv_wall_movie`.
+원본 노드는 건드리지 않았다. **미해결: 텍스처가 단색으로만 렌더된다** —
+UV/머티리얼 설정을 더 봐야 한다. 구도 자체는 나왔다(관객 눈높이에서 휜 벽 + 바닥 원).
