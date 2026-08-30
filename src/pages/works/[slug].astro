@@ -1598,10 +1598,6 @@ function toParagraphs(text: string): string {
       audio.preload = "auto"
       audio.volume = 0.72
 
-      /* 한 번 끈 방문자에게 페이지를 옮길 때마다 다시 소리를 들이밀지 않는다 */
-      var muted = false
-      try { muted = sessionStorage.getItem(key) === "off" } catch (e) {}
-
       var setState = function (on) {
         box.classList.toggle("is-playing", on)
         btn.setAttribute("aria-pressed", on ? "true" : "false")
@@ -1629,23 +1625,61 @@ function toParagraphs(text: string): string {
         }
       })
 
-      if (muted) return
-
-      /* 자동재생을 시도하되 뚫지는 않는다. 기본 설정의 Chrome·Safari는
-         제스처 없는 오디오를 막으므로, 막히면 방문자의 첫 동작에 한 번만
-         편승하고 그마저 실패하면 버튼으로 남는다. */
-      start().then(function (ok) {
-        if (ok) return
-        var armed = ["pointerdown", "keydown", "touchstart", "wheel"]
-        var onFirst = function () {
-          armed.forEach(function (t) { document.removeEventListener(t, onFirst) })
-          try { if (sessionStorage.getItem(key) === "off") return } catch (e) {}
-          start()
-        }
-        armed.forEach(function (t) { document.addEventListener(t, onFirst, { once: false, passive: true }) })
-      })
+      /* 기본은 꺼짐이다. 페이지에는 소리를 내는 영상이 여럿 있고, 들어오자마자
+         앰비언트가 깔리면 관람자가 영상을 열었을 때 두 소리가 겹친다. 청하지
+         않은 소리를 먼저 들이밀지 않고, 버튼으로 남겨 둔다. */
 
       window.addEventListener("pagehide", stop)
+    })()
+  </script>
+
+  {/* 영상이 소리를 내는 동안 앰비언트는 비켜선다. 둘이 겹치면 어느 쪽도
+      제대로 들리지 않고, 특히 이 작업은 화면과 소리가 같은 3분을 함께
+      지나므로 영상의 소리가 곧 작품의 소리다. 영상이 멈추면 앰비언트가
+      켜져 있던 경우에만 제자리로 돌아온다. */}
+  <script is:inline>
+    ;(function () {
+      var box = document.querySelector(".ambient")
+      if (!box) return
+      var vids = document.querySelectorAll("video")
+      if (!vids.length) return
+
+      var wasPlaying = false
+      var ducked = false
+
+      var ambientAudio = function () {
+        /* 앰비언트 스크립트가 만든 Audio 객체를 직접 잡을 수 없으므로,
+           버튼을 눌러 상태를 바꾼다 — 화면 표시와도 자동으로 맞는다. */
+        return box.classList.contains("is-playing")
+      }
+      var toggle = function () {
+        box.querySelector(".ambient-toggle").click()
+      }
+
+      var duck = function () {
+        if (ducked) return
+        wasPlaying = ambientAudio()
+        if (wasPlaying) toggle()
+        ducked = true
+      }
+      var restore = function () {
+        if (!ducked) return
+        ducked = false
+        /* 다른 영상이 아직 소리를 내고 있으면 그대로 둔다 */
+        for (var i = 0; i < vids.length; i++) {
+          if (!vids[i].paused && !vids[i].muted) return
+        }
+        if (wasPlaying && !ambientAudio()) toggle()
+      }
+
+      vids.forEach(function (v) {
+        v.addEventListener("play", function () { if (!v.muted) duck() })
+        v.addEventListener("volumechange", function () {
+          if (!v.paused && !v.muted) duck()
+        })
+        v.addEventListener("pause", restore)
+        v.addEventListener("ended", restore)
+      })
     })()
   </script>
 </Base>
