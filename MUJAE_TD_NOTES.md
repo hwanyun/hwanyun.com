@@ -4,8 +4,8 @@
 
 ## 파일
 
-- Floor `~/Documents/HWANYUN/무제_이관_20260818/터디 비주얼/Floor/260816_Floor.6.toe`
-- Wall  `~/Documents/HWANYUN/무제_이관_20260818/터디 비주얼/Wall/260816_Wall.11.toe`
+- Floor `~/Documents/HWANYUN/무제_이관_20260818/터디 비주얼/Floor/260816_Floor.7.toe`
+- Wall  `~/Documents/HWANYUN/무제_이관_20260818/터디 비주얼/Wall/260816_Wall.12.toe`
 
 ## 브리지 붙이기
 
@@ -118,3 +118,51 @@ project.realTime = prev_rt; tl.par.play = prev_play
 + `iv_cam`(perspective) + `iv_light` + `iv_render`(1280×720) + `iv_wall_movie`.
 원본 노드는 건드리지 않았다. **미해결: 텍스처가 단색으로만 렌더된다** —
 UV/머티리얼 설정을 더 봐야 한다. 구도 자체는 나왔다(관객 눈높이에서 휜 벽 + 바닥 원).
+
+
+## 2026-08-31 진행 상황
+
+**해결: 프레임 유실.** 비실시간 렌더로 10,765프레임 요청 → 10,765 기록,
+179.417초, 유실 0. (어제는 10,800 요청에 8,569만 기록되어 1.26배 빨랐다.)
+연속 프레임 추출로 움직임이 고른 것도 확인했다.
+
+**규명: Wall 크롭 완화는 실익 없음.** crop 이전 원본(transform3)을 5장
+받아 보니 입자가 화면 중앙의 좁은 띠에만 있고 위아래는 검은 여백이다.
+크롭을 풀어도 여백만 늘어난다. 현재 crop이 이미 최적 — 건드리지 말 것.
+
+**상태머신 구동 방법 (검증됨)**
+
+`nr_keys`(constantCHOP)를 script_lidar_state의 input1에 연결해 두었다.
+원래 입력은 `keyboardin_test`. 값 주입 규칙:
+
+- **rising edge로만 인식한다.** 값을 계속 1로 두면 최초 한 번만 먹는다.
+  모든 채널을 0으로 만들고 한 번 쿡한 뒤, 해당 채널만 1로 올려야 한다.
+- **TD 내부 스레드에서 파라미터를 바꿀 수 없다.** threading으로 시나리오를
+  돌리면 값이 반영되지 않는다(전부 0으로 남는다). 밖에서 HTTP로 주입할 것.
+- k0~k5 = 존 안 인원수 0~5. `constant_test_active`가 1이어야 한다(이미 1).
+- 검증: k3 주입 → people=3, mode=3, order=1.0 도달 확인.
+
+**핵심 장애물: 시간 기준 불일치**
+
+`script1_callbacks`의 onCook이 `now = absTime.seconds`(실제 벽시계)를 쓴다.
+비실시간 렌더는 프레임을 임의 속도로 밀기 때문에 "15초 유지" 같은 조건이
+영상 시간과 어긋난다. 이 때문에 시나리오 렌더가 "만개 고정"/"무질서 고정"
+으로 두 번 실패했다.
+
+**다음 단계 (C안): 상태 기록 → 재생**
+
+1. 실시간 재생하며 밖에서 시나리오를 주입하고, 초당 1회 이상 상태 채널을
+   HTTP로 읽어 CSV로 저장한다. (trailCHOP은 히스토리를 제대로 못 담았다 —
+   12,000샘플이 전부 같은 값이었다. 파일로 빼는 쪽이 확실하다.)
+2. 비실시간 렌더에서 그 CSV를 프레임마다 읽어 상태 채널에 그대로 먹인다.
+   상태머신을 우회하므로 벽시계 문제가 사라진다.
+
+기록할 채널 19개는 `nr_rec_sel`(selectCHOP)에 이미 골라 두었다:
+mode order orderTarget atlasIndex people visibleRings transitionProgress
+floorFadeElapsed wallFadeElapsed fadeInProgress floorFadeInProgress
+wallFadeInProgress fadeInElapsed shake shakeAmp shakeElapsed timer3
+resetIn phaseCode
+
+**저장된 노드** (2026-08-31 저장, 버전 .7 / .12)
+`nr_mfo`(moviefileout, prores/60fps), `nr_keys`, `nr_rec_sel`, `nr_rec`,
+`iv_*`(설치 뷰 프로토타입, 텍스처 미해결).
