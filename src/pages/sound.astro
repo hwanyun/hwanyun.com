@@ -183,23 +183,18 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
       button.setAttribute("aria-label", row.dataset.title + (state === "playing" ? " 일시정지" : " 재생"))
     }
     const resetActive = () => { setButton(activeButton, "stopped"); activeButton = null }
-    const clearBackdrop = () => { backdrop.pause(); backdrop.removeAttribute("src"); backdrop.style.objectFit = ""; backdropTitle.textContent = ""; document.body.classList.remove("has-backdrop") }
+    const clearBackdrop = () => { backdrop.pause(); backdrop.removeAttribute("src"); backdropTitle.textContent = ""; document.body.classList.remove("has-backdrop") }
     /* 무제의 두 화면(바닥 원형·벽면 파노라마)은 사운드와 같은 3분을 지난다.
        영상을 제 클럭으로 흘려보내면 몇 초 만에 어긋나므로 오디오를 기준 시계로 삼는다. */
     const followAudio = () => {
       if (!backdrop.src || backdrop.readyState < 1) return
       if (Math.abs(backdrop.currentTime - player.currentTime) > 0.25) backdrop.currentTime = player.currentTime
     }
-    /* 파노라마(4.8:1)를 cover로 채우면 높이가 3배 넘게 확대돼 뭉개진다.
-       화면과 비율이 크게 다른 영상은 잘라 채우지 말고 온전히 보여 준다. */
-    const fitBackdrop = () => {
-      if (!backdrop.videoWidth) return
-      const media = backdrop.videoWidth / backdrop.videoHeight
-      const view = window.innerWidth / window.innerHeight
-      backdrop.style.objectFit = Math.max(media / view, view / media) > 1.8 ? "contain" : "cover"
-    }
-    backdrop.addEventListener("loadedmetadata", fitBackdrop)
-    window.addEventListener("resize", fitBackdrop)
+    /* 백드롭은 언제나 화면을 가득 채운다(CSS의 object-fit: cover).
+       한때 파노라마(4.8:1)만 contain으로 온전히 보여 줬는데 — 확대율이
+       커 뭉개지는 것을 피하려 한 것이었다 — 띠 하나가 떠 있는 모양이라
+       '듣는 화면'이 되지 못했다. 전부 보여 주는 것보다 화면이 차는 편이
+       낫다. 어차피 brightness(.42)로 눌린 배경이라 확대는 잘 드러나지 않는다. */
     document.querySelectorAll(".track-control[data-audio]").forEach((button) => button.addEventListener("click", () => {
       if (activeButton === button) {
         if (player.paused) player.play(); else player.pause()
