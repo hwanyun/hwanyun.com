@@ -79,18 +79,20 @@ Do not remove the local MP4 files until the R2 URLs have been tested in a Cloudf
 - [x] Upload `videos/coexistence-3.mp4` (approximately 61 MB)
 - [x] Replace the two Markdown references with their R2 URLs
 - [x] Deploy and verify the Cloudflare Pages production project at `https://hwanyun-com.pages.dev`
-- [ ] Point the production domain to Cloudflare Pages
+- [x] Point the production domain to Cloudflare Pages (apex + `www`, 2026-08-30)
 - [ ] Remove oversized local MP4s only after verification
 
-Current public base URL (development URL):
+Current public base URL:
 
 ```text
-https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev
+https://media.hwanyun.com
 ```
 
-The development URL is usable during this migration. Before launching the final public site,
-connect a custom media domain such as `media.hwanyun.com` and replace this base URL in the two
-Markdown files. Do not commit any R2 API token, Access Key ID, or Secret Access Key.
+This is a custom domain on the `hwanyun-media` bucket, connected 2026-08-30 once the zone moved
+to Cloudflare. The previous `pub-*.r2.dev` development URL has been disabled: it was rate-limited
+and bypassed the cache, which Cloudflare's own bucket settings flag as unsuitable for production.
+Media now travels the normal CDN path. Do not commit any R2 API token, Access Key ID, or Secret
+Access Key.
 
 The two oversized local MP4 files have been removed from GitHub after the R2 URLs and Pages
 deployment were verified. Keep the originals archived outside this repository if they are needed

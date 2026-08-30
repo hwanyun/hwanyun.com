@@ -23,7 +23,9 @@ Read this file before changing or deploying the site.
 
 - Keep images and video files up to 25 MiB in `public/`.
 - Videos over 25 MiB belong in the public R2 bucket and must be referenced by HTTPS URL in the relevant content Markdown file.
-- Current R2 development base URL: `https://pub-d135883c0c1a4e13a4907d51d88bf5cf.r2.dev`.
+- Current R2 public base URL: `https://media.hwanyun.com` (custom domain on the `hwanyun-media` bucket).
+- The old `pub-*.r2.dev` development URL is retired and disabled. It was rate-limited and
+  uncached — Cloudflare labels it "not recommended for production" — so never reintroduce it.
 - Never commit R2 credentials, API tokens, or private bucket URLs.
 
 For the detailed rationale and current migration state, read `CLOUDFLARE_R2_MIGRATION.md`; for deployment verification, read `PROJECT_CONTEXT.md`.
