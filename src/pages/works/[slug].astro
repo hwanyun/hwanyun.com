@@ -29,8 +29,6 @@ const seriesWorks = data.series
 const relatedSounds = allSounds
   .filter((sound) => sound.data.works.includes(work.slug))
   .sort((a, b) => a.data.order - b.data.order)
-// 페이지에 깔아 둘 소리 — 연결된 사운드 중 재생 가능한 첫 트랙
-const ambientSound = relatedSounds.find((sound) => sound.data.audio)
 
 // 재료로 이어지는 다른 작품 — 작품 페이지가 막다른 골목이 되지 않게 한다.
 // 공유 재료가 많은 순, 같으면 최근작 순.
@@ -453,26 +451,6 @@ function toParagraphs(text: string): string {
             ))}
           </div>
         </details>
-      )
-    }
-
-    {/* 작품에 딸린 사운드를 페이지에 깔아 둔다. 설치작업은 소리 안에서 보는
-        것이라 무음의 도판만으로는 절반만 전해진다. 다만 방문자가 청하지 않은
-        소리이므로 (1) 언제나 보이는 정지 컨트롤을 두고, (2) 한 번 끄면 이
-        세션 동안 다시 켜지 않으며, (3) 브라우저가 자동재생을 막으면 —
-        기본 설정의 Chrome·Safari가 그렇다 — 억지로 뚫지 않고 버튼으로 남는다. */}
-    {
-      ambientSound && (
-        <div class="ambient" data-src={ambientSound.data.audio} data-key={`ambient-${Astro.params.slug}`} hidden>
-          <button class="ambient-toggle" type="button" aria-pressed="false">
-            <span class="ambient-icon" aria-hidden="true"></span>
-            <span class="ambient-text">
-              <span class="ambient-state" data-language-content="en">Sound</span>
-              <span class="ambient-state" data-language-content="ko">사운드</span>
-              <span class="ambient-title">{ambientSound.data.title}</span>
-            </span>
-          </button>
-        </div>
       )
     }
 
@@ -1366,40 +1344,6 @@ function toParagraphs(text: string): string {
       margin: var(--space-4) 0 0;
       padding-top: 0;
     }
-    /* 청하지 않은 소리를 켜는 쪽이므로, 끄는 길이 늘 화면에 보여야 한다.
-       스크롤-투-톱 FAB이 오른쪽에 있으니 왼쪽 아래에 둔다. */
-    .ambient { position: fixed; left: 18px; bottom: 18px; z-index: 60; }
-    .ambient[hidden] { display: none; }
-    .ambient-toggle {
-      display: inline-flex; align-items: center; gap: 9px;
-      max-width: min(70vw, 340px);
-      padding: 8px 15px 8px 12px;
-      border: 1px solid var(--line-2); border-radius: 999px;
-      background: var(--surface); color: var(--text-2);
-      font: 400 var(--fs-xs)/1.2 var(--sans); text-align: left;
-      cursor: pointer;
-      transition: border-color var(--dur-fast) ease, color var(--dur-fast) ease;
-    }
-    .ambient-toggle:hover { border-color: var(--hover); color: var(--hover); }
-    .ambient-icon {
-      flex: none; width: 9px; height: 9px; border-radius: 50%;
-      background: currentColor; opacity: .35;
-      transition: opacity var(--dur-fast) ease;
-    }
-    .ambient.is-playing .ambient-icon { opacity: 1; animation: ambient-pulse 2.6s ease-in-out infinite; }
-    @keyframes ambient-pulse { 0%, 100% { opacity: 1 } 50% { opacity: .3 } }
-    .ambient-text { display: flex; gap: 7px; min-width: 0; }
-    .ambient-state { flex: none; }
-    .ambient-title {
-      color: var(--text-4); min-width: 0;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-    @media (prefers-reduced-motion: reduce) { .ambient.is-playing .ambient-icon { animation: none } }
-    @media (max-width: 700px) {
-      .ambient { left: 12px; bottom: 12px; }
-      .ambient-title { display: none; }
-    }
-
     .related-sounds {
       clear: both;
       position: relative;
@@ -1587,99 +1531,5 @@ function toParagraphs(text: string): string {
     })()
   </script>
 
-  <script is:inline>
-    ;(function () {
-      var box = document.querySelector(".ambient")
-      if (!box) return
-      var btn = box.querySelector(".ambient-toggle")
-      var key = box.dataset.key
-      var audio = new Audio(box.dataset.src)
-      audio.loop = true
-      audio.preload = "auto"
-      audio.volume = 0.72
 
-      var setState = function (on) {
-        box.classList.toggle("is-playing", on)
-        btn.setAttribute("aria-pressed", on ? "true" : "false")
-        btn.querySelectorAll(".ambient-state").forEach(function (el) {
-          var ko = el.dataset.languageContent === "ko"
-          el.textContent = on ? (ko ? "사운드 켜짐" : "Sound on") : (ko ? "사운드 재생" : "Play sound")
-        })
-      }
-      var start = function () {
-        return audio.play().then(function () { setState(true); return true },
-                                 function () { setState(false); return false })
-      }
-      var stop = function () { audio.pause(); setState(false) }
-
-      box.hidden = false
-      setState(false)
-
-      btn.addEventListener("click", function () {
-        if (audio.paused) {
-          try { sessionStorage.removeItem(key) } catch (e) {}
-          start()
-        } else {
-          try { sessionStorage.setItem(key, "off") } catch (e) {}
-          stop()
-        }
-      })
-
-      /* 기본은 꺼짐이다. 페이지에는 소리를 내는 영상이 여럿 있고, 들어오자마자
-         앰비언트가 깔리면 관람자가 영상을 열었을 때 두 소리가 겹친다. 청하지
-         않은 소리를 먼저 들이밀지 않고, 버튼으로 남겨 둔다. */
-
-      window.addEventListener("pagehide", stop)
-    })()
-  </script>
-
-  {/* 영상이 소리를 내는 동안 앰비언트는 비켜선다. 둘이 겹치면 어느 쪽도
-      제대로 들리지 않고, 특히 이 작업은 화면과 소리가 같은 3분을 함께
-      지나므로 영상의 소리가 곧 작품의 소리다. 영상이 멈추면 앰비언트가
-      켜져 있던 경우에만 제자리로 돌아온다. */}
-  <script is:inline>
-    ;(function () {
-      var box = document.querySelector(".ambient")
-      if (!box) return
-      var vids = document.querySelectorAll("video")
-      if (!vids.length) return
-
-      var wasPlaying = false
-      var ducked = false
-
-      var ambientAudio = function () {
-        /* 앰비언트 스크립트가 만든 Audio 객체를 직접 잡을 수 없으므로,
-           버튼을 눌러 상태를 바꾼다 — 화면 표시와도 자동으로 맞는다. */
-        return box.classList.contains("is-playing")
-      }
-      var toggle = function () {
-        box.querySelector(".ambient-toggle").click()
-      }
-
-      var duck = function () {
-        if (ducked) return
-        wasPlaying = ambientAudio()
-        if (wasPlaying) toggle()
-        ducked = true
-      }
-      var restore = function () {
-        if (!ducked) return
-        ducked = false
-        /* 다른 영상이 아직 소리를 내고 있으면 그대로 둔다 */
-        for (var i = 0; i < vids.length; i++) {
-          if (!vids[i].paused && !vids[i].muted) return
-        }
-        if (wasPlaying && !ambientAudio()) toggle()
-      }
-
-      vids.forEach(function (v) {
-        v.addEventListener("play", function () { if (!v.muted) duck() })
-        v.addEventListener("volumechange", function () {
-          if (!v.paused && !v.muted) duck()
-        })
-        v.addEventListener("pause", restore)
-        v.addEventListener("ended", restore)
-      })
-    })()
-  </script>
 </Base>
