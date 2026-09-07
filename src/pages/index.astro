@@ -599,7 +599,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
           const re = /\S+/g; let m: RegExpExecArray | null
           const cs = getComputedStyle(el)
           oc.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`
-          oc.textBaseline = "alphabetic"; oc.fillStyle = "#fff"; oc.strokeStyle = "#fff"; oc.lineWidth = 6; oc.lineJoin = "round"
+          // 글자 둘레 여유 — 모바일은 더 넓게 비워 글자가 입자에서 떠 보이게
+          oc.textBaseline = "alphabetic"; oc.fillStyle = "#fff"; oc.strokeStyle = "#fff"; oc.lineWidth = isMobile ? 12 : 6; oc.lineJoin = "round"
           while ((m = re.exec(text))) {
             const r = document.createRange(); r.setStart(node, m.index); r.setEnd(node, m.index + m[0].length)
             const rect = r.getBoundingClientRect()
@@ -1044,9 +1045,10 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       .hero[data-thesis="2"] .thesis { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; transform: none; }
       .hero:not([data-thesis="2"]) .thesis {
         left: 50%; top: 50%; right: auto; transform: translate(-50%, -50%);
-        width: max-content; max-width: min(22ch, 76vw); text-align: center;
-        font-size: 19px; line-height: 1.45;
+        width: max-content; max-width: min(20ch, 80vw); text-align: center;
+        font-size: 23px; font-weight: 500; line-height: 1.4; color: var(--text);
       }
+      .hero:not([data-thesis="2"]) .thesis a { color: var(--text); border-bottom-color: var(--text); }
       .thesis small { display: none; }
     }
 
