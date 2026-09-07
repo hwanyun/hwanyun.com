@@ -94,23 +94,23 @@ const shareImage = new URL(
         사실만 적는다: 연락처는 Contact 페이지와 같은 원본, 나머지는 링크. */}
     <footer class="site-footer">
       {/* 워드마크는 SVG 텍스트로 — textLength가 폭을 정확히 채운다. vw 계산으로는 글꼴마다 어긋난다. */}
-      {/* 워드마크 — 글자별 span, 크기는 스크립트가 폭에 맞춘다 */}
+      {/* 푸터는 영문 하나로 간다 — 크롬과 같은 규칙(언어 전환은 서술 콘텐츠만 바꾼다). 워드마크는 글자별 span, 크기는 스크립트가 폭에 맞춘다 */}
       <p class="sf-mark" id="sf-mark" aria-label="HWANYUN">
         {"HWANYUN".split("").map((ch) => <span aria-hidden="true">{ch}</span>)}
       </p>
       <div class="sf-cols">
         <div class="sf-col sf-stack">
           <div>
-            <p class="sf-label"><span data-language-content="en">Get in touch</span><span data-language-content="ko" lang="ko">연락</span></p>
+            <p class="sf-label">Get in touch</p>
             <a class="sf-pill" href="mailto:hwanyun.lab@gmail.com">hwanyun.lab@gmail.com</a>
           </div>
           <div>
-            <p class="sf-label"><span data-language-content="en">Follow</span><span data-language-content="ko" lang="ko">팔로우</span></p>
+            <p class="sf-label">Follow</p>
             <a class="sf-pill" href="https://instagram.com/hwanyun.lab" target="_blank" rel="noopener">Instagram</a>
           </div>
         </div>
         <div class="sf-col">
-          <p class="sf-label"><span data-language-content="en">Elsewhere</span><span data-language-content="ko" lang="ko">다른 곳</span></p>
+          <p class="sf-label">Elsewhere</p>
           <nav class="sf-links" aria-label="Footer">
             <a href="/works/">Works</a><a href="/prototypes/">Prototypes</a><a href="/sound/">Sound</a><a href="/events/">Events</a><a href="/cv/">CV</a><a href="/contact/">Contact</a>
           </nav>
@@ -119,10 +119,7 @@ const shareImage = new URL(
       <p class="sf-bottom">
         {/* 2014 = 첫 작품(Fedora – Exile)의 해. 언제부터 해 온 작업인지가 보이는 쪽을 작가가 택했다. 끝 연도는 자동. */}
         <span>© 2014–<span id="footer-year">{new Date().getFullYear()}</span> HWANYUN</span>
-        <span class="sf-dim">
-          <span data-language-content="en">No cookies. Audio never leaves your device.</span>
-          <span data-language-content="ko" lang="ko">쿠키 없음. 소리는 이 기기를 떠나지 않습니다.</span>
-        </span>
+        <span class="sf-dim">No cookies. Audio never leaves your device.</span>
       </p>
     </footer>
 

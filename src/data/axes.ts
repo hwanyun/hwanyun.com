@@ -17,8 +17,8 @@ export const AXES = [
     en: "Sounding",
     // 녹음이든 신디사이저든 프로젝션이든 — 소리와 빛이 공간에 있게 되는 단계.
     // "채집"은 마이크 든 사람의 말이라 Ableton으로 짓는 소리가 빠진다 (작가 지적, 2026-09-07).
-    descKo: "관계는 먼저 들리는 것으로 온다. 무언가가 울린다는 것은 이미 다른 것과 닿아 있다는 뜻이다. 소리든 빛이든, 울림은 혼자 있을 수 없는 것들이 서로를 알아차리는 첫 순간이다.",
-    descEn: "A relation arrives first as something heard. For a thing to resound is already to be touching something else. Sound or light, sounding is the first moment in which things that cannot be alone notice one another.",
+    descKo: "혼자서 울리는 것은 없다. 어떤 소리가 들린다면 이미 무언가가 다른 무언가를 흔들고 있는 것이다. 공기와 벽, 재료와 몸이 같은 떨림을 잠시 나눠 갖는 그 순간에서 작업은 시작한다. 들린다는 것은 이미 함께 있다는 증거다.",
+    descEn: "Nothing sounds alone. If something can be heard, something has already set something else in motion. For a moment, air and wall, material and body share one tremor, and that moment is where the work begins. To be heard is proof of being with.",
     // 카드 미디어와 15초 발췌 — 작가가 바꿀 수 있게 여기 한 곳에 둔다.
     // 미디어는 해당 작품의 thumb/thumbVideo를 그대로 쓰고, 소리는 sounds 컬렉션의 slug다.
     work: "the-voice-of-stripes",
@@ -28,8 +28,8 @@ export const AXES = [
     id: "contact",
     ko: "접촉",
     en: "Contact",
-    descKo: "관계는 닿을 때 비로소 흐른다. 열린 회로는 아무것도 하지 않는다. 몸과 물질, 사람과 시스템 사이의 거리가 좁혀질 때 무엇이 흐르기 시작하고 무엇이 무너지는지, 그 경계를 보려고 작업한다.",
-    descEn: "A relation flows only when it touches. An open circuit does nothing. The work looks at what begins to flow, and what gives way, when the distance between body and material, person and system, closes.",
+    descKo: "가까이 간다는 것은 작은 일이 아니다. 거리가 사라지는 순간 보던 사람은 보이는 것의 일부가 되고, 닫혀 있던 것이 열리거나 멀쩡하던 것이 무너진다. 손이 닿는 그 경계에 머물며 무엇이 시작되고 무엇이 그만두는지를 본다. 만지는 쪽과 만져지는 쪽이 자리를 바꾸는 곳.",
+    descEn: "To come close is no small thing. When distance is gone, the one who was looking becomes part of what is looked at; something closed opens, or something intact gives way. The work stays at that edge where a hand lands, watching what starts and what stops, where touching and being touched change places.",
     work: "atypical-circuit",
     sound: "atypical-circuit-proximity",
   },
@@ -37,8 +37,8 @@ export const AXES = [
     id: "trace",
     ko: "흔적",
     en: "Trace",
-    descKo: "관계는 끝난 뒤에도 남는다. 닿았던 것들은 서로에게 자국을 남기고, 그 자국은 다음 관계의 조건이 된다. 흔적은 지나간 시간이 아니라 아직 이어지고 있는 연결이다.",
-    descEn: "A relation remains after it ends. Things that have touched leave marks on each other, and those marks become the condition for what touches next. A trace is not time gone by but a connection still being held.",
+    descKo: "무언가가 지나간 자리는 비어 있지 않다. 닿았던 것들은 서로에게 자국을 남기고, 다음 만남은 그 자국 위에서 일어난다. 남은 것은 기록이 아니라 아직 식지 않은 상태다. 작업의 절반은 끝난 뒤에 있다.",
+    descEn: "Where something has passed is not empty. What has touched leaves a mark on what it touched, and the next meeting happens on top of that mark. What remains is not a record but a state not yet cooled. Half of the work happens after it ends.",
     // 손이 닿았던 자리에 남는 투사된 원 — 접촉이 남긴 흔적. 루프 영상이 있어 시아노타입 정지 사진보다 세다.
     work: "conductive-circles",
     // 흔적 축에는 아직 소리가 없다 — 없는 것을 지어내지 않는다. 잔열 프로토타입이 채울 자리.
