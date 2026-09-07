@@ -35,17 +35,19 @@ const { active = "about" } = Astro.props
     max-width: 650px;
     margin: 0 0 84px;
   }
+  /* 제목 블록 — Prototypes 페이지와 같은 규격(작가가 그 스타일을 택함, 2026-09) */
   .eyebrow {
-    margin: 0;
+    margin: 0 0 6px;
     font-size: var(--fs-2xs);
-    letter-spacing: .08em;
+    letter-spacing: .12em;
     text-transform: uppercase;
-    color: var(--text-3);
+    color: var(--text-4);
   }
   h1 {
-    margin: 8px 0 16px;
-    font-weight: 300;
+    margin: 0 0 14px;
+    font-weight: 500;
     font-size: var(--fs-display);
+    letter-spacing: -.01em;
     line-height: 1.15;
   }
   .intro {

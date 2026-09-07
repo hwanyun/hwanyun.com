@@ -184,12 +184,13 @@ const showCounts = SHOWS.map((x) => ({
 
 <style>
   .works-archive { margin: var(--desktop-header-clearance) 40px 100px var(--desktop-content-x); max-width: var(--content-w); }
-  .archive-intro { max-width: 650px; margin: 0 0 84px; }
-  .eyebrow { margin: 0; font-size: var(--fs-2xs); letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
-  h1 { margin: 8px 0 16px; font-size: var(--fs-display); font-weight: 300; line-height: 1.15; }
+  /* 제목 블록 — Prototypes 페이지와 같은 규격(작가가 그 스타일을 택함, 2026-09) */
+  .archive-intro { max-width: 650px; margin: 0 0 12px; }
+  .eyebrow { margin: 0 0 6px; font-size: var(--fs-2xs); letter-spacing: .12em; text-transform: uppercase; color: var(--text-4); }
+  h1 { margin: 0 0 14px; font-size: var(--fs-display); font-weight: 500; letter-spacing: -.01em; line-height: 1.15; }
   /* 한 번에 한 언어만 보이므로 단을 나누지 않는다 — 본문이 제 폭을 되찾는다 */
   .intro-copy { display: block; }
-  .intro-copy p { margin: 0; padding-top: 12px; border-top: 1px solid var(--text); font-size: var(--fs-body); line-height: 1.8; color: var(--text-2); }
+  .intro-copy p { margin: 0 0 28px; max-width: 62ch; font-size: var(--fs-sm); line-height: 1.7; color: var(--text-2); }
   .intro-copy p[lang="ko"] { line-height: 1.85; }
     /* display를 지정한 요소는 [hidden]이 무시되므로 명시적으로 되돌린다 */
   [hidden] { display: none !important; }

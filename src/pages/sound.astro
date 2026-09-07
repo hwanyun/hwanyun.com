@@ -252,12 +252,14 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
     :global(body.has-backdrop) #backdrop-title { opacity: 1; }
     #sound-archive { position: relative; z-index: 1; max-width: var(--content-w); margin: var(--desktop-header-clearance) 40px 100px var(--desktop-content-x); transition: color var(--dur-slow) ease; }
     /* Works archive의 소개 블록과 같은 데스크톱 읽기 규격 */
-    .archive-head { max-width: 650px; margin-bottom: 84px; }
-    .eyebrow, .release-count { font-size: var(--fs-2xs); letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
-    h1 { margin: 8px 0 16px; font-weight: 300; font-size: var(--fs-display); line-height: 1.15; }
+    /* 제목 블록 — Prototypes 페이지와 같은 규격 */
+    .archive-head { max-width: 650px; margin-bottom: 12px; }
+    .release-count { font-size: var(--fs-2xs); letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
+    .eyebrow { margin: 0 0 6px; font-size: var(--fs-2xs); letter-spacing: .12em; text-transform: uppercase; color: var(--text-4); }
+    h1 { margin: 0 0 14px; font-weight: 500; font-size: var(--fs-display); letter-spacing: -.01em; line-height: 1.15; }
     /* 한 번에 한 언어만 보이므로 단을 나누지 않는다 */
     .intro-copy { display: block; }
-    .intro { margin: 0; padding-top: 12px; border-top: 1px solid var(--text); font-size: var(--fs-body); line-height: 1.8; color: var(--text-2); }
+    .intro { margin: 0 0 28px; max-width: 62ch; font-size: var(--fs-sm); line-height: 1.7; color: var(--text-2); }
     .intro[lang="ko"] { line-height: 1.85; }
     /* 필터 알약 — Works 아카이브와 같은 규칙. 사이트 안에서 "고르는 일"은
        어디서나 같은 모양이어야 한다. */
