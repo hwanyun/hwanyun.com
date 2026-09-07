@@ -117,6 +117,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
              제자리에 있던 푸터가 본문 뒤로 드러난다(레퍼런스의 푸터). */
           var wantPast = top <= 0
           if (wantPast !== past) { past = wantPast; document.body.classList.toggle("past-hero", past) }
+          var heroMenu = document.getElementById("home-hero-menu")
+          if (heroMenu) heroMenu.classList.toggle("is-past-hero", want)
         }
         window.addEventListener("scroll", upd, { passive: true })
         window.addEventListener("resize", upd)
@@ -504,27 +506,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     /* #works는 이 스크립트보다 뒤에 있다 — 파싱 시점에 찾으면 null이라 관측이 통째로
        건너뛰어진다. DOM이 다 만들어진 뒤에 붙인다. */
     ;(function () {
-      function init() {
-        var menu = document.getElementById("home-hero-menu")
-        var works = document.getElementById("works")
-        if (!menu || !works || !("IntersectionObserver" in window)) return
-        if (!window.matchMedia("(max-width: 700px)").matches) return
-        /* 히어로는 fixed라 항상 뷰포트 안에 남는다 — 히어로 대신, 그 위를 덮고
-           올라오는 그리드가 화면을 얼마나 차지했는지로 판단한다. */
-        var io = new IntersectionObserver(
-          function (entries) {
-            entries.forEach(function (e) {
-              /* 그리드 높이는 뷰포트와 다를 수 있어 ratio(자기 높이 기준)는 못 쓴다 —
-                 뷰포트를 절반 이상 덮었는지로 판단한다. */
-              menu.classList.toggle("is-past-hero", e.intersectionRect.height > window.innerHeight * 0.5)
-            })
-          },
-          { threshold: [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1] }
-        )
-        io.observe(works)
-      }
-      if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init)
-      else init()
+      /* is-past-hero는 아래 본문 위치 스크립트가 함께 켠다 — 예전엔 작품 그리드가 보일 때
+         기준이었는데, 세 축이 그 앞에 오면서 헤더가 본문 한참 안에서도 투명한 채 남았다. */
     })()
   </script>
 
@@ -1042,9 +1025,10 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     }
     .work-archive .conn {
       max-width: var(--content-w); margin: 0 40px 0 var(--desktop-content-x);
-      padding: 120px 0 18px; font-size: var(--fs-xs); letter-spacing: .02em; color: var(--text-3);
+      padding: 160px 0 18px; font-size: var(--fs-xs); letter-spacing: .02em; color: var(--text-3);
     }
     .work-archive .conn .arrow { margin-left: 6px; color: var(--hover); }
+    @media (max-width: 700px) { .work-archive .conn { margin: 0; padding: 112px 16px 18px; } }
     /* 스냅 기준점과 덮는 층은 위 .home-body가 맡는다. 그리드는 본문 안의 한 섹션이다. */
     .work-archive { position: relative; background: var(--surface); }
     /* 모바일 그리드는 타일 비율 때문에 화면 전체를 쓰지 않는다(WorkGrid: 67svh).

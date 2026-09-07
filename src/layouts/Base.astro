@@ -706,6 +706,10 @@ const shareImage = new URL(
         .site-menu--hero.is-past-hero:not(.is-open) {
           --chrome-fg: var(--text);
           color: var(--text);
+          /* 본문에 들어오면 바탕을 깐다 — 투명이면 카드 이미지 위에 글자가 얹힌다(모바일, 작가 지적) */
+          background: color-mix(in srgb, var(--surface) 92%, transparent);
+          -webkit-backdrop-filter: blur(10px);
+          backdrop-filter: blur(10px);
         }
 
         /* 아이콘은 28×24지만 누르는 영역은 44×44여야 한다. 패딩으로 넓히고
