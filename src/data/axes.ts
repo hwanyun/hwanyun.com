@@ -14,14 +14,16 @@ export const AXES = [
   {
     id: "sounding",
     ko: "울림",
-    en: "Sounding",
+    // 영문은 Resonance — Sounding은 소리에만 걸린다. 울림은 빛·이미지에도 쓰는 말(시각적 울림).
+    en: "Resonance",
     // 녹음이든 신디사이저든 프로젝션이든 — 소리와 빛이 공간에 있게 되는 단계.
-    // "채집"은 마이크 든 사람의 말이라 Ableton으로 짓는 소리가 빠진다 (작가 지적, 2026-09-07).
+    // "채집"은 마이크 든 사람의 말이라 Ableton으로 짓는 소리가 빠지고, "Sounding"은 소리에만 걸려
+    // 빛·영상 작업(커리어의 절반)이 빠진다 (작가 지적, 2026-09-07).
     // 카드용 한 문장 — 문단의 마지막 문장(명제). 긴 문단은 Works 페이지에서 축을 골랐을 때 읽힌다.
-    lineKo: "들린다는 것은 이미 함께 있다는 증거다.",
-    lineEn: "To be heard is proof of being with.",
-    descKo: "혼자서 울리는 것은 없다. 어떤 소리가 들린다면 이미 무언가가 다른 무언가를 흔들고 있는 것이다. 공기와 벽, 재료와 몸이 같은 떨림을 잠시 나눠 갖는 그 순간에서 작업은 시작한다. 들린다는 것은 이미 함께 있다는 증거다.",
-    descEn: "Nothing sounds alone. If something can be heard, something has already set something else in motion. For a moment, air and wall, material and body share one tremor, and that moment is where the work begins. To be heard is proof of being with.",
+    lineKo: "보이고 들린다는 것은 이미 함께 있다는 증거다.",
+    lineEn: "To be seen or heard is proof of being with.",
+    descKo: "혼자서 울리는 것은 없다. 소리든 빛이든, 무언가가 감지된다면 이미 무언가가 다른 무언가를 흔들고 있는 것이다. 공기와 벽, 재료와 몸이 같은 떨림을 잠시 나눠 갖는 그 순간에서 작업은 시작한다. 보이고 들린다는 것은 이미 함께 있다는 증거다.",
+    descEn: "Nothing resonates alone. Sound or light, if something can be sensed, something has already set something else in motion. For a moment, air and wall, material and body share one tremor, and that moment is where the work begins. To be seen or heard is proof of being with.",
     // 카드 미디어와 15초 발췌 — 작가가 바꿀 수 있게 여기 한 곳에 둔다.
     // 미디어는 해당 작품의 thumb/thumbVideo를 그대로 쓰고, 소리는 sounds 컬렉션의 slug다.
     work: "the-voice-of-stripes",

@@ -72,7 +72,7 @@ collections:
         required: false
         hint: "신호가 지나는 단계. 한 작품이 두 축에 걸쳐도 된다. 어휘는 src/data/axes.ts"
         options:
-          - { label: "울림 (sounding)", value: "sounding" }
+          - { label: "울림 · Resonance (sounding)", value: "sounding" }
           - { label: "접촉 (contact)", value: "contact" }
           - { label: "흔적 (trace)", value: "trace" }
       - { name: summary, label: "카드 한 줄 (영문)", widget: string, required: false, hint: "30자 안팎. 제목·연도만으로는 작품 간 차이가 안 읽힌다" }
@@ -235,7 +235,7 @@ collections:
         multiple: true
         required: false
         options:
-          - { label: "울림 (sounding)", value: "sounding" }
+          - { label: "울림 · Resonance (sounding)", value: "sounding" }
           - { label: "접촉 (contact)", value: "contact" }
           - { label: "흔적 (trace)", value: "trace" }
       - { name: audio, label: "오디오 URL", widget: string, required: false, hint: "mp3 128k, 30초–2분. R2 URL" }
