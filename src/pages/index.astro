@@ -837,11 +837,9 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
           const pointSize = isInside ? 1.1 : (particle.text ? .9 : .52) + (depth + 1) * .48
           let brightness = isInside ? .96 : Math.min(.96, (particle.text ? .42 : .26) + (depth + 1) * .34 + audioLevel * .18)
           // 뒷면으로 돌아간 문장이 구체 너머로 거울처럼 비치는 것은 그대로 둔다(작가 선택)
-          // 문장은 네온 레몬(작가 선택, 2026-09-07) — 표면을 도는 글자와 커서로 모인 글자 둘 다.
-          // 흰 바탕에서 작은 점이라 살짝 진한 레몬(#d9f21a)으로, 점도 조금 크게.
-          const lemon = particle.text || isInside
-          context.arc(particle.x, particle.y, lemon ? pointSize + .5 : pointSize, 0, Math.PI * 2)
-          context.fillStyle = lemon ? `rgba(217, 242, 26, ${Math.min(1, brightness + .15)})` : `rgba(17, 17, 17, ${brightness})`
+          // 문장도 검정 — 네온 레몬을 시도했다가 검정이 더 엣지 있다고 되돌림(작가, 2026-09-07)
+          context.arc(particle.x, particle.y, pointSize, 0, Math.PI * 2)
+          context.fillStyle = `rgba(17, 17, 17, ${brightness})`
           context.fill()
         }
         requestAnimationFrame(draw)
