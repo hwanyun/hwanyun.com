@@ -17,6 +17,7 @@ const latest = all.slice(0, 3)
       <span data-language-content="en">What is coming out of the studio now</span>
       <span data-language-content="ko" lang="ko">지금 작업실에서 나오는 것</span>
       <span class="arrow" aria-hidden="true">→</span>
+      <span class="conn-short"><span data-language-content="en">Prototypes</span><span data-language-content="ko" lang="ko">프로토타입</span></span>
     </p>
     <div class="proto-grid">
       {latest.map((e) => <PrototypeCard entry={e} />)}
@@ -40,7 +41,7 @@ const latest = all.slice(0, 3)
   .proto-more a:hover { color: var(--hover); }
   @media (max-width: 1000px) { .proto-grid { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 700px) {
-    .protos { margin: 0; padding: 112px 16px 112px; }
+    .protos { margin: 0; padding: 56px 16px 72px; }
     .proto-grid { grid-template-columns: 1fr; }
   }
 </style>

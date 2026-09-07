@@ -528,6 +528,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         <span data-language-content="en">Where the tests arrive</span>
         <span data-language-content="ko" lang="ko">실험이 닿는 곳</span>
         <span class="arrow" aria-hidden="true">→</span>
+        <span class="conn-short"><span data-language-content="en">Works</span><span data-language-content="ko" lang="ko">작품</span></span>
       </p>
       <WorkGrid current="home" menu={false} />
     </section>
@@ -1201,7 +1202,15 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     .home-body :global(.conn) { font-family: var(--display); font-weight: 400; font-size: var(--fs-lead); letter-spacing: 0; }
     .home-body :global(.axis h3), .home-body :global(.proto h3) { font-family: var(--display); font-weight: 400; letter-spacing: 0; }
     .home-body :global(.axis h3) { font-size: 28px; }
-    @media (max-width: 700px) { .work-archive .conn { margin: 0; padding: 112px 16px 18px; } }
+    @media (max-width: 700px) {
+      /* 아래 모바일 라벨 규칙과 같은 모양 — 이 선택자가 더 구체적이라 여기서도 맞춰 준다 */
+      .work-archive .conn {
+        margin: 0; padding: 0 16px 12px; font-family: var(--sans); font-size: var(--fs-2xs); font-weight: 500;
+        letter-spacing: .14em; text-transform: uppercase; color: var(--text-3);
+      }
+    }
+    /* 짧은 라벨은 모바일 전용 — 데스크톱은 문장형 제목 그대로 */
+    .home-body :global(.conn-short) { display: none; }
     /* 스냅 기준점과 덮는 층은 위 .home-body가 맡는다. 그리드는 본문 안의 한 섹션이다. */
     .work-archive { position: relative; background: var(--surface); }
     /* 모바일 그리드는 타일 비율 때문에 화면 전체를 쓰지 않는다(WorkGrid: 67svh).
@@ -1211,10 +1220,32 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     @media (max-width: 700px) {
       /* 헤더(워드마크·EN/KO·햄버거)는 고정이므로 그 높이를 비워 둔다 —
          그리드가 그 아래에서 시작해 헤더를 침범하지 않는다. */
-      .home-body { padding-top: var(--mobile-header-h, 58px); }
+      /* 헤더 여백은 본문 래퍼가 아니라 첫 섹션(작품 그리드)이 갖는다 — 스냅이 그리드 시작에
+         붙을 때 라벨이 고정 헤더 아래로 들어가지 않는다. */
+      .home-body { padding-top: 0; }
+      .work-archive { padding-top: calc(var(--mobile-header-h, 58px) + 14px); }
       /* 모바일 홈은 한 단을 72svh의 3분의 1로 잡는다. 고정값으로 두면
          WorkGrid가 계산한 단수를 덮어써 작품이 늘어도 그리드가 자라지 않는다. */
       .work-archive :global(#packed) { height: calc(var(--grid-rows, 3) * 72svh / 3); }
+
+      /* ── 모바일 홈 재구성(2026-09-07, 작가 지적: 글 중심·집중 안 됨·시인성 없음) ──
+         문법은 그대로(흰 바탕·검정 글자·작은 대문자 라벨·파랑 강조), 순서와 밀도만 바꾼다.
+         히어로 → 작품 그리드 → 세 단계(가로 타일) → 녹음 → 프로토타입. 경력은 CV로 보낸다.
+         문장형 제목("Where the tests arrive →")은 라벨 한 단어로 줄인다 — 모바일에서는
+         문장이 화면을 차지해 무엇을 봐야 할지 흐려졌다. */
+      .home-body { display: flex; flex-direction: column; }
+      .home-body > :global(.work-archive) { order: 1; }
+      .home-body > :global(.axes) { order: 2; }
+      .home-body > :global(.hsound) { order: 3; }
+      .home-body > :global(.protos) { order: 4; }
+      .home-body > :global(.cred) { display: none; }
+      .home-body :global(.conn) {
+        margin: 0 0 12px; font-family: var(--sans); font-size: var(--fs-2xs); font-weight: 500;
+        letter-spacing: .14em; text-transform: uppercase; color: var(--text-3);
+      }
+      .home-body :global(.conn > [data-language-content]), .home-body :global(.conn > .arrow) { display: none !important; }
+      .home-body :global(.conn-short) { display: inline; }
+      .home-body :global(.axis h3) { font-size: 17px; }
     }
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
     /* 히어로는 푸터(z 0)보다 위, 본문(z 1, DOM 뒤)보다 아래. 본문이 다 덮으면 숨긴다. */

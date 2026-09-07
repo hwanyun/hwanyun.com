@@ -32,6 +32,7 @@ const cards = AXES.map((axis) => {
     <span data-language-content="en">Three stages a signal passes through</span>
     <span data-language-content="ko" lang="ko">신호가 지나는 세 단계</span>
     <span class="arrow" aria-hidden="true">→</span>
+    <span class="conn-short"><span data-language-content="en">Three stages</span><span data-language-content="ko" lang="ko">세 단계</span></span>
   </p>
   <div class="axis-grid">
     {cards.map(({ axis, hero, sound, members }) => (
@@ -166,9 +167,19 @@ const cards = AXES.map((axis) => {
     .axis-media { flex: 0 0 42%; aspect-ratio: auto; min-height: 220px; }
   }
   @media (max-width: 700px) {
-    .axes { margin: 0; padding: 96px 16px 0; }
-    .axis { flex-direction: column; }
-    .axis-media { flex: none; aspect-ratio: 16 / 10; min-height: 0; }
+    /* 가로로 넘기는 타일 세 장 — 이미지 + 이름 + 15초. 설명 문단과 작품 수는 Works에서. */
+    .axes { margin: 0; padding: 56px 0 0; }
+    .conn { padding: 0 16px; }
+    .axis-grid {
+      display: flex; gap: 10px; padding: 0 16px; overflow-x: auto;
+      scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    }
+    .axis-grid::-webkit-scrollbar { display: none; }
+    .axis { flex: 0 0 66vw; flex-direction: column; scroll-snap-align: start; border: 0; background: none; }
+    .axis-media { flex: none; aspect-ratio: 4 / 5; min-height: 0; }
+    .axis-body { padding: 10px 0 0; gap: 4px; }
+    .axis-line, .axis-count { display: none; }
+    .axis-foot { margin-top: 2px; justify-content: flex-start; }
   }
   @media (prefers-reduced-motion: reduce) {
     .excerpt[aria-pressed="true"] .ex-dot { animation: none; }

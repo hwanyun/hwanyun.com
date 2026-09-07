@@ -36,6 +36,7 @@ const recent = releases.slice(0, 3)
     <span data-language-content="en">And the recordings</span>
     <span data-language-content="ko" lang="ko">그리고 녹음</span>
     <span class="arrow" aria-hidden="true">→</span>
+    <span class="conn-short"><span data-language-content="en">Sound</span><span data-language-content="ko" lang="ko">사운드</span></span>
   </p>
   <div class="hsound-grid">
     {/* 큰 카드 — 아카이브로 가는 문. 재생 버튼은 두지 않는다: 어차피 눌러서 넘어가는
@@ -154,5 +155,9 @@ const recent = releases.slice(0, 3)
     .hsound { margin: 0; padding: 112px 16px 0; }
     .hsound-grid { grid-template-columns: 1fr; }
     .hs-card { width: 100%; height: 120px; }
+  }
+  @media (max-width: 700px) {
+    .hsound { padding: 56px 16px 0; }
+    .hs-card { height: 96px; }
   }
 </style>
