@@ -17,8 +17,8 @@ export const AXES = [
     en: "Sounding",
     // 녹음이든 신디사이저든 프로젝션이든 — 소리와 빛이 공간에 있게 되는 단계.
     // "채집"은 마이크 든 사람의 말이라 Ableton으로 짓는 소리가 빠진다 (작가 지적, 2026-09-07).
-    descKo: "재봉틀과 바람의 녹음, 신디사이저의 일곱 루프, 벽을 도는 빛. 소리와 빛이 공간에 있게 되는 단계.",
-    descEn: "Recordings of a sewing machine and wind, seven synthesizer loops, light circling a wall. Where sound and light come to be in a space.",
+    descKo: "관계는 먼저 들리는 것으로 온다. 무언가가 울린다는 것은 이미 다른 것과 닿아 있다는 뜻이다. 소리든 빛이든, 울림은 혼자 있을 수 없는 것들이 서로를 알아차리는 첫 순간이다.",
+    descEn: "A relation arrives first as something heard. For a thing to resound is already to be touching something else. Sound or light, sounding is the first moment in which things that cannot be alone notice one another.",
     // 카드 미디어와 15초 발췌 — 작가가 바꿀 수 있게 여기 한 곳에 둔다.
     // 미디어는 해당 작품의 thumb/thumbVideo를 그대로 쓰고, 소리는 sounds 컬렉션의 slug다.
     work: "the-voice-of-stripes",
@@ -28,8 +28,8 @@ export const AXES = [
     id: "contact",
     ko: "접촉",
     en: "Contact",
-    descKo: "구리, 전도성 도료, 센서. 관객의 몸이 닿아야 회로가 닫히고 작품이 움직인다.",
-    descEn: "Copper, conductive paint, sensors. The work moves only when a visitor's body makes contact and closes the circuit.",
+    descKo: "관계는 닿을 때 비로소 흐른다. 열린 회로는 아무것도 하지 않는다. 몸과 물질, 사람과 시스템 사이의 거리가 좁혀질 때 무엇이 흐르기 시작하고 무엇이 무너지는지, 그 경계를 보려고 작업한다.",
+    descEn: "A relation flows only when it touches. An open circuit does nothing. The work looks at what begins to flow, and what gives way, when the distance between body and material, person and system, closes.",
     work: "atypical-circuit",
     sound: "atypical-circuit-proximity",
   },
@@ -37,8 +37,8 @@ export const AXES = [
     id: "trace",
     ko: "흔적",
     en: "Trace",
-    descKo: "빛이 종이에 남긴 자국, 손의 움직임이 굳은 선. 지나간 뒤에 남는 것.",
-    descEn: "A mark light leaves on paper, a line where the hand's movement set. What remains after.",
+    descKo: "관계는 끝난 뒤에도 남는다. 닿았던 것들은 서로에게 자국을 남기고, 그 자국은 다음 관계의 조건이 된다. 흔적은 지나간 시간이 아니라 아직 이어지고 있는 연결이다.",
+    descEn: "A relation remains after it ends. Things that have touched leave marks on each other, and those marks become the condition for what touches next. A trace is not time gone by but a connection still being held.",
     // 손이 닿았던 자리에 남는 투사된 원 — 접촉이 남긴 흔적. 루프 영상이 있어 시아노타입 정지 사진보다 세다.
     work: "conductive-circles",
     // 흔적 축에는 아직 소리가 없다 — 없는 것을 지어내지 않는다. 잔열 프로토타입이 채울 자리.
