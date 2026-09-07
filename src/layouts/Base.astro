@@ -630,7 +630,9 @@ const shareImage = new URL(
          본문(각 페이지의 최상위 래퍼)이 z-index 1 + 불투명 배경이면 그 위를 지나가고,
          아니면 그냥 문서 끝의 보통 푸터처럼 보인다. 어느 쪽이든 깨지지 않는다. */
       /* 최소 한 화면 — 짧은 페이지(Contact)에서도 푸터는 스크롤해야 드러난다 */
-      .page-body { position: relative; z-index: 1; background: var(--surface); min-height: 100svh; }
+      /* flow-root: 첫 자식의 margin-top이 래퍼 밖으로 새어(마진 병합) 헤더와 본문 사이에
+         덮이지 않는 틈이 생겼다 — 그 틈으로 sticky 푸터가 비친다. 여백은 그대로, 안쪽으로만 둔다. */
+      .page-body { position: relative; z-index: 1; background: var(--surface); min-height: 100svh; display: flow-root; }
       /* 푸터 위에서는 크롬이 물러난다 */
       .site-menu--page, .site-menu--grid, .site-menu--hero, .lang-corner, .to-top {
         transition: opacity var(--dur-base) var(--ease), visibility 0s linear 0s;
@@ -726,7 +728,10 @@ const shareImage = new URL(
           line-height: 1.4;
         }
         /* page는 문서 흐름 안에서 시작해 열릴 때만 고정, hero는 항상 히어로 위에 떠 있다 */
-        .site-menu--page { position: relative; top: auto; left: auto; width: 100%; }
+        /* 바탕을 깐다 — 투명이면 sticky 푸터(늘 뷰포트 안, 본문 뒤)가 헤더 띠로 비친다.
+           Safari처럼 뷰포트가 낮은 곳(툴바 포함 ~660px)에서는 푸터 높이(~590px)가
+           헤더 아래까지 올라와 검은 띠가 되고, 더 낮은 폰에서는 푸터가 먼저 보인다. */
+        .site-menu--page { position: relative; top: auto; left: auto; width: 100%; background: var(--surface); }
         .site-menu--hero { position: fixed; inset: 0 0 auto; transition: color var(--dur-base) ease; }
         /* 히어로를 벗어나면 숨기는 대신 잉크를 뒤집는다. 그리드는 이제 독립된 한 페이지라
            숨기면 그 페이지에 내비게이션이 하나도 남지 않는다 — 모바일에서 grid variant는
