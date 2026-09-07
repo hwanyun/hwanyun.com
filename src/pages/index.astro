@@ -518,12 +518,11 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       proximity는 히어로↔본문 경계 근처에서만 붙고, 그 아래는 자유롭게 흐른다. */}
 
   {/* 두 번째 '페이지' — 히어로를 덮고 올라오는 본문. 순서가 곧 논지다:
-      세 축(울림·접촉·흔적) → 지금 나오는 것 → 작품 → 녹음 → 놓였던 곳. */}
+      세 축(울림·접촉·흔적) → 작품 → 녹음 → 놓였던 곳 → 지금 나오는 것(프로토타입). */}
   <div class="home-body" id="home-body">
     {/* 메뉴 — 항상 좌상단에 고정. 히어로 위에서도 보인다. */}
     <SiteMenu variant="grid" current="home" />
     <HomeAxes />
-    <HomePrototypes />
     <section id="works" class="work-archive" aria-label="Selected works">
       <p class="conn">
         <span data-language-content="en">Where the tests arrive</span>
@@ -534,6 +533,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     </section>
     <HomeSound />
     <HomeCred />
+    {/* 프로토타입은 맨 아래 — 완성작과 이력 다음에 "지금 나오는 것"(작가 선택, 2026-09) */}
+    <HomePrototypes />
   </div>
   <PrototypePlayer />
 

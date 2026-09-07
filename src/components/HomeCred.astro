@@ -69,7 +69,7 @@ const where = (e: (typeof events)[number], lang: "en" | "ko") =>
 </section>
 
 <style>
-  .cred { max-width: 1600px; margin: 0 40px 0 var(--desktop-content-x); padding: 160px 0 160px; }
+  .cred { max-width: 1600px; margin: 0 40px 0 var(--desktop-content-x); padding: 160px 0 0; }
   .conn { margin: 0 0 22px; font-family: var(--display); font-size: var(--fs-lead); font-weight: 400; letter-spacing: 0; color: var(--text); }
   .conn .arrow { margin-left: 6px; color: var(--hover); }
   .cred-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); align-items: start; }
@@ -86,5 +86,5 @@ const where = (e: (typeof events)[number], lang: "en" | "ko") =>
   .cv-link a { color: var(--text-3); text-decoration: none; }
   .cv-link a:hover { color: var(--hover); }
   @media (max-width: 800px) { .cred-grid { grid-template-columns: 1fr; } }
-  @media (max-width: 700px) { .cred { margin: 0; padding: 112px 16px 112px; } }
+  @media (max-width: 700px) { .cred { margin: 0; padding: 112px 16px 0; } }
 </style>
