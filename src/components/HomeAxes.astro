@@ -42,9 +42,10 @@ const cards = AXES.map((axis) => {
         </a>
         <div class="axis-body">
           <h3>
+            {/* 보고 있는 언어가 주 — 영문 화면에 한글이 앞서 있으면 어느 나라 사이트인지 헷갈린다 */}
             <a href={`/works/?axis=${axis.id}`}>
-              <span class="ko" lang="ko">{axis.ko}</span>
-              <span class="en">{axis.en}</span>
+              <span data-language-content="en">{axis.en}</span>
+              <span data-language-content="ko" lang="ko">{axis.ko}</span>
             </a>
           </h3>
           <p class="axis-desc">
@@ -152,8 +153,7 @@ const cards = AXES.map((axis) => {
   .axis-body { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px 16px; flex: 1; }
   h3 { margin: 0; font-size: var(--fs-lead); font-weight: 500; letter-spacing: -.01em; }
   h3 a { color: var(--text); text-decoration: none; }
-  h3 a:hover .ko { border-bottom: 1px solid var(--hover); }
-  h3 .en { margin-left: 8px; font-size: var(--fs-sm); font-weight: 400; color: var(--text-3); }
+  h3 a:hover { color: var(--hover); }
   .axis-desc { margin: 0; font-size: var(--fs-sm); line-height: 1.55; color: var(--text-2); }
   .axis-desc [lang="ko"] { line-height: 1.65; }
 

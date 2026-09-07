@@ -39,7 +39,8 @@ export const AXES = [
     en: "Trace",
     descKo: "빛이 종이에 남긴 자국, 손의 움직임이 굳은 선. 지나간 뒤에 남는 것.",
     descEn: "A mark light leaves on paper, a line where the hand's movement set. What remains after.",
-    work: "three-pieces-iii",
+    // 손이 닿았던 자리에 남는 투사된 원 — 접촉이 남긴 흔적. 루프 영상이 있어 시아노타입 정지 사진보다 세다.
+    work: "conductive-circles",
     // 흔적 축에는 아직 소리가 없다 — 없는 것을 지어내지 않는다. 잔열 프로토타입이 채울 자리.
     sound: "",
   },

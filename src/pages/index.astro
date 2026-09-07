@@ -1031,6 +1031,14 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     }
     .home-body.menu-on > :global(.site-menu--grid) { opacity: 1; pointer-events: auto; }
     @media (prefers-reduced-motion: reduce) { .home-body > :global(.site-menu--grid) { transition: none; } }
+    /* 그리드를 위 섹션들과 같은 왼쪽 선·같은 폭에 맞춘다. WorkGrid의 210px 들여쓰기는
+       그리드 첫 칸에 메뉴가 있던 시절의 값이다. 타일 border(4px)만큼 바깥으로 물려 시각적 모서리를 맞춘다. */
+    @media (min-width: 701px) {
+      .work-archive :global(#packed .grid) {
+        left: calc(var(--desktop-content-x) - 4px); right: 40px; max-width: calc(var(--content-w) + 8px);
+        top: 0; bottom: 0;
+      }
+    }
     .work-archive .conn {
       max-width: var(--content-w); margin: 0 40px 0 var(--desktop-content-x);
       padding: 40px 0 18px; font-size: var(--fs-xs); letter-spacing: .02em; color: var(--text-3);
