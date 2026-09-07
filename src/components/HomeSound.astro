@@ -28,8 +28,8 @@ const clock = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2,
 const span = (r: { min: number; max: number }) =>
   !r.max ? "" : r.min === r.max ? clock(r.max) : `${clock(r.min)} – ${clock(r.max)}`
 const recent = releases.slice(0, 3)
-// 카드에 얹을 녹음 — 커버가 있는 가장 최근 릴리스
-const featured = releases.map((r) => r.lead).find((l) => l.data.cover) ?? releases[0]?.lead
+// 카드에서 재생할 녹음 — 가장 최근 릴리스
+const featured = releases[0]?.lead // 카드 하단에 적는 최근 녹음
 ---
 
 <section class="hsound" id="sound" aria-labelledby="hsound-title">
@@ -39,16 +39,12 @@ const featured = releases.map((r) => r.lead).find((l) => l.data.cover) ?? releas
     <span class="arrow" aria-hidden="true">→</span>
   </p>
   <div class="hsound-grid">
-    {/* 큰 미디어 카드 — 커버 위 가운데 원형 재생. 누르면 최근 녹음이 실제로 울린다.
-        카드 자체는 아카이브로 가는 링크, 버튼만 재생을 가로챈다. */}
+    {/* 큰 카드 — 아카이브로 가는 문. 재생 버튼은 두지 않는다: 어차피 눌러서 넘어가는
+        자리라 대기 상태가 의미가 없다(작가 지적). 대신 상자 자체가 늘 살아 있다. */}
     <a class="hs-card" href="/sound/">
-      {featured?.data.cover ? <img src={featured.data.cover} alt="" loading="lazy" draggable="false" /> : <div class="hs-ph" aria-hidden="true" />}
-      <span class="hs-scrim" aria-hidden="true"></span>
-      {featured?.data.audio && (
-        <button type="button" class="hs-play" data-audio={featured.data.audio} aria-pressed="false" aria-label={`Play ${tEn(featured.data)}`}>
-          <span class="hs-icon" aria-hidden="true"></span>
-        </button>
-      )}
+      {/* 작품 이미지는 쓰지 않는다 — 홈에 작품이 이미 충분히 노출된다(작가 지적).
+          대신 소리의 입자: 파형을 따라 점들이 끊임없이 흐르고 떤다. 히어로 구체와 같은 어휘. */}
+      <canvas class="hs-viz" id="hs-viz" aria-hidden="true"></canvas>
       <span class="hs-cap">
         <span class="hs-label">
           <span data-language-content="en">Listening archive</span>
@@ -74,16 +70,59 @@ const featured = releases.map((r) => r.lead).find((l) => l.data.cover) ?? releas
 
 <script is:inline>
   ;(function () {
-    var btn = document.querySelector(".hs-play[data-audio]")
-    if (!btn) return
-    var audio = null
-    btn.addEventListener("click", function (e) {
-      e.preventDefault(); e.stopPropagation()
-      if (!audio) { audio = new Audio(btn.getAttribute("data-audio")); audio.preload = "none"; audio.addEventListener("ended", function () { btn.setAttribute("aria-pressed", "false") }) }
-      if (audio.paused) { audio.play().then(function () { btn.setAttribute("aria-pressed", "true") }).catch(function () {}) }
-      else { audio.pause(); btn.setAttribute("aria-pressed", "false") }
-    })
-    document.addEventListener("visibilitychange", function () { if (document.hidden && audio && !audio.paused) { audio.pause(); btn.setAttribute("aria-pressed", "false") } })
+    var canvas = document.getElementById("hs-viz")
+    if (!canvas) return
+    var ctx = canvas.getContext("2d")
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    var W = 0, H = 0, dpr = 1
+    function fit() {
+      dpr = Math.min(2, window.devicePixelRatio || 1)
+      W = canvas.clientWidth; H = canvas.clientHeight
+      canvas.width = W * dpr; canvas.height = H * dpr
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    }
+    fit(); window.addEventListener("resize", fit)
+    var stroke = getComputedStyle(canvas).color
+    var raf = 0, visible = true, t0 = performance.now()
+
+    /* 입자 — 히어로 구체와 같은 어휘. 점들이 가로로 펼쳐져 있고, 합성 파형(서로 나눠지지 않는
+       주기의 사인 셋)을 따라 들리며, 파형이 클수록 떤다. 멈춰 있는 순간이 없다. */
+    var COLS = 96, ROWS = 5
+    var dots = []
+    for (var r = 0; r < ROWS; r++) for (var c = 0; c < COLS; c++) dots.push({ c: c, r: r, y: H / 2, vy: 0, seed: Math.random() * 6.28 })
+    function level(k, t) {
+      return Math.sin(k * .21 + t * 1.9) * Math.sin(k * .045 - t * .53) * .55
+           + Math.sin(k * .62 + t * 4.7) * .13 * (.5 + .5 * Math.sin(t * .37))
+    }
+    function draw(now) {
+      ctx.clearRect(0, 0, W, H)
+      var t = (now - t0) / 1000
+      var loud = .05 + Math.abs(Math.sin(t * .29) * Math.sin(t * .11)) * .16
+      var mid = H / 2, amp = H * .34, gapX = W / (COLS + 1), gapY = H * .07
+      ctx.fillStyle = stroke
+      for (var n = 0; n < dots.length; n++) {
+        var p = dots[n]
+        var lv = level(p.c, t)
+        var off = p.r - (ROWS - 1) / 2
+        var target = mid + off * gapY + lv * amp * (1 - Math.abs(off) * .18)
+        var tremor = (Math.random() - .5) * loud * H * .3
+        p.vy = (p.vy + (target - p.y) * .12 + tremor) * .72
+        p.y += p.vy
+        var x = gapX * (p.c + 1) + Math.sin(t * .4 + p.seed) * 1.2
+        var size = .9 + Math.min(1.6, Math.abs(lv) * 1.8 + loud * 3)
+        ctx.globalAlpha = .35 + Math.min(.65, Math.abs(lv) * .9 + loud * 1.5)
+        ctx.beginPath(); ctx.arc(x, p.y, size, 0, 6.283); ctx.fill()
+      }
+      ctx.globalAlpha = 1
+      if (!reduce && visible) raf = requestAnimationFrame(draw)
+    }
+    function start() { if (raf) return; raf = requestAnimationFrame(draw) }
+    function stop() { if (raf) cancelAnimationFrame(raf); raf = 0 }
+    draw(performance.now())
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (es) { es.forEach(function (e) { visible = e.isIntersecting; visible ? start() : stop() }) }).observe(canvas)
+    }
+    document.addEventListener("visibilitychange", function () { document.hidden ? stop() : (visible && start()) })
   })()
 </script>
 
@@ -98,19 +137,7 @@ const featured = releases.map((r) => r.lead).find((l) => l.data.cover) ?? releas
     position: relative; display: block; aspect-ratio: 16 / 10; overflow: hidden;
     border-radius: 14px; background: var(--void); color: var(--void-text); text-decoration: none;
   }
-  .hs-card img, .hs-ph { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform var(--dur-slow) var(--ease); }
-  .hs-card:hover img { transform: scale(1.03); }
-  .hs-ph { background: repeating-linear-gradient(45deg, var(--void-line) 0 2px, var(--void) 2px 6px); }
-  .hs-scrim { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,.05) 55%); }
-  .hs-play {
-    position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; margin: -32px 0 0 -32px;
-    display: grid; place-items: center; border: 0; border-radius: 50%; padding: 0;
-    background: var(--surface); color: var(--text); cursor: pointer;
-    box-shadow: 0 6px 24px rgba(0,0,0,.25); transition: transform var(--dur-fast) var(--ease);
-  }
-  .hs-play:hover { transform: scale(1.06); }
-  .hs-icon { width: 0; height: 0; border-style: solid; border-width: 9px 0 9px 15px; border-color: transparent transparent transparent currentColor; margin-left: 4px; }
-  .hs-play[aria-pressed="true"] .hs-icon { width: 14px; height: 16px; border: 0; margin: 0; background: linear-gradient(to right, currentColor 0 5px, transparent 5px 9px, currentColor 9px); }
+  .hs-viz { position: absolute; inset: 0; width: 100%; height: 100%; color: var(--void-text); }
   .hs-cap { position: absolute; left: 18px; right: 18px; bottom: 16px; display: flex; flex-direction: column; gap: 2px; }
   .hs-label { font-size: var(--fs-2xs); letter-spacing: .14em; text-transform: uppercase; color: var(--void-text-2); }
   .hs-n { letter-spacing: 0; }
