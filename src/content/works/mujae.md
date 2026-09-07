@@ -11,6 +11,10 @@ materials:
   - projection
   - sensor
   - moving-image
+axes:
+  - conduct
+summary: "Flyers and signs that appear and vanish from the street, returned through the structure of a mandala; a LiDAR sensor reads where the visitor stands."
+summaryKo: "거리에서 생기고 사라지는 전단과 간판을 만다라의 구조로 되돌린다. 라이다가 관객의 자리를 읽는다."
 size: 3col
 category: work
 order: 1

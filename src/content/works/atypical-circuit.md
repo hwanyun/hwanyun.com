@@ -6,6 +6,10 @@ materials:
   - interactive
   - sensor
   - speaker
+axes:
+  - conduct
+summary: "Image and sound break by the distance of an approaching body; noise is the system registering that body."
+summaryKo: "다가오는 몸의 거리만큼 이미지와 소리가 깨진다. 노이즈는 시스템이 몸을 등록하는 방식이다."
 showType: group
 size: 3col
 category: work

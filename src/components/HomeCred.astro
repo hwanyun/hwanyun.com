@@ -1,0 +1,89 @@
+---
+/**
+ * 결과와 신뢰 — 이 작업이 놓였던 곳.
+ * 브랜드 로고 대신 레지던시·기관을 알약으로, 그 옆에 최근 전시 4줄.
+ * 사실은 cv.json에서만 가져온다 — 여기서 새로 적지 않는다(비면 작가에게 묻는다).
+ */
+import cvEn from "../data/cv.json"
+import cvKo from "../data/cv.ko.json"
+
+// 작업이 실제로 놓였던 장소·기관. 순서 = 최근순이 아니라 무게순(작가가 바꿀 수 있다).
+const INSTITUTIONS = [
+  "GlogauAIR, Berlin",
+  "Listhús, Ólafsfjörður",
+  "ACC 국립아시아문화전당",
+  "KOCCA New Content Academy",
+  "Goldsmiths, University of London",
+  "Royal College of Art",
+  "London Fashion Week",
+  "Arts Council Korea",
+]
+
+// 개인전·단체전·레지던시를 한 줄로 합쳐 최근 4개. 국문은 같은 자리의 항목을 짝짓는다.
+const PICK = ["Exhibitions — Solo", "Exhibitions — Group", "Residency"]
+type Item = { year: string; text: string }
+const rows: { year: string; en: string; ko: string }[] = []
+cvEn.sections.forEach((sec: { title: string; items: Item[] }, si: number) => {
+  if (!PICK.includes(sec.title)) return
+  const koSec = (cvKo.sections as { title: string; items: Item[] }[])[si]
+  sec.items.forEach((it, ii) => {
+    rows.push({ year: it.year, en: it.text, ko: koSec?.items[ii]?.text ?? it.text })
+  })
+})
+const yearOf = (y: string) => Math.max(...(y.match(/\d{4}/g) ?? ["0"]).map(Number))
+rows.sort((a, b) => yearOf(b.year) - yearOf(a.year))
+const recent = rows.slice(0, 4)
+// 문장 끝의 마침표와 괄호 안 주최 표기는 홈에서는 소음이다 — 한 줄로 줄인다.
+const trim = (s: string) => s.replace(/\s*\((?:organised|run) by[^)]*\)/i, "").replace(/\.\s*$/, "")
+---
+
+<section class="cred" aria-labelledby="cred-title">
+  <p class="conn" id="cred-title">
+    <span data-language-content="en">Where the work has been</span>
+    <span data-language-content="ko" lang="ko">이 작업이 놓였던 곳</span>
+    <span class="arrow" aria-hidden="true">→</span>
+  </p>
+  <div class="cred-grid">
+    <div>
+      <h3 class="eyebrow">INSTITUTIONS</h3>
+      <ul class="inst">
+        {INSTITUTIONS.map((n) => <li>{n}</li>)}
+      </ul>
+    </div>
+    <div>
+      <h3 class="eyebrow">RECENT</h3>
+      <ol class="tl">
+        {recent.map((r) => (
+          <li>
+            <span class="y">{yearOf(r.year)}</span>
+            <span>
+              <span data-language-content="en">{trim(r.en)}</span>
+              <span data-language-content="ko" lang="ko">{trim(r.ko)}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+      <p class="cv-link"><a href="/cv/">
+        <span data-language-content="en">Full CV</span><span data-language-content="ko" lang="ko">전체 이력</span> →
+      </a></p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cred { max-width: var(--content-w); margin: 0 40px 0 var(--desktop-content-x); padding: 40px 0 72px; }
+  .conn { margin: 0 0 18px; font-size: var(--fs-xs); letter-spacing: .02em; color: var(--text-3); }
+  .conn .arrow { margin-left: 6px; color: var(--hover); }
+  .cred-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); align-items: start; }
+  .eyebrow { margin: 0 0 10px; font-size: var(--fs-2xs); font-weight: 400; letter-spacing: .12em; color: var(--text-4); }
+  .inst { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  .inst li { padding: 3px 10px; border: 1px solid var(--line-2); border-radius: 999px; font-size: var(--fs-xs); color: var(--text-2); }
+  .tl { list-style: none; margin: 0; padding: 0; font-size: var(--fs-xs); color: var(--text-2); }
+  .tl li { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--line); line-height: 1.5; }
+  .tl .y { color: var(--text-3); font-variant-numeric: tabular-nums; }
+  .cv-link { margin: 12px 0 0; font-size: var(--fs-xs); }
+  .cv-link a { color: var(--text-3); text-decoration: none; }
+  .cv-link a:hover { color: var(--hover); }
+  @media (max-width: 800px) { .cred-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 700px) { .cred { margin: 0; padding: 32px 16px 56px; } }
+</style>

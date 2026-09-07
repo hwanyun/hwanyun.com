@@ -1,0 +1,53 @@
+---
+/**
+ * 프로토타입 오디오 재생 — 페이지에 하나만 심는다.
+ * 카드의 .proto-play 버튼을 전부 위임으로 받아, 한 번에 한 세션만 울린다.
+ * 진행은 버튼 안 막대(--p)로만 보여 준다. 별도 플레이어 UI를 만들지 않는다 —
+ * 퍼시스턴트 플레이어는 작가 결정으로 보류 중(REDESIGN_ROADMAP).
+ */
+---
+
+<script is:inline>
+  ;(function () {
+    var btns = Array.prototype.slice.call(document.querySelectorAll(".proto-play[data-audio]"))
+    if (!btns.length) return
+    var audio = new Audio(); audio.preload = "none"
+    var current = null, raf = 0
+    function tick() {
+      if (!current || !audio.duration) return
+      current.style.setProperty("--p", String(audio.currentTime / audio.duration))
+      raf = requestAnimationFrame(tick)
+    }
+    function stop() {
+      audio.pause()
+      if (raf) { cancelAnimationFrame(raf); raf = 0 }
+      if (current) { current.setAttribute("aria-pressed", "false"); current.style.removeProperty("--p"); current = null }
+    }
+    btns.forEach(function (b) {
+      b.addEventListener("click", function () {
+        if (current === b) { stop(); return }
+        stop()
+        audio.src = b.getAttribute("data-audio")
+        current = b
+        b.setAttribute("aria-pressed", "true")
+        audio.play().then(function () { raf = requestAnimationFrame(tick) }).catch(stop)
+      })
+    })
+    audio.addEventListener("ended", stop)
+    document.addEventListener("visibilitychange", function () { if (document.hidden) stop() })
+
+    /* 영상 카드는 보일 때만 붙이고 재생한다 */
+    var vids = Array.prototype.slice.call(document.querySelectorAll(".proto-video[data-src]"))
+    if (!vids.length || window.matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) return
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        var v = e.target
+        if (e.isIntersecting) {
+          if (!v.src) v.src = v.getAttribute("data-src")
+          var p = v.play(); if (p && p.catch) p.catch(function () {})
+        } else if (v.src) v.pause()
+      })
+    }, { rootMargin: "80px 0px" })
+    vids.forEach(function (v) { io.observe(v) })
+  })()
+</script>

@@ -2,7 +2,13 @@
 import Base from "../layouts/Base.astro"
 import SiteMenu from "../components/SiteMenu.astro"
 import WorkGrid from "../components/WorkGrid.astro"
+import HomeAxes from "../components/HomeAxes.astro"
+import HomePrototypes from "../components/HomePrototypes.astro"
+import HomeSound from "../components/HomeSound.astro"
+import HomeCred from "../components/HomeCred.astro"
+import PrototypePlayer from "../components/PrototypePlayer.astro"
 import { getCollection } from "astro:content"
+import { THESIS } from "../data/axes"
 
 // 홈 하이라이트용 이벤트 데이터 (가장 가까운 미래 일정은 클라이언트에서 오늘 기준으로 선택)
 const upEvents = (await getCollection("events", ({ data }) => !data.draft))
@@ -21,12 +27,32 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
   .sort((a, b) => a.start.localeCompare(b.start))
 ---
 
-<Base title="HWANYUN" chrome="dark">
+<Base title="HWANYUN">
   <SiteMenu slot="menu" variant="hero" />
 
   <section class="hero" aria-labelledby="hero-title">
     <canvas id="particle-canvas" class="hero__field" aria-hidden="true"></canvas>
     <h1 id="hero-title" class="sr-only">HWANYUN</h1>
+    {/* 작가의 문장 — 세 동사가 곧 아래 세 축으로 가는 링크다. 문장과 사이트맵이 같은 것.
+        구체 위에 얹지 않고 좌상단에 둔다: 구체는 그대로 첫 시선을 받고, 문장은 읽힌다. */}
+    <p class="thesis" id="thesis">
+      <span data-language-content="en" lang="en">
+        {THESIS.en.before}
+        {THESIS.en.parts.map((w, i) => (
+          <><a href={`#axis-${["emit", "conduct", "decay"][i]}`}>{w}</a>{THESIS.en.joins[i]}</>
+        ))}
+      </span>
+      <span data-language-content="ko" lang="ko">
+        {THESIS.ko.before}
+        {THESIS.ko.parts.map((w, i) => (
+          <><a href={`#axis-${["emit", "conduct", "decay"][i]}`}>{w}</a>{THESIS.ko.joins[i]}</>
+        ))}
+      </span>
+      <small>
+        <span data-language-content="en" lang="en">Sound installation. It sounds only when a body closes the circuit.</span>
+        <span data-language-content="ko" lang="ko">사운드 인스톨레이션. 몸이 회로를 닫아야 소리가 난다.</span>
+      </small>
+    </p>
     <a id="upcoming-ticker" class="upcoming-ticker" href="/events/" hidden draggable="false" aria-label="Upcoming events"><span class="ut-list" id="ut-track"></span></a>
 
     {/* 방 안의 소리에 구체가 반응한다 — 명시적으로 켜는 층.
@@ -484,7 +510,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       언젠가 반드시 걸리는 문제다. 지금은 3단(한 화면)이라 걸리지 않는다. */}
   <script is:inline>
     ;(function () {
-      var arc = document.querySelector(".work-archive")
+      var arc = document.querySelector(".home-body")
       if (!arc) return
       var relax = function () {
         var over = arc.getBoundingClientRect().height > window.innerHeight + 4
@@ -496,9 +522,23 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     })()
   </script>
 
-  <section id="works" class="work-archive" aria-label="Selected works">
-    <WorkGrid current="home" />
-  </section>
+  {/* 두 번째 '페이지' — 히어로를 덮고 올라오는 본문. 순서가 곧 논지다:
+      세 축 → 지금 나오는 것 → 작품 → 녹음 → 놓였던 곳. */}
+  <div class="home-body">
+    <HomeAxes />
+    <HomePrototypes />
+    <section id="works" class="work-archive" aria-label="Selected works">
+      <p class="conn">
+        <span data-language-content="en">Where the tests arrive</span>
+        <span data-language-content="ko" lang="ko">실험이 닿는 곳</span>
+        <span class="arrow" aria-hidden="true">→</span>
+      </p>
+      <WorkGrid current="home" />
+    </section>
+    <HomeSound />
+    <HomeCred />
+  </div>
+  <PrototypePlayer />
 
   <script>
     const hero = document.querySelector<HTMLElement>(".hero")
@@ -617,11 +657,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         const centerX = width / 2
         const centerY = height / 2
         const size = Math.min(width, height)
-        const haze = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, size * .5)
-        haze.addColorStop(0, "rgba(255, 255, 255, .025)")
-        haze.addColorStop(1, "rgba(7, 8, 10, 0)")
-        context.fillStyle = haze
-        context.fillRect(0, 0, width, height)
+        // 흰 바탕 — 검은 점. 밝은 바탕에서는 후광(haze)이 얼룩으로 보이므로 그리지 않는다.
 
         const rotation = time * .00028
         const tilt = -.22
@@ -689,7 +725,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
           const pointSize = isInside ? 1.1 : .52 + (depth + 1) * .48
           const brightness = isInside ? .96 : Math.min(.9, .26 + (depth + 1) * .34 + audioLevel * .18)
           context.arc(particle.x, particle.y, pointSize, 0, Math.PI * 2)
-          context.fillStyle = `rgba(255, 255, 255, ${brightness})`
+          context.fillStyle = `rgba(17, 17, 17, ${brightness})`
           context.fill()
         }
         requestAnimationFrame(draw)
@@ -776,7 +812,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
        둔다. 스냅이 붙는 동안도 브라우저가 부드럽게 굴리므로 커튼이 덮이는
        모습은 그대로 보인다. */
     :global(html) { scroll-snap-type: y mandatory; }
-    .hero-spacer, .work-archive { scroll-snap-stop: always; }
+    .hero-spacer { scroll-snap-stop: always; }
     :global(body > footer) { scroll-snap-align: none; }
     /* 히어로는 화면에 고정되고, 그리드가 그 위를 덮으며 올라온다 —
        한 문서가 통째로 밀려가는 롱페이지가 아니라 다음 페이지가 뜨는 전환감.
@@ -790,8 +826,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       height: 100svh;
       overflow: hidden;
       place-items: center;
-      color: var(--surface-2);
-      background: var(--void);
+      color: var(--text);
+      background: var(--surface);
       isolation: isolate;
     }
     .hero__field { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: pan-y; }
@@ -800,7 +836,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     .upcoming-ticker {
       position: absolute; left: 22px; bottom: 26px; z-index: 2;
       display: block; max-width: min(48ch, 64vw);
-      color: var(--void-text); text-decoration: none;
+      color: var(--text-2); text-decoration: none;
     }
     .ut-list { display: block; }
     /* 히어로는 화면 전체가 비어 있고 시선은 구체로 간다. 구석의 13px은
@@ -810,7 +846,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     }
     .upcoming-ticker :global(.ut-tag) {
       display: block; margin: 13px 0 4px;
-      color: var(--void-label); letter-spacing: .16em; font-size: var(--fs-2xs);
+      color: var(--text-4); letter-spacing: .16em; font-size: var(--fs-2xs);
     }
     .upcoming-ticker :global(.ut-tag:first-child) { margin-top: 0; }
     /* 점 하나가 천천히 숨을 쉰다. 깜빡임이 아니라 호흡이라 주변시에는 걸리고
@@ -828,8 +864,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     @media (prefers-reduced-motion: reduce) {
       .upcoming-ticker :global(.ut-tag::before) { animation: none; opacity: 1; }
     }
-    .upcoming-ticker :global(.ut-tag-now) { color: var(--surface); }
-    .upcoming-ticker :global(.ut-dim) { color: var(--void-text-2); }
+    .upcoming-ticker :global(.ut-tag-now) { color: var(--text); }
+    .upcoming-ticker :global(.ut-dim) { color: var(--text-3); }
     /* 탄성 드래그용으로 한 글자씩 쪼갠 조각.
        transform이 먹으려면 inline-block이어야 하고, 공백도 사슬의 일부라
        pre로 폭을 지켜야 단어 간격이 무너지지 않는다. */
@@ -843,11 +879,33 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     }
     /* 드래그 중 텍스트 선택이 잡히면 파란 하이라이트가 끌려다닌다 */
     .upcoming-ticker.is-elastic { user-select: none; -webkit-user-select: none; }
-    .upcoming-ticker:hover :global(.ut-row) { color: var(--surface); }
+    .upcoming-ticker:hover :global(.ut-row) { color: var(--hover); }
     @media (max-width: 700px) {
       /* 우하단은 '위로' 버튼 자리다(38px + 여백). 티커가 폭 전체를 쓰면
          버튼이 전시 정보를 덮는다 — 전시가 밀리는 쪽이 훨씬 나쁜 손해다. */
       .upcoming-ticker { left: 16px; bottom: 18px; max-width: calc(100vw - 32px - 52px); }
+    }
+
+    /* 작가의 문장 — 좌상단. 구체는 화면 중앙에 그대로 두고 문장은 그 옆에서 읽힌다.
+       세 동사만 링크다: 아래 세 축으로 가는 유일한 색(--hover)이 여기서 처음 나온다. */
+    .thesis {
+      position: absolute; left: 22px; top: calc(var(--desktop-header-clearance) + 8px); z-index: 2;
+      margin: 0; max-width: min(30ch, 44vw);
+      font-size: var(--fs-lead); font-weight: 400; line-height: 1.35; letter-spacing: -.01em;
+      color: var(--text); text-wrap: balance;
+    }
+    .thesis [lang="ko"] { line-height: 1.45; }
+    .thesis a { color: var(--text); text-decoration: none; border-bottom: 1px solid var(--line-2); }
+    .thesis a:hover { color: var(--hover); border-color: var(--hover); }
+    .thesis small {
+      display: block; margin-top: 12px;
+      font-size: var(--fs-xs); font-weight: 400; line-height: 1.55; color: var(--text-3); letter-spacing: 0;
+    }
+    @media (max-width: 700px) {
+      .thesis {
+        left: 16px; right: 16px; top: calc(var(--mobile-header-h, 67px) + 14px);
+        max-width: none; font-size: var(--fs-body);
+      }
     }
 
     /* LISTEN — 티커와 같은 층위의 조용한 컨트롤, 우하단.
@@ -859,7 +917,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     .listen button { background: none; border: 0; padding: 0; cursor: pointer; font: inherit; }
     #listen-btn {
       display: inline-flex; align-items: center; gap: 8px;
-      color: var(--void-label); font-size: var(--fs-2xs); letter-spacing: .16em;
+      color: var(--text-4); font-size: var(--fs-2xs); letter-spacing: .16em;
     }
     /* 상태마다 한 문구만 */
     .ls-on, .ls-bad, .ls-meter { display: none; }
@@ -870,10 +928,10 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     .listen[data-state="denied"] .ls-bad { display: inline; }
     /* 들리는 크기 — 켜졌는데 조용한 것과 안 켜진 것을 구분해 준다 */
     .ls-meter {
-      width: 34px; height: 2px; background: var(--void-line); overflow: hidden;
+      width: 34px; height: 2px; background: var(--line-2); overflow: hidden;
     }
     .ls-meter i {
-      display: block; height: 100%; background: var(--surface);
+      display: block; height: 100%; background: var(--text);
       width: calc(var(--mic, 0) * 100%);
       transition: width 90ms linear;
     }
@@ -882,15 +940,15 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     .listen[data-silent="true"] .ls-silent { display: block; }
     .ls-silent {
       max-width: 260px; margin: 0; text-align: right;
-      font-size: var(--fs-2xs); line-height: 1.5; color: var(--void-text-2);
+      font-size: var(--fs-2xs); line-height: 1.5; color: var(--text-3);
     }
     .ls-error { display: none; }
     .listen[data-state="denied"] .ls-error { display: block; }
     .ls-error {
       max-width: 260px; margin: 0; text-align: right;
-      font-size: var(--fs-2xs); line-height: 1.5; color: var(--void-text-2);
+      font-size: var(--fs-2xs); line-height: 1.5; color: var(--text-3);
     }
-    #listen-btn:hover { color: var(--surface); }
+    #listen-btn:hover { color: var(--hover); }
     .ls-dot {
       width: 7px; height: 7px; border-radius: 50%;
       border: 1px solid currentColor; background: transparent;
@@ -901,26 +959,26 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       background: currentColor;
       transform: scale(calc(1 + var(--mic, 0) * 1.6));
     }
-    .listen[data-state="on"] #listen-btn { color: var(--surface); }
-    .listen[data-state="denied"] #listen-btn { color: var(--void-text-2); }
+    .listen[data-state="on"] #listen-btn { color: var(--text); }
+    .listen[data-state="denied"] #listen-btn { color: var(--text-3); }
 
     .ls-note {
       max-width: 300px; padding: 14px 16px;
-      background: rgba(10, 11, 13, .92);
-      border: 1px solid var(--void-line);
-      color: var(--void-text);
+      background: color-mix(in srgb, var(--surface) 94%, transparent);
+      border: 1px solid var(--line-2);
+      color: var(--text);
       font-size: var(--fs-xs); line-height: 1.6;
       text-align: left;
     }
-    .ls-note p { margin: 0 0 12px; color: var(--void-text-2); }
+    .ls-note p { margin: 0 0 12px; color: var(--text-2); }
     .ls-actions { display: flex; gap: 14px; }
     .ls-actions button {
       font-size: var(--fs-2xs); letter-spacing: .1em; text-transform: uppercase;
-      color: var(--void-text); border-bottom: 1px solid var(--void-line);
+      color: var(--text); border-bottom: 1px solid var(--line-2);
       padding-bottom: 2px;
     }
-    .ls-actions button:hover { color: var(--surface); border-color: var(--surface); }
-    #listen-cancel { color: var(--void-text-2); }
+    .ls-actions button:hover { color: var(--hover); border-color: var(--hover); }
+    #listen-cancel { color: var(--text-3); }
 
     @media (max-width: 700px) {
       /* 하단은 티커가 폭 전체(100vw - 32px)를 쓴다. 같은 층에 두면 LISTEN이
@@ -949,20 +1007,22 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       z-index: 1;
       background: var(--surface);
     }
-    .work-archive {
-      scroll-margin-top: 0;
-      /* 커튼이 붙는 자리. 높이 0인 표식으로 옮겨 봤더니 스냅 영역이 성립하지
-         않아 그리드가 제때 올라오지 않았다 — 기준점은 실제 높이를 가진
-         요소가 맡아야 한다. 아카이브가 한 화면을 넘어설 때의 문제는
-         스냅을 느슨하게 푸는 쪽(아래 스크립트)에서 따로 막는다. */
+    /* 본문 전체가 두 번째 페이지다 — 스냅 기준점과 덮는 층을 본문 래퍼가 맡는다 */
+    .home-body {
       scroll-snap-align: start;
-      /* 두 번째 '페이지'로 성립하려면 자체가 한 화면을 차지해야 한다 */
-      min-height: 100svh;
-      /* 고정된 히어로 위로 올라와 덮으려면 자체 배경과 위 레이어가 필요하다 */
+      scroll-snap-stop: always;
       position: relative;
       z-index: 1;
       background: var(--surface);
+      min-height: 100svh;
     }
+    .work-archive .conn {
+      max-width: var(--content-w); margin: 0 40px 0 var(--desktop-content-x);
+      padding: 40px 0 18px; font-size: var(--fs-xs); letter-spacing: .02em; color: var(--text-3);
+    }
+    .work-archive .conn .arrow { margin-left: 6px; color: var(--hover); }
+    /* 스냅 기준점과 덮는 층은 위 .home-body가 맡는다. 그리드는 본문 안의 한 섹션이다. */
+    .work-archive { position: relative; background: var(--surface); }
     /* 모바일 그리드는 타일 비율 때문에 화면 전체를 쓰지 않는다(WorkGrid: 67svh).
        한 화면짜리 '페이지'가 된 지금은 그대로 두면 그리드가 맨 위에 붙고 아래만 비어
        잘린 인상이 된다 — 세로 중앙에 앉혀 위아래 여백을 같게 만든다.
@@ -970,14 +1030,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     @media (max-width: 700px) {
       /* 헤더(워드마크·EN/KO·햄버거)는 고정이므로 그 높이를 비워 둔다 —
          그리드가 그 아래에서 시작해 헤더를 침범하지 않는다. */
-      .work-archive {
-        display: grid;
-        align-content: center;
-        padding-top: var(--mobile-header-h, 58px);
-        /* 스냅이 붙을 때 고정 헤더 아래로 정확히 떨어지게 한다 */
-        scroll-margin-top: 0;
-        min-height: 100svh;
-      }
+      .home-body { padding-top: var(--mobile-header-h, 58px); }
       /* 모바일 홈은 한 단을 72svh의 3분의 1로 잡는다. 고정값으로 두면
          WorkGrid가 계산한 단수를 덮어써 작품이 늘어도 그리드가 자라지 않는다. */
       .work-archive :global(#packed) { height: calc(var(--grid-rows, 3) * 72svh / 3); }

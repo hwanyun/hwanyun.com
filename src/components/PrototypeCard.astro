@@ -1,0 +1,84 @@
+---
+/**
+ * 프로토타입 카드 — 세션 하나가 카드 하나.
+ * 영상 없이 소리만 있어도 성립한다: 미디어 자리에 파형 대신 진행 막대를 그린다.
+ * 홈(HomePrototypes)과 /prototypes 목록이 같은 카드를 쓴다.
+ */
+import { AXES } from "../data/axes"
+
+const { entry } = Astro.props
+const d = entry.data
+const clock = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`
+const axisOf = (id: string) => AXES.find((a) => a.id === id)
+const [y, m] = String(d.date).split("-")
+const M = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+const dateEn = m ? `${M[Number(m) - 1] ?? m} ${y}` : y
+const dateKo = m ? `${y}.${m}` : y
+---
+
+<article class="proto" data-tools={d.tools.join("|")} data-axes={d.axes.join(" ")}>
+  <div class="proto-media">
+    {d.video ? (
+      <video class="proto-video" data-src={d.video} poster={d.thumb || undefined} muted loop playsinline preload="none" aria-hidden="true" tabindex="-1" />
+    ) : d.thumb ? (
+      <img src={d.thumb} alt="" loading="lazy" draggable="false" />
+    ) : (
+      <div class="ph" aria-hidden="true" />
+    )}
+    {d.audio && (
+      <button type="button" class="proto-play" data-audio={d.audio} aria-pressed="false" aria-label={`Play ${d.title}`}>
+        <span class="pp-icon" aria-hidden="true"></span>
+        <span class="pp-len">{d.duration > 0 ? clock(d.duration) : ""}</span>
+        <span class="pp-bar" aria-hidden="true"><i></i></span>
+      </button>
+    )}
+  </div>
+  <div class="proto-body">
+    <h3>{d.title} <time datetime={d.date}><span data-language-content="en">{dateEn}</span><span data-language-content="ko">{dateKo}</span></time></h3>
+    {(d.summary || d.summaryKo) && (
+      <p>
+        <span data-language-content="en">{d.summary || d.summaryKo}</span>
+        <span data-language-content="ko" lang="ko">{d.summaryKo || d.summary}</span>
+      </p>
+    )}
+    <ul class="proto-tags">
+      {d.tools.map((t: string) => <li>{t}</li>)}
+      {d.axes.map((id: string) => {
+        const a = axisOf(id)
+        return a ? <li class="tag-axis"><span data-language-content="en">{a.en}</span><span data-language-content="ko" lang="ko">{a.ko}</span></li> : null
+      })}
+    </ul>
+  </div>
+</article>
+
+<style>
+  .proto { display: flex; flex-direction: column; background: var(--surface-2); border: 1px solid var(--line); }
+  .proto-media { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: var(--surface-2); }
+  .proto-media img, .proto-media .ph, .proto-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .proto-media .ph { background: repeating-linear-gradient(45deg, var(--line) 0 2px, var(--surface-2) 2px 6px); }
+  .proto-play {
+    position: absolute; left: 10px; right: 10px; bottom: 10px;
+    display: grid; grid-template-columns: auto auto 1fr; align-items: center; gap: 10px;
+    padding: 6px 10px; border: 1px solid var(--line-2); border-radius: 999px;
+    background: color-mix(in srgb, var(--surface) 88%, transparent); color: var(--text);
+    font: inherit; font-size: var(--fs-2xs); letter-spacing: .06em; cursor: pointer;
+    font-variant-numeric: tabular-nums;
+  }
+  .proto-play:hover { border-color: var(--hover); color: var(--hover); }
+  .proto-play[aria-pressed="true"] { background: var(--text); color: var(--surface); border-color: var(--text); }
+  .pp-icon { width: 0; height: 0; border-style: solid; border-width: 5px 0 5px 8px; border-color: transparent transparent transparent currentColor; }
+  .proto-play[aria-pressed="true"] .pp-icon { width: 8px; height: 8px; border: 0; background: currentColor; }
+  .pp-bar { display: block; height: 2px; background: color-mix(in srgb, currentColor 25%, transparent); overflow: hidden; }
+  .pp-bar i { display: block; height: 100%; width: calc(var(--p, 0) * 100%); background: currentColor; }
+  .proto-body { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px 14px; flex: 1; }
+  h3 { margin: 0; font-size: var(--fs-sm); font-weight: 500; line-height: 1.4; }
+  h3 time { margin-left: 6px; font-weight: 400; color: var(--text-3); font-variant-numeric: tabular-nums; }
+  p { margin: 0; font-size: var(--fs-xs); line-height: 1.55; color: var(--text-2); }
+  p [lang="ko"] { line-height: 1.65; }
+  .proto-tags { list-style: none; margin: auto 0 0; padding: 8px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  .proto-tags li {
+    padding: 1px 8px; border: 1px solid var(--line-2); border-radius: 999px;
+    font-size: var(--fs-2xs); color: var(--text-3); letter-spacing: .02em;
+  }
+  .proto-tags .tag-axis { color: var(--text); border-color: var(--text-4); }
+</style>

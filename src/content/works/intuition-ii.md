@@ -4,6 +4,10 @@ year: "2017"
 medium: "Sculpture (34\"); ABS filament, 3D pen"
 materials:
   - 3d-pen
+axes:
+  - decay
+summary: "The same landscape drawn with a 3D pen as a 34-inch sculpture; the hand's pace and hesitation remain in the line."
+summaryKo: "같은 풍경을 3D펜으로 그린 34인치 조각. 손의 속도와 망설임이 선에 남는다."
 showType: solo
 series:
   id: "intuition-untitled"

@@ -4,6 +4,10 @@ year: "2018"
 medium: "Cyanotype prints; light-sensitive paper"
 materials:
   - light
+axes:
+  - decay
+summary: "The drawing of Untitled II laid on light-sensitive paper, fixed as twenty-four cyanotype prints."
+summaryKo: "Untitled II의 그림을 감광지 위에 올려 스물네 장의 시아노타입으로 고정했다."
 showType: solo
 size: 1col
 category: work

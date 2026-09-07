@@ -1,5 +1,6 @@
 import { defineCollection, z } from "astro:content"
 import { MATERIAL_IDS } from "../data/materials"
+import { AXIS_IDS } from "../data/axes"
 
 // 작품 컬렉션 — 관리자 UI(Sveltia CMS)가 이 스키마대로 폼을 생성한다.
 const works = defineCollection({
@@ -33,6 +34,11 @@ const works = defineCollection({
     thumbVideo: z.string().optional().default(""),
     // 재료 태그 — 작품들을 잇는 그래프의 간선. 어휘는 src/data/materials.ts에서 고정한다.
     materials: z.array(z.enum(MATERIAL_IDS)).optional().default([]),
+    // 세 축(발생·전도·감쇠) — 신호가 지나는 단계. 어휘는 src/data/axes.ts 한 곳에서 관리한다.
+    axes: z.array(z.enum(AXIS_IDS)).optional().default([]),
+    // 카드용 한 줄. 제목과 연도만으로는 작품 간 차이가 읽히지 않는다. 30자 안팎.
+    summary: z.string().optional().default(""),
+    summaryKo: z.string().optional().default(""),
     /* 전시 형태 — 개인전이냐 단체전이냐. 재료 어휘에 섞지 않는다:
        재료는 "무엇으로 만들었는가"이고 이건 "어떻게 보였는가"라 축이 다르다.
        큐레이터가 이력을 읽을 때 가장 먼저 보는 구분이기도 하다.
@@ -150,6 +156,26 @@ const sounds = defineCollection({
   }),
 })
 
+// 프로토타입 컬렉션 — 완성작 이전의 것들. 세션 하나가 카드 하나.
+// 영상 없이 소리와 파형만으로도 카드가 성립해야 한다: Ableton 세션이 그대로 올라오는 출구.
+const prototypes = defineCollection({
+  type: "content", // 본문 = 한두 문장 메모(선택)
+  schema: z.object({
+    title: z.string(),
+    date: z.string(), // "2026-09" — 월 단위. 얼마나 최근인지가 정보다.
+    summary: z.string().optional().default(""),
+    summaryKo: z.string().optional().default(""),
+    tools: z.array(z.string()).optional().default([]), // Ableton, TouchDesigner, 센서, 열화상 …
+    axes: z.array(z.enum(AXIS_IDS)).optional().default([]), // 어느 축의 새 신호인가
+    audio: z.string().optional().default(""), // mp3 128k, 30초–2분
+    duration: z.number().optional().default(0),
+    video: z.string().optional().default(""), // 있을 때만. 세로 폰 촬영 허용
+    thumb: z.string().optional().default(""),
+    works: z.array(z.string()).optional().default([]), // 이어진 작품 slug
+    draft: z.boolean().optional().default(false),
+  }),
+})
+
 // 이벤트 컬렉션 — 전시·공연 등 일정. 날짜가 지나면 프론트에서 자동으로 '지난 일정'으로 이동.
 const events = defineCollection({
   type: "content", // 본문(마크다운) = 상세 설명
@@ -210,4 +236,4 @@ const events = defineCollection({
   }),
 })
 
-export const collections = { works, sounds, events }
+export const collections = { works, sounds, events, prototypes }

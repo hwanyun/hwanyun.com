@@ -8,6 +8,10 @@ materials:
   - sensor
   - polycarbonate
   - light
+axes:
+  - conduct
+summary: "Polycarbonate on the wall turns the room's sound into light; copper on the table returns touch as sound."
+summaryKo: "벽의 폴리카보네이트는 방의 소리를 빛으로, 탁자의 구리는 손의 접촉을 소리로 돌려준다."
 showType: solo
 size: 3col
 category: work

@@ -64,6 +64,18 @@ collections:
           - { label: "영상 (moving-image)", value: "moving-image" }
           - { label: "빛 (light)", value: "light" }
           - { label: "한지 (hanji)", value: "hanji" }
+      - name: axes
+        label: "축 (발생 · 전도 · 감쇠)"
+        widget: select
+        multiple: true
+        required: false
+        hint: "신호가 지나는 단계. 한 작품이 두 축에 걸쳐도 된다. 어휘는 src/data/axes.ts"
+        options:
+          - { label: "발생 (emit)", value: "emit" }
+          - { label: "전도 (conduct)", value: "conduct" }
+          - { label: "감쇠 (decay)", value: "decay" }
+      - { name: summary, label: "카드 한 줄 (영문)", widget: string, required: false, hint: "30자 안팎. 제목·연도만으로는 작품 간 차이가 안 읽힌다" }
+      - { name: summaryKo, label: "카드 한 줄 (국문)", widget: string, required: false }
       - { name: textEn, label: "설명 (영문)", widget: text, required: false }
       - { name: textKr, label: "설명 (국문)", widget: text, required: false }
       - name: processNote
@@ -200,3 +212,35 @@ collections:
       - { name: order, label: "정렬 보조 (작을수록 앞)", widget: number, value_type: int, default: 100 }
       - { name: draft, label: "비공개(초안)", widget: boolean, default: false }
       - { name: body, label: "상세 설명", widget: markdown, required: false }
+
+  - name: prototypes
+    label: "프로토타입 (Prototypes)"
+    label_singular: "프로토타입"
+    folder: "src/content/prototypes"
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    format: frontmatter
+    sortable_fields: [date, title]
+    fields:
+      - { name: title, label: "제목", widget: string }
+      - { name: date, label: "날짜 (YYYY-MM)", widget: string, hint: "월 단위. 얼마나 최근인지가 정보다" }
+      - { name: summary, label: "한 줄 (영문)", widget: string, required: false }
+      - { name: summaryKo, label: "한 줄 (국문)", widget: string, required: false }
+      - { name: tools, label: "도구", widget: list, required: false, hint: "Ableton, TouchDesigner, 센서, 열화상 …" }
+      - name: axes
+        label: "축"
+        widget: select
+        multiple: true
+        required: false
+        options:
+          - { label: "발생 (emit)", value: "emit" }
+          - { label: "전도 (conduct)", value: "conduct" }
+          - { label: "감쇠 (decay)", value: "decay" }
+      - { name: audio, label: "오디오 URL", widget: string, required: false, hint: "mp3 128k, 30초–2분. R2 URL" }
+      - { name: duration, label: "길이 (초)", widget: number, value_type: int, required: false }
+      - { name: video, label: "영상 URL", widget: string, required: false, hint: "있을 때만. 세로 촬영 허용" }
+      - { name: thumb, label: "썸네일", widget: image, required: false }
+      - { name: works, label: "이어진 작품 slug", widget: list, required: false }
+      - { name: draft, label: "초안 (숨김)", widget: boolean, default: false }
+      - { name: body, label: "메모", widget: markdown, required: false }

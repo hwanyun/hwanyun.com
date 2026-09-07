@@ -1,0 +1,46 @@
+---
+/**
+ * 홈 프로토타입 피드 — 최신 3개. 전체는 /prototypes.
+ * 게시된 세션이 하나도 없으면 섹션 자체를 그리지 않는다 — 빈 칸은 "활동 없음"으로 읽힌다.
+ */
+import { getCollection } from "astro:content"
+import PrototypeCard from "./PrototypeCard.astro"
+
+const all = (await getCollection("prototypes", ({ data }) => !data.draft))
+  .sort((a, b) => String(b.data.date).localeCompare(String(a.data.date)))
+const latest = all.slice(0, 3)
+---
+
+{latest.length > 0 && (
+  <section class="protos" id="prototypes" aria-labelledby="protos-title">
+    <p class="conn" id="protos-title">
+      <span data-language-content="en">What is coming out of the studio now</span>
+      <span data-language-content="ko" lang="ko">지금 작업실에서 나오는 것</span>
+      <span class="arrow" aria-hidden="true">→</span>
+    </p>
+    <div class="proto-grid">
+      {latest.map((e) => <PrototypeCard entry={e} />)}
+    </div>
+    {all.length > latest.length && (
+      <p class="proto-more"><a href="/prototypes/">
+        <span data-language-content="en">All {all.length} sessions</span>
+        <span data-language-content="ko" lang="ko">세션 {all.length}개 전체</span> →
+      </a></p>
+    )}
+  </section>
+)}
+
+<style>
+  .protos { max-width: var(--content-w); margin: 0 40px 0 var(--desktop-content-x); padding: 40px 0 24px; }
+  .conn { margin: 0 0 18px; font-size: var(--fs-xs); letter-spacing: .02em; color: var(--text-3); }
+  .conn .arrow { margin-left: 6px; color: var(--hover); }
+  .proto-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); }
+  .proto-more { margin: 14px 0 0; font-size: var(--fs-xs); }
+  .proto-more a { color: var(--text-3); text-decoration: none; }
+  .proto-more a:hover { color: var(--hover); }
+  @media (max-width: 1000px) { .proto-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 700px) {
+    .protos { margin: 0; padding: 32px 16px 16px; }
+    .proto-grid { grid-template-columns: 1fr; }
+  }
+</style>

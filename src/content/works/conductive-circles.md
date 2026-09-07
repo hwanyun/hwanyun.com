@@ -6,6 +6,10 @@ materials:
   - interactive
   - copper
   - projection
+axes:
+  - conduct
+summary: "A hand on copper closes a circuit, and that contact lights the projected circles."
+summaryKo: "구리에 손이 닿으면 회로가 닫히고, 그 접촉이 투사된 원들을 켠다."
 showType: group
 size: 2col
 category: work

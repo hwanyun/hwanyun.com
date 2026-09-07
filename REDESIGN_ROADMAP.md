@@ -296,3 +296,23 @@ Zimoun 홈의 체류 시간이 여기서 나온다.
 - 벤치마크 근거: Zimoun(움직이는 썸네일·Next Exhibitions 단일 리스트), Ikeda(메타데이터 규율),
   Bernier(Until 날짜 표기), Nicolai(연도 아카이브), Anadol(반면교사 — 스펙터클 과잉)
 - 배포 검증 절차는 `PROJECT_CONTEXT.md` 기준
+
+---
+
+## Phase 6 — 홈을 세 축 서사로 (2026-09-07, draft 브랜치)
+
+레퍼런스: universaleverything.com의 뼈대(지배 문장 → 실천 카테고리 → 프로토타입 → 작품 → 결과).
+색·서체·스튜디오 화법은 가져오지 않는다. 작가 문장 "신호가 발생하고, 전도되고, 감쇠한다"의
+세 동사가 축이고, 소리는 섹션 하나가 아니라 히어로·축·프로토타입 세 곳에 흐른다.
+
+- [x] **6-1. 축 어휘** — `src/data/axes.ts` (emit / conduct / decay + 문장 원본). works 스키마에
+      `axes`, `summary`, `summaryKo` 추가, 13작품 배치·한 줄 초안 기입 (**작가 검토 필요**)
+- [x] **6-2. 홈 재구성** — 히어로 흰 바탕(검은 입자) + 좌상단 문장(세 동사 = 축 링크) →
+      `.home-body`: HomeAxes(15초 발췌·루프) → HomePrototypes(최신 3, 없으면 숨김) →
+      WorkGrid → HomeSound(최근 3 릴리스) → HomeCred(기관 pill + cv.json 최근 4)
+- [x] **6-3. Prototypes 컬렉션** — `src/content/prototypes`, CMS 폼, `/prototypes` 페이지(도구·축 필터),
+      카드는 오디오+진행막대만으로 성립. 예시 항목은 draft
+- [x] **6-4. Works 축 필터** — `/works/?axis=…`, 재료 필터 위에 한 줄
+- [ ] **작가 결정** — 히어로에서 나는 소리(현재는 마이크 반응만), 축 카드 미디어 3개(몸이 보이는 장면),
+      감쇠 축 15초 발췌, 축 배치·한 줄 문구 검토, 강조색(색은 후순위 — 구조 먼저)
+- [ ] 첫 실제 프로토타입: Ableton 세션 mp3 128k 30초–2분 → R2 → 마크다운 한 장

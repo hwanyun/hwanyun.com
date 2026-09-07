@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content"
 import Base from "../../layouts/Base.astro"
 import { MATERIALS } from "../../data/materials"
+import { AXES } from "../../data/axes"
 import SeenTracker from "../../components/SeenTracker.astro"
 
 const works = await getCollection("works", ({ data }) => !data.draft)
@@ -10,6 +11,12 @@ works.sort((a, b) => {
   const byYear = sortYear(b.data.year) - sortYear(a.data.year)
   return byYear || (a.data.order ?? 0) - (b.data.order ?? 0)
 })
+
+// 세 축(발생·전도·감쇠) — 신호가 지나는 단계. 홈의 축 카드와 같은 어휘.
+const axisCounts = AXES.map((a) => ({
+  ...a,
+  count: works.filter((w) => w.data.axes.includes(a.id)).length,
+})).filter((a) => a.count > 0)
 
 // 재료별 작품 수 — 0개인 재료는 필터 바에 띄우지 않는다
 const materialCounts = MATERIALS.map((m) => ({
@@ -53,6 +60,17 @@ const showCounts = SHOWS.map((x) => ({
         같은 모양 알약이 위는 스크롤·아래는 두 개짜리 짧은 줄로 갈리면
         의도한 두 축이 아니라 깨진 격자로 읽힌다 (아래 filter-bar 참조). */}
     <div class="filter-bar">
+      {/* 축은 재료보다 앞에 온다 — 무엇으로 만들었는가보다 신호가 어느 단계에 있는가가 먼저다 */}
+      {axisCounts.length > 0 && (
+        <nav class="material-filter axis-filter" aria-label="Filter by stage">
+          {axisCounts.map((a) => (
+            <a href={`/works/?axis=${a.id}`} data-axis={a.id}>
+              <span data-language-content="en">{a.en}</span><span data-language-content="ko" lang="ko">{a.ko}</span>
+              <span class="mf-n">{a.count}</span>
+            </a>
+          ))}
+        </nav>
+      )}
       <nav class="material-filter" aria-label="Filter by material">
         <a href="/works/" class="mf-all" data-material="">All works <span class="mf-n">{works.length}</span></a>
         {
@@ -78,7 +96,7 @@ const showCounts = SHOWS.map((x) => ({
       <div class="archive-head" aria-hidden="true"><span>WORKS</span><span>YEAR</span></div>
       <ol id="work-list">
         {works.map((work) => (
-          <li data-materials={work.data.materials.join(" ")} data-show={work.data.showType || ""} data-slug={work.slug}>
+          <li data-materials={work.data.materials.join(" ")} data-axes={work.data.axes.join(" ")} data-show={work.data.showType || ""} data-slug={work.slug}>
             <a href={`/works/${work.slug}`}>
               <time>{work.data.year}</time><span>{work.data.title}</span>
             </a>
@@ -117,6 +135,7 @@ const showCounts = SHOWS.map((x) => ({
         var hit
         if (!value) hit = true
         else if (kind === "show") hit = li.getAttribute("data-show") === value
+        else if (kind === "axis") hit = (li.getAttribute("data-axes") || "").split(" ").indexOf(value) !== -1
         else hit = (li.getAttribute("data-materials") || "").split(" ").indexOf(value) !== -1
         li.hidden = !hit
         if (hit) shown++
@@ -126,7 +145,9 @@ const showCounts = SHOWS.map((x) => ({
       links.forEach(function (a) {
         var av = a.getAttribute("data-show") !== null
           ? { k: "show", v: a.getAttribute("data-show") }
-          : { k: "material", v: a.getAttribute("data-material") || "" }
+          : a.getAttribute("data-axis") !== null
+            ? { k: "axis", v: a.getAttribute("data-axis") }
+            : { k: "material", v: a.getAttribute("data-material") || "" }
         var on = value ? (av.k === kind && av.v === value) : av.v === ""
         a.setAttribute("aria-current", on ? "true" : "false")
       })
@@ -137,6 +158,8 @@ const showCounts = SHOWS.map((x) => ({
       var q = new URLSearchParams(window.location.search)
       var sh = q.get("show")
       if (sh) return ["show", sh]
+      var ax = q.get("axis")
+      if (ax) return ["axis", ax]
       return ["material", q.get("material") || ""]
     }
     apply.apply(null, fromURL())
@@ -146,8 +169,9 @@ const showCounts = SHOWS.map((x) => ({
         // 같은 페이지 안에서의 상태 변경 — 전체 리로드를 피한다
         e.preventDefault()
         var isShow = a.getAttribute("data-show") !== null
-        var kind = isShow ? "show" : "material"
-        var v = (isShow ? a.getAttribute("data-show") : a.getAttribute("data-material")) || ""
+        var isAxis = a.getAttribute("data-axis") !== null
+        var kind = isShow ? "show" : isAxis ? "axis" : "material"
+        var v = (isShow ? a.getAttribute("data-show") : isAxis ? a.getAttribute("data-axis") : a.getAttribute("data-material")) || ""
         history.pushState({ kind: kind, value: v }, "", v ? "/works/?" + kind + "=" + v : "/works/")
         apply(kind, v)
       })

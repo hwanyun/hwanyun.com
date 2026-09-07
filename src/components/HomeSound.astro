@@ -1,0 +1,86 @@
+---
+/**
+ * 홈 소리 — 아카이브로 가는 문. 히어로·축·프로토타입에 이미 소리가 있으므로
+ * 여기는 플레이어를 또 만들지 않고, 최근 릴리스 세 줄과 /sound 링크만 둔다.
+ * 묶는 규칙(project = 릴리스)과 길이 표기는 sound.astro와 같다.
+ */
+import { getCollection } from "astro:content"
+
+const sounds = (await getCollection("sounds", ({ data }) => !data.draft)).sort(
+  (a, b) => (a.data.order ?? 0) - (b.data.order ?? 0)
+)
+const key = (s: (typeof sounds)[number]) => s.data.project || s.data.title
+const releases = Array.from(new Map(sounds.map((s) => [key(s), s])).values()).map((lead) => {
+  const tracks = sounds.filter((s) => key(s) === key(lead))
+  const secs = tracks.map((t) => t.data.duration).filter((d) => d > 0)
+  return {
+    title: key(lead),
+    lead,
+    min: secs.length ? Math.min(...secs) : 0,
+    max: secs.length ? Math.max(...secs) : 0,
+    n: tracks.length,
+  }
+})
+const clock = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`
+const span = (r: { min: number; max: number }) =>
+  !r.max ? "" : r.min === r.max ? clock(r.max) : `${clock(r.min)} – ${clock(r.max)}`
+const recent = releases.slice(0, 3)
+---
+
+<section class="hsound" id="sound" aria-labelledby="hsound-title">
+  <p class="conn" id="hsound-title">
+    <span data-language-content="en">And the recordings</span>
+    <span data-language-content="ko" lang="ko">그리고 녹음</span>
+    <span class="arrow" aria-hidden="true">→</span>
+  </p>
+  <div class="hsound-grid">
+    <a class="listen-all" href="/sound/">
+      <span class="la-ring" aria-hidden="true"></span>
+      <span class="la-label">
+        <span data-language-content="en">Listening archive</span>
+        <span data-language-content="ko" lang="ko">듣기 아카이브</span>
+      </span>
+      <span class="la-n">{releases.length}</span>
+    </a>
+    <ol class="hsound-list">
+      {recent.map((r) => (
+        <li>
+          <a href={`/sound/#sound-${r.lead.slug}`}>
+            <span class="t">{r.title}</span>
+            {r.n > 1 && <span class="v">{r.n} versions</span>}
+            <span class="len">{span(r)}</span>
+          </a>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .hsound { max-width: var(--content-w); margin: 0 40px 0 var(--desktop-content-x); padding: 40px 0 24px; }
+  .conn { margin: 0 0 18px; font-size: var(--fs-xs); letter-spacing: .02em; color: var(--text-3); }
+  .conn .arrow { margin-left: 6px; color: var(--hover); }
+  .hsound-grid { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: var(--space-3); align-items: start; }
+  .listen-all {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+    min-height: 150px; border: 1px solid var(--line-2); color: var(--text); text-decoration: none;
+    font-size: var(--fs-2xs); letter-spacing: .14em; text-transform: uppercase;
+  }
+  .listen-all:hover { border-color: var(--hover); color: var(--hover); }
+  .la-ring { width: 44px; height: 44px; border-radius: 50%; border: 1px solid currentColor; }
+  .la-n { color: var(--text-3); font-variant-numeric: tabular-nums; }
+  .hsound-list { list-style: none; margin: 0; padding: 0; font-size: var(--fs-sm); }
+  .hsound-list li { border-bottom: 1px solid var(--line); }
+  .hsound-list a {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 14px; align-items: baseline;
+    padding: 10px 0; color: var(--text); text-decoration: none;
+  }
+  .hsound-list a:hover .t { color: var(--hover); }
+  .hsound-list .v { font-size: var(--fs-2xs); color: var(--text-3); letter-spacing: .04em; }
+  .hsound-list .len { font-size: var(--fs-xs); color: var(--text-3); font-variant-numeric: tabular-nums; }
+  @media (max-width: 700px) {
+    .hsound { margin: 0; padding: 32px 16px 16px; }
+    .hsound-grid { grid-template-columns: 1fr; }
+    .listen-all { min-height: 96px; }
+  }
+</style>

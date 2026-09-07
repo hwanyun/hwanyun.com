@@ -1,0 +1,139 @@
+---
+/**
+ * /prototypes — 완성작 이전의 것들. 세션 하나가 카드 하나.
+ * 필터는 도구(Ableton, TouchDesigner …)와 축(발생·전도·감쇠) 두 줄 — Works의 재료/전시 형태와 같은 어휘.
+ */
+import { getCollection } from "astro:content"
+import Base from "../../layouts/Base.astro"
+import PrototypeCard from "../../components/PrototypeCard.astro"
+import PrototypePlayer from "../../components/PrototypePlayer.astro"
+import { AXES } from "../../data/axes"
+
+const entries = (await getCollection("prototypes", ({ data }) => !data.draft))
+  .sort((a, b) => String(b.data.date).localeCompare(String(a.data.date)))
+
+const toolCounts = Array.from(
+  entries.flatMap((e) => e.data.tools).reduce((m, t) => m.set(t, (m.get(t) ?? 0) + 1), new Map<string, number>())
+).sort((a, b) => b[1] - a[1])
+const axisCounts = AXES.map((a) => ({ ...a, n: entries.filter((e) => e.data.axes.includes(a.id)).length })).filter((a) => a.n > 0)
+---
+
+<Base title="Prototypes — HWANYUN" current="prototypes" description="Sessions and tests before the work: Ableton sessions, sensor tests, light and heat experiments by HWANYUN.">
+  <main class="protos-archive">
+    <header class="archive-intro">
+      <p class="eyebrow">PROTOTYPES</p>
+      <h1>Prototypes</h1>
+      <div class="intro-copy">
+        <p lang="en" data-language-content="en">
+          Sessions and tests that come before the work. One session, one card — including the ones that failed.
+          Dates are by month; how recent a test is, is the information.
+        </p>
+        <p lang="ko" data-language-content="ko">
+          작품 이전의 세션과 테스트. 세션 하나가 카드 하나이고, 실패한 것도 올린다.
+          날짜는 월 단위 — 얼마나 최근인지가 정보다.
+        </p>
+      </div>
+    </header>
+
+    {entries.length > 0 && (
+      <div class="filter-bar">
+        <nav class="pf" aria-label="Filter by tool">
+          <a href="/prototypes/" data-tool="" aria-current="true">All <span class="pf-n">{entries.length}</span></a>
+          {toolCounts.map(([t, n]) => <a href={`/prototypes/?tool=${encodeURIComponent(t)}`} data-tool={t}>{t} <span class="pf-n">{n}</span></a>)}
+        </nav>
+        {axisCounts.length > 0 && (
+          <nav class="pf pf-axis" aria-label="Filter by stage">
+            {axisCounts.map((a) => (
+              <a href={`/prototypes/?axis=${a.id}`} data-axis={a.id}>
+                <span data-language-content="en">{a.en}</span><span data-language-content="ko" lang="ko">{a.ko}</span>
+                <span class="pf-n">{a.n}</span>
+              </a>
+            ))}
+          </nav>
+        )}
+      </div>
+    )}
+
+    {entries.length > 0 ? (
+      <div class="proto-grid" id="proto-grid">
+        {entries.map((e) => <PrototypeCard entry={e} />)}
+      </div>
+    ) : (
+      <p class="pf-empty">
+        <span data-language-content="en">No sessions published yet.</span>
+        <span data-language-content="ko" lang="ko">아직 게시된 세션이 없습니다.</span>
+      </p>
+    )}
+    <p class="pf-empty" id="pf-empty" hidden>
+      <span data-language-content="en">Nothing with this filter.</span>
+      <span data-language-content="ko" lang="ko">이 조건의 세션이 없습니다.</span>
+    </p>
+  </main>
+  <PrototypePlayer />
+</Base>
+
+<script is:inline>
+  /* 정적 사이트 — 쿼리 파라미터를 브라우저에서 해석한다. Works/Sound 필터와 같은 동작. */
+  ;(function () {
+    var grid = document.getElementById("proto-grid")
+    var empty = document.getElementById("pf-empty")
+    if (!grid) return
+    var cards = Array.prototype.slice.call(grid.querySelectorAll(".proto"))
+    var links = Array.prototype.slice.call(document.querySelectorAll(".pf a"))
+    function apply(kind, value) {
+      var shown = 0
+      cards.forEach(function (c) {
+        var hit = !value
+          || (kind === "axis" && (c.getAttribute("data-axes") || "").split(" ").indexOf(value) !== -1)
+          || (kind === "tool" && (c.getAttribute("data-tools") || "").split("|").indexOf(value) !== -1)
+        c.hidden = !hit
+        if (hit) shown++
+      })
+      links.forEach(function (a) {
+        var k = a.hasAttribute("data-axis") ? "axis" : "tool"
+        var v = a.getAttribute(k === "axis" ? "data-axis" : "data-tool") || ""
+        a.setAttribute("aria-current", value ? String(k === kind && v === value) : String(v === ""))
+      })
+      if (empty) empty.hidden = shown !== 0
+    }
+    function fromURL() {
+      var q = new URLSearchParams(window.location.search)
+      if (q.get("axis")) return ["axis", q.get("axis")]
+      return ["tool", q.get("tool") || ""]
+    }
+    links.forEach(function (a) {
+      a.addEventListener("click", function (e) {
+        e.preventDefault()
+        history.pushState(null, "", a.getAttribute("href"))
+        apply.apply(null, fromURL())
+      })
+    })
+    window.addEventListener("popstate", function () { apply.apply(null, fromURL()) })
+    apply.apply(null, fromURL())
+  })()
+</script>
+
+<style>
+  .protos-archive { max-width: var(--content-w); margin: var(--desktop-header-clearance) 40px 100px var(--desktop-content-x); }
+  .eyebrow { margin: 0 0 6px; font-size: var(--fs-2xs); letter-spacing: .12em; color: var(--text-4); }
+  h1 { margin: 0 0 14px; font-size: var(--fs-display); font-weight: 500; letter-spacing: -.01em; }
+  .intro-copy p { margin: 0 0 28px; max-width: 62ch; font-size: var(--fs-sm); line-height: 1.7; color: var(--text-2); }
+  .intro-copy p[lang="ko"] { line-height: 1.85; }
+  .filter-bar { display: flex; flex-direction: column; gap: 8px; margin: 0 0 24px; }
+  .pf { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pf a {
+    padding: 3px 10px; border: 1px solid var(--line-2); border-radius: 999px;
+    font-size: var(--fs-xs); color: var(--text-2); text-decoration: none;
+  }
+  .pf a:hover { border-color: var(--hover); color: var(--hover); }
+  .pf a[aria-current="true"] { background: var(--text); color: var(--surface); border-color: var(--text); }
+  .pf-n { margin-left: 4px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+  .pf a[aria-current="true"] .pf-n { color: var(--line-2); }
+  .proto-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); }
+  .pf-empty { margin: 24px 0; font-size: var(--fs-sm); color: var(--text-3); }
+  @media (max-width: 1000px) { .proto-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 700px) {
+    .protos-archive { margin: 0; padding: calc(var(--mobile-header-h, 67px) + 16px) 16px 64px; }
+    .proto-grid { grid-template-columns: 1fr; }
+  }
+</style>

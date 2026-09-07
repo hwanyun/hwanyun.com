@@ -1,0 +1,200 @@
+---
+/**
+ * 세 축 카드 — 홈의 척추.
+ *
+ * 매체가 아니라 신호가 지나는 단계(발생·전도·감쇠)로 작품을 묶는다. 각 카드는
+ * 대표 작품의 루프(또는 정지 이미지) + 한 줄 + 15초 소리 발췌 + 대표작 목록.
+ * 축 이름을 읽기 전에 들을 수 있어야 사운드 작가의 사이트다.
+ *
+ * 어휘와 대표 미디어는 src/data/axes.ts 한 곳에서 관리한다.
+ */
+import { getCollection } from "astro:content"
+import { AXES } from "../data/axes"
+
+const works = await getCollection("works", ({ data }) => !data.draft)
+const sounds = await getCollection("sounds", ({ data }) => !data.draft)
+const sortYear = (year: string) => Math.max(...(year.match(/\d{4}/g) ?? ["0"]).map(Number))
+
+const cards = AXES.map((axis) => {
+  const hero = works.find((w) => w.slug === axis.work)
+  const sound = axis.sound ? sounds.find((s) => s.slug === axis.sound) : undefined
+  const members = works
+    .filter((w) => w.data.axes.includes(axis.id))
+    .sort((a, b) => sortYear(b.data.year) - sortYear(a.data.year) || (a.data.order ?? 0) - (b.data.order ?? 0))
+  return { axis, hero, sound, members }
+})
+---
+
+<section class="axes" id="axes" aria-labelledby="axes-title">
+  <p class="conn" id="axes-title">
+    <span data-language-content="en">Three stages a signal passes through</span>
+    <span data-language-content="ko" lang="ko">신호가 지나는 세 단계</span>
+    <span class="arrow" aria-hidden="true">→</span>
+  </p>
+  <div class="axis-grid">
+    {cards.map(({ axis, hero, sound, members }) => (
+      <article class="axis" id={`axis-${axis.id}`} data-axis={axis.id}>
+        <a class="axis-media" href={`/works/?axis=${axis.id}`} aria-label={`${axis.en} — works`}>
+          {hero?.data.thumb ? <img src={hero.data.thumb} alt="" loading="lazy" draggable="false" /> : <div class="ph" />}
+          {hero?.data.thumbVideo && (
+            <video class="axis-video" data-src={hero.data.thumbVideo} muted loop playsinline preload="none" aria-hidden="true" tabindex="-1" />
+          )}
+        </a>
+        <div class="axis-body">
+          <h3>
+            <a href={`/works/?axis=${axis.id}`}>
+              <span class="ko" lang="ko">{axis.ko}</span>
+              <span class="en">{axis.en}</span>
+            </a>
+          </h3>
+          <p class="axis-desc">
+            <span data-language-content="en">{axis.descEn}</span>
+            <span data-language-content="ko" lang="ko">{axis.descKo}</span>
+          </p>
+          {sound?.data.audio ? (
+            <button
+              type="button"
+              class="excerpt"
+              data-audio={sound.data.audio}
+              data-limit="15"
+              aria-pressed="false"
+              aria-label={`Play 15 seconds of ${sound.data.title}`}
+            >
+              <span class="ex-dot" aria-hidden="true"></span>
+              <span class="ex-label"><span class="ex-off">0:15</span><span class="ex-on">■</span></span>
+              <span class="ex-title">{sound.data.title}</span>
+            </button>
+          ) : (
+            <span class="excerpt excerpt--none">
+              <span data-language-content="en">No recording yet</span>
+              <span data-language-content="ko" lang="ko">아직 녹음 없음</span>
+            </span>
+          )}
+          <ul class="axis-works">
+            {members.slice(0, 5).map((w) => (
+              <li><a href={`/works/${w.slug}/`}>{w.data.title}<span class="y"> {w.data.year}</span></a></li>
+            ))}
+            {members.length > 5 && (
+              <li class="more"><a href={`/works/?axis=${axis.id}`}>+{members.length - 5}</a></li>
+            )}
+          </ul>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>
+
+<script is:inline>
+  /* 15초 발췌 — 한 번에 하나만 울린다. 다른 카드를 누르면 앞 것이 멈춘다.
+     이 섹션과 히어로 구체는 같은 오디오 원소를 쓰지 않는다: 구체는 마이크(입력)이고
+     여기는 재생(출력)이다. 둘이 겹치면 구체가 이 소리에 반응한다 — 의도된 일이다. */
+  ;(function () {
+    var btns = Array.prototype.slice.call(document.querySelectorAll(".axes .excerpt[data-audio]"))
+    if (!btns.length) return
+    var audio = null, current = null, timer = 0
+    function stop() {
+      if (audio) { audio.pause(); audio.currentTime = 0 }
+      if (timer) { clearTimeout(timer); timer = 0 }
+      if (current) { current.setAttribute("aria-pressed", "false"); current = null }
+    }
+    btns.forEach(function (b) {
+      b.addEventListener("click", function () {
+        if (current === b) { stop(); return }
+        stop()
+        if (!audio) { audio = new Audio(); audio.preload = "none" }
+        audio.src = b.getAttribute("data-audio")
+        var limit = parseFloat(b.getAttribute("data-limit") || "15") * 1000
+        current = b
+        b.setAttribute("aria-pressed", "true")
+        audio.play().then(function () {
+          timer = setTimeout(stop, limit)
+        }).catch(stop)
+        audio.onended = stop
+      })
+    })
+    document.addEventListener("visibilitychange", function () { if (document.hidden) stop() })
+
+    /* 루프 썸네일 — WorkGrid와 같은 규칙: 보일 때만 src를 붙이고 재생한다. */
+    var vids = Array.prototype.slice.call(document.querySelectorAll(".axes .axis-video[data-src]"))
+    if (!vids.length || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
+    if (!("IntersectionObserver" in window)) return
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        var v = e.target
+        if (e.isIntersecting) {
+          if (!v.src) v.src = v.getAttribute("data-src")
+          var p = v.play(); if (p && p.catch) p.catch(function () {})
+          v.addEventListener("playing", function () { v.classList.add("is-playing") }, { once: true })
+        } else if (v.src) v.pause()
+      })
+    }, { rootMargin: "80px 0px" })
+    vids.forEach(function (v) { io.observe(v) })
+  })()
+</script>
+
+<style>
+  .axes { max-width: var(--content-w); margin: 0 40px 0 var(--desktop-content-x); padding: 56px 0 24px; }
+  .conn {
+    margin: 0 0 18px; font-size: var(--fs-xs); letter-spacing: .02em; color: var(--text-3);
+  }
+  .conn .arrow { margin-left: 6px; color: var(--hover); }
+  .axis-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); }
+  .axis { display: flex; flex-direction: column; background: var(--surface-2); border: 1px solid var(--line); }
+  .axis-media {
+    position: relative; display: block; aspect-ratio: 16 / 10; overflow: hidden; background: var(--surface-2);
+  }
+  .axis-media img, .axis-media .ph, .axis-video {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  }
+  .axis-media .ph { background: repeating-linear-gradient(45deg, var(--line) 0 2px, var(--surface-2) 2px 6px); }
+  .axis-video { opacity: 0; transition: opacity var(--dur-slow) ease; }
+  .axis-video.is-playing { opacity: 1; }
+  .axis-body { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px 16px; flex: 1; }
+  h3 { margin: 0; font-size: var(--fs-lead); font-weight: 500; letter-spacing: -.01em; }
+  h3 a { color: var(--text); text-decoration: none; }
+  h3 a:hover .ko { border-bottom: 1px solid var(--hover); }
+  h3 .en { margin-left: 8px; font-size: var(--fs-sm); font-weight: 400; color: var(--text-3); }
+  .axis-desc { margin: 0; font-size: var(--fs-sm); line-height: 1.55; color: var(--text-2); }
+  .axis-desc [lang="ko"] { line-height: 1.65; }
+
+  .excerpt {
+    display: inline-flex; align-items: center; gap: 8px; width: fit-content;
+    padding: 4px 10px 4px 8px; border: 1px solid var(--line-2); border-radius: 999px;
+    background: none; color: var(--text); font: inherit; font-size: var(--fs-2xs);
+    letter-spacing: .06em; cursor: pointer;
+  }
+  .excerpt:hover { border-color: var(--hover); color: var(--hover); }
+  .excerpt[aria-pressed="true"] { background: var(--text); color: var(--surface); border-color: var(--text); }
+  .excerpt--none { cursor: default; color: var(--text-3); border-style: dashed; }
+  .excerpt--none:hover { border-color: var(--line-2); color: var(--text-3); }
+  .ex-dot { width: 7px; height: 7px; border-radius: 50%; border: 1px solid currentColor; }
+  .excerpt[aria-pressed="true"] .ex-dot { background: currentColor; animation: ex-breathe 1.2s ease-in-out infinite; }
+  @keyframes ex-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.5); } }
+  .ex-on { display: none; }
+  .excerpt[aria-pressed="true"] .ex-off { display: none; }
+  .excerpt[aria-pressed="true"] .ex-on { display: inline; }
+  .ex-title { color: var(--text-3); max-width: 22ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .excerpt[aria-pressed="true"] .ex-title { color: inherit; }
+
+  .axis-works { list-style: none; margin: auto 0 0; padding: 10px 0 0; border-top: 1px solid var(--line); font-size: var(--fs-xs); line-height: 1.7; }
+  .axis-works a { color: var(--text-2); text-decoration: none; }
+  .axis-works a:hover { color: var(--hover); }
+  .axis-works .y { color: var(--text-3); font-variant-numeric: tabular-nums; }
+  .axis-works .more a { color: var(--text-3); }
+
+  /* 좁은 화면: 세로로 쌓되 카드는 가로형(미디어 왼쪽·본문 오른쪽) — 세 장이 화면 셋을 먹지 않게 */
+  @media (max-width: 1000px) {
+    .axis-grid { grid-template-columns: 1fr; }
+    .axis { flex-direction: row; }
+    .axis-media { flex: 0 0 42%; aspect-ratio: auto; min-height: 220px; }
+  }
+  @media (max-width: 700px) {
+    .axes { margin: 0; padding: 40px 16px 16px; }
+    .axis { flex-direction: column; }
+    .axis-media { flex: none; aspect-ratio: 16 / 10; min-height: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .excerpt[aria-pressed="true"] .ex-dot { animation: none; }
+    .axis-video { display: none; }
+  }
+</style>
