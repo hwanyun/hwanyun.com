@@ -1,0 +1,151 @@
+---
+/**
+ * 구체가 흘러내린다 — 히어로의 입자가 본문으로 새어 세 축을 통과한다.
+ *
+ * 본문이 히어로를 덮기 시작하면 구체 아래쪽에서 입자가 떨어져 나온다. 입자는 문서 좌표로
+ * 살아서 페이지와 함께 스크롤되고, 어느 카드 위에 있느냐에 따라 다르게 군다:
+ *   울림  — 공기처럼 떤다(가만히 있지 못한다)
+ *   접촉  — 커서가 카드 안에 있으면 그 자리로 모인다(손이 닿은 자리)
+ *   흔적  — 느려져 가라앉고, 얼룩처럼 남았다가 아주 천천히 지워진다
+ * 세 축을 지나면 사라진다. 히어로와 본문이 하나의 입자 시스템으로 이어진다.
+ *
+ * 그리는 층은 fixed 캔버스 하나(pointer-events 없음). 본문(.home-body) 안 마지막에 두어
+ * 섹션들 위에 그려지고, 고정 메뉴(z 30)보다는 아래다. reduced-motion이면 아예 그리지 않는다.
+ */
+---
+
+<canvas class="home-flow" id="home-flow" aria-hidden="true"></canvas>
+
+<script is:inline>
+  ;(function () {
+    var canvas = document.getElementById("home-flow")
+    var axes = document.getElementById("axes")
+    if (!canvas || !axes) return
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { canvas.remove(); return }
+    var ctx = canvas.getContext("2d")
+    var W = 0, H = 0, dpr = 1
+    function fit() {
+      dpr = Math.min(2, window.devicePixelRatio || 1)
+      W = window.innerWidth; H = window.innerHeight
+      canvas.width = W * dpr; canvas.height = H * dpr
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      measure()
+    }
+
+    /* 카드 영역(문서 좌표) — 스크롤/리사이즈 때만 다시 잰다 */
+    var zones = []
+    var cards = Array.prototype.slice.call(axes.querySelectorAll(".axis"))
+    function measure() {
+      var sy = window.scrollY
+      zones = cards.map(function (c, i) {
+        var r = c.getBoundingClientRect()
+        return { id: c.getAttribute("data-axis") || String(i), x0: r.left, x1: r.right, y0: r.top + sy, y1: r.bottom + sy }
+      })
+      axTop = axes.getBoundingClientRect().top + sy
+      axBottom = axTop + axes.offsetHeight
+    }
+    var axTop = 0, axBottom = 0
+
+    /* 입자 — 문서 좌표. 히어로 구체(뷰포트 중앙, 반지름 = min(W,H)*.38) 아래에서 태어난다 */
+    var MAX = 420
+    var ps = []
+    var pointer = { x: -1e4, y: -1e4, on: false } // 문서 좌표
+    window.addEventListener("pointermove", function (e) { pointer.x = e.clientX; pointer.y = e.clientY + window.scrollY; pointer.on = true }, { passive: true })
+    window.addEventListener("pointerleave", function () { pointer.on = false })
+    window.addEventListener("resize", fit)
+    window.addEventListener("scroll", measure, { passive: true })
+
+    function spawn(n, sy) {
+      var R = Math.min(W, H) * .38, cx = W / 2, cy = H / 2 + sy
+      for (var i = 0; i < n && ps.length < MAX; i++) {
+        var a = Math.PI * (.5 + (Math.random() - .5) * .9)   // 구체 아래쪽 호
+        ps.push({
+          x: cx + Math.cos(a) * R * (0.9 + Math.random() * .1),
+          y: cy + Math.sin(a) * R * (0.9 + Math.random() * .1),
+          vx: (Math.random() - .5) * .3, vy: .3 + Math.random() * .6,
+          life: 1, seed: Math.random() * 6.283, settled: 0,
+        })
+      }
+    }
+
+    var raf = 0, running = false, last = 0
+    function zoneOf(p) {
+      for (var i = 0; i < zones.length; i++) { var z = zones[i]; if (p.y >= z.y0 && p.y < z.y1) return z }
+      return null
+    }
+
+    function frame(now) {
+      if (!running) return
+      var dt = last ? Math.min(.05, (now - last) / 1000) : .016
+      last = now
+      var sy = window.scrollY
+      /* 본문이 히어로를 덮는 동안(구체가 아직 보이는 동안)만 새어 나온다.
+         덮인 뒤에는 뷰포트 위쪽에서 조금씩 이어진다 — 이미 흘러 있던 것들이 내려오는 것처럼. */
+      var bodyTop = axes.getBoundingClientRect().top - 96 // 섹션 상단(패딩 전)
+      if (bodyTop > 0 && bodyTop < H) spawn(3, sy)
+      else if (bodyTop <= 0 && axBottom - sy > 0) spawn(1, sy - H / 2)
+
+      ctx.clearRect(0, 0, W, H)
+      var t = now / 1000
+      for (var i = ps.length - 1; i >= 0; i--) {
+        var p = ps[i]
+        var z = zoneOf(p)
+        var g = 9 * dt  // 기본 낙하 — 느리게. 카드 안에서 머물러야 군집이 보인다
+        if (!z) {
+          p.vy += g; p.vx *= .98
+        } else if (z.id === "sounding") {
+          // 울림 — 떨림. 가만히 있지 못한다
+          p.vy += g * .6
+          p.vx += (Math.random() - .5) * 40 * dt + Math.sin(t * 7 + p.seed) * 6 * dt
+          p.vy += (Math.random() - .5) * 30 * dt
+          p.vx *= .93; p.vy *= .93
+        } else if (z.id === "contact") {
+          // 접촉 — 커서가 카드 안에 있으면 그 자리로 모인다
+          var inZone = pointer.on && pointer.x >= z.x0 && pointer.x < z.x1 && pointer.y >= z.y0 && pointer.y < z.y1
+          if (inZone) {
+            var dx = pointer.x - p.x, dy = pointer.y - p.y, d = Math.hypot(dx, dy) || 1
+            var pull = Math.min(220, 9000 / d) * dt
+            p.vx += dx / d * pull; p.vy += dy / d * pull
+            p.vx *= .9; p.vy *= .9
+          } else { p.vy += g * .8; p.vx *= .985 }
+        } else if (z.id === "trace") {
+          // 흔적 — 느려져 가라앉고, 남았다가 아주 천천히 지워진다
+          p.vx *= .9; p.vy *= .9
+          if (Math.abs(p.vy) < .05 && Math.abs(p.vx) < .05) p.settled += dt
+          else p.vy += g * .25
+          if (p.settled > 0) p.life -= dt * .035
+        }
+        // 카드 밖(세 축 아래)으로 나가면 멈추며 사라진다
+        if (p.y > axBottom) { p.vy *= .85; p.vx *= .85; p.life -= dt * 2.2 }
+        p.vx *= .995; p.vy = Math.min(p.vy, 1.4)
+        p.x += p.vx; p.y += p.vy
+        if (p.life <= 0 || p.y - sy > H + 40 || p.x < -20 || p.x > W + 20) { ps.splice(i, 1); continue }
+        var vy = p.y - sy
+        if (vy < -10 || vy > H + 10) continue
+        var alpha = .22 + .5 * Math.min(1, Math.hypot(p.vx, p.vy) / 3)
+        if (z && z.id === "trace") alpha = .15 + .35 * p.life
+        ctx.globalAlpha = Math.max(0, Math.min(.85, alpha * p.life))
+        ctx.fillStyle = "rgb(17, 17, 17)"
+        ctx.beginPath(); ctx.arc(p.x, vy, .8 + Math.min(1.2, Math.hypot(p.vx, p.vy) * .25), 0, 6.283); ctx.fill()
+      }
+      ctx.globalAlpha = 1
+      raf = requestAnimationFrame(frame)
+    }
+    function start() { if (running) return; running = true; last = 0; raf = requestAnimationFrame(frame) }
+    function stop() { running = false; if (raf) cancelAnimationFrame(raf); raf = 0; ctx.clearRect(0, 0, W, H) }
+
+    fit()
+    /* 세 축 섹션이 화면 근처(위아래 한 화면)일 때만 돈다 */
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (es) { es.forEach(function (e) { e.isIntersecting ? start() : stop() }) }, { rootMargin: "100% 0px 60% 0px" }).observe(axes)
+    } else start()
+    document.addEventListener("visibilitychange", function () { document.hidden ? stop() : start() })
+  })()
+</script>
+
+<style>
+  .home-flow {
+    position: fixed; inset: 0; width: 100%; height: 100%;
+    z-index: 5; pointer-events: none;
+  }
+</style>
