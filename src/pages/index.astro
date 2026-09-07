@@ -635,10 +635,10 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
           ? ["소리와 빛이 울리고,", "몸이 닿고,", "흔적이 남는다."]
           : ["Sound and light begin,", "a body touches,", "a trace remains."]
         const R = Math.min(width, height) * .38
-        const off = document.createElement("canvas"); const w = Math.ceil(R * 1.7), h = Math.ceil(R * 1.1)
+        const off = document.createElement("canvas"); const w = Math.ceil(R * 1.9), h = Math.ceil(R * 1.2)
         off.width = w; off.height = h
         const oc = off.getContext("2d", { willReadFrequently: true })!
-        const fs = Math.max(14, R * (ko ? .12 : .115))
+        const fs = Math.max(16, R * (ko ? .155 : .15))
         oc.font = `500 ${fs}px "Pretendard Variable", Pretendard, sans-serif`
         oc.textAlign = "center"; oc.textBaseline = "middle"; oc.fillStyle = "#fff"
         lines.forEach((l, i) => oc.fillText(l, w / 2, h / 2 + (i - 1) * fs * 1.25))
@@ -667,7 +667,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         const lines = ko
           ? ["소리와 빛이 울리고,", "몸이 닿고,", "흔적이 남는다."]
           : ["Sound and light begin,", "a body touches,", "a trace remains."]
-        const fontSize = Math.min(width * (ko ? .052 : .05), 64)
+        const fontSize = Math.min(width * (ko ? .07 : .068), 92)
         // 사이트에서 가장 큰 타이포그래피가 시스템 폰트여선 안 된다 — 본문과 같은 폰트로
         sampleContext.font = `500 ${fontSize}px "Pretendard Variable", Pretendard, sans-serif`
         sampleContext.textAlign = "center"
