@@ -31,7 +31,7 @@ const latest = all.slice(0, 3)
 )}
 
 <style>
-  .protos { max-width: var(--content-w); margin: 0 40px 0 var(--desktop-content-x); padding: 40px 0 24px; }
+  .protos { max-width: var(--content-w); margin: 0 40px 0 var(--desktop-content-x); padding: 120px 0 0; }
   .conn { margin: 0 0 18px; font-size: var(--fs-xs); letter-spacing: .02em; color: var(--text-3); }
   .conn .arrow { margin-left: 6px; color: var(--hover); }
   .proto-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); }
@@ -40,7 +40,7 @@ const latest = all.slice(0, 3)
   .proto-more a:hover { color: var(--hover); }
   @media (max-width: 1000px) { .proto-grid { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 700px) {
-    .protos { margin: 0; padding: 32px 16px 16px; }
+    .protos { margin: 0; padding: 80px 16px 0; }
     .proto-grid { grid-template-columns: 1fr; }
   }
 </style>
