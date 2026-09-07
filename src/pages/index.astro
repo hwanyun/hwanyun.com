@@ -802,7 +802,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
           let destinationX = isInside ? particle.targetX : driftX
           let destinationY = isInside ? particle.targetY : driftY
           // 1안 — 문장 글자 위에는 앉지 않는다: 가장 가까운 빈자리로 비킨다
-          if (!isInside && thesisMask && depth > -.2 && maskAt(driftX, driftY)) {
+          // 앞면이든 뒷면이든 — 뒷면 점도 화면에서는 글자 위에 찍히므로 모두 비킨다
+          if (!isInside && thesisMask && maskAt(driftX, driftY)) {
             const d = dodge(driftX, driftY); destinationX = d[0]; destinationY = d[1]
           }
           // 이름이 모인 뒤에는 커서가 글자를 밀어낸다. 반발은 감쇠 안에서 더해야 한다 —
