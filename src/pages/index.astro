@@ -642,7 +642,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         off.width = w; off.height = h
         const oc = off.getContext("2d", { willReadFrequently: true })!
         // 모바일(작은 구체)은 글자를 더 크게 — 입자가 적어 작으면 형태가 안 남는다
-        const fs = Math.max(16, R * (isMobile ? (ko ? .25 : .24) : (ko ? .155 : .15)))
+        const fs = Math.max(16, R * (isMobile ? (ko ? .25 : .24) : (ko ? .125 : .12))) // 데스크톱 한 단계 줄임
         oc.font = `500 ${fs}px "Pretendard Variable", Pretendard, sans-serif`
         oc.textAlign = "center"; oc.textBaseline = "middle"; oc.fillStyle = "#fff"
         lines.forEach((l, i) => oc.fillText(l, w / 2, h / 2 + (i - (lines.length - 1) / 2) * fs * 1.2))
@@ -671,7 +671,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         const lines = ko
           ? ["소리와 빛이 울리고,", "몸이 닿고,", "흔적이 남는다."]
           : ["Sound and light begin,", "a body touches,", "a trace remains."]
-        const fontSize = Math.min(width * (ko ? .07 : .068), 92)
+        const fontSize = Math.min(width * (ko ? .055 : .052), 72) // 작가 요청으로 한 단계 줄임
         // 사이트에서 가장 큰 타이포그래피가 시스템 폰트여선 안 된다 — 본문과 같은 폰트로
         sampleContext.font = `500 ${fontSize}px "Pretendard Variable", Pretendard, sans-serif`
         sampleContext.textAlign = "center"
