@@ -631,21 +631,22 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       const thesisSurfacePoints = (): Array<[number, number, number]> => {
         if (thesisMode !== "2" || !thesisEl) return []
         const ko = document.documentElement.getAttribute("data-lang") === "ko"
+        // 모바일은 네 줄로 나눠 글자를 키운다 — 세 줄이면 구체 폭에 맞추느라 글자가 작아져 안 읽힌다
         const lines = ko
-          ? ["소리와 빛이 울리고,", "몸이 닿고,", "흔적이 남는다."]
-          : ["Sound and light begin,", "a body touches,", "a trace remains."]
-        const R = Math.min(width, height) * .38
+          ? (isMobile ? ["소리와 빛이", "울리고, 몸이", "닿고, 흔적이", "남는다."] : ["소리와 빛이 울리고,", "몸이 닿고,", "흔적이 남는다."])
+          : (isMobile ? ["Sound and light", "begin, a body", "touches, a trace", "remains."] : ["Sound and light begin,", "a body touches,", "a trace remains."])
+        const R = isMobile ? Math.min(width * .46, height * .3) : Math.min(width, height) * .38
         const off = document.createElement("canvas"); const w = Math.ceil(R * 2), h = Math.ceil(R * 1.3)
         off.width = w; off.height = h
         const oc = off.getContext("2d", { willReadFrequently: true })!
         // 모바일(작은 구체)은 글자를 더 크게 — 입자가 적어 작으면 형태가 안 남는다
-        const fs = Math.max(16, R * (isMobile ? (ko ? .2 : .19) : (ko ? .155 : .15)))
+        const fs = Math.max(16, R * (isMobile ? (ko ? .23 : .22) : (ko ? .155 : .15)))
         oc.font = `500 ${fs}px "Pretendard Variable", Pretendard, sans-serif`
         oc.textAlign = "center"; oc.textBaseline = "middle"; oc.fillStyle = "#fff"
-        lines.forEach((l, i) => oc.fillText(l, w / 2, h / 2 + (i - 1) * fs * 1.25))
+        lines.forEach((l, i) => oc.fillText(l, w / 2, h / 2 + (i - (lines.length - 1) / 2) * fs * 1.2))
         const px = oc.getImageData(0, 0, w, h).data
         const pts: Array<[number, number, number]> = []
-        const step = Math.max(2, Math.round(fs / (isMobile ? 7 : 9)))
+        const step = Math.max(2, Math.round(fs / (isMobile ? 10 : 9)))
         for (let y = 0; y < h; y += step) for (let x = 0; x < w; x += step) {
           if (px[(y * w + x) * 4 + 3] < 80) continue
           const u = (x - w / 2) / R, v = (y - h / 2) / R  // -0.85..0.85, -0.55..0.55
@@ -711,8 +712,9 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         repelRadius = nameHeight * REPEL_RADIUS_RATIO
         repelForce = nameHeight * REPEL_FORCE_RATIO
         // 모바일에서는 터치 반응성과 안정성을 위해 렌더링 밀도를 낮춘다.
+        // 모바일은 표면 문장이 입자를 나눠 쓰므로 조금 더 — 적으면 글자가 성기게 찍혀 안 읽힌다
         const count = isMobile
-          ? Math.min(1400, Math.max(900, targets.length))
+          ? Math.min(2000, Math.max(1400, Math.round(targets.length * 1.5)))
           : Math.min(3200, Math.max(2400, targets.length * 2))
         const previous = particles
         particles = Array.from({ length: count }, (_, index) => {
@@ -740,7 +742,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         // 2안 — 앞쪽 일부 입자를 문장 자리로 옮겨 구체와 함께 돌게 한다
         const surf = thesisSurfacePoints()
         if (surf.length) {
-          const n = Math.min(surf.length, Math.floor(particles.length * (isMobile ? .6 : .55)))
+          const n = Math.min(surf.length, Math.floor(particles.length * (isMobile ? .65 : .55)))
           // 인덱스 순서 = 위에서 아래(sphereY). 앞에서부터 가져오면 한쪽 극이 비어 하단 밀도가 준다 —
           // 전체에서 일정 간격으로 뽑아 구체의 밀도를 고르게 남긴다
           const stride = particles.length / n
@@ -837,8 +839,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
           particle.y += particle.vy
           context.beginPath()
           // 문장 입자는 더 크고(모바일은 한층 더) 진하게 — 작은 화면에서도 글자로 읽히게
-          const pointSize = isInside ? 1.1 : (particle.text ? (isMobile ? 1.5 : .9) : .52) + (depth + 1) * .48
-          let brightness = isInside ? .96 : Math.min(.98, (particle.text ? (isMobile ? .55 : .42) : .26) + (depth + 1) * .34 + audioLevel * .18)
+          const pointSize = isInside ? 1.1 : (particle.text ? (isMobile ? 1.6 : .9) : .52) + (depth + 1) * .48
+          let brightness = isInside ? .96 : Math.min(.98, (particle.text ? (isMobile ? .7 : .42) : (isMobile ? .18 : .26)) + (depth + 1) * .34 + audioLevel * .18)
           // 뒷면으로 돌아간 문장이 구체 너머로 거울처럼 비치는 것은 그대로 둔다(작가 선택)
           // 문장도 검정 — 네온 레몬을 시도했다가 검정이 더 엣지 있다고 되돌림(작가, 2026-09-07)
           context.arc(particle.x, particle.y, pointSize, 0, Math.PI * 2)
