@@ -740,9 +740,12 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         const surf = thesisSurfacePoints()
         if (surf.length) {
           const n = Math.min(surf.length, Math.floor(particles.length * .55))
+          // 인덱스 순서 = 위에서 아래(sphereY). 앞에서부터 가져오면 한쪽 극이 비어 하단 밀도가 준다 —
+          // 전체에서 일정 간격으로 뽑아 구체의 밀도를 고르게 남긴다
+          const stride = particles.length / n
           for (let i = 0; i < n; i++) {
             const [u, v, z] = surf[Math.floor(i / n * surf.length)]
-            const p = particles[i]
+            const p = particles[Math.min(particles.length - 1, Math.floor(i * stride))]
             p.sphereX = u; p.sphereY = v; p.sphereZ = z; p.text = true
           }
         }
@@ -834,8 +837,11 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
           const pointSize = isInside ? 1.1 : (particle.text ? .9 : .52) + (depth + 1) * .48
           let brightness = isInside ? .96 : Math.min(.96, (particle.text ? .42 : .26) + (depth + 1) * .34 + audioLevel * .18)
           // 뒷면으로 돌아간 문장이 구체 너머로 거울처럼 비치는 것은 그대로 둔다(작가 선택)
-          context.arc(particle.x, particle.y, pointSize, 0, Math.PI * 2)
-          context.fillStyle = `rgba(17, 17, 17, ${brightness})`
+          // 문장은 네온 레몬(작가 선택, 2026-09-07) — 표면을 도는 글자와 커서로 모인 글자 둘 다.
+          // 흰 바탕에서 작은 점이라 살짝 진한 레몬(#d9f21a)으로, 점도 조금 크게.
+          const lemon = particle.text || isInside
+          context.arc(particle.x, particle.y, lemon ? pointSize + .5 : pointSize, 0, Math.PI * 2)
+          context.fillStyle = lemon ? `rgba(217, 242, 26, ${Math.min(1, brightness + .15)})` : `rgba(17, 17, 17, ${brightness})`
           context.fill()
         }
         requestAnimationFrame(draw)
