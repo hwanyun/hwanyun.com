@@ -102,7 +102,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
   <script type="application/json" id="ev-data" is:inline set:html={JSON.stringify(upEvents)}></script>
 
   <script is:inline>
-    /* 리뷰용 서체 비교 — ?font=syne|serif|unbounded|mono. 연결문과 섹션·카드 제목에만.
+    /* 리뷰용 서체 비교 — ?font=figtree|outfit|syne|serif|unbounded|mono. 연결문과 섹션·카드 제목에만.
        확정되면 외부 요청 없이 직접 호스팅으로 바꾼다(사이트 원칙). 기본은 없음. */
     ;(function () {
       var f = new URLSearchParams(location.search).get("font")
@@ -112,6 +112,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         serif: ["Instrument+Serif:ital@0;1", '"Instrument Serif", serif'],
         unbounded: ["Unbounded:wght@400;600", '"Unbounded", sans-serif'],
         mono: ["JetBrains+Mono:wght@400;600", '"JetBrains Mono", monospace'],
+        figtree: ["Figtree:wght@400;500;600", '"Figtree", sans-serif'],   // Avenir Next에 가장 가까운 무료
+        outfit: ["Outfit:wght@400;500;600", '"Outfit", sans-serif'],
       }
       var m = map[f]; if (!m) return
       var l = document.createElement("link"); l.rel = "stylesheet"
@@ -1221,6 +1223,9 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     :global(html[data-font="unbounded"]) .home-body :global(.axis h3) { font-weight: 600; font-size: var(--fs-body); }
     :global(html[data-font="mono"]) .home-body :global(.conn) { font-weight: 600; font-size: var(--fs-sm); letter-spacing: 0; }
     :global(html[data-font="mono"]) .home-body :global(.axis h3) { font-weight: 600; font-size: var(--fs-body); }
+    /* Avenir 계열은 레퍼런스처럼 400 하나로 — 볼드 없이 크기만 */
+    :global(html[data-font="figtree"]) .home-body :global(.conn), :global(html[data-font="outfit"]) .home-body :global(.conn) { font-weight: 400; font-size: var(--fs-lead); letter-spacing: 0; }
+    :global(html[data-font="figtree"]) .home-body :global(.axis h3), :global(html[data-font="outfit"]) .home-body :global(.axis h3) { font-weight: 400; font-size: 28px; letter-spacing: 0; }
     @media (max-width: 700px) { .work-archive .conn { margin: 0; padding: 112px 16px 18px; } }
     /* 스냅 기준점과 덮는 층은 위 .home-body가 맡는다. 그리드는 본문 안의 한 섹션이다. */
     .work-archive { position: relative; background: var(--surface); }
