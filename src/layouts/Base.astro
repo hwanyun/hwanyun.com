@@ -115,7 +115,8 @@ const shareImage = new URL(
         </div>
       </div>
       <p class="sf-bottom">
-        <span>© 2014–<span id="footer-year">{new Date().getFullYear()}</span> HWANYUN</span>
+        {/* 올해 하나만 — 2014–는 첫 작품 연도였지만 작품마다 연도가 붙어 있어 여기서는 소음이다 */}
+        <span>© <span id="footer-year">{new Date().getFullYear()}</span> HWANYUN</span>
         <span class="sf-dim">
           <span data-language-content="en">No cookies. Audio never leaves your device.</span>
           <span data-language-content="ko" lang="ko">쿠키 없음. 소리는 이 기기를 떠나지 않습니다.</span>
