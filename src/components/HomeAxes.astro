@@ -167,19 +167,15 @@ const cards = AXES.map((axis) => {
     .axis-media { flex: 0 0 42%; aspect-ratio: auto; min-height: 220px; }
   }
   @media (max-width: 700px) {
-    /* 가로로 넘기는 타일 세 장 — 이미지 + 이름 + 15초. 설명 문단과 작품 수는 Works에서. */
-    .axes { margin: 0; padding: 56px 0 0; }
-    .conn { padding: 0 16px; }
-    .axis-grid {
-      display: flex; gap: 10px; padding: 0 16px; overflow-x: auto;
-      scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none;
-    }
-    .axis-grid::-webkit-scrollbar { display: none; }
-    .axis { flex: 0 0 66vw; flex-direction: column; scroll-snap-align: start; border: 0; background: none; }
-    .axis-media { flex: none; aspect-ratio: 4 / 5; min-height: 0; }
-    .axis-body { padding: 10px 0 0; gap: 4px; }
+    /* 데스크톱 카드 세 장을 그대로 세로로 쌓는다 — 이미지 + 이름 + 15초.
+       가로 스와이프는 셋째 카드가 잘려 배열이 이상해 보였다(작가 지적). 설명과 작품 수는 Works에서. */
+    .axes { margin: 0; padding: 56px 16px 0; }
+    .axis-grid { gap: 10px; }
+    .axis { flex-direction: column; }
+    .axis-media { flex: none; aspect-ratio: 16 / 10; min-height: 0; }
+    .axis-body { flex-direction: row; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; }
     .axis-line, .axis-count { display: none; }
-    .axis-foot { margin-top: 2px; justify-content: flex-start; }
+    .axis-foot { margin-top: 0; }
   }
   @media (prefers-reduced-motion: reduce) {
     .excerpt[aria-pressed="true"] .ex-dot { animation: none; }

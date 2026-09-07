@@ -36,6 +36,7 @@ const where = (e: (typeof events)[number], lang: "en" | "ko") =>
     <span data-language-content="en">Where the work has been</span>
     <span data-language-content="ko" lang="ko">이 작업이 놓였던 곳</span>
     <span class="arrow" aria-hidden="true">→</span>
+    <span class="conn-short"><span data-language-content="en">Shown at</span><span data-language-content="ko" lang="ko">놓였던 곳</span></span>
   </p>
   <div class="cred-grid">
     <div>
@@ -86,5 +87,5 @@ const where = (e: (typeof events)[number], lang: "en" | "ko") =>
   .cv-link a { color: var(--text-3); text-decoration: none; }
   .cv-link a:hover { color: var(--hover); }
   @media (max-width: 800px) { .cred-grid { grid-template-columns: 1fr; } }
-  @media (max-width: 700px) { .cred { margin: 0; padding: 112px 16px 0; } }
+  @media (max-width: 700px) { .cred { margin: 0; padding: 56px 16px 0; } }
 </style>
