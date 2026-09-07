@@ -7,6 +7,8 @@ const {
   title = "HWANYUN",
   current = "",
   chrome = "light",
+  // bare: 본문을 .page-body로 감싸지 않는다. 홈은 히어로가 fixed라 스스로 층을 관리한다.
+  bare = false,
   // 공유 카드 — 페이지가 자기 얼굴을 가질 수 있게 열어 둔다.
   // 전시 링크를 메신저에 붙일 때 사이트 기본 카드보다 포스터가 훨씬 많은 걸 말한다.
   image = "",
@@ -41,7 +43,7 @@ const shareImage = new URL(
       })()
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#0a0b0d" />
+    <meta name="theme-color" content="#ffffff" />
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
@@ -78,7 +80,8 @@ const shareImage = new URL(
       <span aria-hidden="true">/</span>
       <button type="button" data-lang-choice="ko" aria-pressed="false">KO</button>
     </nav>
-    <slot />
+    {/* 본문이 푸터 위를 지나가려면 층과 불투명한 바닥이 필요하다 (아래 .site-footer 참조) */}
+    {bare ? <slot /> : <div class="page-body"><slot /></div>}
     <div class="cursor-dot" aria-hidden="true"></div>
 
     {/* 위로 — 긴 페이지(작품 상세는 도판이 일곱 겹이다)에서 상단으로 돌아갈
@@ -86,8 +89,36 @@ const shareImage = new URL(
     <button type="button" class="to-top" id="to-top" hidden aria-label="Back to top">
       <span aria-hidden="true">↑</span>
     </button>
-    <footer>
-      © 2014–<span id="footer-year">{new Date().getFullYear()}</span> HWANYUN
+    {/* 푸터 — 페이지 끝에서 드러난다. sticky bottom이라 본문이 그 위를 지나가며
+        마지막에 걷히듯 나타난다(히어로를 본문이 덮는 것과 같은 커튼 문법의 반대 방향).
+        사실만 적는다: 연락처는 Contact 페이지와 같은 원본, 나머지는 링크. */}
+    <footer class="site-footer">
+      <p class="sf-mark" aria-hidden="true">HWANYUN</p>
+      <dl class="sf-rows">
+        <div class="sf-line">
+          <div class="sf-row">
+            <dt><span data-language-content="en">Get in touch:</span><span data-language-content="ko" lang="ko">연락:</span></dt>
+            <dd><a class="sf-pill" href="mailto:hwanyun.lab@gmail.com">hwanyun.lab@gmail.com</a></dd>
+          </div>
+          <div class="sf-row sf-row--end">
+            <dt><span data-language-content="en">Follow:</span><span data-language-content="ko" lang="ko">팔로우:</span></dt>
+            <dd><a class="sf-pill" href="https://instagram.com/hwanyun.lab" target="_blank" rel="noopener">Instagram</a></dd>
+          </div>
+        </div>
+        <div class="sf-row">
+          <dt><span data-language-content="en">Elsewhere:</span><span data-language-content="ko" lang="ko">다른 곳:</span></dt>
+          <dd class="sf-links">
+            <a href="/works/">Works</a><a href="/prototypes/">Prototypes</a><a href="/sound/">Sound</a><a href="/events/">Events</a><a href="/cv/">CV</a><a href="/contact/">Contact</a>
+          </dd>
+        </div>
+      </dl>
+      <div class="sf-bottom">
+        <span>© 2014–<span id="footer-year">{new Date().getFullYear()}</span> HWANYUN</span>
+        <span class="sf-dim">
+          <span data-language-content="en">No cookies. Audio never leaves your device.</span>
+          <span data-language-content="ko" lang="ko">쿠키 없음. 소리는 이 기기를 떠나지 않습니다.</span>
+        </span>
+      </div>
     </footer>
 
     <script is:inline>
@@ -552,11 +583,71 @@ const shareImage = new URL(
         font-size: var(--fs-body);
       }
 
-      footer {
+      /* 푸터 — 본문 뒤에 붙어 있다가 끝에서 드러난다.
+         본문(각 페이지의 최상위 래퍼)이 z-index 1 + 불투명 배경이면 그 위를 지나가고,
+         아니면 그냥 문서 끝의 보통 푸터처럼 보인다. 어느 쪽이든 깨지지 않는다. */
+      /* 최소 한 화면 — 짧은 페이지(Contact)에서도 푸터는 스크롤해야 드러난다 */
+      .page-body { position: relative; z-index: 1; background: var(--surface); min-height: 100svh; }
+      /* 푸터 — 본문 뒤에 붙어 있다가 끝에서 드러난다(레퍼런스: universaleverything.com).
+         본문(.page-body 또는 홈의 .home-body)이 z-index 1 + 불투명 배경이라 그 위를 지나가고,
+         마지막 한 화면에서 어두운 면과 큰 워드마크가 걷히듯 나타난다.
+         사이트에서 어두운 면은 여기 하나뿐이다 — 강조색이 정해지면 --sf-bg 한 토큰만 바꾼다. */
+      .site-footer {
+        --sf-bg: var(--void);
+        --sf-fg: var(--void-text);
+        --sf-fg-2: var(--void-text-2);
+        --sf-line: var(--void-line);
+        position: sticky;
+        bottom: 0;
+        z-index: 0;
         clear: both;
-        padding: 60px 10px 30px;
-        font-size: var(--fs-xs);
-        color: var(--text-3);
+        padding: 40px 40px 24px;
+        background: var(--sf-bg);
+        color: var(--sf-fg);
+        font-size: var(--fs-sm);
+        scroll-snap-align: none;
+      }
+      /* 워드마크가 폭을 가득 채운다. 글자 크기는 폭에 비례하되 너무 커지지 않게 막는다. */
+      .sf-mark {
+        margin: 0 0 36px;
+        text-align: center;
+        font-size: min(17.5vw, 250px);
+        font-weight: 600;
+        line-height: .88;
+        letter-spacing: -.035em;
+        white-space: nowrap;
+        overflow: hidden;
+        color: var(--sf-fg);
+      }
+      .sf-rows { display: flex; flex-direction: column; gap: 18px; margin: 0; }
+      /* 연락과 팔로우는 한 줄 양끝 — 레퍼런스의 두 컬럼을 한 줄로 */
+      .sf-line { display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; }
+      .sf-row { display: flex; align-items: center; gap: 12px; }
+      .sf-row--end dt { order: 2; }
+      .sf-row--end dd { order: 1; }
+      .sf-row dt { margin: 0; color: var(--sf-fg-2); }
+      .sf-row dd { margin: 0; }
+      .sf-pill {
+        display: inline-block; padding: 7px 16px; border: 1px solid var(--sf-fg); border-radius: 999px;
+        color: var(--sf-fg); text-decoration: none; transition: background var(--dur-base) ease, color var(--dur-base) ease;
+      }
+      .sf-pill:hover { background: var(--sf-fg); color: var(--sf-bg); }
+      .sf-links { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+      .sf-links a { color: var(--sf-fg); text-decoration: none; border-bottom: 1px solid transparent; }
+      .sf-links a:hover { border-color: var(--sf-fg); }
+      .sf-bottom {
+        display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px;
+        margin-top: 44px; padding-top: 14px; border-top: 1px solid var(--sf-line);
+        font-size: var(--fs-xs); color: var(--sf-fg-2);
+      }
+      .sf-dim { color: var(--sf-fg-2); }
+      @media (max-width: 800px) {
+        .site-footer { padding: 32px 16px 18px; }
+        .sf-mark { font-size: 17vw; margin-bottom: 28px; }
+        .sf-line { flex-direction: column; align-items: flex-start; gap: 18px; }
+        .sf-row { flex-wrap: wrap; gap: 8px 12px; }
+        .sf-row--end dt { order: 0; }
+        .sf-row--end dd { order: 0; }
       }
 
       @media (max-width: 700px) {
@@ -577,7 +668,8 @@ const shareImage = new URL(
         /* hero는 검은 히어로 위에 뜬다 — 어두운 글자면 보이지 않는다.
            열리면 흰 반투명 패널이 깔리므로 그때는 다시 어두운 글자로 돌아간다. */
         .site-menu--hero:not(.is-open) {
-          color: var(--void-text);
+          /* 히어로가 흰 바탕이 되었으므로(2026-09) 잉크도 어둡다. is-past-hero 규칙은 그대로 둔다. */
+          color: var(--text);
           background: transparent;
           line-height: 1.4;
         }

@@ -1,11 +1,10 @@
 ---
 /**
  * 결과와 신뢰 — 이 작업이 놓였던 곳.
- * 브랜드 로고 대신 레지던시·기관을 알약으로, 그 옆에 최근 전시 4줄.
- * 사실은 cv.json에서만 가져온다 — 여기서 새로 적지 않는다(비면 작가에게 묻는다).
+ * 브랜드 로고 대신 레지던시·기관을 알약으로, 그 옆에 events 컬렉션의 최근 4개.
+ * 사실은 콘텐츠 원본에서만 가져온다 — 여기서 새로 적지 않는다(비면 작가에게 묻는다).
  */
-import cvEn from "../data/cv.json"
-import cvKo from "../data/cv.ko.json"
+import { getCollection } from "astro:content"
 
 // 작업이 실제로 놓였던 장소·기관. 순서 = 최근순이 아니라 무게순(작가가 바꿀 수 있다).
 const INSTITUTIONS = [
@@ -19,22 +18,15 @@ const INSTITUTIONS = [
   "Arts Council Korea",
 ]
 
-// 개인전·단체전·레지던시를 한 줄로 합쳐 최근 4개. 국문은 같은 자리의 항목을 짝짓는다.
-const PICK = ["Exhibitions — Solo", "Exhibitions — Group", "Residency"]
-type Item = { year: string; text: string }
-const rows: { year: string; en: string; ko: string }[] = []
-cvEn.sections.forEach((sec: { title: string; items: Item[] }, si: number) => {
-  if (!PICK.includes(sec.title)) return
-  const koSec = (cvKo.sections as { title: string; items: Item[] }[])[si]
-  sec.items.forEach((it, ii) => {
-    rows.push({ year: it.year, en: it.text, ko: koSec?.items[ii]?.text ?? it.text })
-  })
-})
-const yearOf = (y: string) => Math.max(...(y.match(/\d{4}/g) ?? ["0"]).map(Number))
-rows.sort((a, b) => yearOf(b.year) - yearOf(a.year))
-const recent = rows.slice(0, 4)
-// 문장 끝의 마침표와 괄호 안 주최 표기는 홈에서는 소음이다 — 한 줄로 줄인다.
-const trim = (s: string) => s.replace(/\s*\((?:organised|run) by[^)]*\)/i, "").replace(/\.\s*$/, "")
+// 최근 일정 — CV가 아니라 events 컬렉션이 원본이다. /events가 이미 지난 일정을
+// 날짜 기준으로 관리하므로, 홈은 그중 최근 4개를 빌려 쓰고 나머지는 그 페이지로 보낸다.
+const events = (await getCollection("events", ({ data }) => !data.draft))
+  .sort((a, b) => b.data.dateStart.localeCompare(a.data.dateStart))
+const recent = events.slice(0, 4)
+const yearOf = (d: string) => d.slice(0, 4)
+const where = (e: (typeof events)[number], lang: "en" | "ko") =>
+  (lang === "ko" ? [e.data.venue, e.data.city] : [e.data.venueEn || e.data.venue, e.data.cityEn || e.data.city])
+    .filter(Boolean).join(", ")
 ---
 
 <section class="cred" aria-labelledby="cred-title">
@@ -53,19 +45,23 @@ const trim = (s: string) => s.replace(/\s*\((?:organised|run) by[^)]*\)/i, "").r
     <div>
       <h3 class="eyebrow">RECENT</h3>
       <ol class="tl">
-        {recent.map((r) => (
+        {recent.map((e) => (
           <li>
-            <span class="y">{yearOf(r.year)}</span>
-            <span>
-              <span data-language-content="en">{trim(r.en)}</span>
-              <span data-language-content="ko" lang="ko">{trim(r.ko)}</span>
-            </span>
+            <span class="y">{yearOf(e.data.dateStart)}</span>
+            <a href={`/events/${e.slug}/`}>
+              <span class="t">{e.data.title}</span>
+              <span class="w">
+                <span data-language-content="en">{where(e, "en")}</span>
+                <span data-language-content="ko" lang="ko">{where(e, "ko")}</span>
+              </span>
+            </a>
           </li>
         ))}
       </ol>
-      <p class="cv-link"><a href="/cv/">
-        <span data-language-content="en">Full CV</span><span data-language-content="ko" lang="ko">전체 이력</span> →
-      </a></p>
+      <p class="cv-link">
+        <a href="/events/"><span data-language-content="en">All events</span><span data-language-content="ko" lang="ko">전체 일정</span> →</a>
+        <a href="/cv/"><span data-language-content="en">CV</span><span data-language-content="ko" lang="ko">이력</span> →</a>
+      </p>
     </div>
   </div>
 </section>
@@ -81,7 +77,10 @@ const trim = (s: string) => s.replace(/\s*\((?:organised|run) by[^)]*\)/i, "").r
   .tl { list-style: none; margin: 0; padding: 0; font-size: var(--fs-xs); color: var(--text-2); }
   .tl li { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--line); line-height: 1.5; }
   .tl .y { color: var(--text-3); font-variant-numeric: tabular-nums; }
-  .cv-link { margin: 12px 0 0; font-size: var(--fs-xs); }
+  .tl a { color: var(--text); text-decoration: none; }
+  .tl a:hover .t { color: var(--hover); }
+  .tl .w { display: block; color: var(--text-3); }
+  .cv-link { display: flex; gap: 18px; margin: 12px 0 0; font-size: var(--fs-xs); }
   .cv-link a { color: var(--text-3); text-decoration: none; }
   .cv-link a:hover { color: var(--hover); }
   @media (max-width: 800px) { .cred-grid { grid-template-columns: 1fr; } }

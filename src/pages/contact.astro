@@ -81,6 +81,9 @@ import Base from "../layouts/Base.astro"
        이 페이지만 다른 사이트처럼 보이던 원인이었다. 인터랙션(커서 추적)은 유지하고
        색만 뺀다. 이제 이 화면에서 색을 갖는 것은 마스코트뿐이고, 그 대비가
        사고가 아니라 의도로 읽힌다. */
+    /* 마스코트 배경이 뷰포트 전체를 덮는 fixed 층이라, 푸터가 그 뒤에 갇힌다. 이 페이지는
+       한 화면이라 푸터를 위로 올려도 지나가는 본문이 없다. */
+    :global(.site-footer) { z-index: 2; }
     #mascot-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background: radial-gradient(circle 42vmax at var(--mx, 55%) var(--my, 42%), var(--surface-2) 0%, var(--surface) 62%); }
     /* 캐릭터 머리 위 말풍선 */
@@ -100,13 +103,6 @@ import Base from "../layouts/Base.astro"
     #mascot-bubble.below { transform: translateX(-50%); max-width: 78vw; text-align: center; }
     #mascot-bubble.below::after { content: ""; position: absolute; left: 50%; top: -8px; right: auto; bottom: auto;
       transform: translateX(-50%); border: 8px solid transparent; border-bottom-color: var(--surface); }
-    :global(body > footer) {
-      position: fixed;
-      z-index: 3;
-      left: 10px;
-      bottom: 30px;
-      padding: 0;
-    }
     @media (max-width: 700px) {
       .page {
         margin: 0;
@@ -128,7 +124,6 @@ import Base from "../layouts/Base.astro"
       }
       .links span { width: auto; font-size: var(--fs-sm); line-height: 1.4; color: var(--text-3); }
       .links a { font-size: var(--fs-sm); line-height: 1.65; }
-      :global(body > footer) { left: 16px; bottom: 18px; }
       #mascot-bubble { font-size: var(--fs-sm); padding: 8px 13px; border-radius: 14px; max-width: 70vw; }
       #mascot-bubble :global(.en) { font-size: var(--fs-2xs); margin-top: 3px; }
     }

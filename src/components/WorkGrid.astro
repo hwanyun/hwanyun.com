@@ -628,10 +628,7 @@ const gridRows = Math.max(MIN_ROWS, Math.round((totalWeight / WEIGHT_PER_ROW) * 
     color: var(--text-3);
   }
 
-  /* 홈에서는 전역 footer 숨김 (그리드가 화면을 채움) — 이 컴포넌트는 홈 전용 */
-  :global(footer) {
-    display: none;
-  }
+  /* 전역 footer는 더 이상 숨기지 않는다 — 홈이 여러 섹션이 되면서 푸터가 문서 끝에서 드러난다(2026-09). */
 
   /* 모바일: 데스크톱과 동일한 패킹 구조를 화면 전체로 확장한다. */
   @media (max-width: 700px) {
@@ -701,9 +698,6 @@ const gridRows = Math.max(MIN_ROWS, Math.round((totalWeight / WEIGHT_PER_ROW) * 
     #noresult {
       position: static;
       padding: 40px 0;
-    }
-    :global(footer) {
-      display: block;
     }
   }
 </style>
