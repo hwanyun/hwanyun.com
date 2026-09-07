@@ -3,7 +3,7 @@
  * 사이트 메뉴 — 단일 소스.
  *
  * variant
- *  - "page" : 일반 페이지(Works/Sound/Events/Bio/Contact). 데스크톱 좌상단 고정 + 모바일 햄버거
+ *  - "page" : 일반 페이지(Works/Prototypes/Sound/Events/Bio). 데스크톱 좌상단 고정 + 모바일 햄버거
  *  - "hero" : 홈 히어로 위. 데스크톱에서는 숨김(구체를 가리지 않음), 모바일에서만 햄버거
  *  - "grid" : 홈 작품 그리드 위 오버레이. 데스크톱 전용(모바일에서는 hero가 대신함)
  *
@@ -24,7 +24,7 @@ const nav = [
   { label: "Sound", href: "/sound", key: "sound" },
   { label: "Events", href: "/events", key: "events" },
   { label: "Bio", href: "/cv", key: "bio" },
-  { label: "Contact", href: "/contact", key: "contact" },
+  // Contact는 메뉴에서 뺀다 — 푸터가 연락처를 맡는다(2026-09). 페이지 자체는 /contact에 그대로 있다.
 ]
 
 const MENU_ID: Record<string, string> = {

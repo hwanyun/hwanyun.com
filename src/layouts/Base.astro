@@ -93,32 +93,33 @@ const shareImage = new URL(
         마지막에 걷히듯 나타난다(히어로를 본문이 덮는 것과 같은 커튼 문법의 반대 방향).
         사실만 적는다: 연락처는 Contact 페이지와 같은 원본, 나머지는 링크. */}
     <footer class="site-footer">
-      <p class="sf-mark" aria-hidden="true">HWANYUN</p>
-      <dl class="sf-rows">
-        <div class="sf-line">
-          <div class="sf-row">
-            <dt><span data-language-content="en">Get in touch:</span><span data-language-content="ko" lang="ko">연락:</span></dt>
-            <dd><a class="sf-pill" href="mailto:hwanyun.lab@gmail.com">hwanyun.lab@gmail.com</a></dd>
-          </div>
-          <div class="sf-row sf-row--end">
-            <dt><span data-language-content="en">Follow:</span><span data-language-content="ko" lang="ko">팔로우:</span></dt>
-            <dd><a class="sf-pill" href="https://instagram.com/hwanyun.lab" target="_blank" rel="noopener">Instagram</a></dd>
-          </div>
+      {/* 워드마크는 SVG 텍스트로 — textLength가 폭을 정확히 채운다. vw 계산으로는 글꼴마다 어긋난다. */}
+      <svg class="sf-mark" viewBox="0 0 1000 150" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <text x="0" y="146" textLength="1000" lengthAdjust="spacingAndGlyphs">HWANYUN</text>
+      </svg>
+      <div class="sf-cols">
+        <div class="sf-col">
+          <p class="sf-label"><span data-language-content="en">Get in touch</span><span data-language-content="ko" lang="ko">연락</span></p>
+          <a class="sf-pill" href="mailto:hwanyun.lab@gmail.com">hwanyun.lab@gmail.com</a>
         </div>
-        <div class="sf-row">
-          <dt><span data-language-content="en">Elsewhere:</span><span data-language-content="ko" lang="ko">다른 곳:</span></dt>
-          <dd class="sf-links">
+        <div class="sf-col">
+          <p class="sf-label"><span data-language-content="en">Follow</span><span data-language-content="ko" lang="ko">팔로우</span></p>
+          <a class="sf-pill" href="https://instagram.com/hwanyun.lab" target="_blank" rel="noopener">Instagram</a>
+        </div>
+        <div class="sf-col">
+          <p class="sf-label"><span data-language-content="en">Elsewhere</span><span data-language-content="ko" lang="ko">다른 곳</span></p>
+          <nav class="sf-links" aria-label="Footer">
             <a href="/works/">Works</a><a href="/prototypes/">Prototypes</a><a href="/sound/">Sound</a><a href="/events/">Events</a><a href="/cv/">CV</a><a href="/contact/">Contact</a>
-          </dd>
+          </nav>
         </div>
-      </dl>
-      <div class="sf-bottom">
+      </div>
+      <p class="sf-bottom">
         <span>© 2014–<span id="footer-year">{new Date().getFullYear()}</span> HWANYUN</span>
         <span class="sf-dim">
           <span data-language-content="en">No cookies. Audio never leaves your device.</span>
           <span data-language-content="ko" lang="ko">쿠키 없음. 소리는 이 기기를 떠나지 않습니다.</span>
         </span>
-      </div>
+      </p>
     </footer>
 
     <script is:inline>
@@ -601,53 +602,51 @@ const shareImage = new URL(
         bottom: 0;
         z-index: 0;
         clear: both;
-        padding: 40px 40px 24px;
+        padding: 44px 40px 22px;
         background: var(--sf-bg);
         color: var(--sf-fg);
         font-size: var(--fs-sm);
         scroll-snap-align: none;
       }
-      /* 워드마크가 폭을 가득 채운다. 글자 크기는 폭에 비례하되 너무 커지지 않게 막는다. */
+      /* 워드마크 — 양끝을 정확히 채운다. 높이는 폭에 비례(viewBox 1000×150). */
       .sf-mark {
-        margin: 0 0 36px;
-        text-align: center;
-        font-size: min(17.5vw, 250px);
-        font-weight: 600;
-        line-height: .88;
-        letter-spacing: -.035em;
-        white-space: nowrap;
-        overflow: hidden;
-        color: var(--sf-fg);
+        display: block; width: 100%; height: auto; aspect-ratio: 1000 / 150;
+        margin: 0 0 48px; overflow: visible;
       }
-      .sf-rows { display: flex; flex-direction: column; gap: 18px; margin: 0; }
-      /* 연락과 팔로우는 한 줄 양끝 — 레퍼런스의 두 컬럼을 한 줄로 */
-      .sf-line { display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; }
-      .sf-row { display: flex; align-items: center; gap: 12px; }
-      .sf-row--end dt { order: 2; }
-      .sf-row--end dd { order: 1; }
-      .sf-row dt { margin: 0; color: var(--sf-fg-2); }
-      .sf-row dd { margin: 0; }
+      .sf-mark text {
+        font-family: var(--sans); font-weight: 600; font-size: 190px; letter-spacing: -.02em;
+        fill: var(--sf-fg);
+      }
+      /* 라벨 위, 내용 아래 — 세 칸이 같은 윗선에서 시작한다 */
+      .sf-cols {
+        display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 24px 40px;
+        align-items: start; margin: 0;
+      }
+      .sf-col { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+      .sf-label {
+        margin: 0; font-size: var(--fs-2xs); letter-spacing: .14em; text-transform: uppercase;
+        color: var(--sf-fg-2);
+      }
       .sf-pill {
-        display: inline-block; padding: 7px 16px; border: 1px solid var(--sf-fg); border-radius: 999px;
+        display: inline-block; padding: 8px 18px; border: 1px solid var(--sf-fg); border-radius: 999px;
         color: var(--sf-fg); text-decoration: none; transition: background var(--dur-base) ease, color var(--dur-base) ease;
       }
       .sf-pill:hover { background: var(--sf-fg); color: var(--sf-bg); }
-      .sf-links { display: flex; flex-wrap: wrap; gap: 6px 18px; }
-      .sf-links a { color: var(--sf-fg); text-decoration: none; border-bottom: 1px solid transparent; }
+      .sf-links { display: flex; flex-direction: column; gap: 4px; }
+      .sf-links a { color: var(--sf-fg); text-decoration: none; width: fit-content; border-bottom: 1px solid transparent; line-height: 1.5; }
       .sf-links a:hover { border-color: var(--sf-fg); }
       .sf-bottom {
-        display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px;
-        margin-top: 44px; padding-top: 14px; border-top: 1px solid var(--sf-line);
+        display: flex; flex-wrap: wrap; gap: 6px 28px;
+        margin: 56px 0 0; padding: 14px 80px 0 0; border-top: 1px solid var(--sf-line);
         font-size: var(--fs-xs); color: var(--sf-fg-2);
       }
       .sf-dim { color: var(--sf-fg-2); }
       @media (max-width: 800px) {
-        .site-footer { padding: 32px 16px 18px; }
-        .sf-mark { font-size: 17vw; margin-bottom: 28px; }
-        .sf-line { flex-direction: column; align-items: flex-start; gap: 18px; }
-        .sf-row { flex-wrap: wrap; gap: 8px 12px; }
-        .sf-row--end dt { order: 0; }
-        .sf-row--end dd { order: 0; }
+        .site-footer { padding: 28px 16px 18px; }
+        .sf-mark { margin-bottom: 32px; }
+        .sf-cols { grid-template-columns: 1fr 1fr; }
+        .sf-col:first-child { grid-column: 1 / -1; }
+        .sf-bottom { margin-top: 36px; padding-right: 64px; }
       }
 
       @media (max-width: 700px) {
