@@ -4,7 +4,6 @@ import Base from "../../layouts/Base.astro"
 import LangText from "../../components/LangText.astro"
 import { tEn, tKo } from "../../lib/titles"
 import { materialLabel } from "../../data/materials"
-import SeenTracker from "../../components/SeenTracker.astro"
 import { logoBox } from "../../lib/logoSize"
 
 export async function getStaticPaths() {
@@ -1511,7 +1510,7 @@ function toParagraphs(text: string): string {
     }
   </style>
 
-  <SeenTracker slug={work.slug} />
+  
 
   {/* 좁은 화면에는 경량본을 준다. 폰의 표시 폭은 400px 남짓이라 데스크톱
       해상도가 보이지도 않는데 파일은 그대로 다 받느라 재생이 끊긴다.

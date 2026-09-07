@@ -3,7 +3,6 @@ import { getCollection } from "astro:content"
 import SiteMenu from "./SiteMenu.astro"
 import LangText from "./LangText.astro"
 import { tEn, tKo } from "../lib/titles"
-import SeenTracker from "./SeenTracker.astro"
 
 // menu=false면 그리드 첫 칸의 메뉴를 그리지 않는다 — 홈은 메뉴를 본문 좌상단에 고정해 따로 둔다(2026-09).
 const { filter = "", current = "home", menu = true } = Astro.props
@@ -77,7 +76,6 @@ const gridRows = Math.max(MIN_ROWS, Math.round((totalWeight / WEIGHT_PER_ROW) * 
   </div>
 </div>
 
-<SeenTracker />
 
 <script is:inline>
   /* 덮이는 동안의 등장 — 그리드가 히어로를 얼마나 덮었는지(0→1)를 진행도로 삼아
@@ -614,11 +612,6 @@ const gridRows = Math.max(MIN_ROWS, Math.round((totalWeight / WEIGHT_PER_ROW) * 
   }
   .card .cap .t {
     font-weight: 400;
-  }
-  /* 방문의 흔적 — 시아노타입(감광지) 인용. 본 작품의 제목 아래에 노출된 자국이 남는다.
-     세션 한정이며 서버로 보내지 않는다. */
-  .card.is-seen .cap .t {
-    box-shadow: inset 0 -1px 0 0 rgba(255, 255, 255, 0.55);
   }
   .card .cap .y {
     font-weight: 300;

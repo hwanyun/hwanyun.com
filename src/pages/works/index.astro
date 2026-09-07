@@ -3,7 +3,6 @@ import { getCollection } from "astro:content"
 import Base from "../../layouts/Base.astro"
 import { MATERIALS } from "../../data/materials"
 import { AXES } from "../../data/axes"
-import SeenTracker from "../../components/SeenTracker.astro"
 import LangText from "../../components/LangText.astro"
 import { tEn, tKo } from "../../lib/titles"
 
@@ -119,7 +118,6 @@ const showCounts = SHOWS.map((x) => ({
     </section>
   </main>
 
-  <SeenTracker />
 </Base>
 
 <script is:inline>
@@ -152,8 +150,6 @@ const showCounts = SHOWS.map((x) => ({
         li.hidden = !hit
         if (hit) shown++
       })
-      // 필터가 걸린 동안에만 트레이스를 그린다
-      list.classList.toggle("is-tracing", !!value)
       links.forEach(function (a) {
         var av = a.getAttribute("data-show") !== null
           ? { k: "show", v: a.getAttribute("data-show") }
@@ -257,53 +253,7 @@ const showCounts = SHOWS.map((x) => ({
 
   ol { margin: 0; padding: 0; list-style: none; }
 
-  /* 트레이스 — 필터가 걸린 동안 남은 항목들을 한 회로로 잇는다.
-     구리선을 흑백 톤 안에서 표현: 얇은 수직선 + 각 항목의 접점. */
-  #work-list.is-tracing { position: relative; padding-left: 22px; }
-  #work-list.is-tracing li { position: relative; }
-  #work-list.is-tracing li::before {
-    content: "";
-    position: absolute;
-    left: -14px;
-    top: -1px;
-    bottom: -1px;
-    width: 1px;
-    background: var(--line-2);
-  }
-  /* 첫 항목은 위쪽, 마지막 항목은 아래쪽 선을 잘라 회로의 끝을 만든다 */
-  #work-list.is-tracing li:not([hidden]):first-of-type::before { top: 50%; }
-  #work-list.is-tracing li::after {
-    content: "";
-    position: absolute;
-    left: -17px;
-    top: 50%;
-    width: 7px;
-    height: 7px;
-    margin-top: -3.5px;
-    border-radius: 50%;
-    border: 1px solid var(--line-2);
-    background: var(--surface);
-  }
-  #work-list.is-tracing li:hover::before,
-  #work-list.is-tracing li:hover::after { border-color: var(--hover); background: var(--hover); }
-  #work-list.is-tracing li:hover::before { background: var(--hover); }
-
-  /* 방문의 흔적 — 시아노타입(감광지) 인용. 본 작품은 접점이 "노출되어" 채워진다.
-     세션 한정이라 탭을 닫으면 사라진다. */
-  #work-list.is-tracing li.is-seen::after { background: var(--text-3); border-color: var(--text-3); }
-  /* 필터가 없을 때는 연도 앞에 작은 흔적만 남긴다 — 목록의 조용함을 해치지 않는다.
-     필터 중에는 접점이 그 역할을 하므로 이중 표시를 피한다. */
-  #work-list.is-tracing li.is-seen time::before { display: none; }
-  li.is-seen time::before {
-    content: "";
-    display: inline-block;
-    width: 4px;
-    height: 4px;
-    margin-right: 6px;
-    vertical-align: 2px;
-    border-radius: 50%;
-    background: var(--text-4);
-  }
+  /* 트레이스 선과 방문 흔적 표식은 뺐다(작가: 마음에 안 듦, 2026-09) */
   @media (prefers-reduced-motion: reduce) {
     .material-filter a { transition: none; }
   }
