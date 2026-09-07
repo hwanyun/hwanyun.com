@@ -1178,12 +1178,12 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
        그리드 첫 칸에 메뉴가 있던 시절의 값이다. 타일 border(4px)만큼 바깥으로 물려 시각적 모서리를 맞춘다. */
     @media (min-width: 701px) {
       .work-archive :global(#packed .grid) {
-        left: calc(var(--desktop-content-x) - 4px); right: 40px; max-width: calc(var(--content-w) + 8px);
+        left: calc(var(--desktop-content-x) - 4px); right: 40px; max-width: calc(1600px + 8px);
         top: 0; bottom: 0;
       }
     }
     .work-archive .conn {
-      max-width: var(--content-w); margin: 0 40px 0 var(--desktop-content-x);
+      max-width: 1600px; margin: 0 40px 0 var(--desktop-content-x);
       padding: 160px 0 18px; font-size: var(--fs-xs); letter-spacing: .02em; color: var(--text-3);
     }
     .work-archive .conn .arrow { margin-left: 6px; color: var(--hover); }
