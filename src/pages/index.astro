@@ -6,7 +6,6 @@ import HomeAxes from "../components/HomeAxes.astro"
 import HomePrototypes from "../components/HomePrototypes.astro"
 import HomeSound from "../components/HomeSound.astro"
 import HomeCred from "../components/HomeCred.astro"
-import HomeFlow from "../components/HomeFlow.astro"
 import PrototypePlayer from "../components/PrototypePlayer.astro"
 import { getCollection } from "astro:content"
 import { THESIS } from "../data/axes"
@@ -552,8 +551,6 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     </section>
     <HomeSound />
     <HomeCred />
-    {/* 구체에서 새어 나온 입자가 세 축을 통과한다 — 본문 위, 고정 메뉴 아래 층 */}
-    <HomeFlow />
   </div>
   <PrototypePlayer />
 
