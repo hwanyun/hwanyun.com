@@ -74,6 +74,14 @@ const recent = releases.slice(0, 3)
     }
     fit(); window.addEventListener("resize", fit)
     var raf = 0, visible = true, t0 = performance.now()
+    /* 커서 = 힘. 올라오면 파형이 커지고 떨림이 늘며, 커서 근처의 입자는 밀려난다.
+       떠나면 스프링이 천천히 원래 흐름으로 되돌린다 — 히어로 입자·티커와 같은 문법. */
+    var px = -1e4, py = -1e4, hover = 0
+    var card = canvas.closest("a") || canvas
+    card.addEventListener("pointermove", function (e) { var b = canvas.getBoundingClientRect(); px = e.clientX - b.left; py = e.clientY - b.top })
+    card.addEventListener("pointerenter", function () { hoverTarget = 1 })
+    card.addEventListener("pointerleave", function () { hoverTarget = 0; px = -1e4; py = -1e4 })
+    var hoverTarget = 0
 
     /* 입자 — 히어로 구체와 같은 어휘. 점들이 가로로 펼쳐져 있고, 합성 파형(서로 나눠지지 않는
        주기의 사인 셋)을 따라 들리며, 파형이 클수록 떤다. 멈춰 있는 순간이 없다. */
@@ -87,18 +95,26 @@ const recent = releases.slice(0, 3)
     function draw(now) {
       ctx.clearRect(0, 0, W, H)
       var t = (now - t0) / 1000
-      var loud = .05 + Math.abs(Math.sin(t * .29) * Math.sin(t * .11)) * .16
+      hover += (hoverTarget - hover) * (hoverTarget ? .08 : .03)
+      var loud = .05 + Math.abs(Math.sin(t * .29) * Math.sin(t * .11)) * .16 + hover * .28
       var mid = H / 2, amp = H * .24, gapX = W / (COLS + 1), gapY = H * .07
       ctx.fillStyle = getComputedStyle(canvas).color
       for (var n = 0; n < dots.length; n++) {
         var p = dots[n]
-        var lv = level(p.c, t)
+        var lv = level(p.c, t * (1 + hover * 1.6)) * (1 + hover * .9)
         var off = p.r - (ROWS - 1) / 2
         var target = mid + off * gapY + lv * amp * (1 - Math.abs(off) * .18)
         var tremor = (Math.random() - .5) * loud * H * .3
-        p.vy = (p.vy + (target - p.y) * .12 + tremor) * .72
+        var x0 = gapX * (p.c + 1)
+        var pushY = 0, pushX = 0
+        if (hover > .01) {
+          var dx = x0 - px, dy = p.y - py, dist = Math.hypot(dx, dy) || .001, R = H * .55
+          if (dist < R) { var f = (1 - dist / R); f = f * f * hover * H * .12; pushX = dx / dist * f; pushY = dy / dist * f }
+        }
+        p.px = (p.px || 0) * .8 + pushX
+        p.vy = (p.vy + (target - p.y) * .12 + tremor + pushY) * .72
         p.y += p.vy
-        var x = gapX * (p.c + 1) + Math.sin(t * .4 + p.seed) * 1.2
+        var x = x0 + Math.sin(t * .4 + p.seed) * 1.2 + p.px
         var size = .9 + Math.min(1.6, Math.abs(lv) * 1.8 + loud * 3)
         ctx.globalAlpha = .35 + Math.min(.65, Math.abs(lv) * .9 + loud * 1.5)
         ctx.beginPath(); ctx.arc(x, p.y, size, 0, 6.283); ctx.fill()
