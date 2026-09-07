@@ -19,6 +19,8 @@ const {
   description = "Sound, light, material, and the body alter one another — installations and interactive systems by HWANYUN.",
   imageAlt = "HWANYUN particle sphere forming the wordmark",
 } = Astro.props
+// Adobe Fonts 웹 프로젝트 ID (use.typekit.net/<ID>.css). 비어 있으면 로드하지 않는다.
+const TYPEKIT_ID = ""
 const canonicalUrl = new URL(Astro.url.pathname, "https://www.hwanyun.com").href
 const shareImage = new URL(
   image || "/images/social/hwanyun-share-preview.png",
@@ -62,6 +64,8 @@ const shareImage = new URL(
     {/* Pretendard Variable 셀프호스트 — 동적 서브셋(unicode-range)이라
         브라우저가 필요한 글리프 블록만 받는다. 외부 폰트 요청 0. */}
     <link rel="stylesheet" href="/fonts/pretendard/pretendardvariable-dynamic-subset.css" />
+    {/* Adobe Fonts — Avenir Next LT Pro 400. TYPEKIT_ID를 작가의 웹 프로젝트 ID로 채운다 */}
+    {TYPEKIT_ID && <link rel="stylesheet" href={`https://use.typekit.net/${TYPEKIT_ID}.css`} />}
     <slot name="head" />
   </head>
   <body data-chrome={chrome}>
@@ -409,6 +413,9 @@ const shareImage = new URL(
         --desktop-content-x: 170px;
         /* 데스크톱에서는 작가명과 본문을 분리하는 공통 헤더 여백 */
         --desktop-header-clearance: 82px;
+        /* 디스플레이 서체 — Avenir Next LT Pro(Adobe Fonts). 이 서체 하나만 외부 요청 원칙의 예외(작가 결정, 2026-09).
+           typekit 링크가 없으면 Pretendard로 자연스럽게 떨어진다. */
+        --display: "avenir-next-lt-pro", "Pretendard Variable", Pretendard, sans-serif;
         --sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
           system-ui, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
       }
