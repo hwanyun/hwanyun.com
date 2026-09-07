@@ -585,13 +585,13 @@ const gridRows = Math.max(MIN_ROWS, Math.round((totalWeight / WEIGHT_PER_ROW) * 
     inset: 0;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
-    padding: 10cqw 6cqw 6cqw;
+    justify-content: center;
+    padding: 5cqw;
     font-family: var(--display);
-    font-size: clamp(16px, 11cqw, 72px);
+    font-size: clamp(18px, 17cqw, 140px);
     font-weight: 400;
-    line-height: .95;
-    letter-spacing: -.015em;
+    line-height: .92;
+    letter-spacing: -.02em;
     color: var(--surface);
     background: rgba(0, 0, 0, 0.45);
     /* 가까워지면 서서히 드러나고, 올리면 완전히 나타난다 */
@@ -601,7 +601,7 @@ const gridRows = Math.max(MIN_ROWS, Math.round((totalWeight / WEIGHT_PER_ROW) * 
     overflow: hidden;
     overflow-wrap: anywhere;
   }
-  .card .cap .y { display: block; margin-top: .4em; font-size: .38em; letter-spacing: 0; color: rgba(255, 255, 255, .72); font-variant-numeric: tabular-nums; }
+  .card .cap .y { display: block; margin-top: .35em; font-size: .3em; letter-spacing: 0; color: rgba(255, 255, 255, .72); font-variant-numeric: tabular-nums; }
   .card:hover .cap {
     opacity: 1;
   }
