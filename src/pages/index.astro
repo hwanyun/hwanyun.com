@@ -584,7 +584,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       let thesisMaskW = 0
       const buildThesisMask = () => {
         thesisMask = null
-        if (thesisMode !== "1" || !thesisEl || isMobile || width < 1 || height < 1) return
+        if (thesisMode !== "1" || !thesisEl || width < 1 || height < 1) return
         const off = document.createElement("canvas"); off.width = width; off.height = height
         const oc = off.getContext("2d", { willReadFrequently: true })!
         const hb = hero.getBoundingClientRect()
@@ -635,16 +635,17 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
           ? ["소리와 빛이 울리고,", "몸이 닿고,", "흔적이 남는다."]
           : ["Sound and light begin,", "a body touches,", "a trace remains."]
         const R = Math.min(width, height) * .38
-        const off = document.createElement("canvas"); const w = Math.ceil(R * 1.9), h = Math.ceil(R * 1.2)
+        const off = document.createElement("canvas"); const w = Math.ceil(R * 2), h = Math.ceil(R * 1.3)
         off.width = w; off.height = h
         const oc = off.getContext("2d", { willReadFrequently: true })!
-        const fs = Math.max(16, R * (ko ? .155 : .15))
+        // 모바일(작은 구체)은 글자를 더 크게 — 입자가 적어 작으면 형태가 안 남는다
+        const fs = Math.max(16, R * (isMobile ? (ko ? .2 : .19) : (ko ? .155 : .15)))
         oc.font = `500 ${fs}px "Pretendard Variable", Pretendard, sans-serif`
         oc.textAlign = "center"; oc.textBaseline = "middle"; oc.fillStyle = "#fff"
         lines.forEach((l, i) => oc.fillText(l, w / 2, h / 2 + (i - 1) * fs * 1.25))
         const px = oc.getImageData(0, 0, w, h).data
         const pts: Array<[number, number, number]> = []
-        const step = Math.max(2, Math.round(fs / 9))
+        const step = Math.max(2, Math.round(fs / (isMobile ? 7 : 9)))
         for (let y = 0; y < h; y += step) for (let x = 0; x < w; x += step) {
           if (px[(y * w + x) * 4 + 3] < 80) continue
           const u = (x - w / 2) / R, v = (y - h / 2) / R  // -0.85..0.85, -0.55..0.55
@@ -739,7 +740,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         // 2안 — 앞쪽 일부 입자를 문장 자리로 옮겨 구체와 함께 돌게 한다
         const surf = thesisSurfacePoints()
         if (surf.length) {
-          const n = Math.min(surf.length, Math.floor(particles.length * .55))
+          const n = Math.min(surf.length, Math.floor(particles.length * (isMobile ? .6 : .55)))
           // 인덱스 순서 = 위에서 아래(sphereY). 앞에서부터 가져오면 한쪽 극이 비어 하단 밀도가 준다 —
           // 전체에서 일정 간격으로 뽑아 구체의 밀도를 고르게 남긴다
           const stride = particles.length / n
@@ -779,7 +780,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         const audioLevel = mic && mic.on ? mic.level : 0
         const audioHigh = mic && mic.on && !reduceMotion ? mic.high : 0
         const audioLow = mic && mic.on && !reduceMotion ? mic.low : 0
-        const globeRadius = size * .38
+        // 모바일은 폭 기준으로 더 크게 — 작은 구체가 빈 화면 한가운데 떠 있으면 구도가 어색하다
+        const globeRadius = isMobile ? Math.min(width * .46, height * .3) : size * .38
         // 데스크톱은 커서가 얹혀 있는 동안, 모바일은 손가락이 닿아 있는 동안
         const repelling = isInside && hasPointer && !reduceMotion
 
@@ -834,8 +836,9 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
           particle.x += particle.vx
           particle.y += particle.vy
           context.beginPath()
-          const pointSize = isInside ? 1.1 : (particle.text ? .9 : .52) + (depth + 1) * .48
-          let brightness = isInside ? .96 : Math.min(.96, (particle.text ? .42 : .26) + (depth + 1) * .34 + audioLevel * .18)
+          // 문장 입자는 더 크고(모바일은 한층 더) 진하게 — 작은 화면에서도 글자로 읽히게
+          const pointSize = isInside ? 1.1 : (particle.text ? (isMobile ? 1.5 : .9) : .52) + (depth + 1) * .48
+          let brightness = isInside ? .96 : Math.min(.98, (particle.text ? (isMobile ? .55 : .42) : .26) + (depth + 1) * .34 + audioLevel * .18)
           // 뒷면으로 돌아간 문장이 구체 너머로 거울처럼 비치는 것은 그대로 둔다(작가 선택)
           // 문장도 검정 — 네온 레몬을 시도했다가 검정이 더 엣지 있다고 되돌림(작가, 2026-09-07)
           context.arc(particle.x, particle.y, pointSize, 0, Math.PI * 2)
@@ -1032,10 +1035,13 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       font-size: var(--fs-xs); font-weight: 400; line-height: 1.55; color: var(--text-3); letter-spacing: 0;
     }
     @media (max-width: 700px) {
-      .thesis {
+      /* 모바일도 2안 — 문장은 구체 표면의 입자로만. HTML 문장은 스크린리더용 */
+      .hero[data-thesis="2"] .thesis { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; transform: none; }
+      .hero:not([data-thesis="2"]) .thesis {
         left: 16px; right: 16px; top: calc(var(--mobile-header-h, 67px) + 14px); transform: none;
         max-width: none; font-size: var(--fs-body);
       }
+      .thesis small { display: none; }
     }
 
     /* LISTEN — 티커와 같은 층위의 조용한 컨트롤, 우하단.
@@ -1114,11 +1120,13 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       /* 하단은 티커가 폭 전체(100vw - 32px)를 쓴다. 같은 층에 두면 LISTEN이
          티커를 덮어 전시 정보가 눌린다 — 아예 반대편 끝, 헤더 아래로 옮긴다.
          안내문은 아래로 펼쳐지므로 화면 밖으로 나가지 않는다. */
+      /* 문장이 헤더 아래 왼쪽에 오면서 LISTEN은 다시 우하단으로. 티커는 그만큼 폭을 비운다 */
       .listen {
         right: 16px; left: auto;
-        top: calc(var(--mobile-header-h, 67px) + 12px); bottom: auto;
+        top: auto; bottom: 26px;
         align-items: flex-end;
       }
+      .upcoming-ticker { max-width: calc(100vw - 32px - 120px); }
       .ls-note, .ls-error, .ls-silent { max-width: calc(100vw - 32px); }
     }
     @media (prefers-reduced-motion: reduce) {
