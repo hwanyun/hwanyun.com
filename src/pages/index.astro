@@ -1025,16 +1025,12 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     /* 홈 메뉴 — 그리드 첫 칸이 아니라 뷰포트 좌상단에 고정. 히어로 위에서는 숨긴다. */
     .home-body > :global(.site-menu--grid) {
       position: fixed; top: 10px; left: 10px; z-index: 30;
+      background: transparent; /* 상자가 아니라 글자만 — 본문 왼쪽 여백 위에 얹힌다 */
       opacity: 0; pointer-events: none;
       transition: opacity var(--dur-base) var(--ease);
     }
     .home-body.menu-on > :global(.site-menu--grid) { opacity: 1; pointer-events: auto; }
     @media (prefers-reduced-motion: reduce) { .home-body > :global(.site-menu--grid) { transition: none; } }
-    /* 고정 메뉴 상자(210px)가 본문 왼쪽을 덮지 않게 — 홈 섹션은 그만큼 더 들여쓴다 */
-    @media (min-width: 701px) {
-      .home-body :global(.axes), .home-body :global(.protos), .home-body :global(.hsound),
-      .home-body :global(.cred), .work-archive .conn { margin-left: 236px; }
-    }
     .work-archive .conn {
       max-width: var(--content-w); margin: 0 40px 0 var(--desktop-content-x);
       padding: 40px 0 18px; font-size: var(--fs-xs); letter-spacing: .02em; color: var(--text-3);
