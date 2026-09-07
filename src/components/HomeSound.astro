@@ -29,7 +29,6 @@ const span = (r: { min: number; max: number }) =>
   !r.max ? "" : r.min === r.max ? clock(r.max) : `${clock(r.min)} – ${clock(r.max)}`
 const recent = releases.slice(0, 3)
 // 카드에서 재생할 녹음 — 가장 최근 릴리스
-const featured = releases[0]?.lead // 카드 하단에 적는 최근 녹음
 ---
 
 <section class="hsound" id="sound" aria-labelledby="hsound-title">
@@ -41,18 +40,10 @@ const featured = releases[0]?.lead // 카드 하단에 적는 최근 녹음
   <div class="hsound-grid">
     {/* 큰 카드 — 아카이브로 가는 문. 재생 버튼은 두지 않는다: 어차피 눌러서 넘어가는
         자리라 대기 상태가 의미가 없다(작가 지적). 대신 상자 자체가 늘 살아 있다. */}
-    <a class="hs-card" href="/sound/">
+    <a class="hs-card" href="/sound/" aria-label="Listening archive">
       {/* 작품 이미지는 쓰지 않는다 — 홈에 작품이 이미 충분히 노출된다(작가 지적).
           대신 소리의 입자: 파형을 따라 점들이 끊임없이 흐르고 떤다. 히어로 구체와 같은 어휘. */}
       <canvas class="hs-viz" id="hs-viz" aria-hidden="true"></canvas>
-      <span class="hs-cap">
-        <span class="hs-label">
-          <span data-language-content="en">Listening archive</span>
-          <span data-language-content="ko" lang="ko">듣기 아카이브</span>
-          <span class="hs-n"> · {releases.length}</span>
-        </span>
-        {featured && <span class="hs-now"><LangText en={tEn(featured.data)} ko={tKo(featured.data)} /></span>}
-      </span>
     </a>
     <ol class="hsound-list">
       {recent.map((r) => (
@@ -87,7 +78,7 @@ const featured = releases[0]?.lead // 카드 하단에 적는 최근 녹음
 
     /* 입자 — 히어로 구체와 같은 어휘. 점들이 가로로 펼쳐져 있고, 합성 파형(서로 나눠지지 않는
        주기의 사인 셋)을 따라 들리며, 파형이 클수록 떤다. 멈춰 있는 순간이 없다. */
-    var COLS = 96, ROWS = 5
+    var COLS = 40, ROWS = 6
     var dots = []
     for (var r = 0; r < ROWS; r++) for (var c = 0; c < COLS; c++) dots.push({ c: c, r: r, y: H / 2, vy: 0, seed: Math.random() * 6.28 })
     function level(k, t) {
@@ -98,7 +89,7 @@ const featured = releases[0]?.lead // 카드 하단에 적는 최근 녹음
       ctx.clearRect(0, 0, W, H)
       var t = (now - t0) / 1000
       var loud = .05 + Math.abs(Math.sin(t * .29) * Math.sin(t * .11)) * .16
-      var mid = H / 2, amp = H * .34, gapX = W / (COLS + 1), gapY = H * .07
+      var mid = H / 2, amp = H * .24, gapX = W / (COLS + 1), gapY = H * .07
       ctx.fillStyle = stroke
       for (var n = 0; n < dots.length; n++) {
         var p = dots[n]
@@ -130,18 +121,16 @@ const featured = releases[0]?.lead // 카드 하단에 적는 최근 녹음
   .hsound { max-width: var(--content-w); margin: 0 40px 0 var(--desktop-content-x); padding: 120px 0 0; }
   .conn { margin: 0 0 18px; font-size: var(--fs-xs); letter-spacing: .02em; color: var(--text-3); }
   .conn .arrow { margin-left: 6px; color: var(--hover); }
-  .hsound-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: var(--space-3); align-items: start; }
+  .hsound-grid { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: var(--space-3); align-items: start; }
 
   /* 미디어 카드 — 둥근 모서리, 커버 위 가운데 원형 재생(레퍼런스 prototypes 카드의 문법) */
+  /* 원래 상자 그대로(200×150, 흰 바탕, 얇은 선) — 안에 검은 입자만 산다. 글자 없음 */
   .hs-card {
-    position: relative; display: block; aspect-ratio: 16 / 10; overflow: hidden;
-    border-radius: 14px; background: var(--void); color: var(--void-text); text-decoration: none;
+    position: relative; display: block; width: 200px; height: 150px; overflow: hidden;
+    border: 1px solid var(--line-2); background: var(--surface); color: var(--text); text-decoration: none;
   }
-  .hs-viz { position: absolute; inset: 0; width: 100%; height: 100%; color: var(--void-text); }
-  .hs-cap { position: absolute; left: 18px; right: 18px; bottom: 16px; display: flex; flex-direction: column; gap: 2px; }
-  .hs-label { font-size: var(--fs-2xs); letter-spacing: .14em; text-transform: uppercase; color: var(--void-text-2); }
-  .hs-n { letter-spacing: 0; }
-  .hs-now { font-size: var(--fs-sm); color: var(--void-text); }
+  .hs-card:hover { border-color: var(--hover); }
+  .hs-viz { position: absolute; inset: 0; width: 100%; height: 100%; color: var(--text); }
 
   .hsound-list { list-style: none; margin: 0; padding: 0; font-size: var(--fs-sm); }
   .hsound-list li { border-bottom: 1px solid var(--line); }
@@ -155,5 +144,6 @@ const featured = releases[0]?.lead // 카드 하단에 적는 최근 녹음
   @media (max-width: 800px) {
     .hsound { margin: 0; padding: 80px 16px 0; }
     .hsound-grid { grid-template-columns: 1fr; }
+    .hs-card { width: 100%; height: 120px; }
   }
 </style>
