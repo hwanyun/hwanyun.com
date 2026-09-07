@@ -22,10 +22,10 @@ const { variant = "page", current = "" } = Astro.props
 
 const nav = [
   { label: "Works", href: "/works", key: "works" },
-  { label: "Prototypes", href: "/prototypes", key: "prototypes" },
   { label: "Sound", href: "/sound", key: "sound" },
   { label: "Events", href: "/events", key: "events" },
   { label: "Bio", href: "/cv", key: "bio" },
+  { label: "Prototypes", href: "/prototypes", key: "prototypes" }, // 맨 아래 — 홈 순서와 같다(작가 선택)
   // Contact는 메뉴에서 뺀다 — 푸터가 연락처를 맡는다(2026-09). 페이지 자체는 /contact에 그대로 있다.
 ]
 
