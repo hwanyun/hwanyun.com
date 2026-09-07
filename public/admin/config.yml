@@ -65,15 +65,15 @@ collections:
           - { label: "빛 (light)", value: "light" }
           - { label: "한지 (hanji)", value: "hanji" }
       - name: axes
-        label: "축 (발생 · 전도 · 감쇠)"
+        label: "축 (울림 · 접촉 · 흔적)"
         widget: select
         multiple: true
         required: false
         hint: "신호가 지나는 단계. 한 작품이 두 축에 걸쳐도 된다. 어휘는 src/data/axes.ts"
         options:
-          - { label: "발생 (emit)", value: "emit" }
-          - { label: "전도 (conduct)", value: "conduct" }
-          - { label: "감쇠 (decay)", value: "decay" }
+          - { label: "울림 (sounding)", value: "sounding" }
+          - { label: "접촉 (contact)", value: "contact" }
+          - { label: "흔적 (trace)", value: "trace" }
       - { name: summary, label: "카드 한 줄 (영문)", widget: string, required: false, hint: "30자 안팎. 제목·연도만으로는 작품 간 차이가 안 읽힌다" }
       - { name: summaryKo, label: "카드 한 줄 (국문)", widget: string, required: false }
       - { name: textEn, label: "설명 (영문)", widget: text, required: false }
@@ -234,9 +234,9 @@ collections:
         multiple: true
         required: false
         options:
-          - { label: "발생 (emit)", value: "emit" }
-          - { label: "전도 (conduct)", value: "conduct" }
-          - { label: "감쇠 (decay)", value: "decay" }
+          - { label: "울림 (sounding)", value: "sounding" }
+          - { label: "접촉 (contact)", value: "contact" }
+          - { label: "흔적 (trace)", value: "trace" }
       - { name: audio, label: "오디오 URL", widget: string, required: false, hint: "mp3 128k, 30초–2분. R2 URL" }
       - { name: duration, label: "길이 (초)", widget: number, value_type: int, required: false }
       - { name: video, label: "영상 URL", widget: string, required: false, hint: "있을 때만. 세로 촬영 허용" }

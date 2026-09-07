@@ -11,7 +11,7 @@ exhibition:
 materials:
   - field-recording
 axes:
-  - emit
+  - sounding
 summary: "Field recordings and notes from the Listhús residency; the density of moss felt by hand."
 summaryKo: "리스투스 레지던시의 현장 녹음과 기록. 이끼의 밀도를 손으로 만진 시간."
 size: 1col

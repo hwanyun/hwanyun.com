@@ -34,7 +34,7 @@ const works = defineCollection({
     thumbVideo: z.string().optional().default(""),
     // 재료 태그 — 작품들을 잇는 그래프의 간선. 어휘는 src/data/materials.ts에서 고정한다.
     materials: z.array(z.enum(MATERIAL_IDS)).optional().default([]),
-    // 세 축(발생·전도·감쇠) — 신호가 지나는 단계. 어휘는 src/data/axes.ts 한 곳에서 관리한다.
+    // 세 축(울림·접촉·흔적) — 신호가 지나는 단계. 어휘는 src/data/axes.ts 한 곳에서 관리한다.
     axes: z.array(z.enum(AXIS_IDS)).optional().default([]),
     // 카드용 한 줄. 제목과 연도만으로는 작품 간 차이가 읽히지 않는다. 30자 안팎.
     summary: z.string().optional().default(""),

@@ -6,7 +6,7 @@ summaryKo: "카드 서식을 보여 주는 예시. 실제 세션으로 바꾸고
 tools:
   - Ableton
 axes:
-  - conduct
+  - contact
 audio: ""
 duration: 0
 video: ""

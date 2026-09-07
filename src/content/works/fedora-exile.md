@@ -6,7 +6,7 @@ materials:
   - field-recording
   - moving-image
 axes:
-  - emit
+  - sounding
 summary: "A red thread around a black fedora; sound composed from sewing recordings keeps Woo Dang's memory active."
 summaryKo: "검은 페도라를 감는 붉은 실. 재봉 소리를 녹음해 만든 사운드로 우당의 기억을 잇는다."
 showType: group

@@ -39,18 +39,18 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       <span data-language-content="en" lang="en">
         {THESIS.en.before}
         {THESIS.en.parts.map((w, i) => (
-          <><a href={`#axis-${["emit", "conduct", "decay"][i]}`}>{w}</a>{THESIS.en.joins[i]}</>
+          <><a href={`#axis-${["sounding", "contact", "trace"][i]}`}>{w}</a>{THESIS.en.joins[i]}</>
         ))}
       </span>
       <span data-language-content="ko" lang="ko">
         {THESIS.ko.before}
         {THESIS.ko.parts.map((w, i) => (
-          <><a href={`#axis-${["emit", "conduct", "decay"][i]}`}>{w}</a>{THESIS.ko.joins[i]}</>
+          <><a href={`#axis-${["sounding", "contact", "trace"][i]}`}>{w}</a>{THESIS.ko.joins[i]}</>
         ))}
       </span>
       <small>
-        <span data-language-content="en" lang="en">Sound installation. It sounds only when a body closes the circuit.</span>
-        <span data-language-content="ko" lang="ko">사운드 인스톨레이션. 몸이 회로를 닫아야 소리가 난다.</span>
+        <span data-language-content="en" lang="en">Media installation that began in sound. It works only when a body makes contact.</span>
+        <span data-language-content="ko" lang="ko">사운드에서 시작한 미디어 인스톨레이션. 몸이 닿아야 작동한다.</span>
       </small>
     </p>
     <a id="upcoming-ticker" class="upcoming-ticker" href="/events/" hidden draggable="false" aria-label="Upcoming events"><span class="ut-list" id="ut-track"></span></a>
@@ -523,7 +523,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
   </script>
 
   {/* 두 번째 '페이지' — 히어로를 덮고 올라오는 본문. 순서가 곧 논지다:
-      세 축 → 지금 나오는 것 → 작품 → 녹음 → 놓였던 곳. */}
+      세 축(울림·접촉·흔적) → 지금 나오는 것 → 작품 → 녹음 → 놓였던 곳. */}
   <div class="home-body">
     <HomeAxes />
     <HomePrototypes />

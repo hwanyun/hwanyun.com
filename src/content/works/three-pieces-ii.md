@@ -5,7 +5,7 @@ medium: "Hanging 3D drawing; ABS filament, 3D pen, wood, fabric"
 materials:
   - 3d-pen
 axes:
-  - decay
+  - trace
 summary: "A drawing made in the air with a 3D pen, hung like a scroll; light extends it as shadow across wall and floor."
 summaryKo: "3D펜으로 허공에 그린 선을 족자처럼 걸었다. 빛이 그 그림자를 벽과 바닥으로 넓힌다."
 showType: solo

@@ -6,7 +6,7 @@ materials:
   - speaker
   - polycarbonate
 axes:
-  - emit
+  - sounding
 summary: "Stripes on garments read as point, line, and interval, turned into a graphic score and sound. With Jinju Ma."
 summaryKo: "옷의 줄무늬를 점·선·간격의 데이터로 읽어 그래픽 스코어와 소리로 바꿨다. 마진주와 협업."
 showType: group

@@ -8,7 +8,7 @@ materials:
   - polycarbonate
   - conductive-paint
 axes:
-  - conduct
+  - contact
 summary: "A residency's street-facing showcase turned into a dining table passersby could touch. With Hannah Celli."
 summaryKo: "베를린 레지던시의 거리 쪽 쇼케이스를 행인이 만지는 식탁으로 바꿨다. 한나 첼리와 협업."
 showType: group

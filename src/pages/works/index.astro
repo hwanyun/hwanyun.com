@@ -12,7 +12,7 @@ works.sort((a, b) => {
   return byYear || (a.data.order ?? 0) - (b.data.order ?? 0)
 })
 
-// 세 축(발생·전도·감쇠) — 신호가 지나는 단계. 홈의 축 카드와 같은 어휘.
+// 세 축(울림·접촉·흔적) — 신호가 지나는 단계. 홈의 축 카드와 같은 어휘.
 const axisCounts = AXES.map((a) => ({
   ...a,
   count: works.filter((w) => w.data.axes.includes(a.id)).length,

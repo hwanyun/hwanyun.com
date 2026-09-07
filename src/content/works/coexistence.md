@@ -8,7 +8,7 @@ materials:
   - polycarbonate
   - projection
 axes:
-  - conduct
+  - contact
 summary: "An installation responding to visitors' sound and movement, asking how beings with different senses share one space."
 summaryKo: "관객의 소리와 움직임에 반응하는 설치. 다른 감각과 조건을 가진 존재들이 한 공간을 나누는 방법을 묻는다."
 showType: group

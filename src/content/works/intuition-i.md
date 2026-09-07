@@ -10,8 +10,8 @@ materials:
   - conductive-paint
   - hanji
 axes:
-  - conduct
-  - emit
+  - contact
+  - sounding
 summary: "Iceland's moss and wind carried into hanji, electric paint, and field recordings; a responsive installation."
 summaryKo: "아이슬란드의 이끼와 바람을 한지와 전기 페인트, 현장 녹음으로 옮긴 반응하는 설치."
 showType: solo
