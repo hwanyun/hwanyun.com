@@ -141,6 +141,16 @@ const shareImage = new URL(
       })()
     </script>
     <script is:inline>
+      /* 푸터가 화면에 들어오면 떠 있던 것들(메뉴·언어·위로)이 물러난다 — 푸터는 혼자 놓인다. */
+      ;(function () {
+        var f = document.querySelector(".site-footer")
+        if (!f || !("IntersectionObserver" in window)) return
+        new IntersectionObserver(function (es) {
+          es.forEach(function (e) { document.body.classList.toggle("footer-in", e.isIntersecting) })
+        }, { threshold: 0.12 }).observe(f)
+      })()
+    </script>
+    <script is:inline>
       /* 위로 — 한 화면 넘게 내려가면 나타난다. 홈은 히어로가 fixed라
          스크롤 위치가 곧 그리드의 덮임 정도이므로 같은 기준이 그대로 통한다. */
       ;(function () {
@@ -608,6 +618,15 @@ const shareImage = new URL(
          아니면 그냥 문서 끝의 보통 푸터처럼 보인다. 어느 쪽이든 깨지지 않는다. */
       /* 최소 한 화면 — 짧은 페이지(Contact)에서도 푸터는 스크롤해야 드러난다 */
       .page-body { position: relative; z-index: 1; background: var(--surface); min-height: 100svh; }
+      /* 푸터 위에서는 크롬이 물러난다 */
+      .site-menu--page, .site-menu--grid, .site-menu--hero, .lang-corner, .to-top {
+        transition: opacity var(--dur-base) var(--ease), visibility 0s linear 0s;
+      }
+      body.footer-in .site-menu--page, body.footer-in .site-menu--grid, body.footer-in .site-menu--hero:not(.is-open),
+      body.footer-in .lang-corner, body.footer-in .to-top {
+        opacity: 0 !important; visibility: hidden; pointer-events: none;
+        transition: opacity var(--dur-base) var(--ease), visibility 0s linear var(--dur-base);
+      }
       /* 푸터 — 본문 뒤에 붙어 있다가 끝에서 드러난다(레퍼런스: universaleverything.com).
          본문(.page-body 또는 홈의 .home-body)이 z-index 1 + 불투명 배경이라 그 위를 지나가고,
          마지막 한 화면에서 어두운 면과 큰 워드마크가 걷히듯 나타난다.
