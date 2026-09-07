@@ -1236,8 +1236,17 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
          문장이 화면을 차지해 무엇을 봐야 할지 흐려졌다. */
       /* 순서·구성은 데스크톱과 같다(작가 확정): 세 단계 → 작품 → 녹음 → 놓였던 곳 → 프로토타입.
          본문 끝에 한 화면의 3분의 1을 비워 둔다 — 마지막 목록 바로 밑에서 푸터가 걷히면
-         너무 쉽게 끝나 버린다(작가 지적). */
+         너무 쉽게 끝나 버린다(작가 지적). 푸터는 커튼 그대로(작가 확정). */
       .home-body { padding-bottom: 36svh; }
+
+      /* ── 모바일 히어로는 일반 공식(작가 지적, 2026-09-07): 고정·스냅 없이 위로 흘러간다.
+         구체·마이크 반응은 그대로. 푸터 커튼과 데스크톱은 그대로. */
+      :global(html) { scroll-snap-type: none; }
+      .hero { position: relative; inset: auto; height: 100svh; }
+      .hero-spacer { display: none; }
+      .home-body { scroll-snap-align: none; scroll-snap-stop: normal; min-height: 0; }
+      .work-archive, .hero-spacer { scroll-snap-align: none; scroll-snap-stop: normal; }
+      :global(body.past-hero) .hero { visibility: visible; }
       .home-body :global(.conn) {
         margin: 0 0 12px; font-family: var(--sans); font-size: var(--fs-2xs); font-weight: 500;
         letter-spacing: .14em; text-transform: uppercase; color: var(--text-3);

@@ -724,7 +724,11 @@ const shareImage = new URL(
         .site-menu--hero:not(.is-open) {
           /* 히어로가 흰 바탕이 되었으므로(2026-09) 잉크도 어둡다. is-past-hero 규칙은 그대로 둔다. */
           color: var(--text);
-          background: transparent;
+          /* 히어로가 흐르는 구조(모바일)라 구체 입자가 글자 뒤를 지나간다 — 늘 바탕을 깐다.
+             맨 위에서는 흰 바탕 위의 흰 판이라 보이지 않는다. */
+          background: color-mix(in srgb, var(--surface) 92%, transparent);
+          -webkit-backdrop-filter: blur(10px);
+          backdrop-filter: blur(10px);
           line-height: 1.4;
         }
         /* page는 문서 흐름 안에서 시작해 열릴 때만 고정, hero는 항상 히어로 위에 떠 있다 */
