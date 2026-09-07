@@ -3,7 +3,8 @@ import { getCollection } from "astro:content"
 import SiteMenu from "./SiteMenu.astro"
 import SeenTracker from "./SeenTracker.astro"
 
-const { filter = "", current = "home" } = Astro.props
+// menu=false면 그리드 첫 칸의 메뉴를 그리지 않는다 — 홈은 메뉴를 본문 좌상단에 고정해 따로 둔다(2026-09).
+const { filter = "", current = "home", menu = true } = Astro.props
 
 // size → 패킹 weight (셀 비중). 클수록 넓은 면적을 차지한다.
 const WEIGHT: Record<string, number> = { "1col": 1, "2col": 1.7, "3col": 2.6 }
@@ -32,7 +33,7 @@ const gridRows = Math.max(MIN_ROWS, Math.round((totalWeight / WEIGHT_PER_ROW) * 
 ---
 
 <div id="packed" style={`--grid-rows:${gridRows}`}>
-  <SiteMenu variant="grid" current={current} />
+  {menu && <SiteMenu variant="grid" current={current} />}
 
   <!-- 직사각형 그리드 (메뉴 컬럼 오른쪽, 좌우·상하 여백 안쪽) -->
   <div class="grid">

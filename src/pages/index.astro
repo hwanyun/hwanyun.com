@@ -101,6 +101,32 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
   <script type="application/json" id="ev-data" is:inline set:html={JSON.stringify(upEvents)}></script>
 
   <script is:inline>
+    /* 본문이 히어로를 덮으면 메뉴를 좌상단에 고정한다. 히어로 위에서는 구체만 남긴다. */
+    ;(function () {
+      function init() {
+        var body = document.getElementById("home-body")
+        if (!body) return
+        var on = false
+        var past = false
+        function upd() {
+          var top = body.getBoundingClientRect().top
+          var want = top <= 40
+          if (want !== on) { on = want; body.classList.toggle("menu-on", on) }
+          /* 본문이 히어로를 완전히 덮으면 고정 히어로를 숨긴다 — 그래야 문서 끝에서
+             제자리에 있던 푸터가 본문 뒤로 드러난다(레퍼런스의 푸터). */
+          var wantPast = top <= 0
+          if (wantPast !== past) { past = wantPast; document.body.classList.toggle("past-hero", past) }
+        }
+        window.addEventListener("scroll", upd, { passive: true })
+        window.addEventListener("resize", upd)
+        upd()
+      }
+      // 이 스크립트는 본문보다 앞에 있다 — DOM이 다 오고 나서 찾는다
+      if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init)
+      else init()
+    })()
+  </script>
+  <script is:inline>
     /* 마이크 → 입자. 오디오는 이 함수 밖으로 나가지 않는다:
        스트림은 어떤 노드에도 연결되지 않은 분석기에서 끝나고(스피커로도
        안 간다), 매 프레임 숫자 셋(level/low/high)만 남기고 버린다.
@@ -509,7 +535,9 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
 
   {/* 두 번째 '페이지' — 히어로를 덮고 올라오는 본문. 순서가 곧 논지다:
       세 축(울림·접촉·흔적) → 지금 나오는 것 → 작품 → 녹음 → 놓였던 곳. */}
-  <div class="home-body">
+  <div class="home-body" id="home-body">
+    {/* 메뉴 — 본문이 히어로를 덮는 순간부터 좌상단에 고정된다. 구체가 있는 첫 화면에서만 없다. */}
+    <SiteMenu variant="grid" current="home" />
     <HomeAxes />
     <HomePrototypes />
     <section id="works" class="work-archive" aria-label="Selected works">
@@ -518,7 +546,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         <span data-language-content="ko" lang="ko">실험이 닿는 곳</span>
         <span class="arrow" aria-hidden="true">→</span>
       </p>
-      <WorkGrid current="home" />
+      <WorkGrid current="home" menu={false} />
     </section>
     <HomeSound />
     <HomeCred />
@@ -983,10 +1011,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     }
     /* 히어로가 fixed로 화면 전체를 덮는 레이어가 되었으므로, 그리드 뒤에 오는 것들도
        불투명하게 그 위에 올려야 한다 — 아니면 푸터 자리에 검은 히어로가 비친다. */
-    /* 홈에서는 푸터를 sticky로 두지 않는다. 히어로가 fixed 층이라 맨 위에서도 푸터가
-       빈 spacer 너머로 비쳐 보인다. 홈은 이미 본문이 히어로를 덮는 커튼이 있으므로
-       푸터는 본문 뒤에 보통 흐름으로 붙고, 히어로 위에 올라오게 층만 준다. */
-    :global(.site-footer) { position: relative; z-index: 1; }
+    /* 푸터는 Base의 sticky 푸터 그대로 — 제자리에 있고 본문이 걷히며 드러난다.
+       맨 위에서 푸터가 히어로 너머로 비치지 않도록 히어로를 푸터 위 층에 둔다(아래). */
     /* 본문 전체가 두 번째 페이지다 — 스냅 기준점과 덮는 층을 본문 래퍼가 맡는다 */
     .home-body {
       scroll-snap-align: start;
@@ -995,6 +1021,19 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       z-index: 1;
       background: var(--surface);
       min-height: 100svh;
+    }
+    /* 홈 메뉴 — 그리드 첫 칸이 아니라 뷰포트 좌상단에 고정. 히어로 위에서는 숨긴다. */
+    .home-body > :global(.site-menu--grid) {
+      position: fixed; top: 10px; left: 10px; z-index: 30;
+      opacity: 0; pointer-events: none;
+      transition: opacity var(--dur-base) var(--ease);
+    }
+    .home-body.menu-on > :global(.site-menu--grid) { opacity: 1; pointer-events: auto; }
+    @media (prefers-reduced-motion: reduce) { .home-body > :global(.site-menu--grid) { transition: none; } }
+    /* 고정 메뉴 상자(210px)가 본문 왼쪽을 덮지 않게 — 홈 섹션은 그만큼 더 들여쓴다 */
+    @media (min-width: 701px) {
+      .home-body :global(.axes), .home-body :global(.protos), .home-body :global(.hsound),
+      .home-body :global(.cred), .work-archive .conn { margin-left: 236px; }
     }
     .work-archive .conn {
       max-width: var(--content-w); margin: 0 40px 0 var(--desktop-content-x);
@@ -1016,5 +1055,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       .work-archive :global(#packed) { height: calc(var(--grid-rows, 3) * 72svh / 3); }
     }
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+    /* 히어로는 푸터(z 0)보다 위, 본문(z 1, DOM 뒤)보다 아래. 본문이 다 덮으면 숨긴다. */
+    .hero { z-index: 1; }
+    :global(body.past-hero) .hero { visibility: hidden; }
   </style>
 </Base>

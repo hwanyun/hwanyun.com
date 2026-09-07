@@ -567,7 +567,8 @@ const shareImage = new URL(
 
       /* variant: page — 일반 페이지 좌상단 */
       .site-menu--page {
-        position: absolute;
+        /* 스크롤해도 따라온다 — 홈을 제외한 모든 페이지에서 메뉴는 항상 좌상단(2026-09) */
+        position: fixed;
         z-index: 20;
         top: 10px;
         left: 10px;
