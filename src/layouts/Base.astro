@@ -144,10 +144,18 @@ const shareImage = new URL(
       /* 푸터가 화면에 들어오면 떠 있던 것들(메뉴·언어·위로)이 물러난다 — 푸터는 혼자 놓인다. */
       ;(function () {
         var f = document.querySelector(".site-footer")
-        if (!f || !("IntersectionObserver" in window)) return
-        new IntersectionObserver(function (es) {
-          es.forEach(function (e) { document.body.classList.toggle("footer-in", e.isIntersecting) })
-        }, { threshold: 0.12 }).observe(f)
+        if (!f) return
+        /* 푸터는 sticky라 늘 뷰포트 '안'에 있다(본문 뒤에 가려져 있을 뿐) — 교차 관찰로는
+           맨 위에서도 켜진다. 본문이 걷혀 푸터가 실제로 드러난 만큼(문서 끝까지 남은 거리)으로 판단한다. */
+        var on = false
+        function upd() {
+          var left = document.documentElement.scrollHeight - (window.scrollY + window.innerHeight)
+          var want = left < f.offsetHeight * .8
+          if (want !== on) { on = want; document.body.classList.toggle("footer-in", on) }
+        }
+        window.addEventListener("scroll", upd, { passive: true })
+        window.addEventListener("resize", upd)
+        upd()
       })()
     </script>
     <script is:inline>
@@ -597,10 +605,10 @@ const shareImage = new URL(
       .site-menu--hero > *:not(.name) { display: none; }
       .site-menu--hero .name { margin: 0; }
       .site-menu--hero .name a {
-        color: var(--void-text-2);
+        color: var(--text); /* 히어로가 흰 바탕이 된 뒤 옅은 회색은 사라진 것처럼 보였다 */
         transition: color var(--dur-fast) var(--ease);
       }
-      .site-menu--hero .name a:hover { color: var(--void-text); border-bottom: 0; }
+      .site-menu--hero .name a:hover { color: var(--hover); border-bottom: 0; }
       /* variant: grid — 홈 작품 그리드 위 오버레이 (데스크톱 전용) */
       .site-menu--grid {
         position: absolute;

@@ -520,7 +520,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
   {/* 두 번째 '페이지' — 히어로를 덮고 올라오는 본문. 순서가 곧 논지다:
       세 축(울림·접촉·흔적) → 지금 나오는 것 → 작품 → 녹음 → 놓였던 곳. */}
   <div class="home-body" id="home-body">
-    {/* 메뉴 — 본문이 히어로를 덮는 순간부터 좌상단에 고정된다. 구체가 있는 첫 화면에서만 없다. */}
+    {/* 메뉴 — 항상 좌상단에 고정. 히어로 위에서도 보인다. */}
     <SiteMenu variant="grid" current="home" />
     <HomeAxes />
     <HomePrototypes />
@@ -882,8 +882,9 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     /* 작가의 문장 — 좌상단. 구체는 화면 중앙에 그대로 두고 문장은 그 옆에서 읽힌다.
        세 동사만 링크다: 아래 세 축으로 가는 유일한 색(--hover)이 여기서 처음 나온다. */
     .thesis {
-      position: absolute; left: 22px; top: calc(var(--desktop-header-clearance) + 8px); z-index: 2;
-      margin: 0; max-width: min(30ch, 44vw);
+      /* 왼쪽 세로 중앙, 구체 옆 — 좌상단은 메뉴 자리다 */
+      position: absolute; left: 22px; top: 50%; transform: translateY(-50%); z-index: 2;
+      margin: 0; max-width: min(26ch, 22vw);
       font-size: var(--fs-lead); font-weight: 400; line-height: 1.35; letter-spacing: -.01em;
       color: var(--text); text-wrap: balance;
     }
@@ -896,7 +897,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     }
     @media (max-width: 700px) {
       .thesis {
-        left: 16px; right: 16px; top: calc(var(--mobile-header-h, 67px) + 14px);
+        left: 16px; right: 16px; top: calc(var(--mobile-header-h, 67px) + 14px); transform: none;
         max-width: none; font-size: var(--fs-body);
       }
     }
@@ -1007,13 +1008,14 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       min-height: 100svh;
     }
     /* 홈 메뉴 — 그리드 첫 칸이 아니라 뷰포트 좌상단에 고정. 히어로 위에서는 숨긴다. */
+    /* 히어로에서도 보인다 — 예전엔 구체를 가리지 않으려 워드마크만 남겼는데, 흰 바탕이 되면서
+       그 옅은 워드마크마저 사라진 것처럼 보였다(작가 지적). 메뉴는 늘 같은 자리. */
     .home-body > :global(.site-menu--grid) {
       position: fixed; top: 10px; left: 10px; z-index: 30;
       background: transparent; /* 상자가 아니라 글자만 — 본문 왼쪽 여백 위에 얹힌다 */
-      opacity: 0; pointer-events: none;
-      transition: opacity var(--dur-base) var(--ease);
     }
-    .home-body.menu-on > :global(.site-menu--grid) { opacity: 1; pointer-events: auto; }
+    /* 데스크톱 히어로의 워드마크만 남기던 hero 변형은 이제 중복이라 숨긴다(모바일은 그대로) */
+    @media (min-width: 701px) { :global(.site-menu--hero) { display: none; } }
     @media (prefers-reduced-motion: reduce) { .home-body > :global(.site-menu--grid) { transition: none; } }
     /* 그리드를 위 섹션들과 같은 왼쪽 선·같은 폭에 맞춘다. WorkGrid의 210px 들여쓰기는
        그리드 첫 칸에 메뉴가 있던 시절의 값이다. 타일 border(4px)만큼 바깥으로 물려 시각적 모서리를 맞춘다. */
