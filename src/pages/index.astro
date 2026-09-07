@@ -640,7 +640,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         off.width = w; off.height = h
         const oc = off.getContext("2d", { willReadFrequently: true })!
         // 모바일(작은 구체)은 글자를 더 크게 — 입자가 적어 작으면 형태가 안 남는다
-        const fs = Math.max(16, R * (isMobile ? (ko ? .23 : .22) : (ko ? .155 : .15)))
+        const fs = Math.max(16, R * (isMobile ? (ko ? .25 : .24) : (ko ? .155 : .15)))
         oc.font = `500 ${fs}px "Pretendard Variable", Pretendard, sans-serif`
         oc.textAlign = "center"; oc.textBaseline = "middle"; oc.fillStyle = "#fff"
         lines.forEach((l, i) => oc.fillText(l, w / 2, h / 2 + (i - (lines.length - 1) / 2) * fs * 1.2))
@@ -712,9 +712,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         repelRadius = nameHeight * REPEL_RADIUS_RATIO
         repelForce = nameHeight * REPEL_FORCE_RATIO
         // 모바일에서는 터치 반응성과 안정성을 위해 렌더링 밀도를 낮춘다.
-        // 모바일은 표면 문장이 입자를 나눠 쓰므로 조금 더 — 적으면 글자가 성기게 찍혀 안 읽힌다
         const count = isMobile
-          ? Math.min(2000, Math.max(1400, Math.round(targets.length * 1.5)))
+          ? Math.min(1400, Math.max(900, targets.length))
           : Math.min(3200, Math.max(2400, targets.length * 2))
         const previous = particles
         particles = Array.from({ length: count }, (_, index) => {
@@ -739,18 +738,21 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
           }
         })
         buildThesisMask()
-        // 2안 — 앞쪽 일부 입자를 문장 자리로 옮겨 구체와 함께 돌게 한다
+        // 2안 — 문장 입자는 구체 입자에서 떼어 쓰지 않고 따로 얹는다. 떼어 쓰면 구체가 성기고 고르지 않다.
         const surf = thesisSurfacePoints()
         if (surf.length) {
-          const n = Math.min(surf.length, Math.floor(particles.length * (isMobile ? .65 : .55)))
-          // 인덱스 순서 = 위에서 아래(sphereY). 앞에서부터 가져오면 한쪽 극이 비어 하단 밀도가 준다 —
-          // 전체에서 일정 간격으로 뽑아 구체의 밀도를 고르게 남긴다
-          const stride = particles.length / n
-          for (let i = 0; i < n; i++) {
+          const n = Math.min(surf.length, isMobile ? 900 : 1400)
+          const base = particles.length
+          const extra = Array.from({ length: n }, (_, i) => {
             const [u, v, z] = surf[Math.floor(i / n * surf.length)]
-            const p = particles[Math.min(particles.length - 1, Math.floor(i * stride))]
-            p.sphereX = u; p.sphereY = v; p.sphereZ = z; p.text = true
-          }
+            const [targetX, targetY] = targets[Math.floor(i / n * targets.length)] || [width / 2, height / 2]
+            const carried = previous[base + i]
+            return {
+              x: carried ? carried.x : width / 2, y: carried ? carried.y : height / 2, vx: 0, vy: 0,
+              sphereX: u, sphereY: v, sphereZ: z, targetX, targetY, text: true,
+            }
+          })
+          particles = particles.concat(extra)
         }
       }
 
@@ -839,8 +841,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
           particle.y += particle.vy
           context.beginPath()
           // 문장 입자는 더 크고(모바일은 한층 더) 진하게 — 작은 화면에서도 글자로 읽히게
-          const pointSize = isInside ? 1.1 : (particle.text ? (isMobile ? 1.6 : .9) : .52) + (depth + 1) * .48
-          let brightness = isInside ? .96 : Math.min(.98, (particle.text ? (isMobile ? .7 : .42) : (isMobile ? .18 : .26)) + (depth + 1) * .34 + audioLevel * .18)
+          const pointSize = isInside ? 1.1 : (particle.text ? (isMobile ? 1.9 : 1) : .52) + (depth + 1) * .48
+          let brightness = isInside ? .96 : Math.min(.98, (particle.text ? (isMobile ? .8 : .45) : .26) + (depth + 1) * .34 + audioLevel * .18)
           // 뒷면으로 돌아간 문장이 구체 너머로 거울처럼 비치는 것은 그대로 둔다(작가 선택)
           // 문장도 검정 — 네온 레몬을 시도했다가 검정이 더 엣지 있다고 되돌림(작가, 2026-09-07)
           context.arc(particle.x, particle.y, pointSize, 0, Math.PI * 2)
