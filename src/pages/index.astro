@@ -577,7 +577,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
          1 빈자리: 입자가 문장 글자 위에는 앉지 않는다(문장 = 입자의 부재)
          2 표면:  문장을 구체 앞면에 입자로 새겨 함께 돈다
          3 호흡:  문장의 세 동사가 구체 앞면과 같은 리듬으로 밝아졌다 어두워진다 */
-      const thesisMode = (new URLSearchParams(location.search).get("thesis") || "2") // 기본 2안(작가 선택, 2026-09-07)
+      // 기본: 데스크톱 2안(표면), 모바일 1안(빈자리). 폰 크기 구체에 입자 글자는 굵어져 구체와 어울리지 않는다.
+      const thesisMode = (new URLSearchParams(location.search).get("thesis") || (isMobile ? "1" : "2"))
       hero.dataset.thesis = thesisMode
       const thesisEl = document.getElementById("thesis")
       let thesisMask: Uint8Array | null = null   // width*height, 1 = 글자(여유 포함)
@@ -1039,11 +1040,12 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       font-size: var(--fs-xs); font-weight: 400; line-height: 1.55; color: var(--text-3); letter-spacing: 0;
     }
     @media (max-width: 700px) {
-      /* 모바일도 2안 — 문장은 구체 표면의 입자로만. HTML 문장은 스크린리더용 */
+      /* 모바일 — 1안. 문장이 구체 안 중앙에 선명한 글자로, 입자는 글자를 피해 돈다. 부제 없음 */
       .hero[data-thesis="2"] .thesis { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; transform: none; }
       .hero:not([data-thesis="2"]) .thesis {
-        left: 16px; right: 16px; top: calc(var(--mobile-header-h, 67px) + 14px); transform: none;
-        max-width: none; font-size: var(--fs-body);
+        left: 50%; top: 50%; right: auto; transform: translate(-50%, -50%);
+        width: max-content; max-width: min(22ch, 76vw); text-align: center;
+        font-size: 19px; line-height: 1.45;
       }
       .thesis small { display: none; }
     }
