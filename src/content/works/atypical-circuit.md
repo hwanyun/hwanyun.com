@@ -1,5 +1,6 @@
 ---
-title: "Atypical Circuit"
+title: "비정형의 회로"
+titleEn: "Atypical Circuit"
 year: "2026"
 medium: "Generative and interactive media installation; ultrasonic sensors, TouchDesigner, Ableton Live, flat-screen display and stand, electrical wires, Arduino, loudspeaker"
 materials:

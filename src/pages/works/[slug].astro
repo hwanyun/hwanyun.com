@@ -1,6 +1,8 @@
 ---
 import { getCollection } from "astro:content"
 import Base from "../../layouts/Base.astro"
+import LangText from "../../components/LangText.astro"
+import { tEn, tKo } from "../../lib/titles"
 import { materialLabel } from "../../data/materials"
 import SeenTracker from "../../components/SeenTracker.astro"
 import { logoBox } from "../../lib/logoSize"
@@ -16,7 +18,8 @@ const { Content } = await work.render()
 /* 제목이 이미 괄호로 끝나면(〈무제 (無諸)〉, 〈Coexistence (공존)〉) 연도를 또
    괄호로 붙여 "무제 (無諸) (2026)"처럼 겹친다. 그때는 쉼표로 잇는다 —
    "Title, Year"도 미술계의 표준 표기다. */
-const yr = data.year ? (data.title.trim().endsWith(")") ? `, ${data.year}` : ` (${data.year})`) : ""
+const yrFor = (t: string) => (data.year ? (t.trim().endsWith(")") ? `, ${data.year}` : ` (${data.year})`) : "")
+const yr = yrFor(tEn(data))
 const allWorks = await getCollection("works", ({ data }) => !data.draft)
 const allSounds = await getCollection("sounds", ({ data }) => !data.draft)
 const seriesWorks = data.series
@@ -148,9 +151,9 @@ function toParagraphs(text: string): string {
 }
 ---
 
-<Base title={`HWANYUN — ${data.title}`}>
+<Base title={`HWANYUN — ${tEn(data)}`}>
   <div id="entry" data-media-prototype={useImmersiveMedia ? "true" : undefined} data-waveform={useWaveform ? "true" : undefined}>
-    <div class="entry_title">{data.title}{yr}</div>
+    <div class="entry_title"><LangText en={`${tEn(data)}${yrFor(tEn(data))}`} ko={`${tKo(data)}${yrFor(tKo(data))}`} /></div>
 
     {
       mediumParts.length > 0 && (
@@ -201,9 +204,9 @@ function toParagraphs(text: string): string {
           <div class="series-members">
             {seriesWorks.map((item) =>
               item.slug === work.slug ? (
-                <span class="series-current" aria-current="page">{item.data.title}</span>
+                <span class="series-current" aria-current="page"><LangText en={tEn(item.data)} ko={tKo(item.data)} /></span>
               ) : (
-                <a href={`/works/${item.slug}/`}>{item.data.title}</a>
+                <a href={`/works/${item.slug}/`}><LangText en={tEn(item.data)} ko={tKo(item.data)} /></a>
               )
             )}
           </div>
@@ -237,7 +240,7 @@ function toParagraphs(text: string): string {
               )}
               {(media[0].noteEn || media[0].noteKr) && (
                 <div class="media-note">
-                  {media[0].noteLabel && <div class="media-note-label">{media[0].noteLabel}</div>}
+                  {media[0].noteLabel && <div class="media-note-label"><LangText en={media[0].noteLabelEn || media[0].noteLabel} ko={media[0].noteLabel} /></div>}
                   <div class="media-note-cols">
                     <p data-language-content="en">{media[0].noteEn}</p>
                     <p data-language-content="ko" lang="ko">{media[0].noteKr}</p>
@@ -247,7 +250,7 @@ function toParagraphs(text: string): string {
             </figure>
           ) : (
             <figure class={`block ${defaultLayout(media[0], 0)} ${media[0].align ? `align-${media[0].align}` : ""}`}>
-              <img src={media[0].src} alt={media[0].caption || data.title} loading="lazy" />
+              <img src={media[0].src} alt={media[0].captionEn || media[0].caption || tEn(data)} loading="lazy" />
               {media[0].caption && (
                 <figcaption>
                   {media[0].captionEn && media[0].captionEn !== media[0].caption ? (
@@ -360,7 +363,7 @@ function toParagraphs(text: string): string {
                         ) : (
                           <video src={embedURL(m.src).src} data-src-sm={m.srcMobile ? embedURL(m.srcMobile).src : undefined} controls={!useImmersiveMedia} preload={useImmersiveMedia ? "metadata" : undefined} muted={useImmersiveMedia} playsinline />
                         )}
-                        {useImmersiveMedia && <button class="video-play" type="button" aria-label={`Play ${m.caption || data.title}`}><span aria-hidden="true"></span></button>}
+                        {useImmersiveMedia && <button class="video-play" type="button" aria-label={`Play ${m.captionEn || m.caption || tEn(data)}`}><span aria-hidden="true"></span></button>}
                       </div>
                       {m.caption && (
                 <figcaption>
@@ -376,7 +379,7 @@ function toParagraphs(text: string): string {
               )}
                       {(m.noteEn || m.noteKr) && (
                         <div class="media-note">
-                          {m.noteLabel && <div class="media-note-label">{m.noteLabel}</div>}
+                          {m.noteLabel && <div class="media-note-label"><LangText en={m.noteLabelEn || m.noteLabel} ko={m.noteLabel} /></div>}
                           <div class="media-note-cols">
                             <p data-language-content="en">{m.noteEn}</p>
                             <p data-language-content="ko" lang="ko">{m.noteKr}</p>
@@ -387,7 +390,7 @@ function toParagraphs(text: string): string {
                   ) : (
                     <figure class="block">
                       <span class="plate-n" aria-hidden="true">{n}</span>
-                      <img src={m.src} alt={m.caption || data.title} loading="lazy" />
+                      <img src={m.src} alt={m.captionEn || m.caption || tEn(data)} loading="lazy" />
                       {m.caption && (
                 <figcaption>
                   {m.captionEn && m.captionEn !== m.caption ? (
@@ -404,7 +407,7 @@ function toParagraphs(text: string): string {
                           여러 장이 하나의 설명을 공유하는 묶음은 첫 장에 단다 */}
                       {(m.noteEn || m.noteKr) && (
                         <div class="media-note">
-                          {m.noteLabel && <div class="media-note-label">{m.noteLabel}</div>}
+                          {m.noteLabel && <div class="media-note-label"><LangText en={m.noteLabelEn || m.noteLabel} ko={m.noteLabel} /></div>}
                           <div class="media-note-cols">
                             <p data-language-content="en">{m.noteEn}</p>
                             <p data-language-content="ko" lang="ko">{m.noteKr}</p>
@@ -446,7 +449,7 @@ function toParagraphs(text: string): string {
           <div class="ma-grid">
             {archiveMedia.map((m) => (
               <figure>
-                <img src={m.src} alt={m.caption || `${data.title} — archive`} loading="lazy" />
+                <img src={m.src} alt={m.captionEn || m.caption || `${tEn(data)} — archive`} loading="lazy" />
               </figure>
             ))}
           </div>
@@ -463,7 +466,7 @@ function toParagraphs(text: string): string {
           <div class="related-sounds-list">
             {relatedSounds.map((sound) => (
               <a href={`/sound/#sound-${sound.slug}`}>
-                <span>{sound.data.title}</span>
+                <span><LangText en={tEn(sound.data)} ko={tKo(sound.data)} /></span>
                 <span aria-hidden="true">↗</span>
               </a>
             ))}
@@ -553,7 +556,7 @@ function toParagraphs(text: string): string {
             {relatedByMaterial.map((r) => (
               <li>
                 <a href={`/works/${r.work.slug}/`}>
-                  <span class="rm-title">{r.work.data.title}</span>
+                  <span class="rm-title"><LangText en={tEn(r.work.data)} ko={tKo(r.work.data)} /></span>
                   <span class="rm-shared">{r.shared.map((m) => materialLabel(m)).join(" · ")}</span>
                 </a>
               </li>

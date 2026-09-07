@@ -1,5 +1,6 @@
 ---
-title: "무제 Mujae (無諸)"
+title: "무제 (無諸)"
+titleEn: "Mujae (無諸)"
 subtitle: "모든 것은 생겨나고 사라진다"
 subtitleEn: "Everything Comes and Goes"
 collaboration: "윤병환 & 이인선 — 팀 프로젝트"
@@ -143,6 +144,7 @@ media:
     caption: "바닥 — 한 순환의 처음부터 끝까지. 사운드 아카이브의 3분과 같은 시간을 지난다"
     captionEn: "Floor — one full cycle, start to end, over the same three minutes as the sound archive"
     noteLabel: "바닥 · 생성과 소멸"
+    noteLabelEn: "Floor · Appearance and disappearance"
     noteEn: >
       A single projector draws the mandala on the floor, and it has only two
       movements. Gathering, extending, completing are not separate stages —
@@ -207,6 +209,7 @@ media:
     caption: "벽면 — 같은 순환을 360°로 편 띠. 바닥과 같은 순간을 함께 지난다"
     captionEn: "Wall — the same cycle laid out across 360°, moving through the same moments as the floor"
     noteLabel: "벽면 · 구성"
+    noteLabelEn: "Wall · Composition"
     noteEn: >
       Three edge-blended projectors wrap the wall of the 3.7 m room, so the
       image closes on itself and has no edge to stand outside of. The band above
@@ -249,6 +252,7 @@ media:
     caption: "전시장에서 — 전단지 사이클. 360° 벽과 바닥이 함께 도는 것을 카메라로 기록했다"
     captionEn: "In the room — the flyer cycle, filmed as the 360° wall and floor turn together"
     noteLabel: "전시 기록"
+    noteLabelEn: "Documentation"
     noteEn: >
       The two videos above are what the system draws. These two are what the
       room looked like with it running — filmed in a dark space with a
@@ -294,7 +298,7 @@ media:
     src: "/images/mujae/poster.png"
     archive: true
     caption: "무제(無諸) — 모든 것은 생겨나고 사라진다 / Everything Comes and Goes"
-    captionEn: "무제(無諸) — Everything Comes and Goes"
+    captionEn: "Mujae (無諸) — Everything Comes and Goes"
   - type: image
     src: "/images/events/2026-nca-showcase.jpg"
     archive: true

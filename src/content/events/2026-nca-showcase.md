@@ -1,5 +1,6 @@
 ---
 title: "무제 (無諸)"
+titleEn: "Mujae (無諸)"
 dateStart: "2026-08-19"
 dateEnd: "2026-08-21"
 timeNote: "10:00 – 17:00"
@@ -25,7 +26,7 @@ textEn: |
 
   We live in the opposite tempo. Most of the world's data was made in the last few years, and algorithms copy and pour out new images by the second. When generation never stops, disappearance becomes hard to see — and once disappearance is invisible, generation stops being an event at all.
 
-  〈무제 (無諸)〉 lays a circular mandala, woven from data, across the floor of the gallery. It blooms along the path of whoever walks in, grows for as long as they stay, and collapses when they leave. No finished form is preserved. When the next person enters, the mandala begins again from nothing.
+  Mujae (無諸) lays a circular mandala, woven from data, across the floor of the gallery. It blooms along the path of whoever walks in, grows for as long as they stay, and collapses when they leave. No finished form is preserved. When the next person enters, the mandala begins again from nothing.
 
   What remains is not a shape but a sensation. 諸行無常 — all things arise and pass away. Making and vanishing are not two opposing ends but a single closed circle, and the visitor is not someone watching it from outside but the hand that draws it.
 roleKr: "팀 프로젝트 · 팀장"
@@ -36,26 +37,36 @@ externalLabel: "NCA 공식 누리집"
 links:
   - kind: "official"
     publisher: "뉴콘텐츠아카데미"
+    publisherEn: "New Content Academy"
     title: "2026 뉴콘텐츠아카데미 쇼케이스 — 사전등록 및 안내"
+    titleEn: "2026 New Content Academy Showcase — registration and information"
     url: "https://www.ncakocca.kr"
   - kind: "press"
     publisher: "헤럴드경제"
+    publisherEn: "Herald Economy"
     title: "장항준·송은이·신우석 뜬다…19일부터 콘진원 'NCA 쇼케이스'"
+    titleEn: "KOCCA's NCA Showcase opens on the 19th"
     url: "https://biz.heraldcorp.com/article/10835430"
     date: "2026-08-10"
   - kind: "press"
     publisher: "아시아투데이"
+    publisherEn: "Asia Today"
     title: "AI·XR로 그린 콘텐츠의 미래"
+    titleEn: "The future of content, drawn with AI and XR"
     url: "https://www.asiatoday.co.kr/kn/view.php?key=20260810010003213"
     date: "2026-08-10"
   - kind: "press"
     publisher: "문화일보"
+    publisherEn: "Munhwa Ilbo"
     title: "콘진원, '2026 뉴콘텐츠아카데미 쇼케이스' 개최"
+    titleEn: "KOCCA holds the 2026 New Content Academy Showcase"
     url: "https://www.munhwa.com/article/11608593"
     date: "2026-08-11"
   - kind: "press"
     publisher: "스포츠경향"
+    publisherEn: "Sports Kyunghyang"
     title: "콘진원, '2026 뉴콘텐츠아카데미 쇼케이스' 개최"
+    titleEn: "KOCCA holds the 2026 New Content Academy Showcase"
     url: "https://sports.khan.co.kr/article/202608110316003/"
     date: "2026-08-11"
 images:

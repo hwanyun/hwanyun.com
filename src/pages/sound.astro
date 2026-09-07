@@ -1,6 +1,8 @@
 ---
 import { getCollection } from "astro:content"
 import Base from "../layouts/Base.astro"
+import LangText from "../components/LangText.astro"
+import { tEn, tKo } from "../lib/titles"
 
 const sounds = (await getCollection("sounds", ({ data }) => !data.draft)).sort(
   (a, b) => (a.data.order ?? 0) - (b.data.order ?? 0)
@@ -21,6 +23,7 @@ const releases = Array.from(new Map(sounds.map((s) => [key(s), s])).values()).ma
   const secs = tracks.map((t) => t.data.duration).filter((d) => d > 0)
   return {
     title: key(lead),
+    titleEn: lead.data.projectEn || (lead.data.project ? lead.data.project : tEn(lead.data)),
     section: lead.data.section,
     tracks,
     // 버전이 여러 개면 합계가 아니라 범위를 보여 준다. 셋 중 하나만 듣는 것이라
@@ -75,7 +78,7 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
         <li class="release" data-kind={release.section}>
           <details>
             <summary>
-              <strong>{release.title}</strong>
+              <strong><LangText en={release.titleEn} ko={release.title} /></strong>
               {/* 배지가 있는 행과 없는 행에서 길이 열이 어긋나지 않게 한 칸에 묶는다.
                   영상 여부는 표시하지 않는다 — 19개 중 2개를 위해 모든 행이 열을
                   하나 유지할 이유가 없고, 재생하면 화면이 바뀌어 스스로 드러난다. */}
@@ -90,12 +93,12 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
             </summary>
             <ol class="tracklist">
               {release.tracks.map((sound) => (
-                <li id={`sound-${sound.slug}`} class="track" data-title={sound.data.title}>
-                  <span>{sound.data.title}</span>
+                <li id={`sound-${sound.slug}`} class="track" data-title={tEn(sound.data)} data-title-ko={tKo(sound.data)}>
+                  <span class="track-title"><LangText en={tEn(sound.data)} ko={tKo(sound.data)} /></span>
                   <span class="track-meta">
                     {sound.data.duration > 0 && <span class="track-len">{clock(sound.data.duration)}</span>}
                   </span>
-                  {sound.data.audio && <button class="track-control" type="button" data-audio={sound.data.audio} data-backdrop={sound.data.backdrop} data-backdrop-sm={sound.data.backdropMobile} aria-label={`${sound.data.title} 재생`}><span aria-hidden="true"></span></button>}
+                  {sound.data.audio && <button class="track-control" type="button" data-audio={sound.data.audio} data-backdrop={sound.data.backdrop} data-backdrop-sm={sound.data.backdropMobile} aria-label={`Play ${tEn(sound.data)}`}><span aria-hidden="true"></span></button>}
                 </li>
               ))}
             </ol>
@@ -153,10 +156,10 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
   <div id="player-bar" hidden>
     <div class="player-track"><span class="now-playing"></span><span class="player-time">0:00 / 0:00</span></div>
     <div class="player-actions">
-      <button type="button" class="pause" aria-label="일시정지"><span aria-hidden="true"></span></button>
-      <button type="button" class="stop" aria-label="정지"><span aria-hidden="true"></span></button>
+      <button type="button" class="pause" aria-label="Pause"><span aria-hidden="true"></span></button>
+      <button type="button" class="stop" aria-label="Stop"><span aria-hidden="true"></span></button>
     </div>
-    <div class="progress" role="progressbar" aria-label="재생 진행" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
+    <div class="progress" role="progressbar" aria-label="Playback progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
   </div>
 
   <script is:inline>
@@ -180,7 +183,7 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
       const row = button.closest(".track")
       row.classList.toggle("is-playing", state === "playing")
       row.classList.toggle("is-paused", state === "paused")
-      button.setAttribute("aria-label", row.dataset.title + (state === "playing" ? " 일시정지" : " 재생"))
+      button.setAttribute("aria-label", (state === "playing" ? "Pause " : "Play ") + row.dataset.title)
     }
     const resetActive = () => { setButton(activeButton, "stopped"); activeButton = null }
     const clearBackdrop = () => { backdrop.pause(); backdrop.removeAttribute("src"); backdropTitle.textContent = ""; document.body.classList.remove("has-backdrop") }
@@ -195,6 +198,17 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
        커 뭉개지는 것을 피하려 한 것이었다 — 띠 하나가 떠 있는 모양이라
        '듣는 화면'이 되지 못했다. 전부 보여 주는 것보다 화면이 차는 편이
        낫다. 어차피 brightness(.42)로 눌린 배경이라 확대는 잘 드러나지 않는다. */
+    /* 지금 재생 중 표시는 보고 있는 언어를 따른다 */
+    function rowTitle(row) {
+      const ko = document.documentElement.getAttribute("data-lang") === "ko"
+      return (ko && row.dataset.titleKo) || row.dataset.title
+    }
+    /* 행 어디를 눌러도 재생된다 — 22px 원만 겨누게 하지 않는다(작가 요청). 버튼 자체는 그대로 둔다. */
+    document.querySelectorAll(".track").forEach((row) => row.addEventListener("click", (e) => {
+      if (e.target.closest(".track-control")) return
+      const btn = row.querySelector(".track-control[data-audio]")
+      if (btn) btn.click()
+    }))
     document.querySelectorAll(".track-control[data-audio]").forEach((button) => button.addEventListener("click", () => {
       if (activeButton === button) {
         if (player.paused) player.play(); else player.pause()
@@ -211,11 +225,11 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
         backdrop.src = (narrow && button.dataset.backdropSm) || button.dataset.backdrop
         backdrop.currentTime = 0
         backdrop.play().catch(() => {})
-        backdropTitle.textContent = button.closest(".track").dataset.title
+        backdropTitle.textContent = rowTitle(button.closest(".track"))
         document.body.classList.add("has-backdrop")
       }
       player.play()
-      now.textContent = button.closest(".track").dataset.title
+      now.textContent = rowTitle(button.closest(".track"))
       bar.hidden = false
     }))
     pause.addEventListener("click", () => player.paused ? player.play() : player.pause())
@@ -228,8 +242,8 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
       time.textContent = formatTime(player.currentTime) + " / " + formatTime(player.duration)
       followAudio()
     })
-    player.addEventListener("play", () => { setButton(activeButton, "playing"); pause.classList.add("is-playing"); pause.setAttribute("aria-label", "일시정지"); if (backdrop.src) backdrop.play().catch(() => {}) })
-    player.addEventListener("pause", () => { if (player.currentTime) setButton(activeButton, "paused"); pause.classList.remove("is-playing"); pause.setAttribute("aria-label", "재생"); backdrop.pause() })
+    player.addEventListener("play", () => { setButton(activeButton, "playing"); pause.classList.add("is-playing"); pause.setAttribute("aria-label", "Pause"); if (backdrop.src) backdrop.play().catch(() => {}) })
+    player.addEventListener("pause", () => { if (player.currentTime) setButton(activeButton, "paused"); pause.classList.remove("is-playing"); pause.setAttribute("aria-label", "Play"); backdrop.pause() })
     player.addEventListener("seeked", followAudio)
     player.addEventListener("ended", () => { resetActive(); clearBackdrop(); pause.classList.remove("is-playing"); progressFill.style.width = "0%" })
     if (location.hash) {
@@ -306,6 +320,8 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
     .track-control span, .pause span { display: block; width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 7px solid currentColor; margin-left: 2px; }
     .track.is-playing .track-control span, .pause.is-playing span { width: 7px; height: 9px; border: 0; border-left: 2px solid currentColor; border-right: 2px solid currentColor; margin-left: 0; }
     .track-control:hover { color: var(--hover); }
+    .track { cursor: pointer; }
+    .track:hover .track-title { color: var(--hover); }
     /* display를 지정한 요소에는 [hidden]이 먹지 않는다. 이걸 빠뜨려서
        재생 전에도 검은 바가 화면 하단을 가로질러 "0:00 / 0:00"을 띄우고 있었다 —
        조용한 흰 페이지에서 가장 큰 요소가 아무 말도 하지 않는 상태였다. */

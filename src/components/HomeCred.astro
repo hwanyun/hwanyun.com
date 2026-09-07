@@ -5,12 +5,14 @@
  * 사실은 콘텐츠 원본에서만 가져온다 — 여기서 새로 적지 않는다(비면 작가에게 묻는다).
  */
 import { getCollection } from "astro:content"
+import LangText from "./LangText.astro"
+import { tEn, tKo } from "../lib/titles"
 
 // 작업이 실제로 놓였던 장소·기관. 순서 = 최근순이 아니라 무게순(작가가 바꿀 수 있다).
 const INSTITUTIONS = [
   "GlogauAIR, Berlin",
   "Listhús, Ólafsfjörður",
-  "ACC 국립아시아문화전당",
+  "Asia Culture Center (ACC), Gwangju",
   "KOCCA New Content Academy",
   "Goldsmiths, University of London",
   "Royal College of Art",
@@ -49,7 +51,7 @@ const where = (e: (typeof events)[number], lang: "en" | "ko") =>
           <li>
             <span class="y">{yearOf(e.data.dateStart)}</span>
             <a href={`/events/${e.slug}/`}>
-              <span class="t">{e.data.title}</span>
+              <span class="t"><LangText en={tEn(e.data)} ko={tKo(e.data)} /></span>
               <span class="w">
                 <span data-language-content="en">{where(e, "en")}</span>
                 <span data-language-content="ko" lang="ko">{where(e, "ko")}</span>

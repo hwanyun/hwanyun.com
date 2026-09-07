@@ -7,6 +7,8 @@ const works = defineCollection({
   type: "content", // 본문(마크다운)은 선택적 부가 설명
   schema: z.object({
     title: z.string(),
+    // 영문 화면용 제목. 없으면 title을 양쪽에 쓴다. 규칙은 src/lib/titles.ts
+    titleEn: z.string().optional().default(""),
     // 전시 부제 — 본문이 시작되기 전 에피그래프 한 줄로 놓인다
     subtitle: z.string().optional().default(""),
     subtitleEn: z.string().optional().default(""),
@@ -106,6 +108,7 @@ const works = defineCollection({
           caption: z.string().optional().default(""),
           captionEn: z.string().optional().default(""), // 영문 화면용 — 없으면 caption 그대로
           noteLabel: z.string().optional().default(""),
+          noteLabelEn: z.string().optional().default(""),
           noteEn: z.string().optional().default(""),
           noteKr: z.string().optional().default(""),
         })
@@ -137,6 +140,7 @@ const sounds = defineCollection({
   type: "content",
   schema: z.object({
     title: z.string(),
+    titleEn: z.string().optional().default(""),
     year: z.string().optional().default(""),
     url: z.string().optional().default(""), // 기존 SoundCloud 기록 보존용 — 페이지에서는 사용하지 않음
     audio: z.string().optional().default(""), // R2 또는 public/의 직접 재생 가능한 오디오 파일
@@ -145,6 +149,7 @@ const sounds = defineCollection({
     duration: z.number().optional().default(0),
     section: z.enum(["works", "scores", "archive"]).default("archive"),
     project: z.string().optional().default(""), // 여러 버전을 하나의 작업으로 묶는 제목
+    projectEn: z.string().optional().default(""),
     works: z.array(z.string()).optional().default([]), // 연결할 작품 slug
     backdrop: z.string().optional().default(""), // 해당 트랙 재생 시 보여 줄 배경 영상
     // 좁은 화면용 경량본 — 백드롭은 전체화면이라 폰에서 부담이 가장 크다
@@ -183,6 +188,7 @@ const events = defineCollection({
     // 제목은 언어와 무관하게 하나로 둔다 — 〈무제 (無諸)〉처럼 번역이
     // 작품을 훼손하는 경우가 있어 작가가 영문 제목을 두지 않기로 했다.
     title: z.string(),
+    titleEn: z.string().optional().default(""), // 영문 화면용. 규칙은 src/lib/titles.ts
     dateStart: z.string(), // "2026-09-10" (필수)
     dateEnd: z.string().optional().default(""), // 종료일(기간 전시)
     // 시간·장소는 언어별로 갈린다. 비워 두면 한국어 값을 그대로 쓴다.
@@ -214,7 +220,9 @@ const events = defineCollection({
         z.object({
           kind: z.enum(["official", "press"]).default("press"),
           publisher: z.string(), // 매체 또는 기관
+          publisherEn: z.string().optional().default(""), // 영문 화면용(한국 매체면 영문 표기)
           title: z.string(),
+          titleEn: z.string().optional().default(""), // 영문 화면용(기사 제목 번역)
           url: z.string(),
           date: z.string().optional().default(""), // "2026-08-10"
         })

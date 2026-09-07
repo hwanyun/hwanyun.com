@@ -1,6 +1,8 @@
 ---
 import { getCollection } from "astro:content"
 import Base from "../../layouts/Base.astro"
+import LangText from "../../components/LangText.astro"
+import { tEn, tKo } from "../../lib/titles"
 
 export async function getStaticPaths() {
   const events = await getCollection("events", ({ data }) => !data.draft)
@@ -43,15 +45,15 @@ const fmtDate = (d: string) => {
 
 {/* 전시 링크는 메신저로 돌아다닌다 — 사이트 기본 카드보다 포스터가 훨씬 많은 걸 말한다 */}
 <Base
-  title={`HWANYUN — ${data.title}`}
+  title={`HWANYUN — ${tEn(data)}`}
   current="events"
   image={data.thumb}
-  imageAlt={`${data.title} — ${whereKr}`}
+  imageAlt={`${tEn(data)} — ${whereEn}`}
   description={data.summaryEn || data.summary}
 >
   <article class="ev-detail">
     <a class="back" href="/events/">← Events</a>
-    <h1>{data.title}</h1>
+    <h1><LangText en={tEn(data)} ko={tKo(data)} /></h1>
     <p class="meta">
       <span class="d">{fmt(data.dateStart, data.dateEnd)}</span>
       {data.timeNote && (
@@ -113,7 +115,7 @@ const fmtDate = (d: string) => {
           {data.images.map((m, i) => (
             <figure>
               <span class="plate-n" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
-              <img src={m.src} alt={m.captionEn || m.caption || data.title} loading="lazy" />
+              <img src={m.src} alt={m.captionEn || m.caption || tEn(data)} loading="lazy" />
               {m.caption && (
                 <figcaption>
                   <span data-language-content="en">{m.captionEn || m.caption}</span>
@@ -138,7 +140,7 @@ const fmtDate = (d: string) => {
               <li>
                 <a href={l.url} target="_blank" rel="noopener">
                   <span class="lk-pub">
-                    {l.publisher}
+                    <LangText en={l.publisherEn || l.publisher} ko={l.publisher} />
                     {l.kind === "official" && (
                       <span class="lk-tag">
                         <span data-language-content="en">Official</span>
@@ -146,7 +148,7 @@ const fmtDate = (d: string) => {
                       </span>
                     )}
                   </span>
-                  <span class="lk-title">{l.title}</span>
+                  <span class="lk-title"><LangText en={l.titleEn || l.title} ko={l.title} /></span>
                   <span class="lk-date">{l.date ? fmtDate(l.date) : ""}</span>
                 </a>
               </li>

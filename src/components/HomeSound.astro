@@ -5,6 +5,8 @@
  * 묶는 규칙(project = 릴리스)과 길이 표기는 sound.astro와 같다.
  */
 import { getCollection } from "astro:content"
+import LangText from "./LangText.astro"
+import { tEn, tKo } from "../lib/titles"
 
 const sounds = (await getCollection("sounds", ({ data }) => !data.draft)).sort(
   (a, b) => (a.data.order ?? 0) - (b.data.order ?? 0)
@@ -15,6 +17,7 @@ const releases = Array.from(new Map(sounds.map((s) => [key(s), s])).values()).ma
   const secs = tracks.map((t) => t.data.duration).filter((d) => d > 0)
   return {
     title: key(lead),
+    titleEn: lead.data.projectEn || (lead.data.project ? lead.data.project : tEn(lead.data)),
     lead,
     min: secs.length ? Math.min(...secs) : 0,
     max: secs.length ? Math.max(...secs) : 0,
@@ -46,7 +49,7 @@ const recent = releases.slice(0, 3)
       {recent.map((r) => (
         <li>
           <a href={`/sound/#sound-${r.lead.slug}`}>
-            <span class="t">{r.title}</span>
+            <span class="t"><LangText en={r.titleEn} ko={r.title} /></span>
             {r.n > 1 && <span class="v">{r.n} versions</span>}
             <span class="len">{span(r)}</span>
           </a>

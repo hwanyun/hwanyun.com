@@ -1,5 +1,6 @@
 ---
-title: "공존 Coexistence"
+title: "공존"
+titleEn: "Coexistence"
 dateStart: "2022-12-21"
 dateEnd: "2022-12-22"
 timeNote: "10:00 – 18:00 (작은음악회 12/21 16:00)"
@@ -34,7 +35,9 @@ images:
 links:
   - kind: "press"
     publisher: "새부천신문"
+    publisherEn: "Saebucheon News"
     title: "부천시 시각장애인협회 '공존' 주제 전시회 열어"
+    titleEn: "Bucheon association of the visually impaired opens an exhibition on the theme of Coexistence"
     url: "http://www.saebucheon.com/news/news.html?news_num=24996"
 order: 100
 draft: false

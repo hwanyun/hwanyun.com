@@ -1,5 +1,6 @@
 ---
-title: "비정형의 회로 Atypical Circuit"
+title: "비정형의 회로"
+titleEn: "Atypical Circuit"
 dateStart: "2026-04-23"
 dateEnd: "2026-04-25"
 timeNote: "11:00 – 19:00 (25일 17:30까지)"
@@ -13,7 +14,7 @@ genreEn: "Generative and interactive media installation"
 summary: "초음파 센서가 관객의 거리를 읽고, 정돈된 화면과 사운드가 글리치로 무너진다. 노이즈를 오류가 아닌 시청각 언어로 다루는 설치."
 summaryEn: "Ultrasonic sensors read the distance of the viewer, and an ordered image and sound collapse into glitch — an installation that treats noise not as error but as an audiovisual language."
 roleKr: "참여 작가 — 제13회 미디어아트 그룹전 《빛장 — Noise 노이즈》, VSLAB 주최"
-roleEn: "Participating artist — 13th Media Art Group Exhibition《빛장 — Noise》, organised by VSLAB"
+roleEn: "Participating artist — 13th Media Art Group Exhibition Bitjang — Noise, organised by VSLAB"
 textKr: |
   완벽하게 통제된 시스템과 그 이면의 필연적인 붕괴 사이의 긴장을 다룬 설치. 초음파 센서가 관객의 거리를 감지하는 순간 정돈되어 있던 화면과 사운드는 예측 불가능한 디지털 글리치와 파열음으로 왜곡된다.
 
@@ -29,16 +30,17 @@ textEn: |
 
   Noise and light proliferating beneath a rigid system act as atypical symptoms resisting controlled order; meeting the chance interventions that disturb the circuit, they produce an unpredictable creative rupture. These non-linear fragments, born of "intended error", open a fissure in the smoothly domesticated surface of perception and bring the viewer face to face with raw sensation outside control.
 
-  Shown as one of ten artists in the 13th Media Art Group Exhibition《빛장 — Noise》, organised by VSLAB. The exhibition took noise as an inquiry into the boundary between digital sound and visual art; this work answered with sensors and glitch.
+  Shown as one of ten artists in the 13th Media Art Group Exhibition Bitjang — Noise, organised by VSLAB. The exhibition took noise as an inquiry into the boundary between digital sound and visual art; this work answered with sensors and glitch.
 thumb: "/images/events/2026-atypical-circuit.jpg"
 images:
   - src: "/images/events/2026-atypical-circuit.jpg"
     caption: "제13회 미디어아트 그룹전 《빛장 — Noise 노이즈》 포스터"
-    captionEn: "13th Media Art Group Exhibition《빛장 — Noise》— poster"
+    captionEn: "13th Media Art Group Exhibition Bitjang — Noise — poster"
 links:
   - kind: "official"
     publisher: "VSLAB"
     title: "제13회 미디어아트 그룹전 《빛장 — Noise 노이즈》"
+    titleEn: "13th Media Art Group Exhibition Bitjang — Noise"
     url: "https://www.instagram.com/p/DXP2pkqk3nq/"
 order: 100
 draft: false

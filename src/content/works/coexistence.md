@@ -1,5 +1,6 @@
 ---
-title: "Coexistence (공존)"
+title: "공존"
+titleEn: "Coexistence"
 year: "2022"
 medium: "Interactive visual installation with live performance; polycarbonate, sensors, sound"
 materials:
@@ -47,8 +48,8 @@ media:
   - { type: image, src: "/images/coexistence/07.jpeg", archive: true }
   - { type: image, src: "/images/coexistence/09.jpeg", archive: true }
 sponsors:
-  - { name: "경기도 (Gyeonggi-do)", logo: "/images/coexistence/sponsors/gyeonggi-do.png" }
-  - { name: "판타지아 부천 (Fantasia Bucheon)", logo: "/images/coexistence/sponsors/fantasia-bucheon.png" }
-  - { name: "경기도시각장애인연합회 부천시지회", logo: "/images/coexistence/sponsors/visually-impaired-assoc.png" }
+  - { name: "Gyeonggi-do", logo: "/images/coexistence/sponsors/gyeonggi-do.png" }
+  - { name: "Fantasia Bucheon", logo: "/images/coexistence/sponsors/fantasia-bucheon.png" }
+  - { name: "Gyeonggi Association of the Visually Impaired, Bucheon Branch", logo: "/images/coexistence/sponsors/visually-impaired-assoc.png" }
 draft: false
 ---

@@ -1,0 +1,6 @@
+---
+/** 언어별 텍스트 한 쌍. 둘이 같으면 span 없이 그대로 찍는다. */
+const { en = "", ko = "" } = Astro.props
+const same = !ko || ko === en
+---
+{same ? en : <><span data-language-content="en">{en}</span><span data-language-content="ko" lang="ko">{ko}</span></>}

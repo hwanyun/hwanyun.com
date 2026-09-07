@@ -25,7 +25,8 @@ collections:
     format: frontmatter
     sortable_fields: [order, title, year]
     fields:
-      - { name: title, label: "제목", widget: string }
+      - { name: title, label: "제목 (국문 화면)", widget: string }
+      - { name: titleEn, label: "제목 (영문 화면)", widget: string, required: false, hint: "비우면 위 제목을 양쪽에 쓴다" }
       - { name: year, label: "연도", widget: string, required: false }
       - { name: medium, label: "매체 표기", widget: string, required: false }
       - name: size

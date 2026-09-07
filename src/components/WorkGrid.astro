@@ -1,6 +1,8 @@
 ---
 import { getCollection } from "astro:content"
 import SiteMenu from "./SiteMenu.astro"
+import LangText from "./LangText.astro"
+import { tEn, tKo } from "../lib/titles"
 import SeenTracker from "./SeenTracker.astro"
 
 // menu=false면 그리드 첫 칸의 메뉴를 그리지 않는다 — 홈은 메뉴를 본문 좌상단에 고정해 따로 둔다(2026-09).
@@ -43,11 +45,11 @@ const gridRows = Math.max(MIN_ROWS, Math.round((totalWeight / WEIGHT_PER_ROW) * 
           class="tile card"
           href={`/works/${w.slug}`}
           data-weight={WEIGHT[w.data.size] ?? 1.7}
-          data-search={`${w.data.title} ${w.data.year} ${w.data.medium}`.toLowerCase()}
+          data-search={`${w.data.title} ${w.data.titleEn} ${w.data.year} ${w.data.medium}`.toLowerCase()}
           data-slug={w.slug}
         >
           <div class="thumb">
-            {w.data.thumb ? <img src={w.data.thumb} alt={w.data.title} draggable="false" /> : <div class="ph" />}
+            {w.data.thumb ? <img src={w.data.thumb} alt={tEn(w.data)} draggable="false" /> : <div class="ph" />}
             {/* 영상은 src 없이 심어 두고, 뷰포트에 들어올 때 스크립트가 붙인다.
                 12개를 한꺼번에 받으면 첫 화면이 느려진다. */}
             {w.data.thumbVideo && (
@@ -65,7 +67,7 @@ const gridRows = Math.max(MIN_ROWS, Math.round((totalWeight / WEIGHT_PER_ROW) * 
           </div>
           <span class="scrim" aria-hidden="true" />
           <div class="cap">
-            <span class="t">{w.data.title}</span>
+            <span class="t"><LangText en={tEn(w.data)} ko={tKo(w.data)} /></span>
             {w.data.year ? <span class="y"> ({w.data.year})</span> : ""}
           </div>
         </a>

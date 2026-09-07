@@ -1,10 +1,12 @@
 ---
-title: "무제 Mujae (無諸) — 3-minute cycle, floor"
+title: "무제 (無諸) — 3-minute cycle, floor"
+titleEn: "Mujae (無諸) — 3-minute cycle, floor"
 year: "2026"
 audio: "https://media.hwanyun.com/audio/mujae-3min.m4a"
 duration: 179
 section: "works"
-project: "무제 Mujae (無諸)"
+project: "무제 (無諸)"
+projectEn: "Mujae (無諸)"
 works:
   - mujae
 backdrop: "https://media.hwanyun.com/videos/mujae-floor-sync.mp4"

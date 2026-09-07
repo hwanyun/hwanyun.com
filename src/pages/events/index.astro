@@ -1,6 +1,8 @@
 ---
 import { getCollection } from "astro:content"
 import Base from "../../layouts/Base.astro"
+import LangText from "../../components/LangText.astro"
+import { tEn, tKo } from "../../lib/titles"
 
 const events = (await getCollection("events", ({ data }) => !data.draft)).sort(
   (a, b) => a.data.dateStart.localeCompare(b.data.dateStart) || (a.data.order ?? 0) - (b.data.order ?? 0)
@@ -51,7 +53,7 @@ function fmt(start: string, end: string) {
             <a class="ev-link" href={`/events/${e.slug}/`}>
               <span class="ev-date">{fmt(e.data.dateStart, e.data.dateEnd)}</span>
               <span class="ev-main">
-                <span class="ev-title">{e.data.title}</span>
+                <span class="ev-title"><LangText en={tEn(e.data)} ko={tKo(e.data)} /></span>
                 {(e.data.venue || e.data.city) && (
                   <span class="ev-where">
                     <span data-language-content="en">

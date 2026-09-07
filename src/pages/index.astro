@@ -15,6 +15,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
   .map((e) => ({
     slug: e.slug,
     title: e.data.title,
+    titleEn: e.data.titleEn || e.data.title,
     start: e.data.dateStart,
     end: e.data.dateEnd || e.data.dateStart,
     venue: e.data.venue,
@@ -317,7 +318,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         var ko = document.documentElement.getAttribute("data-lang") === "ko"
         var where = (ko ? [evs[i].venue, evs[i].city] : [evs[i].venueEn, evs[i].cityEn])
           .filter(Boolean).join(", ")
-        var item = esc(evs[i].title) + '<span class="ut-dim"> · ' + date + (where ? " · " + esc(where) : "") + "</span>"
+        var item = esc(ko ? evs[i].title : evs[i].titleEn) + '<span class="ut-dim"> · ' + date + (where ? " · " + esc(where) : "") + "</span>"
         if (!isNaN(start) && start <= today) nowItems.push(item)
         else soonItems.push(item)
       }

@@ -4,6 +4,8 @@ import Base from "../../layouts/Base.astro"
 import { MATERIALS } from "../../data/materials"
 import { AXES } from "../../data/axes"
 import SeenTracker from "../../components/SeenTracker.astro"
+import LangText from "../../components/LangText.astro"
+import { tEn, tKo } from "../../lib/titles"
 
 const works = await getCollection("works", ({ data }) => !data.draft)
 works.sort((a, b) => {
@@ -98,7 +100,7 @@ const showCounts = SHOWS.map((x) => ({
         {works.map((work) => (
           <li data-materials={work.data.materials.join(" ")} data-axes={work.data.axes.join(" ")} data-show={work.data.showType || ""} data-slug={work.slug}>
             <a href={`/works/${work.slug}`}>
-              <time>{work.data.year}</time><span>{work.data.title}</span>
+              <time>{work.data.year}</time><span><LangText en={tEn(work.data)} ko={tKo(work.data)} /></span>
             </a>
           </li>
         ))}

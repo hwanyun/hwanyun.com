@@ -10,6 +10,8 @@
  */
 import { getCollection } from "astro:content"
 import { AXES } from "../data/axes"
+import LangText from "./LangText.astro"
+import { tEn, tKo } from "../lib/titles"
 
 const works = await getCollection("works", ({ data }) => !data.draft)
 const sounds = await getCollection("sounds", ({ data }) => !data.draft)
@@ -73,7 +75,7 @@ const cards = AXES.map((axis) => {
           )}
           <ul class="axis-works">
             {members.slice(0, 5).map((w) => (
-              <li><a href={`/works/${w.slug}/`}>{w.data.title}<span class="y"> {w.data.year}</span></a></li>
+              <li><a href={`/works/${w.slug}/`}><LangText en={tEn(w.data)} ko={tKo(w.data)} /><span class="y"> {w.data.year}</span></a></li>
             ))}
             {members.length > 5 && (
               <li class="more"><a href={`/works/?axis=${axis.id}`}>+{members.length - 5}</a></li>
