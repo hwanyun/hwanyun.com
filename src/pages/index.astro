@@ -577,8 +577,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
          1 빈자리: 입자가 문장 글자 위에는 앉지 않는다(문장 = 입자의 부재)
          2 표면:  문장을 구체 앞면에 입자로 새겨 함께 돈다
          3 호흡:  문장의 세 동사가 구체 앞면과 같은 리듬으로 밝아졌다 어두워진다 */
-      // 기본: 데스크톱 2안(표면), 모바일 1안(빈자리). 폰 크기 구체에 입자 글자는 굵어져 구체와 어울리지 않는다.
-      const thesisMode = (new URLSearchParams(location.search).get("thesis") || (isMobile ? "1" : "2"))
+      // 기본 2안(표면) — 모바일도 데스크톱과 같다(작가 확정). 모바일은 대신 더 잘 보이게 조정한다.
+      const thesisMode = (new URLSearchParams(location.search).get("thesis") || "2")
       hero.dataset.thesis = thesisMode
       const thesisEl = document.getElementById("thesis")
       let thesisMask: Uint8Array | null = null   // width*height, 1 = 글자(여유 포함)
@@ -648,7 +648,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         lines.forEach((l, i) => oc.fillText(l, w / 2, h / 2 + (i - (lines.length - 1) / 2) * fs * 1.2))
         const px = oc.getImageData(0, 0, w, h).data
         const pts: Array<[number, number, number]> = []
-        const step = Math.max(2, Math.round(fs / (isMobile ? 10 : 9)))
+        const step = Math.max(2, Math.round(fs / (isMobile ? 12 : 9)))
         for (let y = 0; y < h; y += step) for (let x = 0; x < w; x += step) {
           if (px[(y * w + x) * 4 + 3] < 80) continue
           const u = (x - w / 2) / R, v = (y - h / 2) / R  // -0.85..0.85, -0.55..0.55
@@ -743,7 +743,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         // 2안 — 문장 입자는 구체 입자에서 떼어 쓰지 않고 따로 얹는다. 떼어 쓰면 구체가 성기고 고르지 않다.
         const surf = thesisSurfacePoints()
         if (surf.length) {
-          const n = Math.min(surf.length, isMobile ? 900 : 1400)
+          const n = Math.min(surf.length, isMobile ? 1300 : 1400)
           const base = particles.length
           const extra = Array.from({ length: n }, (_, i) => {
             const [u, v, z] = surf[Math.floor(i / n * surf.length)]
@@ -774,7 +774,9 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
           thesisEl.style.setProperty("--jx", lv > .012 ? ((Math.random() - .5) * lv * 40).toFixed(1) + "px" : "0px")
           thesisEl.style.setProperty("--jy", lv > .012 ? ((Math.random() - .5) * lv * 40).toFixed(1) + "px" : "0px")
         }
-        const rotation = time * .00028
+        // 모바일은 한 방향 회전 대신 정면을 중심으로 ±50° 흔들린다 — 문장이 늘 정면 근처에 있어 읽힌다.
+        // 데스크톱은 계속 돈다(뒷면으로 넘어가 비치는 것까지가 의도).
+        const rotation = isMobile ? Math.sin(time * .00035) * .85 : time * .00028
         const tilt = -.22
         const cosRotation = Math.cos(rotation)
         const sinRotation = Math.sin(rotation)
@@ -844,9 +846,11 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
           particle.y += particle.vy
           context.beginPath()
           // 문장 입자는 더 크고(모바일은 한층 더) 진하게 — 작은 화면에서도 글자로 읽히게
-          const pointSize = isInside ? 1.1 : (particle.text ? (isMobile ? 1.9 : 1) : .52) + (depth + 1) * .48
+          const pointSize = isInside ? 1.1 : (particle.text ? (isMobile ? 1.7 : 1) : .52) + (depth + 1) * .48
           let brightness = isInside ? .96 : Math.min(.98, (particle.text ? (isMobile ? .8 : .45) : .26) + (depth + 1) * .34 + audioLevel * .18)
-          // 뒷면으로 돌아간 문장이 구체 너머로 거울처럼 비치는 것은 그대로 둔다(작가 선택)
+          // 뒷면으로 돌아간 문장이 구체 너머로 비치는 것은 그대로 두되(작가 선택),
+          // 모바일은 뒷면을 옅게 해 앞면 문장이 또렷이 구분되게 한다
+          if (isMobile && particle.text && !isInside && depth < 0) brightness *= Math.max(.25, 1 + depth)
           // 문장도 검정 — 네온 레몬을 시도했다가 검정이 더 엣지 있다고 되돌림(작가, 2026-09-07)
           context.arc(particle.x, particle.y, pointSize, 0, Math.PI * 2)
           context.fillStyle = `rgba(17, 17, 17, ${brightness})`
