@@ -17,6 +17,9 @@ export const AXES = [
     en: "Sounding",
     // 녹음이든 신디사이저든 프로젝션이든 — 소리와 빛이 공간에 있게 되는 단계.
     // "채집"은 마이크 든 사람의 말이라 Ableton으로 짓는 소리가 빠진다 (작가 지적, 2026-09-07).
+    // 카드용 한 문장 — 문단의 마지막 문장(명제). 긴 문단은 Works 페이지에서 축을 골랐을 때 읽힌다.
+    lineKo: "들린다는 것은 이미 함께 있다는 증거다.",
+    lineEn: "To be heard is proof of being with.",
     descKo: "혼자서 울리는 것은 없다. 어떤 소리가 들린다면 이미 무언가가 다른 무언가를 흔들고 있는 것이다. 공기와 벽, 재료와 몸이 같은 떨림을 잠시 나눠 갖는 그 순간에서 작업은 시작한다. 들린다는 것은 이미 함께 있다는 증거다.",
     descEn: "Nothing sounds alone. If something can be heard, something has already set something else in motion. For a moment, air and wall, material and body share one tremor, and that moment is where the work begins. To be heard is proof of being with.",
     // 카드 미디어와 15초 발췌 — 작가가 바꿀 수 있게 여기 한 곳에 둔다.
@@ -28,6 +31,8 @@ export const AXES = [
     id: "contact",
     ko: "접촉",
     en: "Contact",
+    lineKo: "만지는 쪽과 만져지는 쪽이 자리를 바꾸는 곳.",
+    lineEn: "Where touching and being touched change places.",
     descKo: "가까이 간다는 것은 작은 일이 아니다. 거리가 사라지는 순간 보던 사람은 보이는 것의 일부가 되고, 닫혀 있던 것이 열리거나 멀쩡하던 것이 무너진다. 손이 닿는 그 경계에 머물며 무엇이 시작되고 무엇이 그만두는지를 본다. 만지는 쪽과 만져지는 쪽이 자리를 바꾸는 곳.",
     descEn: "To come close is no small thing. When distance is gone, the one who was looking becomes part of what is looked at; something closed opens, or something intact gives way. The work stays at that edge where a hand lands, watching what starts and what stops, where touching and being touched change places.",
     work: "atypical-circuit",
@@ -37,6 +42,8 @@ export const AXES = [
     id: "trace",
     ko: "흔적",
     en: "Trace",
+    lineKo: "작업의 절반은 끝난 뒤에 있다.",
+    lineEn: "Half of the work happens after it ends.",
     descKo: "무언가가 지나간 자리는 비어 있지 않다. 닿았던 것들은 서로에게 자국을 남기고, 다음 만남은 그 자국 위에서 일어난다. 남은 것은 기록이 아니라 아직 식지 않은 상태다. 작업의 절반은 끝난 뒤에 있다.",
     descEn: "Where something has passed is not empty. What has touched leaves a mark on what it touched, and the next meeting happens on top of that mark. What remains is not a record but a state not yet cooled. Half of the work happens after it ends.",
     // 손이 닿았던 자리에 남는 투사된 원 — 접촉이 남긴 흔적. 루프 영상이 있어 시아노타입 정지 사진보다 세다.

@@ -43,44 +43,29 @@ const cards = AXES.map((axis) => {
           )}
         </a>
         <div class="axis-body">
+          {/* 카드는 훑는 자리다: 제목 · 한 문장 · 작품 수. 문단과 목록은 축을 눌러 들어간 Works에서. */}
           <h3>
-            {/* 보고 있는 언어가 주 — 영문 화면에 한글이 앞서 있으면 어느 나라 사이트인지 헷갈린다 */}
             <a href={`/works/?axis=${axis.id}`}>
               <span data-language-content="en">{axis.en}</span>
               <span data-language-content="ko" lang="ko">{axis.ko}</span>
             </a>
           </h3>
-          <p class="axis-desc">
-            <span data-language-content="en">{axis.descEn}</span>
-            <span data-language-content="ko" lang="ko">{axis.descKo}</span>
+          <p class="axis-line">
+            <span data-language-content="en">{axis.lineEn}</span>
+            <span data-language-content="ko" lang="ko">{axis.lineKo}</span>
           </p>
-          {sound?.data.audio ? (
-            <button
-              type="button"
-              class="excerpt"
-              data-audio={sound.data.audio}
-              data-limit="15"
-              aria-pressed="false"
-              aria-label={`Play 15 seconds of ${sound.data.title}`}
-            >
-              <span class="ex-dot" aria-hidden="true"></span>
-              <span class="ex-label"><span class="ex-off">0:15</span><span class="ex-on">■</span></span>
-              <span class="ex-title">{sound.data.title}</span>
-            </button>
-          ) : (
-            <span class="excerpt excerpt--none">
-              <span data-language-content="en">No recording yet</span>
-              <span data-language-content="ko" lang="ko">아직 녹음 없음</span>
-            </span>
-          )}
-          <ul class="axis-works">
-            {members.slice(0, 5).map((w) => (
-              <li><a href={`/works/${w.slug}/`}><LangText en={tEn(w.data)} ko={tKo(w.data)} /><span class="y"> {w.data.year}</span></a></li>
-            ))}
-            {members.length > 5 && (
-              <li class="more"><a href={`/works/?axis=${axis.id}`}>+{members.length - 5}</a></li>
-            )}
-          </ul>
+          <div class="axis-foot">
+            {sound?.data.audio ? (
+              <button type="button" class="excerpt" data-audio={sound.data.audio} data-limit="15" aria-pressed="false" aria-label={`Play 15 seconds of ${sound.data.title}`}>
+                <span class="ex-dot" aria-hidden="true"></span>
+                <span class="ex-label"><span class="ex-off">0:15</span><span class="ex-on">■</span></span>
+              </button>
+            ) : null}
+            <a class="axis-count" href={`/works/?axis=${axis.id}`}>
+              <span data-language-content="en">{members.length} works →</span>
+              <span data-language-content="ko" lang="ko">작품 {members.length} →</span>
+            </a>
+          </div>
         </div>
       </article>
     ))}
@@ -152,39 +137,30 @@ const cards = AXES.map((axis) => {
   .axis-media .ph { background: repeating-linear-gradient(45deg, var(--line) 0 2px, var(--surface-2) 2px 6px); }
   .axis-video { opacity: 0; transition: opacity var(--dur-slow) ease; }
   .axis-video.is-playing { opacity: 1; }
-  .axis-body { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px 16px; flex: 1; }
+  .axis-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
   h3 { margin: 0; font-size: var(--fs-lead); font-weight: 500; letter-spacing: -.01em; }
   h3 a { color: var(--text); text-decoration: none; }
   h3 a:hover { color: var(--hover); }
-  .axis-desc { margin: 0; font-size: var(--fs-sm); line-height: 1.55; color: var(--text-2); }
-  .axis-desc [lang="ko"] { line-height: 1.65; }
-
+  .axis-line { margin: 0; font-size: var(--fs-sm); line-height: 1.5; color: var(--text-2); }
+  .axis-line [lang="ko"] { line-height: 1.6; }
+  .axis-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px; }
   .excerpt {
-    display: inline-flex; align-items: center; gap: 8px; width: fit-content;
+    display: inline-flex; align-items: center; gap: 8px;
     padding: 4px 10px 4px 8px; border: 1px solid var(--line-2); border-radius: 999px;
     background: none; color: var(--text); font: inherit; font-size: var(--fs-2xs);
     letter-spacing: .06em; cursor: pointer;
   }
   .excerpt:hover { border-color: var(--hover); color: var(--hover); }
   .excerpt[aria-pressed="true"] { background: var(--text); color: var(--surface); border-color: var(--text); }
-  .excerpt--none { cursor: default; color: var(--text-3); border-style: dashed; }
-  .excerpt--none:hover { border-color: var(--line-2); color: var(--text-3); }
   .ex-dot { width: 7px; height: 7px; border-radius: 50%; border: 1px solid currentColor; }
   .excerpt[aria-pressed="true"] .ex-dot { background: currentColor; animation: ex-breathe 1.2s ease-in-out infinite; }
   @keyframes ex-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.5); } }
   .ex-on { display: none; }
   .excerpt[aria-pressed="true"] .ex-off { display: none; }
   .excerpt[aria-pressed="true"] .ex-on { display: inline; }
-  .ex-title { color: var(--text-3); max-width: 22ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .excerpt[aria-pressed="true"] .ex-title { color: inherit; }
+  .axis-count { margin-left: auto; font-size: var(--fs-xs); color: var(--text-3); text-decoration: none; }
+  .axis-count:hover { color: var(--hover); }
 
-  .axis-works { list-style: none; margin: auto 0 0; padding: 10px 0 0; border-top: 1px solid var(--line); font-size: var(--fs-xs); line-height: 1.7; }
-  .axis-works a { color: var(--text-2); text-decoration: none; }
-  .axis-works a:hover { color: var(--hover); }
-  .axis-works .y { color: var(--text-3); font-variant-numeric: tabular-nums; }
-  .axis-works .more a { color: var(--text-3); }
-
-  /* 좁은 화면: 세로로 쌓되 카드는 가로형(미디어 왼쪽·본문 오른쪽) — 세 장이 화면 셋을 먹지 않게 */
   @media (max-width: 1000px) {
     .axis-grid { grid-template-columns: 1fr; }
     .axis { flex-direction: row; }
