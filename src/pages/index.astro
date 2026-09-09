@@ -22,7 +22,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
   .sort((a, b) => a.start.localeCompare(b.start))
 ---
 
-<Base footer={false} title="HWANYUN" bare>
+<Base title="HWANYUN" bare>
   <SiteMenu slot="menu" variant="hero" />
 
   <section class="hero" aria-labelledby="hero-title">
