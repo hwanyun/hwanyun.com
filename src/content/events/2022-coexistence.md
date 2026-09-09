@@ -39,6 +39,8 @@ links:
     title: "부천시 시각장애인협회 '공존' 주제 전시회 열어"
     titleEn: "Bucheon association of the visually impaired opens an exhibition on the theme of Coexistence"
     url: "http://www.saebucheon.com/news/news.html?news_num=24996"
+works:
+  - coexistence
 order: 100
 draft: false
 ---

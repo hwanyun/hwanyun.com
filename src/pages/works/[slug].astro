@@ -21,6 +21,12 @@ const yrFor = (t: string) => (data.year ? (t.trim().endsWith(")") ? `, ${data.ye
 const yr = yrFor(tEn(data))
 const allWorks = await getCollection("works", ({ data }) => !data.draft)
 const allSounds = await getCollection("sounds", ({ data }) => !data.draft)
+// 이 작품이 나간 행사의 공식 안내·보도 — 작품을 직접 다룬 기사가 없어도(무제),
+// 행사를 다룬 대표 기사 목록은 작품 상세에 붙어 있어야 한다(작가, 2026-09).
+const allEvents = await getCollection("events", ({ data }) => !data.draft)
+const pressLinks = allEvents
+  .filter((e) => e.data.works.includes(work.slug))
+  .flatMap((e) => e.data.links.map((l) => ({ ...l, eventTitle: e.data.title, eventTitleEn: e.data.titleEn || e.data.title })))
 const seriesWorks = data.series
   ? allWorks
       .filter((item) => item.data.series?.id === data.series?.id)
@@ -505,6 +511,29 @@ function toParagraphs(text: string): string {
             {data.externalLinks.map((link) => (
               <a href={link.url} target="_blank" rel="noopener">
                 <span>{link.title}</span>
+                <span aria-hidden="true">↗</span>
+              </a>
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    {
+      pressLinks.length > 0 && (
+        <section class="external-links" aria-label="Press">
+          <div class="external-links-label">Press</div>
+          <div class="external-links-list press-list">
+            {pressLinks.map((link) => (
+              <a href={link.url} target="_blank" rel="noopener">
+                <span class="press-pub">
+                  <span data-language-content="en">{link.publisherEn || link.publisher}</span>
+                  <span data-language-content="ko" lang="ko">{link.publisher}</span>
+                </span>
+                <span>
+                  <span data-language-content="en">{link.titleEn || link.title}</span>
+                  <span data-language-content="ko" lang="ko">{link.title}</span>
+                </span>
                 <span aria-hidden="true">↗</span>
               </a>
             ))}
@@ -1381,6 +1410,11 @@ function toParagraphs(text: string): string {
     .external-links-list { display: flex; flex-wrap: wrap; gap: 9px 24px; }
     .external-links-list a { display: inline-flex; gap: 8px; align-items: baseline; color: var(--text-3); font-size: var(--fs-sm); }
     .external-links-list a span:last-child { font-size: var(--fs-xs); color: var(--text-4); }
+    /* 보도 — 매체명이 앞에 서고, 기사 제목이 따른다. 한 줄에 하나. */
+    .press-list { flex-direction: column; gap: 8px; }
+    .press-list a { color: var(--text-2); }
+    .press-list .press-pub { flex: none; min-width: 9ch; color: var(--text); font-size: var(--fs-sm); }
+    .press-list a:hover span { color: var(--hover); }
     .external-links-list a:hover, .external-links-list a:hover span:last-child { color: var(--hover); }
     .exhibition-label,
     .sponsors-label {

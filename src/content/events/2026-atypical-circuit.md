@@ -42,6 +42,8 @@ links:
     title: "제13회 미디어아트 그룹전 《빛장 — Noise 노이즈》"
     titleEn: "13th Media Art Group Exhibition Bitjang — Noise"
     url: "https://www.instagram.com/p/DXP2pkqk3nq/"
+works:
+  - atypical-circuit
 order: 100
 draft: false
 ---

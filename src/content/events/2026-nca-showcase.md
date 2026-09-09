@@ -114,6 +114,8 @@ images:
   - src: "/images/events/2026-nca-showcase.jpg"
     caption: "2026 뉴콘텐츠아카데미 쇼케이스 포스터"
     captionEn: "2026 New Content Academy Showcase poster"
+works:
+  - mujae
 order: 100
 draft: false
 ---

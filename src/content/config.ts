@@ -239,6 +239,7 @@ const events = defineCollection({
       )
       .optional()
       .default([]),
+    works: z.array(z.string()).optional().default([]), // 이 행사에 나간 작품 slug — 작품 상세가 보도를 끌어온다
     order: z.number().default(100), // 같은 날짜 내 정렬 보조
     draft: z.boolean().optional().default(false),
   }),
