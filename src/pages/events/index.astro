@@ -177,7 +177,7 @@ function fmt(start: string, end: string) {
   <style>
     .events {
       margin: calc(var(--desktop-header-clearance) + 64px) 40px 120px var(--desktop-content-x);
-      max-width: 720px;
+      max-width: var(--content-w); /* 다른 섹션 목록(900px)과 같은 폭(2026-09 통일) */
     }
     /* 제목 블록 — Prototypes 페이지와 같은 규격 */
     .events-head { margin-bottom: 96px; }
