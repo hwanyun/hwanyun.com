@@ -45,6 +45,8 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
   <div id="backdrop-title" aria-live="polite"></div>
   <main id="sound-archive">
     <header class="archive-head">
+      {/* 소리의 입자 — 제목과 소개문 뒤에 깔린다(작가 요청). 파형을 따라 점들이 흐르고, 커서가 올라오면 증폭된다. */}
+      <canvas class="sound-viz" id="sound-viz" aria-hidden="true"></canvas>
       <p class="eyebrow">LISTENING ARCHIVE</p>
       <h1>Sound</h1>
       <div class="intro-copy">
@@ -52,9 +54,6 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
         <p class="intro" data-language-content="ko" lang="ko">사운드 작업, 스코어, 그리고 기록을 모은 아카이브. 각각의 기록은 작업이 만들어진 장소와 시간, 관계의 맥락을 함께 간직한다.</p>
       </div>
     </header>
-
-    {/* 소리의 입자 — 홈에서 옮겨 온 효과. 파형을 따라 점들이 흐르고, 커서가 올라오면 증폭된다. */}
-    <div class="sound-band" aria-hidden="true"><canvas class="sound-viz" id="sound-viz"></canvas></div>
 
     <nav class="sound-filter" aria-label="Filter recordings">
       <a href="/sound/" data-kind="">
@@ -270,7 +269,8 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
     #sound-archive { position: relative; z-index: 1; max-width: var(--content-w); margin: calc(var(--desktop-header-clearance) + 64px) 40px 100px var(--desktop-content-x); transition: color var(--dur-slow) ease; }
     /* Works archive의 소개 블록과 같은 데스크톱 읽기 규격 */
     /* 제목 블록 — Prototypes 페이지와 같은 규격 */
-    .archive-head { max-width: 650px; margin-bottom: 96px; }
+    .archive-head { max-width: 900px; margin-bottom: 96px; }
+    .archive-head .intro-copy { max-width: 650px; }
     .release-count { font-size: var(--fs-2xs); letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
     .eyebrow { margin: 0 0 6px; font-size: var(--fs-2xs); letter-spacing: .12em; text-transform: uppercase; color: var(--text-4); }
     h1 { margin: 0 0 20px; font-family: var(--display); font-weight: 400; font-size: clamp(40px, 4.4vw, 60px); letter-spacing: -.01em; line-height: 1.05; }
@@ -280,9 +280,11 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
     .intro[lang="ko"] { line-height: 1.85; }
     /* 필터 알약 — Works 아카이브와 같은 규칙. 사이트 안에서 "고르는 일"은
        어디서나 같은 모양이어야 한다. */
-    .sound-band { position: relative; width: 100%; height: 180px; margin: -24px 0 40px; color: var(--text); }
-    .sound-band:hover { color: var(--hover); }
-    .sound-viz { position: absolute; inset: 0; width: 100%; height: 100%; color: inherit; }
+    /* 머리 뒤의 웨이브 — 글자가 앞, 입자는 뒤(옅게). 머리 폭 전체를 쓴다 */
+    .archive-head { position: relative; }
+    .archive-head > :not(.sound-viz) { position: relative; z-index: 1; }
+    .sound-viz { position: absolute; inset: -24px -40px -24px -24px; width: calc(100% + 64px); height: calc(100% + 48px); color: var(--text); opacity: .45; pointer-events: none; }
+    .archive-head:hover .sound-viz { opacity: .7; }
     .sound-filter { display: flex; flex-wrap: wrap; gap: 6px 8px; margin: 0 0 22px; }
     .sound-filter a {
       /* 칩은 도구 — 콘텐츠보다 조용하게, works 필터와 같은 13 */
@@ -424,7 +426,7 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
     /* 커서가 올라오면 파형이 커지고 떨림이 는다(커서 자리를 비우지는 않는다 — 작가 지적).
        떠나면 천천히 원래 흐름으로 되돌아간다. */
     var hover = 0
-    var card = canvas.parentElement || canvas
+    var card = canvas.closest(".archive-head") || canvas
     card.addEventListener("pointerenter", function () { hoverTarget = 1 })
     card.addEventListener("pointerleave", function () { hoverTarget = 0 })
     var hoverTarget = 0
