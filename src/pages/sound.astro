@@ -349,6 +349,9 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
     :global(body.has-backdrop) .release-count, :global(body.has-backdrop) .number, :global(body.has-backdrop) .track, :global(body.has-backdrop) .track-meta { color: rgba(255,255,255,.78); }
     :global(body.has-backdrop) .track.is-playing, :global(body.has-backdrop) summary strong { color: var(--surface); }
     @media (max-width: 700px) {
+      /* 모바일 QA(2026-09): 입자가 소개 문장을 침범해 읽기를 방해 — 더 옅게 */
+      .sound-viz { opacity: .18; }
+      .archive-head:hover .sound-viz { opacity: .18; }
       #sound-archive { width: auto; margin: 24px 16px 80px; }
       .archive-head { margin-bottom: 54px; }
       h1 { font-size: clamp(25px, 7vw, 32px); line-height: 1.22; }
