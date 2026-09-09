@@ -187,6 +187,66 @@ const axisCounts = AXES.map((a) => ({ ...a, n: entries.filter((e) => e.data.axes
   })()
 </script>
 
+<script>
+  /* 라이브 데모 타일 — data-demo="mascot": 콘택트 페이지 캐릭터의 축약판.
+     같은 GLB(/mascot/character.glb)를 작은 씬에서 돌린다: 대기 애니메이션 + 커서를 따라 도는 몸. */
+  import * as THREE from "three"
+  import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
+  document.querySelectorAll<HTMLCanvasElement>('canvas.proto-demo[data-demo="mascot"]').forEach((canvas) => {
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true })
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
+    const scene = new THREE.Scene()
+    const cam = new THREE.PerspectiveCamera(34, 1, 0.1, 500)
+    scene.add(new THREE.AmbientLight(0xffffff, 1.15))
+    const key = new THREE.DirectionalLight(0xffffff, 1.5); key.position.set(2, 4, 5); scene.add(key)
+    let mixer: THREE.AnimationMixer | null = null
+    let avatar: THREE.Group | null = null
+    let targetRot = 0
+    new GLTFLoader().load("/mascot/character.glb", (gltf) => {
+      const model = gltf.scene
+      const box = new THREE.Box3().setFromObject(model)
+      const size = new THREE.Vector3(); box.getSize(size)
+      const center = new THREE.Vector3(); box.getCenter(center)
+      model.position.set(-center.x, -center.y, -center.z)
+      avatar = new THREE.Group(); avatar.add(model); scene.add(avatar)
+      const d = size.y / (2 * Math.tan((cam.fov * Math.PI) / 360))
+      cam.position.set(0, size.y * 0.04, d * 1.35)
+      mixer = new THREE.AnimationMixer(model)
+      if (gltf.animations.length) mixer.clipAction(gltf.animations[0]).play()
+    })
+    canvas.addEventListener("pointermove", (e) => {
+      const b = canvas.getBoundingClientRect()
+      targetRot = ((e.clientX - b.left) / b.width - 0.5) * 1.1
+    })
+    canvas.addEventListener("pointerleave", () => { targetRot = 0 })
+    const clock = new THREE.Clock()
+    let visible = false, raf = 0
+    function resize() {
+      const b = canvas.getBoundingClientRect()
+      if (!b.width) return
+      renderer.setSize(b.width, b.height, false)
+      cam.aspect = b.width / b.height; cam.updateProjectionMatrix()
+    }
+    function frame() {
+      if (!visible) return
+      const dt = clock.getDelta()
+      if (mixer && !reduce) mixer.update(dt)
+      if (avatar) avatar.rotation.y += (targetRot - avatar.rotation.y) * 0.08
+      renderer.render(scene, cam)
+      raf = requestAnimationFrame(frame)
+    }
+    new IntersectionObserver((es) => {
+      es.forEach((en) => {
+        visible = en.isIntersecting
+        cancelAnimationFrame(raf)
+        if (visible) { resize(); clock.getDelta(); raf = requestAnimationFrame(frame) }
+      })
+    }, { rootMargin: "60px 0px" }).observe(canvas)
+    window.addEventListener("resize", resize)
+  })
+</script>
+
 <style>
   .protos-archive { margin: calc(var(--desktop-header-clearance) + 64px) 12px 100px 12px; }
   /* 머리글·필터는 본문 들여쓰기 라인, 그리드만 화면 전체(레퍼런스: UE prototypes) */
