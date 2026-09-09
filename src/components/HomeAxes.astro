@@ -31,7 +31,7 @@ const cards = AXES.map((axis) => {
 <section class="axes" id="axes" aria-labelledby="axes-title">
   <SectionHead id="axes-title" en="Three stages a signal passes through" ko="신호가 지나는 세 단계"
     pills={AXES.map((a) => ({ href: `/works/?axis=${a.id}`, en: a.en, ko: a.ko }))} />
-  <div class="axis-grid">
+  <div class="axis-stack">
     {cards.map(({ axis, hero, sound, members }) => (
       <article class="axis" id={`axis-${axis.id}`} data-axis={axis.id}>
         <a class="axis-media" href={`/works/?axis=${axis.id}`} aria-label={`${axis.en} — works`}>
@@ -39,32 +39,29 @@ const cards = AXES.map((axis) => {
           {hero?.data.thumbVideo && (
             <video class="axis-video" data-src={hero.data.thumbVideo} muted loop playsinline preload="none" aria-hidden="true" tabindex="-1" />
           )}
-        </a>
-        <div class="axis-body">
-          {/* 카드는 훑는 자리다: 제목 · 한 문장 · 작품 수. 문단과 목록은 축을 눌러 들어간 Works에서. */}
-          <h3>
-            <a href={`/works/?axis=${axis.id}`}>
+          <span class="scrim" aria-hidden="true"></span>
+          {/* 레퍼런스(universaleverything.com 홈) — 제목과 한 줄이 미디어 좌상단에 얹힌다 */}
+          <span class="axis-copy">
+            <span class="axis-name">
               <span data-language-content="en">{axis.en}</span>
               <span data-language-content="ko" lang="ko">{axis.ko}</span>
-            </a>
-          </h3>
-          <p class="axis-line">
-            <span data-language-content="en">{axis.lineEn}</span>
-            <span data-language-content="ko" lang="ko">{axis.lineKo}</span>
-          </p>
-          <div class="axis-foot">
-            {sound?.data.audio ? (
-              <button type="button" class="excerpt" data-audio={sound.data.audio} data-limit="15" aria-pressed="false" aria-label={`Play 15 seconds of ${sound.data.title}`}>
-                <span class="ex-dot" aria-hidden="true"></span>
-                <span class="ex-label"><span class="ex-off">0:15</span><span class="ex-on">■</span></span>
-              </button>
-            ) : null}
-            <a class="axis-count" href={`/works/?axis=${axis.id}`}>
-              <span data-language-content="en">{members.length} works →</span>
-              <span data-language-content="ko" lang="ko">작품 {members.length} →</span>
-            </a>
-          </div>
-        </div>
+            </span>
+            <span class="axis-line">
+              <span data-language-content="en">{axis.lineEn}</span>
+              <span data-language-content="ko" lang="ko">{axis.lineKo}</span>
+            </span>
+          </span>
+          <span class="axis-count">
+            <span data-language-content="en">{members.length} works →</span>
+            <span data-language-content="ko" lang="ko">작품 {members.length} →</span>
+          </span>
+        </a>
+        {sound?.data.audio ? (
+          <button type="button" class="excerpt" data-audio={sound.data.audio} data-limit="15" aria-pressed="false" aria-label={`Play 15 seconds of ${sound.data.title}`}>
+            <span class="ex-dot" aria-hidden="true"></span>
+            <span class="ex-label"><span class="ex-off">0:15</span><span class="ex-on">■</span></span>
+          </button>
+        ) : null}
       </article>
     ))}
   </div>
@@ -120,53 +117,50 @@ const cards = AXES.map((axis) => {
 
 
 <style>
-  .axes { max-width: 1600px; margin: 0 40px 0 var(--desktop-content-x); padding: 128px 0 0; }
-  .conn { margin: 0 0 22px; font-family: var(--display); font-size: var(--fs-lead); font-weight: 400; letter-spacing: 0; color: var(--text); }
-  .conn .arrow { margin-left: 6px; color: var(--hover); }
-  .axis-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); }
-  .axis { display: flex; flex-direction: column; background: var(--surface-2); border: 1px solid var(--line); }
-  .axis-media {
-    position: relative; display: block; aspect-ratio: 16 / 10; overflow: hidden; background: var(--surface-2);
-  }
-  .axis-media img, .axis-media .ph, .axis-video {
-    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
-  }
+  /* 전면 타일 — 축 하나가 화면을 채운다(레퍼런스: universaleverything.com 홈, 작가 요청 2026-09) */
+  .axes { margin: 0; padding: 128px 0 0; }
+  .axes > :global(.sec-head) { margin-left: var(--desktop-content-x); margin-right: 40px; }
+  .axis-stack { display: flex; flex-direction: column; gap: 10px; padding: 0 10px; }
+  .axis { position: relative; }
+  .axis-media { position: relative; display: block; height: 82svh; min-height: 420px; overflow: hidden; background: var(--surface-2); }
+  .axis-media img, .axis-media .ph, .axis-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .axis-media .ph { background: repeating-linear-gradient(45deg, var(--line) 0 2px, var(--surface-2) 2px 6px); }
   .axis-video { opacity: 0; transition: opacity var(--dur-slow) ease; }
   .axis-video.is-playing { opacity: 1; }
-  .axis-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
-  h3 { margin: 0; font-size: var(--fs-lead); font-weight: 500; letter-spacing: -.01em; }
-  h3 a { color: var(--text); text-decoration: none; }
-  h3 a:hover { color: var(--hover); }
-  .axis-line { margin: 0; font-size: var(--fs-sm); line-height: 1.5; color: var(--text-2); }
+  /* 밝은 썸네일에서도 글자가 서도록 위쪽에만 얇은 스크림 */
+  .scrim { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,.38), rgba(0,0,0,0) 42%); pointer-events: none; }
+  /* 좌측 고정 메뉴와 겹치지 않게 본문 들여쓰기 라인에 맞춘다 */
+  .axis-copy { position: absolute; top: 22px; left: var(--desktop-content-x); right: 24px; z-index: 1; display: flex; flex-direction: column; gap: 6px; color: #fff; }
+  .axis-name { font-family: var(--display); font-weight: 400; font-size: clamp(24px, 2.2vw, 34px); letter-spacing: -.01em; line-height: 1.1; }
+  .axis-name [lang="ko"] { font-family: var(--sans); }
+  .axis-line { max-width: 44ch; font-size: var(--fs-sm); line-height: 1.5; opacity: .92; }
   .axis-line [lang="ko"] { line-height: 1.6; }
-  .axis-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px; }
+  .axis-count { position: absolute; right: 24px; bottom: 20px; z-index: 1; color: #fff; font-size: var(--fs-xs); letter-spacing: .02em; text-shadow: 0 1px 8px rgba(0,0,0,.35); }
+  .axis-media:hover .axis-count { text-decoration: underline; }
   .excerpt {
+    position: absolute; left: 24px; bottom: 20px; z-index: 2;
     display: inline-flex; align-items: center; gap: 8px;
-    padding: 4px 10px 4px 8px; border: 1px solid var(--line-2); border-radius: 999px;
-    background: none; color: var(--text); font: inherit; font-size: var(--fs-2xs);
-    letter-spacing: .06em; cursor: pointer;
+    padding: 5px 12px 5px 10px; border: 1px solid rgba(255,255,255,.7); border-radius: 999px;
+    background: rgba(0,0,0,.25); color: #fff; font: inherit; font-size: var(--fs-2xs);
+    letter-spacing: .06em; cursor: pointer; backdrop-filter: blur(4px);
   }
-  .excerpt:hover { border-color: var(--hover); color: var(--hover); }
-  .excerpt[aria-pressed="true"] { background: var(--text); color: var(--surface); border-color: var(--text); }
+  .excerpt:hover { border-color: #fff; }
+  .excerpt[aria-pressed="true"] { background: #fff; color: #111; border-color: #fff; }
   .ex-dot { width: 7px; height: 7px; border-radius: 50%; border: 1px solid currentColor; }
   .excerpt[aria-pressed="true"] .ex-dot { background: currentColor; animation: ex-breathe 1.2s ease-in-out infinite; }
   @keyframes ex-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.5); } }
   .ex-on { display: none; }
   .excerpt[aria-pressed="true"] .ex-off { display: none; }
   .excerpt[aria-pressed="true"] .ex-on { display: inline; }
-  .axis-count { margin-left: auto; font-size: var(--fs-xs); color: var(--text-3); text-decoration: none; }
-  .axis-count:hover { color: var(--hover); }
 
-  @media (max-width: 1000px) {
-    .axis-grid { grid-template-columns: 1fr; }
-    .axis { flex-direction: row; }
-    .axis-media { flex: 0 0 42%; aspect-ratio: auto; min-height: 220px; }
-  }
   @media (max-width: 700px) {
-    .axes { margin: 0; padding: 96px 16px 0; }
-    .axis { flex-direction: column; }
-    .axis-media { flex: none; aspect-ratio: 16 / 10; min-height: 0; }
+    .axes { padding: 96px 0 0; }
+    .axes > :global(.sec-head) { margin-left: 16px; margin-right: 16px; }
+    .axis-stack { gap: 8px; padding: 0 8px; }
+    .axis-media { height: 64svh; min-height: 340px; }
+    .axis-copy { top: 16px; left: 16px; right: 16px; }
+    .excerpt { left: 16px; bottom: 16px; }
+    .axis-count { right: 16px; bottom: 18px; }
   }
   @media (prefers-reduced-motion: reduce) {
     .excerpt[aria-pressed="true"] .ex-dot { animation: none; }
