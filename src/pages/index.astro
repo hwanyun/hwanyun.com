@@ -3,7 +3,6 @@ import Base from "../layouts/Base.astro"
 import SiteMenu from "../components/SiteMenu.astro"
 import HomeAxes from "../components/HomeAxes.astro"
 import HomePrototypes from "../components/HomePrototypes.astro"
-import HomeSound from "../components/HomeSound.astro"
 import HomeCred from "../components/HomeCred.astro"
 import PrototypePlayer from "../components/PrototypePlayer.astro"
 import { getCollection } from "astro:content"
@@ -557,7 +556,6 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     <SiteMenu variant="grid" current="home" />
     <HomeAxes />
     {/* 작품 그리드는 /works 로 옮겼다(작가, 2026-09). 홈은 세 축 → 녹음 → 놓였던 곳 → 프로토타입. */}
-    <HomeSound />
     <HomeCred />
     {/* 프로토타입은 맨 아래 — 완성작과 이력 다음에 "지금 나오는 것"(작가 선택, 2026-09) */}
     <HomePrototypes />
