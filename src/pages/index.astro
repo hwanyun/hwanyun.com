@@ -1189,7 +1189,10 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       z-index: 1;
       background: var(--surface);
       min-height: 100svh;
+      /* 마지막 섹션이 무엇이든(프로토타입이 비어도) 푸터 앞에서 같은 폭으로 쉰다 */
+      padding-bottom: 200px;
     }
+    @media (max-width: 700px) { .home-body { padding-bottom: 120px; } }
     /* 홈 메뉴 — 그리드 첫 칸이 아니라 뷰포트 좌상단에 고정. 히어로 위에서는 숨긴다. */
     /* 히어로에서도 보인다 — 예전엔 구체를 가리지 않으려 워드마크만 남겼는데, 흰 바탕이 되면서
        그 옅은 워드마크마저 사라진 것처럼 보였다(작가 지적). 메뉴는 늘 같은 자리. */
