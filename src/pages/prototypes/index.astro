@@ -266,12 +266,14 @@ const axisCounts = AXES.map((a) => ({ ...a, n: entries.filter((e) => e.data.axes
   .pf-n { margin-left: 4px; color: var(--text-3); font-variant-numeric: tabular-nums; }
   .pf a[aria-current="true"] .pf-n { color: var(--line-2); }
   /* 레퍼런스: universaleverything.com/prototypes — 큰 타일 2열, 미디어가 먼저 말한다 */
-  .proto-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px; }
+  /* 박스 자체를 줄인다(작가, 2026-09) — 전폭 대신 본문 라인에 맞춘 2열, 타일 약 460px */
+  .proto-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; max-width: 960px; margin-left: calc(var(--desktop-content-x) - 12px); }
   .pf-empty { margin: 24px 0; font-size: var(--fs-sm); color: var(--text-3); }
   @media (max-width: 1000px) { .proto-grid { grid-template-columns: 1fr; } }
   @media (max-width: 700px) {
     .protos-archive { margin: 0; padding: calc(var(--mobile-header-h, 67px) + 16px) 12px 64px; }
     .archive-intro, .filter-bar { margin-left: 4px; margin-right: 4px; }
+    .proto-grid { max-width: none; margin-left: 0; gap: 16px; }
     .proto-grid { grid-template-columns: 1fr; }
   }
 </style>
