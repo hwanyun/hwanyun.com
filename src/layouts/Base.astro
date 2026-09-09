@@ -543,8 +543,11 @@ const shareImage = new URL(
           width: 14px;
           height: 14px;
           border-radius: 50%;
-          background: var(--surface);
-          mix-blend-mode: difference;
+          /* 블렌드(difference)에 기대지 않는다 — 사파리는 캔버스 위 fixed 요소에 블렌드를 못 먹여
+             흰 점이 흰 바탕에 묻히고, 원래 커서는 숨겨 커서가 사라진 것처럼 보였다(맥북 사파리, 2026-09).
+             어두운 점 + 흰 테두리면 흰 바탕과 검은 푸터 어디서든 보인다. */
+          background: var(--text);
+          box-shadow: 0 0 0 1.5px var(--surface);
           pointer-events: none;
           opacity: 0;
           transition: opacity var(--dur-fast) ease;
