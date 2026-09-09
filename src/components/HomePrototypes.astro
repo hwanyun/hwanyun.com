@@ -5,6 +5,7 @@
  */
 import { getCollection } from "astro:content"
 import PrototypeCard from "./PrototypeCard.astro"
+import SectionHead from "./SectionHead.astro"
 
 const all = (await getCollection("prototypes", ({ data }) => !data.draft))
   .sort((a, b) => String(b.data.date).localeCompare(String(a.data.date)))
@@ -13,11 +14,8 @@ const latest = all.slice(0, 3)
 
 {latest.length > 0 && (
   <section class="protos" id="prototypes" aria-labelledby="protos-title">
-    <p class="conn" id="protos-title">
-      <span data-language-content="en">What is coming out of the studio now</span>
-      <span data-language-content="ko" lang="ko">지금 작업실에서 나오는 것</span>
-      <span class="arrow" aria-hidden="true">→</span>
-    </p>
+    <SectionHead id="protos-title" en="What is coming out of the studio now" ko="지금 작업실에서 나오는 것"
+      pills={[{ href: "/prototypes/", en: "All sessions", ko: "세션 전체" }]} />
     <div class="proto-grid">
       {latest.map((e) => <PrototypeCard entry={e} />)}
     </div>

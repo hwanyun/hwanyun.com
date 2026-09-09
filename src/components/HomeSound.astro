@@ -7,6 +7,7 @@
 import { getCollection } from "astro:content"
 import LangText from "./LangText.astro"
 import { tEn, tKo } from "../lib/titles"
+import SectionHead from "./SectionHead.astro"
 
 const sounds = (await getCollection("sounds", ({ data }) => !data.draft)).sort(
   (a, b) => (a.data.order ?? 0) - (b.data.order ?? 0)
@@ -32,11 +33,13 @@ const recent = releases.slice(0, 3)
 ---
 
 <section class="hsound" id="sound" aria-labelledby="hsound-title">
-  <p class="conn" id="hsound-title">
-    <span data-language-content="en">And the recordings</span>
-    <span data-language-content="ko" lang="ko">그리고 녹음</span>
-    <span class="arrow" aria-hidden="true">→</span>
-  </p>
+  <SectionHead id="hsound-title" en="And the recordings" ko="그리고 녹음"
+    pills={[
+      { href: "/sound/", en: "All recordings", ko: "전체" },
+      { href: "/sound/?kind=works", en: "Work soundtracks", ko: "작품 사운드" },
+      { href: "/sound/?kind=scores", en: "Commissions", ko: "커미션" },
+      { href: "/sound/?kind=archive", en: "Independent recordings", ko: "독립 녹음" },
+    ]} />
   <div class="hsound-grid">
     {/* 큰 카드 — 아카이브로 가는 문. 재생 버튼은 두지 않는다: 어차피 눌러서 넘어가는
         자리라 대기 상태가 의미가 없다(작가 지적). 대신 상자 자체가 늘 살아 있다. */}

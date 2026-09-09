@@ -3,6 +3,7 @@ import Base from "../layouts/Base.astro"
 import SiteMenu from "../components/SiteMenu.astro"
 import WorkGrid from "../components/WorkGrid.astro"
 import HomeAxes from "../components/HomeAxes.astro"
+import SectionHead from "../components/SectionHead.astro"
 import HomePrototypes from "../components/HomePrototypes.astro"
 import HomeSound from "../components/HomeSound.astro"
 import HomeCred from "../components/HomeCred.astro"
@@ -520,11 +521,17 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     <SiteMenu variant="grid" current="home" />
     <HomeAxes />
     <section id="works" class="work-archive" aria-label="Selected works">
-      <p class="conn">
-        <span data-language-content="en">Where the tests arrive</span>
-        <span data-language-content="ko" lang="ko">실험이 닿는 곳</span>
-        <span class="arrow" aria-hidden="true">→</span>
-      </p>
+      <div class="works-head">
+        <SectionHead en="Where the tests arrive" ko="실험이 닿는 곳"
+          pills={[
+            { href: "/works/", en: "All works", ko: "전체 작품" },
+            { href: "/works/?material=interactive", en: "Interactive", ko: "인터랙티브" },
+            { href: "/works/?material=sensor", en: "Sensor", ko: "센서" },
+            { href: "/works/?material=copper", en: "Copper", ko: "구리" },
+            { href: "/works/?material=projection", en: "Projection", ko: "프로젝션" },
+            { href: "/works/?material=light", en: "Light", ko: "빛" },
+          ]} />
+      </div>
       <WorkGrid current="home" menu={false} />
     </section>
     <HomeSound />
@@ -1179,6 +1186,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         top: 0; bottom: 0;
       }
     }
+    .works-head { max-width: 1600px; margin: 0 40px 0 var(--desktop-content-x); padding: 160px 0 0; }
+    @media (max-width: 700px) { .works-head { margin: 0; padding: 112px 16px 0; } }
     .work-archive .conn {
       max-width: 1600px; margin: 0 40px 0 var(--desktop-content-x);
       padding: 160px 0 22px; font-size: var(--fs-lead); font-weight: 400; letter-spacing: 0; color: var(--text); font-family: var(--display);

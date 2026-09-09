@@ -1,0 +1,50 @@
+---
+/**
+ * 홈 섹션 머리 — 레퍼런스(universaleverything.com/exhibitions)의 상단 구성.
+ * 큰 제목(두 줄까지, Figtree 400) 아래에 알약 필터 한 줄. 작은 연결문 + 화살표를 대체한다(작가 선택 1안, 2026-09).
+ * pills: [{ href, en, ko }] — 각 섹션이 자기 목록 페이지의 필터로 보낸다.
+ */
+const { id = "", en = "", ko = "", pills = [] } = Astro.props as {
+  id?: string; en: string; ko: string; pills?: Array<{ href: string; en: string; ko?: string }>
+}
+---
+
+<header class="sec-head">
+  <h2 class="sec-title" id={id || undefined}>
+    <span data-language-content="en">{en}</span>
+    <span data-language-content="ko" lang="ko">{ko}</span>
+  </h2>
+  {pills.length > 0 && (
+    <nav class="sec-pills" aria-label={en}>
+      {pills.map((p) => (
+        <a href={p.href}>
+          {p.ko && p.ko !== p.en ? (
+            <><span data-language-content="en">{p.en}</span><span data-language-content="ko" lang="ko">{p.ko}</span></>
+          ) : p.en}
+        </a>
+      ))}
+    </nav>
+  )}
+</header>
+
+<style>
+  .sec-head { display: flex; flex-direction: column; gap: 22px; margin: 0 0 56px; }
+  .sec-title {
+    margin: 0; max-width: 18ch;
+    font-family: var(--display); font-weight: 400;
+    font-size: clamp(32px, 3.4vw, 52px); line-height: 1.06; letter-spacing: -.015em;
+    color: var(--text); text-wrap: balance;
+  }
+  .sec-title [lang="ko"] { font-family: var(--sans); letter-spacing: -.01em; line-height: 1.2; }
+  .sec-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .sec-pills a {
+    display: inline-block; padding: 6px 14px; border: 1px solid var(--line-2); border-radius: 999px;
+    font-size: var(--fs-sm); color: var(--text); text-decoration: none;
+    transition: border-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+  }
+  .sec-pills a:hover { border-color: var(--hover); color: var(--hover); }
+  @media (max-width: 700px) {
+    .sec-head { gap: 16px; margin-bottom: 32px; }
+    .sec-title { font-size: clamp(26px, 7vw, 34px); }
+  }
+</style>

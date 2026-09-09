@@ -7,6 +7,7 @@
 import { getCollection } from "astro:content"
 import LangText from "./LangText.astro"
 import { tEn, tKo } from "../lib/titles"
+import SectionHead from "./SectionHead.astro"
 
 // 작업이 실제로 놓였던 장소·기관. 순서 = 최근순이 아니라 무게순(작가가 바꿀 수 있다).
 const INSTITUTIONS = [
@@ -32,11 +33,11 @@ const where = (e: (typeof events)[number], lang: "en" | "ko") =>
 ---
 
 <section class="cred" aria-labelledby="cred-title">
-  <p class="conn" id="cred-title">
-    <span data-language-content="en">Where the work has been</span>
-    <span data-language-content="ko" lang="ko">이 작업이 놓였던 곳</span>
-    <span class="arrow" aria-hidden="true">→</span>
-  </p>
+  <SectionHead id="cred-title" en="Where the work has been" ko="이 작업이 놓였던 곳"
+    pills={[
+      { href: "/events/", en: "All events", ko: "전체 일정" },
+      { href: "/cv/", en: "CV", ko: "이력" },
+    ]} />
   <div class="cred-grid">
     <div>
       <h3 class="eyebrow">INSTITUTIONS</h3>
