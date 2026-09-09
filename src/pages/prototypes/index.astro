@@ -275,16 +275,43 @@ const axisCounts = AXES.map((a) => ({ ...a, n: entries.filter((e) => e.data.axes
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
     const scene = new THREE.Scene()
-    scene.background = new THREE.Color(0xf4f3f0)
+    scene.background = new THREE.Color(0xfaf9f7)
     const cam = new THREE.PerspectiveCamera(36, 1, 0.1, 100)
     cam.position.set(0, 4.6, 11.5); cam.lookAt(0, 0.5, 0) /* 벤치가 작아 보이는 큰 공간의 시점 */
     scene.add(new THREE.AmbientLight(0xffffff, 1.05))
     const sun = new THREE.DirectionalLight(0xffffff, 0.9); sun.position.set(3, 6, 4); scene.add(sun)
 
-    const floor = new THREE.Mesh(new THREE.PlaneGeometry(20, 12), new THREE.MeshLambertMaterial({ color: 0xe9e8e4 }))
+    /* 공간 — 실사 스터디(옆 카드)처럼 흰 벽 + 밝은 바닥의 갤러리로 읽히게(작가, 2026-09).
+       조명에 물들어 회색이 되지 않도록 벽·바닥은 unlit 재질로 색을 직접 깐다. */
+    function grad(w: number, h: number, top: string, bottom: string) {
+      const c = document.createElement("canvas"); c.width = w; c.height = h
+      const x = c.getContext("2d")!
+      const g = x.createLinearGradient(0, 0, 0, h)
+      g.addColorStop(0, top); g.addColorStop(1, bottom)
+      x.fillStyle = g; x.fillRect(0, 0, w, h)
+      return new THREE.CanvasTexture(c)
+    }
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(30, 16),
+      new THREE.MeshBasicMaterial({ map: grad(4, 256, "#dedcd6", "#efeeea") })) // 먼 곳이 살짝 어두운 콘크리트 바닥
     floor.rotation.x = -Math.PI / 2; scene.add(floor)
-    const wall = new THREE.Mesh(new THREE.PlaneGeometry(40, 16), new THREE.MeshLambertMaterial({ color: 0xf6f5f2 }))
-    wall.position.set(0, 4, -3.4); scene.add(wall)
+    const wall = new THREE.Mesh(new THREE.PlaneGeometry(30, 16),
+      new THREE.MeshBasicMaterial({ map: grad(4, 256, "#ffffff", "#f2f1ed") })) // 위가 밝은 흰 벽
+    wall.position.set(0, 8, -5); scene.add(wall)
+    ;[-1, 1].forEach((sd) => {
+      const side = new THREE.Mesh(new THREE.PlaneGeometry(22, 16),
+        new THREE.MeshBasicMaterial({ map: grad(4, 256, "#fbfaf8", "#eceae6") }))
+      side.rotation.y = -sd * Math.PI / 2
+      side.position.set(sd * 9.5, 8, 3); scene.add(side)
+    })
+    // 벤치 밑 부드러운 접지 그림자 — 공간에 무게를 준다
+    const shC = document.createElement("canvas"); shC.width = 256; shC.height = 128
+    const shX = shC.getContext("2d")!
+    const shG = shX.createRadialGradient(128, 64, 6, 128, 64, 120)
+    shG.addColorStop(0, "rgba(0,0,0,.22)"); shG.addColorStop(1, "rgba(0,0,0,0)")
+    shX.fillStyle = shG; shX.beginPath(); shX.ellipse(128, 64, 124, 52, 0, 0, Math.PI * 2); shX.fill()
+    const shadow = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 1.6),
+      new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(shC), transparent: true, depthWrite: false }))
+    shadow.rotation.x = -Math.PI / 2; shadow.position.y = 0.004; scene.add(shadow)
 
     const wood = new THREE.MeshLambertMaterial({ color: 0xb08b5e })
     const top = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.12, 0.72), wood)
