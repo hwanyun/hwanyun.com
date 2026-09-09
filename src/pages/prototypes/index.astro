@@ -188,13 +188,14 @@ const axisCounts = AXES.map((a) => ({ ...a, n: entries.filter((e) => e.data.axes
 </script>
 
 <style>
-  .protos-archive { max-width: var(--content-w); margin: calc(var(--desktop-header-clearance) + 64px) 40px 100px var(--desktop-content-x); }
-  .archive-intro { margin: 0 0 96px; }
+  .protos-archive { margin: calc(var(--desktop-header-clearance) + 64px) 12px 100px 12px; }
+  /* 머리글·필터는 본문 들여쓰기 라인, 그리드만 화면 전체(레퍼런스: UE prototypes) */
+  .archive-intro { margin: 0 28px 96px calc(var(--desktop-content-x) - 12px); }
   .eyebrow { margin: 0 0 6px; font-size: var(--fs-2xs); letter-spacing: .12em; color: var(--text-4); }
   h1 { margin: 0 0 20px; font-family: var(--display); font-weight: 400; font-size: clamp(40px, 4.4vw, 60px); letter-spacing: -.01em; line-height: 1.05; }
   .intro-copy p { margin: 0; max-width: 62ch; font-size: var(--fs-sm); line-height: 1.7; color: var(--text-2); }
   .intro-copy p[lang="ko"] { line-height: 1.85; }
-  .filter-bar { display: flex; flex-direction: column; gap: 8px; margin: 0 0 24px; }
+  .filter-bar { display: flex; flex-direction: column; gap: 8px; margin: 0 28px 24px calc(var(--desktop-content-x) - 12px); }
   .pf { display: flex; flex-wrap: wrap; gap: 6px; }
   .pf a {
     padding: 3px 10px; border: 1px solid var(--line-2); border-radius: 999px;
@@ -205,11 +206,12 @@ const axisCounts = AXES.map((a) => ({ ...a, n: entries.filter((e) => e.data.axes
   .pf-n { margin-left: 4px; color: var(--text-3); font-variant-numeric: tabular-nums; }
   .pf a[aria-current="true"] .pf-n { color: var(--line-2); }
   /* 레퍼런스: universaleverything.com/prototypes — 큰 타일 2열, 미디어가 먼저 말한다 */
-  .proto-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+  .proto-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px; }
   .pf-empty { margin: 24px 0; font-size: var(--fs-sm); color: var(--text-3); }
   @media (max-width: 1000px) { .proto-grid { grid-template-columns: 1fr; } }
   @media (max-width: 700px) {
-    .protos-archive { margin: 0; padding: calc(var(--mobile-header-h, 67px) + 16px) 16px 64px; }
+    .protos-archive { margin: 0; padding: calc(var(--mobile-header-h, 67px) + 16px) 12px 64px; }
+    .archive-intro, .filter-bar { margin-left: 4px; margin-right: 4px; }
     .proto-grid { grid-template-columns: 1fr; }
   }
 </style>
