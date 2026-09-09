@@ -572,9 +572,9 @@ const gridRows = Math.max(MIN_ROWS, Math.round((totalWeight / WEIGHT_PER_ROW) * 
      초음파 센서가 거리를 연속값으로 읽는 작업의 문법을 화면에 옮긴 것.
      모바일의 스크롤 포커스와 같은 원리이고, 입력만 커서 거리로 바뀐다. */
   .card .thumb {
-    filter: brightness(calc(0.93 + var(--p, 0) * 0.13));
-    transition: filter var(--dur-base) ease;
+    transition: filter var(--dur-slow) var(--ease);
   }
+  .card:hover .thumb { filter: brightness(.72); }
   /* 캡션 — 하단 한 줄이 아니라 타일 전체를 채우는 제목(작가 제안, 2026-09).
      타일 폭에 비례하는 글자(cqw)로 이미지 위에 크게 놓이고, 어두운 막이 이미지를 가라앉힌다. */
   .card { container-type: inline-size; }
@@ -592,9 +592,10 @@ const gridRows = Math.max(MIN_ROWS, Math.round((totalWeight / WEIGHT_PER_ROW) * 
     letter-spacing: -.02em;
     color: var(--surface);
     background: rgba(0, 0, 0, 0.45);
-    /* 가까워지면 서서히 드러나고, 올리면 완전히 나타난다 */
-    opacity: calc(var(--p, 0) * 0.85);
-    transition: opacity var(--dur-base) ease;
+    /* 올라간 타일에서만, 같은 속도로 — 근접 정도에 따라 여러 타일이 제각각 미리 뜨던 것을
+       뺐다(작가: 너무 빨리 나와 통일성이 없다). */
+    opacity: 0;
+    transition: opacity var(--dur-slow) var(--ease);
     pointer-events: none;
     overflow: hidden;
     overflow-wrap: anywhere;
