@@ -633,7 +633,9 @@ const shareImage = new URL(
          본문(각 페이지의 최상위 래퍼)이 z-index 1 + 불투명 배경이면 그 위를 지나가고,
          아니면 그냥 문서 끝의 보통 푸터처럼 보인다. 어느 쪽이든 깨지지 않는다. */
       /* 최소 한 화면 — 짧은 페이지(Contact)에서도 푸터는 스크롤해야 드러난다 */
-      .page-body { position: relative; z-index: 1; background: var(--surface); min-height: 100svh; }
+      .page-body { position: relative; z-index: 1; background: var(--surface); min-height: 100svh; padding-bottom: 160px; }
+      /* 발자국 앞의 숨 — 모든 페이지가 푸터를 만나기 전에 같은 폭으로 쉰다(작가, 2026-09) */
+      @media (max-width: 700px) { .page-body { padding-bottom: 96px; } }
       /* 푸터 위에서는 크롬이 물러난다 */
       .site-menu--page, .site-menu--grid, .site-menu--hero, .lang-corner, .to-top {
         transition: opacity var(--dur-base) var(--ease), visibility 0s linear 0s;
