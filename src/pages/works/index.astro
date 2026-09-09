@@ -5,6 +5,7 @@ import { MATERIALS } from "../../data/materials"
 import { AXES } from "../../data/axes"
 import LangText from "../../components/LangText.astro"
 import { tEn, tKo } from "../../lib/titles"
+import WorkGrid from "../../components/WorkGrid.astro"
 
 const works = await getCollection("works", ({ data }) => !data.draft)
 works.sort((a, b) => {
@@ -103,6 +104,12 @@ const showCounts = SHOWS.map((x) => ({
       )}
     </div>
 
+    {/* 그리드 — 홈에서 옮겨 왔다(작가, 2026-09). 필터 알약이 그리드와 아래 목록을 같이 거른다.
+        스크롤하면 그리드 아래에 글자 목록이 이어진다. */}
+    <section class="archive-grid" aria-label="Works">
+      <WorkGrid current="works" menu={false} />
+    </section>
+
     <section class="archive-list" aria-label="Works by year">
       <div class="archive-head" aria-hidden="true"><span>WORKS</span><span>YEAR</span></div>
       <ol id="work-list">
@@ -149,6 +156,13 @@ const showCounts = SHOWS.map((x) => ({
         else hit = (li.getAttribute("data-materials") || "").split(" ").indexOf(value) !== -1
         li.hidden = !hit
         if (hit) shown++
+      })
+      // 그리드도 같은 조건으로
+      if (window.__hyGrid) window.__hyGrid.filter(function (el) {
+        if (!value) return true
+        if (kind === "show") return el.getAttribute("data-show") === value
+        if (kind === "axis") return (el.getAttribute("data-axes") || "").split(" ").indexOf(value) !== -1
+        return (el.getAttribute("data-materials") || "").split(" ").indexOf(value) !== -1
       })
       links.forEach(function (a) {
         var av = a.getAttribute("data-show") !== null
@@ -201,7 +215,11 @@ const showCounts = SHOWS.map((x) => ({
 </script>
 
 <style>
-  .works-archive { margin: calc(var(--desktop-header-clearance) + 64px) 40px 100px var(--desktop-content-x); max-width: var(--content-w); }
+  .works-archive { margin: calc(var(--desktop-header-clearance) + 64px) 40px 200px var(--desktop-content-x); max-width: 1600px; }
+  /* 그리드 — 컨테이너가 이미 여백을 가지므로 그리드는 컨테이너 폭을 그대로 쓴다(타일 border 4px만큼 물림) */
+  .archive-grid { margin: 0 0 120px; }
+  .archive-grid :global(#packed .grid) { left: -4px; right: -4px; top: 0; bottom: 0; }
+  .archive-list { max-width: var(--content-w); }
   /* 제목 블록 — Prototypes 페이지와 같은 규격(작가가 그 스타일을 택함, 2026-09) */
   .archive-intro { max-width: 650px; margin: 0 0 96px; }
   .eyebrow { margin: 0 0 6px; font-size: var(--fs-2xs); letter-spacing: .12em; text-transform: uppercase; color: var(--text-4); }

@@ -46,6 +46,9 @@ const gridRows = Math.max(MIN_ROWS, Math.round((totalWeight / WEIGHT_PER_ROW) * 
           data-weight={WEIGHT[w.data.size] ?? 1.7}
           data-search={`${w.data.title} ${w.data.titleEn} ${w.data.year} ${w.data.medium}`.toLowerCase()}
           data-slug={w.slug}
+          data-materials={w.data.materials.join(" ")}
+          data-axes={w.data.axes.join(" ")}
+          data-show={w.data.showType || ""}
         >
           <div class="thumb">
             {w.data.thumb ? <img src={w.data.thumb} alt={tEn(w.data)} draggable="false" /> : <div class="ph" />}
@@ -312,6 +315,22 @@ const gridRows = Math.max(MIN_ROWS, Math.round((totalWeight / WEIGHT_PER_ROW) * 
       if (proximityRemeasure) proximityRemeasure()
     }
     if (input) input.addEventListener("input", apply)
+    /* 바깥(Works 페이지의 축·재료 필터)에서 그리드를 거를 수 있게 연다. fn(el) → 보일지 */
+    window.__hyGrid = {
+      filter: function (fn) {
+        var shown = 0
+        leaves.forEach(function (l) {
+          if (l.menu) return
+          var hit = !fn || fn(l.el)
+          l.el.style.display = hit ? "" : "none"
+          if (hit) shown++
+        })
+        if (none) none.hidden = shown !== 0
+        syncMode()
+        if (proximityRemeasure) proximityRemeasure()
+        return shown
+      }
+    }
     var searchQuery = new URLSearchParams(window.location.search).get("q")
     if (input && searchQuery) {
       input.value = searchQuery

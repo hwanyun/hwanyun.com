@@ -1,9 +1,7 @@
 ---
 import Base from "../layouts/Base.astro"
 import SiteMenu from "../components/SiteMenu.astro"
-import WorkGrid from "../components/WorkGrid.astro"
 import HomeAxes from "../components/HomeAxes.astro"
-import SectionHead from "../components/SectionHead.astro"
 import HomePrototypes from "../components/HomePrototypes.astro"
 import HomeSound from "../components/HomeSound.astro"
 import HomeCred from "../components/HomeCred.astro"
@@ -558,20 +556,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     {/* 메뉴 — 항상 좌상단에 고정. 히어로 위에서도 보인다. */}
     <SiteMenu variant="grid" current="home" />
     <HomeAxes />
-    <section id="works" class="work-archive" aria-label="Selected works">
-      <div class="works-head">
-        <SectionHead en="Works" ko="작품"
-          pills={[
-            { href: "/works/", en: "All works", ko: "전체 작품" },
-            { href: "/works/?material=interactive", en: "Interactive", ko: "인터랙티브" },
-            { href: "/works/?material=sensor", en: "Sensor", ko: "센서" },
-            { href: "/works/?material=copper", en: "Copper", ko: "구리" },
-            { href: "/works/?material=projection", en: "Projection", ko: "프로젝션" },
-            { href: "/works/?material=light", en: "Light", ko: "빛" },
-          ]} />
-      </div>
-      <WorkGrid current="home" menu={false} />
-    </section>
+    {/* 작품 그리드는 /works 로 옮겼다(작가, 2026-09). 홈은 세 축 → 녹음 → 놓였던 곳 → 프로토타입. */}
     <HomeSound />
     <HomeCred />
     {/* 프로토타입은 맨 아래 — 완성작과 이력 다음에 "지금 나오는 것"(작가 선택, 2026-09) */}
