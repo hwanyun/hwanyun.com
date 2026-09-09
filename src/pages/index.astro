@@ -1,8 +1,6 @@
 ---
 import Base from "../layouts/Base.astro"
 import SiteMenu from "../components/SiteMenu.astro"
-import HomePrototypes from "../components/HomePrototypes.astro"
-import PrototypePlayer from "../components/PrototypePlayer.astro"
 import { getCollection } from "astro:content"
 import { THESIS } from "../data/axes"
 
@@ -24,7 +22,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
   .sort((a, b) => a.start.localeCompare(b.start))
 ---
 
-<Base title="HWANYUN" bare>
+<Base footer={false} title="HWANYUN" bare>
   <SiteMenu slot="menu" variant="hero" />
 
   <section class="hero" aria-labelledby="hero-title">
@@ -547,21 +545,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       mandatory면 푸터가 있는 문서 끝까지 스크롤이 닿지 않는다(스냅점이 문서 끝에 없다).
       proximity는 히어로↔본문 경계 근처에서만 붙고, 그 아래는 자유롭게 흐른다. */}
 
-  {/* 두 번째 '페이지' — 히어로를 덮고 올라오는 본문: 한 줄 선언 → 프로토타입(게시 시). */}
-  <div class="home-body" id="home-body">
-    {/* 메뉴 — 항상 좌상단에 고정. 히어로 위에서도 보인다. */}
-    <SiteMenu variant="grid" current="home" />
-    {/* 구체 다음 페이지 — 히어로에서 지웠던 한 줄이 여기로 온다(작가, 2026-09).
-        레퍼런스(universaleverything.com)의 첫 문장들처럼, 본문의 처음이 작업을 한 줄로 말한다. */}
-    <section class="home-statement" aria-label="About">
-      <p>
-        <span data-language-content="en" lang="en">Installations and systems about relation and connection.</span>
-        <span data-language-content="ko" lang="ko">관계와 연결을 다루는 설치와 시스템.</span>
-      </p>
-    </section>
-    <HomePrototypes />
-  </div>
-  <PrototypePlayer />
+  {/* 홈은 구체 하나로 끝난다(작가, 2026-09). 본문 페이지를 지웠으므로 메뉴만 남긴다. */}
+  <SiteMenu variant="grid" current="home" />
 
   <script>
     const hero = document.querySelector<HTMLElement>(".hero")
@@ -1194,13 +1179,6 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       padding-bottom: 200px;
     }
     @media (max-width: 700px) { .home-body { padding-bottom: 120px; } }
-    .home-statement { max-width: 1600px; margin: 0 40px 0 var(--desktop-content-x); padding: 160px 0 0; }
-    .home-statement p { margin: 0; max-width: 22ch; font-family: var(--display); font-weight: 400; font-size: clamp(34px, 3.6vw, 56px); line-height: 1.12; letter-spacing: -.015em; color: var(--text); text-wrap: balance; }
-    .home-statement p [lang="ko"] { font-family: var(--sans); letter-spacing: -.01em; line-height: 1.35; }
-    @media (max-width: 700px) {
-      .home-statement { margin: 0; padding: 112px 16px 0; }
-      .home-statement p { font-size: clamp(28px, 8vw, 36px); }
-    }
     /* 홈 메뉴 — 그리드 첫 칸이 아니라 뷰포트 좌상단에 고정. 히어로 위에서는 숨긴다. */
     /* 히어로에서도 보인다 — 예전엔 구체를 가리지 않으려 워드마크만 남겼는데, 흰 바탕이 되면서
        그 옅은 워드마크마저 사라진 것처럼 보였다(작가 지적). 메뉴는 늘 같은 자리. */

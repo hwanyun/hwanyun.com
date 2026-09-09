@@ -9,6 +9,7 @@ const {
   chrome = "light",
   // bare: 본문을 .page-body로 감싸지 않는다. 홈은 히어로가 fixed라 스스로 층을 관리한다.
   bare = false,
+  footer = true,
   // 공유 카드 — 페이지가 자기 얼굴을 가질 수 있게 열어 둔다.
   // 전시 링크를 메신저에 붙일 때 사이트 기본 카드보다 포스터가 훨씬 많은 걸 말한다.
   image = "",
@@ -94,6 +95,7 @@ const shareImage = new URL(
     {/* 푸터 — 페이지 끝에서 드러난다. sticky bottom이라 본문이 그 위를 지나가며
         마지막에 걷히듯 나타난다(히어로를 본문이 덮는 것과 같은 커튼 문법의 반대 방향).
         사실만 적는다: 연락처는 Contact 페이지와 같은 원본, 나머지는 링크. */}
+    {footer && (
     <footer class="site-footer">
       {/* 워드마크는 SVG 텍스트로 — textLength가 폭을 정확히 채운다. vw 계산으로는 글꼴마다 어긋난다. */}
       {/* 푸터는 영문 하나로 간다 — 크롬과 같은 규칙(언어 전환은 서술 콘텐츠만 바꾼다). 워드마크는 글자별 span, 크기는 스크립트가 폭에 맞춘다 */}
@@ -124,6 +126,7 @@ const shareImage = new URL(
         <span class="sf-dim">No cookies. Audio never leaves your device.</span>
       </p>
     </footer>
+    )}
 
     <script is:inline>
       /* 워드마크 — 글자 폭의 합이 컨테이너의 96.5%가 되는 크기로 맞춘다. */
