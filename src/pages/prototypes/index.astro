@@ -277,7 +277,7 @@ const axisCounts = AXES.map((a) => ({ ...a, n: entries.filter((e) => e.data.axes
     const scene = new THREE.Scene()
     scene.background = new THREE.Color(0xf4f3f0)
     const cam = new THREE.PerspectiveCamera(36, 1, 0.1, 100)
-    cam.position.set(0, 3.1, 6.4); cam.lookAt(0, 0.55, 0)
+    cam.position.set(0, 4.6, 11.5); cam.lookAt(0, 0.5, 0) /* 벤치가 작아 보이는 큰 공간의 시점 */
     scene.add(new THREE.AmbientLight(0xffffff, 1.05))
     const sun = new THREE.DirectionalLight(0xffffff, 0.9); sun.position.set(3, 6, 4); scene.add(sun)
 
@@ -391,7 +391,7 @@ const axisCounts = AXES.map((a) => ({ ...a, n: entries.filter((e) => e.data.axes
       const sx = Math.max(-1.3, Math.min(1.3, x))
       if (occupied(sx)) return
       d.seatX = sx
-      d.fromX = sx < 0 ? -3.6 : 3.6
+      d.fromX = sx < 0 ? -6.5 : 6.5
       d.walkDur = Math.abs(d.fromX - sx) / 0.65 /* 느린 걸음(작가, 2026-09) */
       d.dwellDur = 6 + Math.random() * 6
       d.hue = Math.random() * 360
@@ -400,10 +400,13 @@ const axisCounts = AXES.map((a) => ({ ...a, n: entries.filter((e) => e.data.axes
       d.phase = "walkin"; d.t = now
     }
     function step(d: Dummy, now: number) {
+      /* 몸은 늘 진행 방향을 본다(작가 지적: 옆으로 미끄러지듯 보였다) — 앉을 때만 정면으로 돌아앉는다 */
+      const inDir = d.seatX >= d.fromX ? 1 : -1
       if (d.phase === "walkin") {
         const k = Math.min(1, (now - d.t) / d.walkDur)
         d.root.position.x = d.fromX + (d.seatX - d.fromX) * k
         d.root.position.z = 0.45
+        d.root.rotation.y = inDir * Math.PI / 2
         pose(d, 0, Math.sin(now * 5) * 0.42)
         if (k >= 1) {
           d.phase = "sitdown"; d.t = now
@@ -417,6 +420,7 @@ const axisCounts = AXES.map((a) => ({ ...a, n: entries.filter((e) => e.data.axes
       } else if (d.phase === "sitdown") {
         const k = Math.min(1, (now - d.t) / 1.3)
         d.root.position.z = 0.45 * (1 - k)
+        d.root.rotation.y = inDir * Math.PI / 2 * (1 - k)
         pose(d, k, 0)
         if (k >= 1) { d.phase = "dwell"; d.t = now }
       } else if (d.phase === "dwell") {
@@ -430,11 +434,13 @@ const axisCounts = AXES.map((a) => ({ ...a, n: entries.filter((e) => e.data.axes
       } else if (d.phase === "standup") {
         const k = Math.min(1, (now - d.t) / 1.3)
         d.root.position.z = 0.45 * k
+        d.root.rotation.y = -inDir * Math.PI / 2 * k
         pose(d, 1 - k, 0)
         if (k >= 1) { d.phase = "walkout"; d.t = now }
       } else if (d.phase === "walkout") {
         const k = Math.min(1, (now - d.t) / d.walkDur)
         d.root.position.x = d.seatX + (d.fromX - d.seatX) * k
+        d.root.rotation.y = -inDir * Math.PI / 2
         pose(d, 0, Math.sin(now * 5) * 0.42)
         if (k >= 1) { d.root.visible = false; d.phase = "idle" }
       }
