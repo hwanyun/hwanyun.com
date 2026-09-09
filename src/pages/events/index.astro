@@ -193,7 +193,7 @@ function fmt(start: string, end: string) {
       grid-template-columns: 150px 1fr auto;
       gap: 18px;
       align-items: baseline;
-      padding: 18px 4px;
+      padding: 12px 4px;
       color: var(--text);
       text-decoration: none;
       transition: color var(--dur-fast) var(--ease);
@@ -211,7 +211,8 @@ function fmt(start: string, end: string) {
 
     .ev-empty { color: var(--text-4); font-size: var(--fs-sm); padding: 26px 4px; }
     .ev-pool { display: none; }
-    .ev-secth { font-size: var(--fs-xs); letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-4); margin: 46px 0 8px; font-weight: 500; }
+    /* 구획 머리 = Works·Sound의 표 머리와 같은 라벨 문법(2026-09 통일) */
+    .ev-secth { font-size: var(--fs-2xs); letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3); margin: 46px 0 0; font-weight: 400; border-top: 1px solid var(--text); border-bottom: 1px solid var(--text); padding: 5px 0 4px; }
     /* 첫 묶음의 제목은 목록 바로 위에 붙는다 — 위쪽 여백은 머리글이 가진다 */
     #ev-next .ev-secth { margin-top: 0; }
     /* 두 문구 중 하나만. 언어 전환은 그 안에서 다시 갈린다. */
@@ -241,7 +242,7 @@ function fmt(start: string, end: string) {
     @media (max-width: 700px) {
       .events { margin: 0 16px 80px; padding-top: 8px; max-width: none; }
       .events h1 { font-size: clamp(25px, 7vw, 32px); line-height: 1.22; }
-      .ev-link { grid-template-columns: 1fr auto; gap: 6px 12px; padding: 16px 2px; }
+      .ev-link { grid-template-columns: 1fr auto; gap: 6px 12px; padding: 12px 2px; }
       .ev-date { grid-column: 1 / -1; order: -1; font-size: var(--fs-xs); }
       .ev-title { font-size: var(--fs-body); }
     }

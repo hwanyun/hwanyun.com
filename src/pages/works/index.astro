@@ -281,8 +281,9 @@ const showCounts = SHOWS.map((x) => ({
      어긋난다. 사이트 라벨 문법(11 + 자간 + 회색)을 그대로 따른다. */
   .archive-head { border-top: 1px solid var(--text); border-bottom: 1px solid var(--text); padding: 5px 0 4px; font-size: var(--fs-2xs); letter-spacing: .08em; color: var(--text-3); }
   .archive-head span:last-child { text-align: right; }
-  li { border-bottom: 1px solid var(--text-3); }
-  li a { align-items: baseline; padding: 5px 0 6px; }
+  /* 행 구분선·패딩은 사이트 공통 장부 문법(Sound·Events와 동일, 2026-09) */
+  li { border-bottom: 1px solid var(--line); }
+  li a { align-items: baseline; padding: 12px 0; }
   /* 숫자 열은 고정폭 숫자로 — 비례폭이면 연도마다 폭이 달라 오른쪽 열이 떨린다.
      CV의 연도 열이 이미 쓰는 규칙이다. */
   time { grid-column: 2; grid-row: 1; text-align: right; font-size: var(--fs-sm); font-weight: 300; letter-spacing: 0.025em; font-variant-numeric: tabular-nums; }

@@ -55,11 +55,16 @@ const { data, korean = false } = Astro.props
     line-height: 1.65;
   }
   .cv-section { margin: 0 0 34px; }
+  /* 구획 머리 — Works·Sound·Events와 같은 라벨 문법(2026-09 통일). 인쇄용(@media print)은 그대로. */
   .cv-title {
-    font-size: var(--fs-body);
-    font-weight: 500;
-    margin: 0 0 12px;
-    padding-bottom: 6px;
+    font-size: var(--fs-2xs);
+    font-weight: 400;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin: 0 0 10px;
+    padding: 5px 0 4px;
+    border-top: 1px solid var(--text);
     border-bottom: 1px solid var(--text);
   }
   /* 연도 열은 가장 긴 값이 들어가고도 여백이 남아야 한다.
