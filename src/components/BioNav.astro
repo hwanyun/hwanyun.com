@@ -38,6 +38,7 @@ const { active = "about" } = Astro.props
   /* 제목 블록 — Prototypes 페이지와 같은 규격(작가가 그 스타일을 택함, 2026-09) */
   .eyebrow {
     margin: 0 0 6px;
+    line-height: 1.35; /* 컨테이너 행간(1.65)을 상속받으면 다른 페이지보다 3px 낮아진다 */
     font-size: var(--fs-2xs);
     letter-spacing: .12em;
     text-transform: uppercase;
