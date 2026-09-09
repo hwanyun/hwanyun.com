@@ -108,10 +108,10 @@ textKr: |
 media:
   # 2026-08 기록 — 시스템을 직접 구동해 뽑은 자료. 해상도와 계조가 가장 좋아
   # 작품의 첫인상을 맡긴다. 사운드가 만든 질서를 먼저 보이고, 그다음 붕괴.
-  - { type: video, src: "/videos/atypical-circuit-audiovisual.mp4", width: full, ratio: "16:9", caption: "Seven loops, no two of the same length" }
+  - { type: video, src: "/videos/atypical-circuit-audiovisual.mp4", srcMobile: "/videos/atypical-circuit-audiovisual-sm.mp4", width: full, ratio: "16:9", caption: "Seven loops, no two of the same length" }
   - { type: image, src: "/images/atypical-circuit/06.jpg", width: half, align: right, caption: "Composed state" }
   - { type: image, src: "/images/atypical-circuit/07.jpg", width: half, caption: "Composed state" }
-  - { type: video, src: "/videos/atypical-circuit-sensor.mp4", width: full, ratio: "16:9", caption: "Proximity response — three distance bands, weighted by nearness" }
+  - { type: video, src: "/videos/atypical-circuit-sensor.mp4", srcMobile: "/videos/atypical-circuit-sensor-sm.mp4", width: full, ratio: "16:9", caption: "Proximity response — three distance bands, weighted by nearness" }
   - { type: image, src: "/images/atypical-circuit/08.jpg", width: half, align: left, caption: "Onset of interference" }
   - { type: image, src: "/images/atypical-circuit/09.jpg", width: half, caption: "Full collapse at closest range" }
   # 전시 기록 — 화면이 실제로 놓였던 공간과 관객의 자리
@@ -119,7 +119,7 @@ media:
   - { type: video, src: "https://media.hwanyun.com/%E1%84%92%E1%85%AA%E1%84%86%E1%85%A7%E1%86%AB%20%E1%84%80%E1%85%B5%E1%84%85%E1%85%A9%E1%86%A8%202026-07-19%20%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE%205.02.53.mov", width: full, ratio: "16:9", caption: "TouchDesigner interaction documentation" }
   - { type: image, src: "/images/atypical-circuit/04.png", width: half, align: right, caption: "Generative visual pattern" }
   - { type: video, src: "https://media.hwanyun.com/videos/atypical-circuit.mp4", width: half, ratio: "9:16" }
-  - { type: video, src: "/videos/atypical-circuit-2.mp4", width: half, ratio: "9:16" }
+  - { type: video, src: "/videos/atypical-circuit-2.mp4", srcMobile: "/videos/atypical-circuit-2-sm.mp4", width: half, ratio: "9:16" }
   - { type: image, src: "/images/atypical-circuit/05.jpg", width: half, align: left, caption: "Installation view" }
   # 부록 — 인쇄물과 여분 프레임
   - { type: image, src: "/images/atypical-circuit/02.png", archive: true }

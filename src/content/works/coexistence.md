@@ -39,7 +39,7 @@ media:
   - { type: image, src: "/images/coexistence/03.webp", width: full, caption: "The folded panel without projection" }
   - { type: image, src: "/images/coexistence/06.jpeg", width: half, caption: "A visitor engaging with the interactive projection" }
   - { type: image, src: "/images/coexistence/08.jpeg", width: half, caption: "Performance and audience" }
-  - { type: video, src: "/videos/coexistence-1.mp4", width: full, ratio: "16:9", caption: "Live performance documentation" }
+  - { type: video, src: "/videos/coexistence-1.mp4", srcMobile: "/videos/coexistence-1-sm.mp4", width: full, ratio: "16:9", caption: "Live performance documentation" }
   - { type: video, src: "https://media.hwanyun.com/videos/coexistence-3.mp4", width: half, ratio: "9:16", caption: "Live performance documentation" }
   - { type: video, src: "/videos/coexistence-2.mp4", width: half, ratio: "9:16", caption: "Live performance documentation" }
   - { type: image, src: "/images/coexistence/02.jpg", width: half, align: left, caption: "Live violin performance in the exhibition space" }

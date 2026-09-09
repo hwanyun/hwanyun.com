@@ -56,9 +56,9 @@ textKr: |
 media:
   - { type: video, src: "/videos/conductive-circles-intro.mp4", width: full, ratio: "4:3" }
   - { type: image, src: "/images/conductive-circles/01.jpg", width: half }
-  - { type: video, src: "/videos/conductive-circles-1.mp4", width: half, ratio: "9:16" }
+  - { type: video, src: "/videos/conductive-circles-1.mp4", srcMobile: "/videos/conductive-circles-1-sm.mp4", width: half, ratio: "9:16" }
   - { type: image, src: "/images/conductive-circles/02.jpg", width: full }
-  - { type: video, src: "/videos/conductive-circles-2.mp4", width: half, ratio: "9:16" }
+  - { type: video, src: "/videos/conductive-circles-2.mp4", srcMobile: "/videos/conductive-circles-2-sm.mp4", width: half, ratio: "9:16" }
   - { type: image, src: "/images/conductive-circles/03.jpg", width: half }
 sponsors:
   - { name: "Arts Council Korea", logo: "/images/conductive-circles/sponsors/arts-council-korea.png" }
