@@ -34,7 +34,7 @@ import Base from "../layouts/Base.astro"
   <style>
     .page {
       position: relative; z-index: 5;
-      margin: var(--desktop-header-clearance) 40px 100px var(--desktop-content-x);
+      margin: calc(var(--desktop-header-clearance) + 64px) 40px 100px var(--desktop-content-x);
       max-width: 460px; padding: 0; font-size: var(--fs-body); font-weight: 400; line-height: 1.7;
       pointer-events: none;
     }
@@ -42,7 +42,7 @@ import Base from "../layouts/Base.astro"
     .page h1, .page li, .page a, .page .eyebrow { text-shadow: 0 0 6px var(--surface), 0 0 6px var(--surface), 0 0 10px var(--surface); }
     /* 제목 블록 — Prototypes 페이지와 같은 규격 */
     .page .eyebrow { margin: 0 0 6px; font-size: var(--fs-2xs); letter-spacing: .12em; text-transform: uppercase; color: var(--text-4); }
-    .page h1 { margin: 0 0 14px; font-family: var(--display); font-weight: 400; font-size: var(--fs-display); letter-spacing: 0; line-height: 1.15; }
+    .page h1 { margin: 0 0 20px; font-family: var(--display); font-weight: 400; font-size: clamp(40px, 4.4vw, 60px); letter-spacing: -.01em; line-height: 1.05; }
     /* 이 페이지의 목적을 첫 줄에서 밝힌다 — 방문자는 연락처를 찾으러 왔다 */
     .page .lead { margin: -12px 0 26px; font-size: var(--fs-sm); line-height: 1.6; color: var(--text-2); }
     .page .lead span { display: block; }

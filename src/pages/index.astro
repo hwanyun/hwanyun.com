@@ -1,12 +1,6 @@
 ---
 import Base from "../layouts/Base.astro"
 import SiteMenu from "../components/SiteMenu.astro"
-import WorkGrid from "../components/WorkGrid.astro"
-import HomeAxes from "../components/HomeAxes.astro"
-import HomePrototypes from "../components/HomePrototypes.astro"
-import HomeSound from "../components/HomeSound.astro"
-import HomeCred from "../components/HomeCred.astro"
-import PrototypePlayer from "../components/PrototypePlayer.astro"
 import { getCollection } from "astro:content"
 import { THESIS } from "../data/axes"
 
@@ -49,10 +43,6 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
           <><a href={`#axis-${["sounding", "contact", "trace"][i]}`}>{w}</a>{THESIS.ko.joins[i]}</>
         ))}
       </span>
-      <small>
-        <span data-language-content="en" lang="en">Installations and systems about relation and connection.</span>
-        <span data-language-content="ko" lang="ko">관계와 연결을 다루는 설치와 시스템.</span>
-      </small>
     </p>
     <a id="upcoming-ticker" class="upcoming-ticker" href="/events/" hidden draggable="false" aria-label="Upcoming events"><span class="ut-list" id="ut-track"></span></a>
 
@@ -101,6 +91,44 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
   </section>
   <script type="application/json" id="ev-data" is:inline set:html={JSON.stringify(upEvents)}></script>
 
+  <script is:inline>
+    /* 히어로 ↔ 본문 전환만 붙인다(작가 요청). CSS mandatory 스냅은 문서 끝(푸터)까지 못 내려가게
+       하므로 쓰지 않고, 첫 전환만 스크립트로: 히어로에서 아래로 굴리면 본문 시작으로,
+       본문 맨 위에서 위로 굴리면 히어로로. 그 아래는 자유. reduced-motion이면 즉시 이동. */
+    ;(function () {
+      function init() {
+      var body = document.getElementById("home-body")
+      if (!body) return
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      var busy = false
+      function go(y) {
+        busy = true
+        window.scrollTo({ top: y, behavior: reduce ? "auto" : "smooth" })
+        setTimeout(function () { busy = false }, reduce ? 50 : 700)
+      }
+      function bodyTop() { return body.getBoundingClientRect().top + window.scrollY }
+      window.addEventListener("wheel", function (e) {
+        if (busy) { e.preventDefault(); return }
+        var y = window.scrollY, top = bodyTop()
+        if (e.deltaY > 0 && y < top - 2) { e.preventDefault(); go(top) }          // 히어로에서 아래로
+        else if (e.deltaY < 0 && y > 0 && y <= top + 2) { e.preventDefault(); go(0) } // 본문 맨 위에서 위로
+      }, { passive: false })
+      // 터치·키보드처럼 wheel이 없는 입력: 멈춘 자리가 히어로 중간이면 가까운 쪽으로 붙인다
+      var t = 0
+      window.addEventListener("scroll", function () {
+        if (busy) return
+        clearTimeout(t)
+        t = setTimeout(function () {
+          var y = window.scrollY, top = bodyTop()
+          if (y > 0 && y < top) go(y > top * .3 ? top : 0)
+        }, 140)
+      }, { passive: true })
+      }
+      // 이 스크립트는 본문보다 앞에 있다 — DOM이 다 오고 나서 찾는다
+      if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init)
+      else init()
+    })()
+  </script>
   <script is:inline>
     /* 본문이 히어로를 덮으면 메뉴를 좌상단에 고정한다. 히어로 위에서는 구체만 남긴다. */
     ;(function () {
@@ -517,27 +545,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       mandatory면 푸터가 있는 문서 끝까지 스크롤이 닿지 않는다(스냅점이 문서 끝에 없다).
       proximity는 히어로↔본문 경계 근처에서만 붙고, 그 아래는 자유롭게 흐른다. */}
 
-  {/* 두 번째 '페이지' — 히어로를 덮고 올라오는 본문. 순서가 곧 논지다:
-      세 축(울림·접촉·흔적) → 작품 → 녹음 → 놓였던 곳 → 지금 나오는 것(프로토타입). */}
-  <div class="home-body" id="home-body">
-    {/* 메뉴 — 항상 좌상단에 고정. 히어로 위에서도 보인다. */}
-    <SiteMenu variant="grid" current="home" />
-    <HomeAxes />
-    <section id="works" class="work-archive" aria-label="Selected works">
-      <p class="conn">
-        <span data-language-content="en">Where the tests arrive</span>
-        <span data-language-content="ko" lang="ko">실험이 닿는 곳</span>
-        <span class="arrow" aria-hidden="true">→</span>
-        <span class="conn-short"><span data-language-content="en">Works</span><span data-language-content="ko" lang="ko">작품</span></span>
-      </p>
-      <WorkGrid current="home" menu={false} />
-    </section>
-    <HomeSound />
-    <HomeCred />
-    {/* 프로토타입은 맨 아래 — 완성작과 이력 다음에 "지금 나오는 것"(작가 선택, 2026-09) */}
-    <HomePrototypes />
-  </div>
-  <PrototypePlayer />
+{/* 홈은 구체 하나로 끝난다(작가, 2026-09). 본문 페이지를 지웠으므로 메뉴만 남긴다. */}
+  <SiteMenu variant="grid" current="home" />
 
   <script>
     const hero = document.querySelector<HTMLElement>(".hero")
@@ -948,7 +957,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
        이 규칙은 홈에서만 적용된다 (페이지 스코프 전역 스타일). */
     /* proximity — 예전엔 mandatory였지만(두 페이지짜리 홈), 본문이 여러 섹션 + 푸터가 되면서
        문서 끝에 스냅점이 없어 끝까지 내려가지 못했다. 경계 근처에서만 붙는 것으로 충분하다. */
-    :global(html) { scroll-snap-type: y proximity; }
+    /* CSS 스냅은 쓰지 않는다 — 히어로↔본문 전환은 위 스크립트가 붙이고, 그 아래는 자유. */
+    :global(html) { scroll-snap-type: none; }
     .hero-spacer { scroll-snap-stop: always; }
     :global(body > footer) { scroll-snap-align: none; }
     /* 히어로는 화면에 고정되고, 그리드가 그 위를 덮으며 올라온다 —
@@ -1173,7 +1183,10 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       z-index: 1;
       background: var(--surface);
       min-height: 100svh;
+      /* 마지막 섹션이 무엇이든(프로토타입이 비어도) 푸터 앞에서 같은 폭으로 쉰다 */
+      padding-bottom: 200px;
     }
+    @media (max-width: 700px) { .home-body { padding-bottom: 120px; } }
     /* 홈 메뉴 — 그리드 첫 칸이 아니라 뷰포트 좌상단에 고정. 히어로 위에서는 숨긴다. */
     /* 히어로에서도 보인다 — 예전엔 구체를 가리지 않으려 워드마크만 남겼는데, 흰 바탕이 되면서
        그 옅은 워드마크마저 사라진 것처럼 보였다(작가 지적). 메뉴는 늘 같은 자리. */
@@ -1192,6 +1205,8 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         top: 0; bottom: 0;
       }
     }
+    .works-head { max-width: 1600px; margin: 0 40px 0 var(--desktop-content-x); padding: 160px 0 0; }
+    @media (max-width: 700px) { .works-head { margin: 0; padding: 112px 16px 0; } }
     .work-archive .conn {
       max-width: 1600px; margin: 0 40px 0 var(--desktop-content-x);
       padding: 160px 0 22px; font-size: var(--fs-lead); font-weight: 400; letter-spacing: 0; color: var(--text); font-family: var(--display);

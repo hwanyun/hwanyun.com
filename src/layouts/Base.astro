@@ -9,6 +9,7 @@ const {
   chrome = "light",
   // bare: 본문을 .page-body로 감싸지 않는다. 홈은 히어로가 fixed라 스스로 층을 관리한다.
   bare = false,
+  footer = true,
   // 공유 카드 — 페이지가 자기 얼굴을 가질 수 있게 열어 둔다.
   // 전시 링크를 메신저에 붙일 때 사이트 기본 카드보다 포스터가 훨씬 많은 걸 말한다.
   image = "",
@@ -94,6 +95,7 @@ const shareImage = new URL(
     {/* 푸터 — 페이지 끝에서 드러난다. sticky bottom이라 본문이 그 위를 지나가며
         마지막에 걷히듯 나타난다(히어로를 본문이 덮는 것과 같은 커튼 문법의 반대 방향).
         사실만 적는다: 연락처는 Contact 페이지와 같은 원본, 나머지는 링크. */}
+    {footer && (
     <footer class="site-footer">
       {/* 워드마크는 SVG 텍스트로 — textLength가 폭을 정확히 채운다. vw 계산으로는 글꼴마다 어긋난다. */}
       {/* 푸터는 영문 하나로 간다 — 크롬과 같은 규칙(언어 전환은 서술 콘텐츠만 바꾼다). 워드마크는 글자별 span, 크기는 스크립트가 폭에 맞춘다 */}
@@ -124,6 +126,7 @@ const shareImage = new URL(
         <span class="sf-dim">No cookies. Audio never leaves your device.</span>
       </p>
     </footer>
+    )}
 
     <script is:inline>
       /* 워드마크 — 글자 폭의 합이 컨테이너의 96.5%가 되는 크기로 맞춘다. */
@@ -543,8 +546,11 @@ const shareImage = new URL(
           width: 14px;
           height: 14px;
           border-radius: 50%;
-          background: var(--surface);
-          mix-blend-mode: difference;
+          /* 블렌드(difference)에 기대지 않는다 — 사파리는 캔버스 위 fixed 요소에 블렌드를 못 먹여
+             흰 점이 흰 바탕에 묻히고, 원래 커서는 숨겨 커서가 사라진 것처럼 보였다(맥북 사파리, 2026-09).
+             어두운 점 + 흰 테두리면 흰 바탕과 검은 푸터 어디서든 보인다. */
+          background: var(--text);
+          box-shadow: 0 0 0 1.5px var(--surface);
           pointer-events: none;
           opacity: 0;
           transition: opacity var(--dur-fast) ease;
@@ -630,9 +636,10 @@ const shareImage = new URL(
          본문(각 페이지의 최상위 래퍼)이 z-index 1 + 불투명 배경이면 그 위를 지나가고,
          아니면 그냥 문서 끝의 보통 푸터처럼 보인다. 어느 쪽이든 깨지지 않는다. */
       /* 최소 한 화면 — 짧은 페이지(Contact)에서도 푸터는 스크롤해야 드러난다 */
-      /* flow-root: 첫 자식의 margin-top이 래퍼 밖으로 새어(마진 병합) 헤더와 본문 사이에
-         덮이지 않는 틈이 생겼다 — 그 틈으로 sticky 푸터가 비친다. 여백은 그대로, 안쪽으로만 둔다. */
-      .page-body { position: relative; z-index: 1; background: var(--surface); min-height: 100svh; display: flow-root; }
+      /* flow-root: 마진 병합 틈으로 sticky 푸터가 비치는 것을 막는다(모바일 수정, 2026-09-07).
+         padding-bottom: 푸터 앞의 공통 하단 여백(작가, 2026-09-09). */
+      .page-body { position: relative; z-index: 1; background: var(--surface); min-height: 100svh; display: flow-root; padding-bottom: 160px; }
+      @media (max-width: 700px) { .page-body { padding-bottom: 96px; } }
       /* 푸터 위에서는 크롬이 물러난다 */
       .site-menu--page, .site-menu--grid, .site-menu--hero, .lang-corner, .to-top {
         transition: opacity var(--dur-base) var(--ease), visibility 0s linear 0s;

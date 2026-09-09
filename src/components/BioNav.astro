@@ -33,7 +33,7 @@ const { active = "about" } = Astro.props
      다르지만, 머리까지 따라 달라지면 두 페이지가 또 다른 페이지로 읽힌다. */
   .bio-head {
     max-width: 650px;
-    margin: 0 0 84px;
+    margin: 0 0 96px;
   }
   /* 제목 블록 — Prototypes 페이지와 같은 규격(작가가 그 스타일을 택함, 2026-09) */
   .eyebrow {
@@ -44,12 +44,12 @@ const { active = "about" } = Astro.props
     color: var(--text-4);
   }
   h1 {
-    margin: 0 0 14px;
+    margin: 0 0 20px;
     font-family: var(--display);
     font-weight: 400;
-    font-size: var(--fs-display);
-    letter-spacing: 0;
-    line-height: 1.15;
+    font-size: clamp(40px, 4.4vw, 60px);
+    letter-spacing: -.01em;
+    line-height: 1.05;
   }
   .intro {
     margin: 0;
