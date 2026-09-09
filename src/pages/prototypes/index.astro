@@ -246,11 +246,11 @@ const axisCounts = AXES.map((a) => ({ ...a, n: entries.filter((e) => e.data.axes
     window.addEventListener("resize", resize)
   })
 </script>
-
 <script>
   /* 라이브 데모 타일 — data-demo="afterglow": 4학기 프로젝트(아직 따뜻한)의 규칙 스케치.
-     화이트 큐브 + 미니멀 벤치. 회색 더미가 앉았다 떠나면 접촉면에만 빛이 고인다.
-     새 자국은 밝고, 오래된 자국부터 가라앉고, 겹치면 가산 혼합으로 더 따뜻해진다.
+     화이트 큐브 + 미니멀 벤치. 관절 있는 회색 더미가 옆에서 걸어 들어와 앉는다(그냥 생겨나지 않는다 — 작가 지적).
+     앉는 순간부터 접촉면(엉덩이 + 두 발바닥)이 서서히 물들고, 떠난 뒤 여운이 흐른다.
+     방문자마다 색이 달라 겹치는 자리는 프리즘처럼 섞인다. 동시에 둘까지 앉는다.
      몸의 윤곽·그림자는 그리지 않는다(설계 규칙). 누르면 그 자리에 앉는다. */
   import * as THREE from "three"
   document.querySelectorAll<HTMLCanvasElement>('canvas.proto-demo[data-demo="afterglow"]').forEach((canvas) => {
@@ -264,13 +264,11 @@ const axisCounts = AXES.map((a) => ({ ...a, n: entries.filter((e) => e.data.axes
     scene.add(new THREE.AmbientLight(0xffffff, 1.05))
     const sun = new THREE.DirectionalLight(0xffffff, 0.9); sun.position.set(3, 6, 4); scene.add(sun)
 
-    // 방 — 바닥과 뒷벽 두 장이면 화이트 큐브로 읽힌다
-    const floor = new THREE.Mesh(new THREE.PlaneGeometry(20, 12), new THREE.MeshLambertMaterial({ color: 0xd9d7d2 }))
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(20, 12), new THREE.MeshLambertMaterial({ color: 0xe9e8e4 }))
     floor.rotation.x = -Math.PI / 2; scene.add(floor)
-    const wall = new THREE.Mesh(new THREE.PlaneGeometry(20, 8), new THREE.MeshLambertMaterial({ color: 0xf6f5f2 }))
+    const wall = new THREE.Mesh(new THREE.PlaneGeometry(40, 16), new THREE.MeshLambertMaterial({ color: 0xf6f5f2 }))
     wall.position.set(0, 4, -3.4); scene.add(wall)
 
-    // 벤치 — 상판 + 두 다리
     const wood = new THREE.MeshLambertMaterial({ color: 0xb08b5e })
     const top = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.12, 0.72), wood)
     top.position.y = 0.66; scene.add(top)
@@ -279,63 +277,150 @@ const axisCounts = AXES.map((a) => ({ ...a, n: entries.filter((e) => e.data.axes
       leg.position.set(x, 0.3, 0); scene.add(leg)
     })
 
-    // 자국 층 — 상판 바로 위 캔버스 텍스처. 가산 혼합이라 겹치면 진해진다
-    const tex = document.createElement("canvas"); tex.width = 512; tex.height = 128
-    const tctx = tex.getContext("2d")!
-    const traceTex = new THREE.CanvasTexture(tex)
-    const traceMat = new THREE.MeshBasicMaterial({ map: traceTex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false })
-    const trace = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.72), traceMat)
-    trace.rotation.x = -Math.PI / 2; trace.position.y = 0.727; scene.add(trace)
+    // 자국 층 — 벤치 상판과 바닥. 가산 혼합이라 겹치면 색이 섞인다
+    function layer(w: number, h: number, geoW: number, geoH: number, y: number, z: number) {
+      const c = document.createElement("canvas"); c.width = w; c.height = h
+      const ctx = c.getContext("2d")!
+      const t = new THREE.CanvasTexture(c)
+      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(geoW, geoH),
+        new THREE.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false }))
+      mesh.rotation.x = -Math.PI / 2; mesh.position.set(0, y, z); scene.add(mesh)
+      return { c, ctx, t, geoW, geoH, z }
+    }
+    const seatL = layer(512, 128, 3.2, 0.72, 0.727, 0)
+    const floorL = layer(512, 256, 4.2, 2.1, 0.006, 0.7)
 
-    type Pool = { x: number; birth: number; dwell: number; hue: number }
+    /* 앉는 동안 물들고(SOAK), 떠난 뒤 여운(LIFE). 흔적이 열보다 오래 머문다(연출 원칙). */
+    type Pool = { x: number; z: number; layer: "seat" | "floor"; birth: number; leave: number; dwell: number; hue: number }
     const pools: Pool[] = []
-    const BLOOM = 1.6, LIFE = 42 // 초 — 실제 열보다 훨씬 길게(연출 원칙: 흔적이 열보다 오래 머문다)
+    const SOAK = 9, LIFE = 55 /* 더 느리게 물들고 더 오래 머문다 */
     function drawPools(now: number) {
-      tctx.clearRect(0, 0, 512, 128)
+      seatL.ctx.clearRect(0, 0, 512, 128)
+      floorL.ctx.clearRect(0, 0, 512, 256)
+      /* 프리즘 혼색 — 겹침은 텍스처 안에서 lighter로 섞는다(3D 가산은 흰 바닥에서 씻겨 나감) */
+      seatL.ctx.globalCompositeOperation = "lighter"
+      floorL.ctx.globalCompositeOperation = "lighter"
       for (let i = pools.length - 1; i >= 0; i--) {
         const p = pools[i]
-        const age = now - p.birth
-        if (age > LIFE) { pools.splice(i, 1); continue }
-        const bloom = Math.min(1, age / BLOOM)
-        const decay = Math.pow(1 - age / LIFE, 1.6)
-        const a = bloom * decay * (0.55 + p.dwell * 0.45)
-        const cx = (p.x / 3.2 + 0.5) * 512, cy = 64
-        const r = 46 + p.dwell * 26
-        /* 프리즘 혼색(작가, 2026-09) — 방문자마다 다른 색. 가산 혼합이라 겹치는 자리에서 색이 섞여 화려해진다.
-           나이가 들수록 채도가 죽으며 온기(주황)로 가라앉는다. */
-        const hue = p.hue + Math.min(age / LIFE, 1) * (30 - p.hue % 60) * 0.2
-        const g = tctx.createRadialGradient(cx, cy, 0, cx, cy, r)
-        g.addColorStop(0, `hsla(${hue}, 95%, 62%, ${a})`)
-        g.addColorStop(0.55, `hsla(${(hue + 40) % 360}, 90%, 55%, ${a * 0.5})`)
-        g.addColorStop(1, `hsla(${(hue + 80) % 360}, 85%, 50%, 0)`)
-        tctx.fillStyle = g
-        tctx.beginPath(); tctx.arc(cx, cy, r, 0, Math.PI * 2); tctx.fill()
+        if (p.leave > 0 && now - p.leave > LIFE) { pools.splice(i, 1); continue }
+        const bloom = Math.min(1, Math.max(0, now - p.birth) / SOAK)
+        if (bloom <= 0) continue
+        const decay = p.leave > 0 ? Math.pow(1 - (now - p.leave) / LIFE, 1.6) : 1
+        const alpha = bloom * decay * (0.5 + p.dwell * 0.5)
+        const L = p.layer === "seat" ? seatL : floorL
+        const cx = (p.x / L.geoW + 0.5) * L.c.width
+        const cy = ((p.z - L.z) / L.geoH + 0.5) * L.c.height
+        const r = (p.layer === "seat" ? 46 + p.dwell * 26 : 20 + p.dwell * 8) * (0.4 + bloom * 0.6)
+        const fade = p.leave > 0 ? Math.min((now - p.leave) / LIFE, 1) : 0
+        const hue = p.hue + fade * 20
+        const g = L.ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(r, 1))
+        g.addColorStop(0, `hsla(${hue}, 100%, 52%, ${alpha})`)
+        g.addColorStop(0.55, `hsla(${(hue + 55) % 360}, 100%, 50%, ${alpha * 0.55})`)
+        g.addColorStop(1, `hsla(${(hue + 110) % 360}, 100%, 48%, 0)`)
+        L.ctx.fillStyle = g
+        L.ctx.beginPath(); L.ctx.arc(cx, cy, Math.max(r, 1), 0, Math.PI * 2); L.ctx.fill()
       }
-      traceTex.needsUpdate = true
+      seatL.t.needsUpdate = true
+      floorL.t.needsUpdate = true
     }
 
-    // 더미 — 얼굴 없는 무광 회색 인체. 앉은 자세 고정, 나타났다 사라진다
+    /* 더미 — 관절 있는 무광 회색 인체(머리·몸통·팔·허벅지·정강이·발).
+       옆에서 걸어 들어와(다리 흔들림) 앉고, 일어나 걸어 나간다. */
     function makeDummy() {
-      const m = new THREE.MeshLambertMaterial({ color: 0x9a9a9a, transparent: true, opacity: 0 })
-      const g = new THREE.Group()
-      const torso = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.62, 0.24), m); torso.position.y = 1.05
-      const head = new THREE.Mesh(new THREE.SphereGeometry(0.13, 16, 12), m); head.position.y = 1.5
-      const thigh = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.16, 0.5), m); thigh.position.set(0, 0.78, 0.2)
-      const shin = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.55, 0.14), m); shin.position.set(0, 0.42, 0.42)
-      g.add(torso, head, thigh, shin)
-      g.visible = false
-      scene.add(g)
-      return { g, m }
+      const m = new THREE.MeshLambertMaterial({ color: 0x9a9a9a })
+      const root = new THREE.Group()
+      const torso = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.52, 0.19), m); torso.position.y = 1.22
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.115, 16, 12), m); head.position.y = 1.63
+      root.add(torso, head)
+      function limb(px: number) {
+        const hip = new THREE.Group(); hip.position.set(px, 0.94, 0)
+        const thigh = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.4, 0.15), m); thigh.position.y = -0.2; hip.add(thigh)
+        const knee = new THREE.Group(); knee.position.y = -0.4; hip.add(knee)
+        const shin = new THREE.Mesh(new THREE.BoxGeometry(0.115, 0.4, 0.13), m); shin.position.y = -0.2; knee.add(shin)
+        const foot = new THREE.Mesh(new THREE.BoxGeometry(0.115, 0.07, 0.24), m); foot.position.set(0, -0.42, 0.05); knee.add(foot)
+        root.add(hip)
+        return { hip, knee }
+      }
+      const legs = [limb(-0.09), limb(0.09)]
+      function arm(px: number) {
+        const sh = new THREE.Group(); sh.position.set(px, 1.42, 0)
+        const a = new THREE.Mesh(new THREE.BoxGeometry(0.085, 0.44, 0.1), m); a.position.y = -0.22; sh.add(a)
+        root.add(sh)
+        return sh
+      }
+      const arms = [arm(-0.2), arm(0.2)]
+      root.visible = false
+      scene.add(root)
+      return { root, legs, arms, phase: "idle", t: 0, seatX: 0, fromX: 0, dwellDur: 0, walkDur: 0, pools: [] as Pool[], hue: 0 }
     }
-    const dummy = makeDummy()
-    let phase = "idle", phaseT = 0, seatX = 0, dwellDur = 0, nextAt = 1.5
+    type Dummy = ReturnType<typeof makeDummy>
+    const dummies: Dummy[] = [makeDummy(), makeDummy()]
+
+    function pose(d: Dummy, sitK: number, swing: number) {
+      // sitK: 0=서기 1=앉기. swing: 걷기 다리 흔들림(라디안)
+      d.root.position.y = -0.155 * sitK
+      d.legs[0].hip.rotation.x = -1.35 * sitK + swing * (1 - sitK)
+      d.legs[1].hip.rotation.x = -1.35 * sitK - swing * (1 - sitK)
+      d.legs.forEach((l) => { l.knee.rotation.x = 1.3 * sitK })
+      d.arms[0].rotation.x = 0.25 * sitK - swing * 0.6 * (1 - sitK)
+      d.arms[1].rotation.x = 0.25 * sitK + swing * 0.6 * (1 - sitK)
+    }
+
+    let nextAt = 1.2
+    function occupied(x: number) { return dummies.some((d) => d.phase !== "idle" && Math.abs(d.seatX - x) < 0.55) }
     function sit(x: number, now: number) {
-      if (phase !== "idle") return
-      seatX = Math.max(-1.3, Math.min(1.3, x))
-      dwellDur = 2.5 + Math.random() * 3.5
-      dummy.g.position.set(seatX, 0, 0)
-      dummy.g.visible = true
-      phase = "in"; phaseT = now
+      const d = dummies.find((k) => k.phase === "idle")
+      if (!d) return
+      const sx = Math.max(-1.3, Math.min(1.3, x))
+      if (occupied(sx)) return
+      d.seatX = sx
+      d.fromX = sx < 0 ? -3.6 : 3.6
+      d.walkDur = Math.abs(d.fromX - sx) / 0.65 /* 느린 걸음(작가, 2026-09) */
+      d.dwellDur = 6 + Math.random() * 6
+      d.hue = Math.random() * 360
+      d.root.position.set(d.fromX, 0, 0.45)
+      d.root.visible = true
+      d.phase = "walkin"; d.t = now
+    }
+    function step(d: Dummy, now: number) {
+      if (d.phase === "walkin") {
+        const k = Math.min(1, (now - d.t) / d.walkDur)
+        d.root.position.x = d.fromX + (d.seatX - d.fromX) * k
+        d.root.position.z = 0.45
+        pose(d, 0, Math.sin(now * 5) * 0.42)
+        if (k >= 1) {
+          d.phase = "sitdown"; d.t = now
+          d.pools = [
+            { x: d.seatX, z: 0, layer: "seat", birth: now + 0.5, leave: 0, dwell: 0.6, hue: d.hue },
+            { x: d.seatX - 0.1, z: 0.62, layer: "floor", birth: now + 0.8, leave: 0, dwell: 0.6, hue: (d.hue + 25) % 360 },
+            { x: d.seatX + 0.1, z: 0.62, layer: "floor", birth: now + 1, leave: 0, dwell: 0.6, hue: (d.hue + 335) % 360 },
+          ]
+          d.pools.forEach((p) => pools.push(p))
+        }
+      } else if (d.phase === "sitdown") {
+        const k = Math.min(1, (now - d.t) / 1.3)
+        d.root.position.z = 0.45 * (1 - k)
+        pose(d, k, 0)
+        if (k >= 1) { d.phase = "dwell"; d.t = now }
+      } else if (d.phase === "dwell") {
+        pose(d, 1, 0)
+        if (now - d.t > d.dwellDur) {
+          d.phase = "standup"; d.t = now
+          const dw = Math.min(1, d.dwellDur / 6)
+          d.pools.forEach((p) => { p.leave = now + 0.6; p.dwell = 0.4 + dw * 0.6 })
+          d.pools = []
+        }
+      } else if (d.phase === "standup") {
+        const k = Math.min(1, (now - d.t) / 1.3)
+        d.root.position.z = 0.45 * k
+        pose(d, 1 - k, 0)
+        if (k >= 1) { d.phase = "walkout"; d.t = now }
+      } else if (d.phase === "walkout") {
+        const k = Math.min(1, (now - d.t) / d.walkDur)
+        d.root.position.x = d.seatX + (d.fromX - d.seatX) * k
+        pose(d, 0, Math.sin(now * 5) * 0.42)
+        if (k >= 1) { d.root.visible = false; d.phase = "idle" }
+      }
     }
 
     let visible = false, raf = 0
@@ -346,18 +431,8 @@ const axisCounts = AXES.map((a) => ({ ...a, n: entries.filter((e) => e.data.axes
       const dt = Math.min(clock.getDelta(), 0.1)
       simT += dt
       const now = simT
-      // 방문 주기 — 스스로도 계속 산다
-      if (phase === "idle" && now > nextAt && !reduce) sit((Math.random() * 2 - 1) * 1.3, now)
-      if (phase === "in") { dummy.m.opacity = Math.min(1, (now - phaseT) / 0.8); if (dummy.m.opacity >= 1) { phase = "dwell"; phaseT = now } }
-      else if (phase === "dwell" && now - phaseT > dwellDur) { phase = "out"; phaseT = now }
-      else if (phase === "out") {
-        dummy.m.opacity = Math.max(0, 1 - (now - phaseT) / 0.8)
-        if (dummy.m.opacity <= 0) {
-          dummy.g.visible = false
-          pools.push({ x: seatX, birth: now, dwell: Math.min(1, dwellDur / 6), hue: Math.random() * 360 })
-          phase = "idle"; nextAt = now + 2 + Math.random() * 5
-        }
-      }
+      if (now > nextAt && !reduce) { sit((Math.random() * 2 - 1) * 1.3, now); nextAt = now + 5 + Math.random() * 6 }
+      dummies.forEach((d) => step(d, now))
       drawPools(now)
       renderer.render(scene, cam)
       raf = requestAnimationFrame(frame)
@@ -382,6 +457,10 @@ const axisCounts = AXES.map((a) => ({ ...a, n: entries.filter((e) => e.data.axes
     window.addEventListener("resize", resize)
   })
 </script>
+
+
+
+
 
 <style>
   .protos-archive { margin: calc(var(--desktop-header-clearance) + 64px) 12px 100px 12px; }
