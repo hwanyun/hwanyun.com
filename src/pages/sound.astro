@@ -264,13 +264,13 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
     :global(body.has-backdrop) #listening-backdrop { opacity: 1; }
     #backdrop-title { position: fixed; z-index: 2; left: 50%; top: 50%; width: min(88vw, 780px); transform: translate(-50%, -50%); color: var(--surface); font-size: clamp(24px, 4vw, 52px); font-weight: 300; line-height: 1.12; text-align: center; text-shadow: 0 2px 20px rgba(0,0,0,.45); opacity: 0; pointer-events: none; transition: opacity var(--dur-slow) ease; }
     :global(body.has-backdrop) #backdrop-title { opacity: 1; }
-    #sound-archive { position: relative; z-index: 1; max-width: var(--content-w); margin: var(--desktop-header-clearance) 40px 100px var(--desktop-content-x); transition: color var(--dur-slow) ease; }
+    #sound-archive { position: relative; z-index: 1; max-width: var(--content-w); margin: calc(var(--desktop-header-clearance) + 64px) 40px 100px var(--desktop-content-x); transition: color var(--dur-slow) ease; }
     /* Works archive의 소개 블록과 같은 데스크톱 읽기 규격 */
     /* 제목 블록 — Prototypes 페이지와 같은 규격 */
-    .archive-head { max-width: 650px; margin-bottom: 12px; }
+    .archive-head { max-width: 650px; margin-bottom: 96px; }
     .release-count { font-size: var(--fs-2xs); letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
     .eyebrow { margin: 0 0 6px; font-size: var(--fs-2xs); letter-spacing: .12em; text-transform: uppercase; color: var(--text-4); }
-    h1 { margin: 0 0 14px; font-family: var(--display); font-weight: 400; font-size: var(--fs-display); letter-spacing: 0; line-height: 1.15; }
+    h1 { margin: 0 0 20px; font-family: var(--display); font-weight: 400; font-size: clamp(40px, 4.4vw, 60px); letter-spacing: -.01em; line-height: 1.05; }
     /* 한 번에 한 언어만 보이므로 단을 나누지 않는다 */
     .intro-copy { display: block; }
     .intro { margin: 0 0 28px; max-width: 62ch; font-size: var(--fs-sm); line-height: 1.7; color: var(--text-2); }
