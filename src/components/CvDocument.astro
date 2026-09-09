@@ -79,7 +79,9 @@ const { data, korean = false } = Astro.props
     padding: 4px 0;
   }
   .year {
-    color: var(--text-2);
+    /* 숫자 열 공통 문법(2026-09): fs-sm · text-3 · tabular */
+    font-size: var(--fs-sm);
+    color: var(--text-3);
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
   }

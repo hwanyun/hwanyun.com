@@ -313,10 +313,10 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
        각자 다른 자리에 서서 숫자 열이 흔들리고, 머리글과도 어긋난다. */
     summary { display: grid; grid-template-columns: minmax(0,1fr) auto 104px 24px; gap: 12px; align-items: baseline; padding: 12px 0; cursor: pointer; list-style: none; }
     .rel-tags { display: flex; align-items: baseline; justify-content: flex-end; gap: 14px; }
-    .release-len { text-align: right; font-size: var(--fs-sm); color: var(--text-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .release-len { text-align: right; font-size: var(--fs-sm); color: var(--text-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
     .track-len { font-size: var(--fs-xs); color: var(--text-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
     summary::-webkit-details-marker { display: none; }
-    summary strong { font-weight: 400; }
+    summary strong { font-weight: 400; font-size: var(--fs-body); }
     .expand { text-align: right; font-size: var(--fs-lead); font-weight: 300; line-height: .7; }
     details[open] .expand { transform: rotate(45deg); }
     .tracklist { padding: 0 36px 14px 64px; }
