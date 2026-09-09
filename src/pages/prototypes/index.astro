@@ -327,7 +327,8 @@ const axisCounts = AXES.map((a) => ({ ...a, n: entries.filter((e) => e.data.axes
         const L = p.layer === "seat" ? seatL : floorL
         const cx = (p.x / L.geoW + 0.5) * L.c.width
         const cy = ((p.z - L.z) / L.geoH + 0.5) * L.c.height
-        const r = (p.layer === "seat" ? 46 + p.dwell * 26 : 20 + p.dwell * 8) * (0.4 + bloom * 0.6)
+        /* 번짐 두 배(작가, 2026-09) — 이웃한 자국까지 닿아 서로 침범하며 섞인다 */
+        const r = (p.layer === "seat" ? 92 + p.dwell * 52 : 40 + p.dwell * 16) * (0.4 + bloom * 0.6)
         const fade = p.leave > 0 ? Math.min((now - p.leave) / LIFE, 1) : 0
         const hue = p.hue + fade * 20
         const g = L.ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(r, 1))
