@@ -86,6 +86,9 @@ const fmtDate = (d: string) => {
       )
     }
 
+    {/* 머리(제목·메타·역할)와 내용 사이의 선 — 작품 상세의 부제 선과 같은 문법(작가 지시, 2026-09-09) */}
+    <hr class="rule" />
+
     {
       data.summary && (
         <p class="summary">
@@ -179,6 +182,8 @@ const fmtDate = (d: string) => {
     .meta { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: var(--fs-sm); color: var(--text-2); margin: 0 0 20px; }
     .meta .d { color: var(--text); }
     .role { font-size: var(--fs-xs); color: var(--text-3); margin: -12px 0 20px; letter-spacing: .01em; }
+    /* 선 위(메타)와는 넉넉히, 선 아래(내용)와는 가깝게 — 붙는 쪽이 소속을 말한다(작품 상세와 동일) */
+    .rule { border: 0; border-top: 1px solid var(--text); margin: 26px 0 26px; }
     .summary { font-size: var(--fs-body); line-height: 1.6; color: var(--text-2); margin: 0 0 28px; max-width: 560px; }
     .body { font-size: var(--fs-body); line-height: 1.8; color: var(--text-2); max-width: 620px; }
     .body :global(p) { margin: 0 0 1.15em; }
@@ -229,8 +234,13 @@ const fmtDate = (d: string) => {
     }
 
     @media (max-width: 700px) {
-      .ev-detail { margin: 0 16px 80px; padding-top: 8px; max-width: none; }
-      .ev-detail h1 { font-size: var(--fs-lead); }
+      .ev-detail { margin: 24px 16px 80px; padding-top: 0; max-width: none; }
+      .back { margin-bottom: 18px; }
+      .ev-detail h1 { font-size: clamp(25px, 7vw, 32px); line-height: 1.22; margin-bottom: 10px; }
+      .meta { margin-bottom: 16px; }
+      .role { margin: -8px 0 16px; }
+      .rule { margin: 20px 0 20px; }
+      .summary { margin-bottom: 22px; }
       .ev-links a { grid-template-columns: 1fr auto; gap: 3px 12px; padding: 14px 2px; }
       .lk-pub { grid-column: 1; }
       .lk-date { grid-column: 2; grid-row: 1; }

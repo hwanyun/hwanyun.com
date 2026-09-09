@@ -527,8 +527,11 @@ const axisCounts = AXES.map((a) => ({ ...a, n: entries.filter((e) => e.data.axes
   .pf-empty { margin: 24px 0; font-size: var(--fs-sm); color: var(--text-3); }
   /* 좁은 화면에서도 한 줄 두 박스(작가, 2026-09) */
   @media (max-width: 700px) {
-    .protos-archive { margin: 0; padding: calc(var(--mobile-header-h, 67px) + 16px) 12px 64px; }
-    .archive-intro, .filter-bar { margin-left: 4px; margin-right: 4px; }
+    /* 모바일 상단 규격은 Works와 같다(2026-09-09 통일): 컨테이너 24px 16px, 제목 아래 54px */
+    .protos-archive { margin: 24px 16px 64px; padding: 0; }
+    .archive-intro { margin: 0 0 54px; }
+    .filter-bar { margin: 0 0 24px; }
+    h1 { font-size: clamp(25px, 7vw, 32px); line-height: 1.22; }
     .proto-grid { max-width: none; margin-left: 0; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
 </style>
