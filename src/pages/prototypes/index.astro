@@ -113,8 +113,82 @@ const axisCounts = AXES.map((a) => ({ ...a, n: entries.filter((e) => e.data.axes
   })()
 </script>
 
+<script is:inline>
+  /* 라이브 데모 타일 — data-demo="sphere": 홈 히어로 구체의 축약판(입자 격자 + 커서 반응).
+     타일 밖과 공유하는 상태가 없다. 보일 때만 그린다. */
+  ;(function () {
+    var canvases = Array.prototype.slice.call(document.querySelectorAll('canvas.proto-demo[data-demo="sphere"]'))
+    if (!canvases.length) return
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    canvases.forEach(function (canvas) {
+      var ctx = canvas.getContext("2d")
+      if (!ctx) return
+      var W = 0, H = 0, DPR = 1, pts = []
+      var N = 900, R = 0
+      var mx = 0, my = 0, inside = false
+      function resize() {
+        var b = canvas.getBoundingClientRect()
+        if (!b.width || !b.height) return
+        DPR = Math.min(window.devicePixelRatio || 1, 2)
+        W = b.width; H = b.height
+        canvas.width = W * DPR; canvas.height = H * DPR
+        R = Math.min(W, H) * 0.36
+        pts = []
+        var GA = Math.PI * (3 - Math.sqrt(5))
+        for (var i = 0; i < N; i++) {
+          var y = 1 - (i / (N - 1)) * 2
+          var r = Math.sqrt(1 - y * y)
+          var th = GA * i
+          pts.push({ x: Math.cos(th) * r, y: y, z: Math.sin(th) * r })
+        }
+      }
+      var rot = 0, raf = 0, visible = false
+      function frame() {
+        if (!visible) return
+        rot += reduce ? 0 : 0.0022
+        ctx.setTransform(DPR, 0, 0, DPR, 0, 0)
+        ctx.clearRect(0, 0, W, H)
+        var cx = W / 2, cy = H / 2
+        var ink = getComputedStyle(canvas).color
+        ctx.fillStyle = ink
+        var cosR = Math.cos(rot), sinR = Math.sin(rot)
+        for (var i = 0; i < pts.length; i++) {
+          var p = pts[i]
+          var x = p.x * cosR - p.z * sinR
+          var z = p.x * sinR + p.z * cosR
+          var sx = cx + x * R, sy = cy + p.y * R
+          var rad = 0.6 + (z + 1) * 0.75
+          if (inside) {
+            var dx = sx - mx, dy = sy - my
+            var d = Math.sqrt(dx * dx + dy * dy)
+            if (d < 90) { var f = (1 - d / 90) * 14; sx += (dx / (d || 1)) * f; sy += (dy / (d || 1)) * f; rad += (1 - d / 90) * 0.9 }
+          }
+          ctx.globalAlpha = 0.25 + (z + 1) * 0.3
+          ctx.beginPath(); ctx.arc(sx, sy, rad, 0, Math.PI * 2); ctx.fill()
+        }
+        ctx.globalAlpha = 1
+        raf = requestAnimationFrame(frame)
+      }
+      canvas.addEventListener("pointermove", function (e) {
+        var b = canvas.getBoundingClientRect(); mx = e.clientX - b.left; my = e.clientY - b.top; inside = true
+      })
+      canvas.addEventListener("pointerleave", function () { inside = false })
+      if ("IntersectionObserver" in window) {
+        new IntersectionObserver(function (es) {
+          es.forEach(function (en) {
+            visible = en.isIntersecting
+            if (visible) { resize(); cancelAnimationFrame(raf); raf = requestAnimationFrame(frame) }
+            else cancelAnimationFrame(raf)
+          })
+        }, { rootMargin: "60px 0px" }).observe(canvas)
+      } else { visible = true; resize(); frame() }
+      window.addEventListener("resize", function () { resize() })
+    })
+  })()
+</script>
+
 <style>
-  .protos-archive { max-width: var(--content-w); margin: calc(var(--desktop-header-clearance) + 64px) 40px 100px var(--desktop-content-x); }
+  .protos-archive { max-width: 1600px; margin: calc(var(--desktop-header-clearance) + 64px) 40px 100px var(--desktop-content-x); }
   .archive-intro { margin: 0 0 96px; }
   .eyebrow { margin: 0 0 6px; font-size: var(--fs-2xs); letter-spacing: .12em; color: var(--text-4); }
   h1 { margin: 0 0 20px; font-family: var(--display); font-weight: 400; font-size: clamp(40px, 4.4vw, 60px); letter-spacing: -.01em; line-height: 1.05; }
@@ -130,9 +204,10 @@ const axisCounts = AXES.map((a) => ({ ...a, n: entries.filter((e) => e.data.axes
   .pf a[aria-current="true"] { background: var(--text); color: var(--surface); border-color: var(--text); }
   .pf-n { margin-left: 4px; color: var(--text-3); font-variant-numeric: tabular-nums; }
   .pf a[aria-current="true"] .pf-n { color: var(--line-2); }
-  .proto-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); }
+  /* 레퍼런스: universaleverything.com/prototypes — 큰 타일 2열, 미디어가 먼저 말한다 */
+  .proto-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
   .pf-empty { margin: 24px 0; font-size: var(--fs-sm); color: var(--text-3); }
-  @media (max-width: 1000px) { .proto-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 1000px) { .proto-grid { grid-template-columns: 1fr; } }
   @media (max-width: 700px) {
     .protos-archive { margin: 0; padding: calc(var(--mobile-header-h, 67px) + 16px) 16px 64px; }
     .proto-grid { grid-template-columns: 1fr; }

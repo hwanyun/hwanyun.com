@@ -177,6 +177,7 @@ const prototypes = defineCollection({
     video: z.string().optional().default(""), // 있을 때만. 세로 폰 촬영 허용
     thumb: z.string().optional().default(""),
     works: z.array(z.string()).optional().default([]), // 이어진 작품 slug
+    demo: z.string().optional().default(""), // 라이브 데모 타일: "sphere" 등 코드 프로토타입 식별자
     draft: z.boolean().optional().default(false),
   }),
 })
