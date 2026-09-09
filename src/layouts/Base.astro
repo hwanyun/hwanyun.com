@@ -692,7 +692,8 @@ const shareImage = new URL(
       }
       /* 워드마크 — 글자를 양끝으로 펼치고, 크기는 스크립트가 폭에 맞춘다(아래 #sf-mark). */
       .sf-mark {
-        display: flex; justify-content: space-between; align-items: baseline;
+        /* 글자를 붙인다(작가, 2026-09) — 양끝 벌림 대신 자연 자간 */
+        display: flex; justify-content: flex-start; align-items: baseline;
         margin: 0 0 40px; padding: 0;
         font-family: var(--display); font-size: 60px; font-weight: 300; line-height: .86; letter-spacing: 0;
         color: var(--sf-fg); white-space: nowrap; overflow: hidden;
