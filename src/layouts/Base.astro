@@ -21,6 +21,23 @@ const {
   imageAlt = "HWANYUN particle sphere forming the wordmark",
 } = Astro.props
 const canonicalUrl = new URL(Astro.url.pathname, "https://www.hwanyun.com").href
+/* 검색엔진에 "HWANYUN이 누구인지"를 직접 선언한다. 이게 없으면 구글이
+   동명의 다른 인물·웹툰·쇼핑몰과 섞어 추측한다. sameAs는 공식 채널의
+   목록 — 지식 패널과 AI 개요가 이 링크들을 같은 인물로 묶는 근거가 된다. */
+const personSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "HWANYUN",
+  url: "https://www.hwanyun.com",
+  jobTitle: "Artist",
+  description:
+    "Sound, light, material, and the body alter one another — installations and interactive systems by HWANYUN.",
+  alumniOf: "Goldsmiths, University of London",
+  sameAs: [
+    "https://www.instagram.com/hwanyun.lab/",
+    "https://vimeo.com/hwanyun",
+  ],
+})
 const shareImage = new URL(
   image || "/images/social/hwanyun-share-preview.png",
   "https://www.hwanyun.com"
@@ -60,6 +77,7 @@ const shareImage = new URL(
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={shareImage} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script type="application/ld+json" set:html={personSchema} />
     {/* Pretendard Variable 셀프호스트 — 동적 서브셋(unicode-range)이라
         브라우저가 필요한 글리프 블록만 받는다. 외부 폰트 요청 0. */}
     <link rel="stylesheet" href="/fonts/pretendard/pretendardvariable-dynamic-subset.css" />
