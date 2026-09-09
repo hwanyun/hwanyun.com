@@ -144,6 +144,27 @@ const shareImage = new URL(
         fit()
         window.addEventListener("resize", fit)
         if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit)
+
+        /* 글자 들어올리기(레퍼런스: originkit textlift, 자체 구현) —
+           글자마다 뒤로 밀린 겹층을 쌓고, 호버하면 앞면이 좌상단으로 떠오르며 층이 드러난다.
+           겹층은 absolute라 fit()의 폭 측정에 끼어들지 않는다. */
+        var DEPTH = 7
+        letters.forEach(function (l) {
+          var ch = l.textContent
+          l.classList.add("lift")
+          l.textContent = ""
+          for (var i = DEPTH; i >= 1; i--) {
+            var c = document.createElement("i")
+            c.className = "sf-l"
+            c.style.setProperty("--i", i)
+            c.textContent = ch
+            l.appendChild(c)
+          }
+          var f = document.createElement("b")
+          f.className = "sf-f"
+          f.textContent = ch
+          l.appendChild(f)
+        })
       })()
     </script>
     <script is:inline>
@@ -677,7 +698,21 @@ const shareImage = new URL(
         color: var(--sf-fg); white-space: nowrap; overflow: hidden;
         user-select: none; -webkit-user-select: none;
       }
-      .sf-mark span { display: inline-block; }
+      .sf-mark span { display: inline-block; position: relative; }
+      /* 겹층 — 쉬는 동안 접혀 있다가 호버에 우하단으로 펼쳐진다. 앞면은 좌상단으로 뜬다 */
+      .sf-mark .sf-f { font-style: normal; font-weight: inherit; display: inline-block;
+        transition: transform .5s cubic-bezier(.2, 1.5, .3, 1); }
+      .sf-mark .sf-l { position: absolute; inset: 0; font-style: normal; pointer-events: none;
+        opacity: 0; transform: translate(0, 0);
+        transition: transform .5s cubic-bezier(.2, 1.5, .3, 1), opacity .35s ease; }
+      .sf-mark span.lift:hover .sf-f { transform: translate(-7px, -7px); }
+      .sf-mark span.lift:hover .sf-l {
+        opacity: calc(1 - var(--i) * .13);
+        transform: translate(calc(var(--i) * 3px - 7px), calc(var(--i) * 3px - 7px));
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .sf-mark .sf-f, .sf-mark .sf-l { transition: none; }
+      }
       /* 라벨 위, 내용 아래 — 세 칸이 같은 윗선에서 시작한다 */
       /* 두 칸: 왼쪽에 연락·팔로우가 세로로, 오른쪽에 다른 곳 */
       .sf-cols {
