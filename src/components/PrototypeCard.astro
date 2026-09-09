@@ -37,19 +37,7 @@ const dateKo = m ? `${y}.${m}` : y
   </div>
   <div class="proto-body">
     <h3>{d.title} <time datetime={d.date}><span data-language-content="en">{dateEn}</span><span data-language-content="ko">{dateKo}</span></time></h3>
-    {(d.summary || d.summaryKo) && (
-      <p>
-        <span data-language-content="en">{d.summary || d.summaryKo}</span>
-        <span data-language-content="ko" lang="ko">{d.summaryKo || d.summary}</span>
-      </p>
-    )}
-    <ul class="proto-tags">
-      {d.tools.map((t: string) => <li>{t}</li>)}
-      {d.axes.map((id: string) => {
-        const a = axisOf(id)
-        return a ? <li class="tag-axis"><span data-language-content="en">{a.en}</span><span data-language-content="ko" lang="ko">{a.ko}</span></li> : null
-      })}
-    </ul>
+    {/* 설명·태그는 카드에서 뺐다(작가, 2026-09) — 미디어가 먼저 말한다. 필터는 data-속성으로만 동작 */}
   </div>
 </article>
 
