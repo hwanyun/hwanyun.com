@@ -965,9 +965,11 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
        한 문서가 통째로 밀려가는 롱페이지가 아니라 다음 페이지가 뜨는 전환감.
        스냅 기준점은 히어로가 아니라 아래의 .hero-spacer가 맡는다: 고정/스티키 요소에
        scroll-snap-align을 주면 기준점이 요소를 따라다녀 스크롤이 중간에 붙잡힌다. */
+    /* 본문 페이지가 사라졌으므로(2026-09-09, 홈=구체) 히어로는 고정이 아니라 보통 흐름이다.
+       스크롤하면 히어로가 올라가고 sticky 푸터가 아래에서 드러난다 — 다른 페이지와 같은 공식. */
     .hero {
-      position: fixed;
-      inset: 0;
+      position: relative;
+      background: var(--surface);
       z-index: 0;
       display: grid;
       height: 100svh;
@@ -1167,10 +1169,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     }
     /* 고정된 히어로가 흐름에서 빠졌으므로, 히어로 한 화면 분량의 스크롤 길이와
        스냅 기준점을 이 자리표시자가 대신 갖는다. */
-    .hero-spacer {
-      height: 100svh;
-      scroll-snap-align: start;
-    }
+    .hero-spacer { display: none; }
     /* 히어로가 fixed로 화면 전체를 덮는 레이어가 되었으므로, 그리드 뒤에 오는 것들도
        불투명하게 그 위에 올려야 한다 — 아니면 푸터 자리에 검은 히어로가 비친다. */
     /* 푸터는 Base의 sticky 푸터 그대로 — 제자리에 있고 본문이 걷히며 드러난다.
