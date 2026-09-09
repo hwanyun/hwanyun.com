@@ -873,7 +873,7 @@ function toParagraphs(text: string): string {
     /* 같은 재료의 작품 — 작품 페이지의 막다른 골목을 없앤다 */
     /* 본문 뒤 크레딧 블록들(재료·전시·읽을거리·후원)은 하나의 리듬을 공유한다 —
        블록 사이 48px, 라벨과 내용 사이 12px. 4:1이라 어디서 끊기는지 눈이 안다. */
-    .related-materials { margin: var(--space-4) 0 0; }
+    .related-materials { margin: var(--space-4) 0 0; max-width: var(--content-w); /* 목록 폭 통일(2026-09) */ }
     .related-materials-label {
       font-size: var(--fs-2xs);
       letter-spacing: 0.14em;
@@ -1368,13 +1368,14 @@ function toParagraphs(text: string): string {
     }
 
     /* 전시 맥락과 후원 크레딧은 작품 갤러리와 분리해 표기 */
-    .exhibition-credit {
+    .exhibition-credit { max-width: var(--content-w);
       clear: both;
       position: relative;
       z-index: 1;
       margin: var(--space-4) 0 0;
       padding-top: 0;
     }
+    .related-sounds { max-width: var(--content-w); }
     .related-sounds {
       clear: both;
       position: relative;
@@ -1393,6 +1394,7 @@ function toParagraphs(text: string): string {
     .related-sounds-list a { display: inline-flex; gap: 8px; align-items: baseline; color: var(--text-2); font-size: var(--fs-sm); }
     .related-sounds-list a span:last-child { font-size: var(--fs-xs); color: var(--text-4); }
     .related-sounds-list a:hover, .related-sounds-list a:hover span:last-child { color: var(--hover); }
+    .external-links { max-width: var(--content-w); }
     .external-links {
       clear: both;
       position: relative;
