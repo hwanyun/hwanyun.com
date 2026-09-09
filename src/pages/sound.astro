@@ -53,6 +53,9 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
       </div>
     </header>
 
+    {/* 소리의 입자 — 홈에서 옮겨 온 효과. 파형을 따라 점들이 흐르고, 커서가 올라오면 증폭된다. */}
+    <div class="sound-band" aria-hidden="true"><canvas class="sound-viz" id="sound-viz"></canvas></div>
+
     <nav class="sound-filter" aria-label="Filter recordings">
       <a href="/sound/" data-kind="">
         <span data-language-content="en">All</span><span data-language-content="ko">전체</span>
@@ -277,6 +280,9 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
     .intro[lang="ko"] { line-height: 1.85; }
     /* 필터 알약 — Works 아카이브와 같은 규칙. 사이트 안에서 "고르는 일"은
        어디서나 같은 모양이어야 한다. */
+    .sound-band { position: relative; width: 100%; height: 180px; margin: -24px 0 40px; color: var(--text); }
+    .sound-band:hover { color: var(--hover); }
+    .sound-viz { position: absolute; inset: 0; width: 100%; height: 100%; color: inherit; }
     .sound-filter { display: flex; flex-wrap: wrap; gap: 6px 8px; margin: 0 0 22px; }
     .sound-filter a {
       /* 칩은 도구 — 콘텐츠보다 조용하게, works 필터와 같은 13 */
@@ -399,3 +405,69 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
     }
   </style>
 </Base>
+
+<script is:inline>
+  ;(function () {
+    var canvas = document.getElementById("sound-viz")
+    if (!canvas) return
+    var ctx = canvas.getContext("2d")
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    var W = 0, H = 0, dpr = 1
+    function fit() {
+      dpr = Math.min(2, window.devicePixelRatio || 1)
+      W = canvas.clientWidth; H = canvas.clientHeight
+      canvas.width = W * dpr; canvas.height = H * dpr
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    }
+    fit(); window.addEventListener("resize", fit)
+    var raf = 0, visible = true, t0 = performance.now()
+    /* 커서가 올라오면 파형이 커지고 떨림이 는다(커서 자리를 비우지는 않는다 — 작가 지적).
+       떠나면 천천히 원래 흐름으로 되돌아간다. */
+    var hover = 0
+    var card = canvas.parentElement || canvas
+    card.addEventListener("pointerenter", function () { hoverTarget = 1 })
+    card.addEventListener("pointerleave", function () { hoverTarget = 0 })
+    var hoverTarget = 0
+
+    /* 입자 — 히어로 구체와 같은 어휘. 점들이 가로로 펼쳐져 있고, 합성 파형(서로 나눠지지 않는
+       주기의 사인 셋)을 따라 들리며, 파형이 클수록 떤다. 멈춰 있는 순간이 없다. */
+    var COLS = 96, ROWS = 6  // 넓은 띠 — 홈 상자(40열)보다 촘촘하게
+    var dots = []
+    for (var r = 0; r < ROWS; r++) for (var c = 0; c < COLS; c++) dots.push({ c: c, r: r, y: H / 2, vy: 0, seed: Math.random() * 6.28 })
+    function level(k, t) {
+      return Math.sin(k * .21 + t * 1.9) * Math.sin(k * .045 - t * .53) * .55
+           + Math.sin(k * .62 + t * 4.7) * .13 * (.5 + .5 * Math.sin(t * .37))
+    }
+    function draw(now) {
+      ctx.clearRect(0, 0, W, H)
+      var t = (now - t0) / 1000
+      hover += (hoverTarget - hover) * (hoverTarget ? .08 : .03)
+      var loud = .05 + Math.abs(Math.sin(t * .29) * Math.sin(t * .11)) * .16 + hover * .28
+      var mid = H / 2, amp = H * .24, gapX = W / (COLS + 1), gapY = H * .07
+      ctx.fillStyle = getComputedStyle(canvas).color
+      for (var n = 0; n < dots.length; n++) {
+        var p = dots[n]
+        var lv = level(p.c, t * (1 + hover * 1.6)) * (1 + hover * .9)
+        var off = p.r - (ROWS - 1) / 2
+        var target = mid + off * gapY + lv * amp * (1 - Math.abs(off) * .18)
+        var tremor = (Math.random() - .5) * loud * H * .3
+        var x0 = gapX * (p.c + 1)
+        p.vy = (p.vy + (target - p.y) * .12 + tremor) * .72
+        p.y += p.vy
+        var x = x0 + Math.sin(t * .4 + p.seed) * 1.2
+        var size = .9 + Math.min(1.6, Math.abs(lv) * 1.8 + loud * 3)
+        ctx.globalAlpha = .35 + Math.min(.65, Math.abs(lv) * .9 + loud * 1.5)
+        ctx.beginPath(); ctx.arc(x, p.y, size, 0, 6.283); ctx.fill()
+      }
+      ctx.globalAlpha = 1
+      if (!reduce && visible) raf = requestAnimationFrame(draw)
+    }
+    function start() { if (raf) return; raf = requestAnimationFrame(draw) }
+    function stop() { if (raf) cancelAnimationFrame(raf); raf = 0 }
+    draw(performance.now())
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (es) { es.forEach(function (e) { visible = e.isIntersecting; visible ? start() : stop() }) }).observe(canvas)
+    }
+    document.addEventListener("visibilitychange", function () { document.hidden ? stop() : (visible && start()) })
+  })()
+</script>
