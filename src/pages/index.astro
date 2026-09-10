@@ -773,6 +773,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         surfaceText = thesisSurfacePoints()
       }
 
+      let rafId = 0
       const draw = (time: number) => {
         context.clearRect(0, 0, width, height)
         const centerX = width / 2
@@ -913,7 +914,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
             context.globalAlpha = 1
           }
         }
-        requestAnimationFrame(draw)
+        rafId = requestAnimationFrame(draw)
       }
 
       const isWithinGlobe = (event: PointerEvent) => {
@@ -979,12 +980,29 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
       // 순간)과 뷰포트 변화 없이 박스만 바뀌는 경우를 놓쳐 워드마크가 낡은 폭으로 남는다.
       if ("ResizeObserver" in window) new ResizeObserver(resize).observe(hero)
       resize()
-      requestAnimationFrame(draw)
+      rafId = requestAnimationFrame(draw)
       // 폰트가 늦게 도착하면 워드마크 샘플이 폴백 글꼴로 찍힌다 — 로드 후 한 번 재생성
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { resize(); buildThesisMask() })
       document.addEventListener("hy:lang", () => { buildThesisMask(); width = 0; resize() })
       // 문장 리빌 등으로 글자 위치가 바뀔 수 있으니 한 번 더
       setTimeout(buildThesisMask, 1500)
+      /* 모바일에서 히어로가 간헐적으로 비어 보이던 것(작가, 2026-09-10) —
+         뒤로가기 bfcache 복원, 탭 복귀, 회전 뒤에는 측정이 낡거나 루프가 멈춘 채 남는다.
+         세 경우 모두 강제로 다시 측정하고 그리기를 잇는다. */
+      const revive = () => { width = 0; resize(); buildThesisMask(); cancelAnimationFrame(rafId); rafId = requestAnimationFrame(draw) }
+      window.addEventListener("pageshow", (e) => { if ((e as PageTransitionEvent).persisted) revive() })
+      document.addEventListener("visibilitychange", () => { if (!document.hidden) revive() })
+      window.addEventListener("orientationchange", () => { setTimeout(revive, 350) })
+      // 첫 로드 보험 — 폰트·레이아웃이 늦어 입자가 하나도 안 만들어졌으면 될 때까지 재시도
+      let tries = 0
+      const ensure = () => {
+        if (tries++ > 24) return
+        const rect = hero.getBoundingClientRect()
+        const stale = !particles.length || Math.abs(rect.width - width) > 2 || Math.abs(rect.height - height) > 2
+        if (stale && rect.width > 0) { width = 0; resize() }
+        setTimeout(ensure, 250)
+      }
+      setTimeout(ensure, 300)
     }
   </script>
 
