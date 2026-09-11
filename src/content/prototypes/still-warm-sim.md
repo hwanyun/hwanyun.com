@@ -1,6 +1,7 @@
 ---
 title: "Still Warm — Rule Simulation"
 date: "2026-09"
+order: 3
 summary: "The rules of the piece running live: figures walk in and sit; warmth soaks into seat and footprints, overlaps mix like a prism, old traces sink first."
 summaryKo: "작품 규칙의 라이브 구동. 더미가 걸어 들어와 앉으면 엉덩이와 발자국 자리가 서서히 물들고, 겹치면 프리즘처럼 섞이며, 오래된 자국부터 가라앉는다."
 tools:

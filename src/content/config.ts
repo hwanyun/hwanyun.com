@@ -168,6 +168,7 @@ const prototypes = defineCollection({
   schema: z.object({
     title: z.string(),
     date: z.string(), // "2026-09" — 월 단위. 얼마나 최근인지가 정보다.
+    order: z.number().optional().default(0), // 같은 달 안의 게재 순번. 목록은 오래된 것부터, 최신이 아래에 쌓인다(작가 확정 2026-09-11).
     summary: z.string().optional().default(""),
     summaryKo: z.string().optional().default(""),
     tools: z.array(z.string()).optional().default([]), // Ableton, TouchDesigner, 센서, 열화상 …
