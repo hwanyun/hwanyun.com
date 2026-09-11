@@ -1,5 +1,5 @@
 ---
-title: "Atypical Circuit — Hall 4 Lattice Study"
+title: ""
 date: "2026-09"
 order: 6
 summary: "An earlier study of the same hall: the medusae rebuilt as 3D wireframe bells in Blender, pulsing on the wall while two figures walk in and the nearest bells turn toward them."

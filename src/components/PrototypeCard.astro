@@ -28,7 +28,8 @@ const dateKo = m ? `${y}.${m}` : y
       <div class="ph" aria-hidden="true" />
     )}
     {/* 제목은 타일 안 좌하단(작가, 2026-09) */}
-    <h3 class="proto-title">{d.title}</h3>
+    {/* 제목이 빈 항목(4관 프리비즈 2종, 작가 지시)은 h3 자체를 내지 않는다 */}
+    {d.title && <h3 class="proto-title">{d.title}</h3>}
     {d.audio && (
       <button type="button" class="proto-play" data-audio={d.audio} aria-pressed="false" aria-label={`Play ${d.title}`}>
         <span class="pp-icon" aria-hidden="true"></span>

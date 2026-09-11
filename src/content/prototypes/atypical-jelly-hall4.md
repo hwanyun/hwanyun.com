@@ -1,5 +1,5 @@
 ---
-title: "Atypical Circuit — Hall 4 LED Wall Previz"
+title: ""
 date: "2026-09"
 order: 5
 summary: "Blender previz of Hall 4 at the K-Culture Museum, Incheon Airport: the medusa bloom playing on the 13.5 m LED wall, reflected in the floor and the three glass walls, seen from a visitor's eye height."
