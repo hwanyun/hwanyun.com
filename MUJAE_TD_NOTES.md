@@ -166,3 +166,11 @@ resetIn phaseCode
 **저장된 노드** (2026-08-31 저장, 버전 .7 / .12)
 `nr_mfo`(moviefileout, prores/60fps), `nr_keys`, `nr_rec_sel`, `nr_rec`,
 `iv_*`(설치 뷰 프로토타입, 텍스처 미해결).
+
+## 2026-09-12 확립: CSV 재생 + 타임라인 비실시간 렌더 (바닥·벽 프레임 동기)
+
+- 강제 쿡 루프(`out2.cook(force=True)` 반복)는 **한 프레임 안에서 돌아 absTime이 멈춘다** → 파티클 dt=0, 만다라가 안 모인다. 대신 `project.realTime=False` 상태에서 `tl.par.play=1`로 타임라인을 실제로 진행시키고 moviefileout이 매 프레임 기록하게 한다(유실 0).
+- 재생 scriptCHOP은 **입력이 안 바뀌면 쿡되지 않는다**. `absTime.frame` 표현식 constantCHOP을 입력에 붙여 매 프레임 갱신. 행 인덱스는 `absTime.frame - 기준`(타임라인 프레임 값은 콜백 안에서 갱신이 안 됐다).
+- 시작 직후 `idx - frame` 오프셋이 프로젝트마다 다르다(바닥 +1, 벽 +10). 컷할 때 보정.
+- h264 인코딩은 상용 라이선스 필요 → ProRes로 뽑고 ffmpeg로 변환.
+- Wall은 `oscin_floorstate`(11채널)를 같은 CSV로 대체하면 된다. 결과 `~/Desktop/mandala_src/`.

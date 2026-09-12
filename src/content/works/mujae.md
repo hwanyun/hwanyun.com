@@ -136,6 +136,20 @@ media:
     layout: hero
     caption: "설치 전경 — 간판 씬. 프로젝터 4대, 360° 벽과 바닥"
     captionEn: "Installation view — sign scene. Four projectors across the 360° wall and floor"
+  # 한 사이클 — 전시 시스템(TouchDesigner)에서 같은 상태 기록으로 벽·바닥을 렌더하고,
+  # Ableton 전시 세트에서 그룹별 클립을 같은 스텝 시각에 발사해 녹음한 소리를 붙였다 (2026-09-12).
+  - type: video
+    src: "/videos/mujae/mujae-cycle-flyer.mp4"
+    width: half
+    ratio: "9:16"
+    caption: "전단지 버전 — 한 사이클 (21초). 벽·바닥 동기, 그룹 1 사운드"
+    captionEn: "Flyer version — one cycle (21 s). Wall and floor in sync, group 1 sound"
+  - type: video
+    src: "/videos/mujae/mujae-cycle-sign.mp4"
+    width: half
+    ratio: "9:16"
+    caption: "간판 버전 — 한 사이클 (20초). 벽·바닥 동기, 그룹 2 사운드"
+    captionEn: "Sign version — one cycle (20 s). Wall and floor in sync, group 2 sound"
   - type: video
     src: "https://media.hwanyun.com/videos/mujae-floor-sync.mp4"
     srcMobile: "https://media.hwanyun.com/videos/mujae-floor-sync-sm.mp4"
