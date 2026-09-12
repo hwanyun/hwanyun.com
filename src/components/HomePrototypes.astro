@@ -8,7 +8,7 @@ import PrototypeCard from "./PrototypeCard.astro"
 import SectionHead from "./SectionHead.astro"
 
 const all = (await getCollection("prototypes", ({ data }) => !data.draft))
-  .sort((a, b) => String(a.data.date).localeCompare(String(b.data.date)) || a.data.order - b.data.order) // 오래된 것부터 — 최신이 아래에 쌓인다
+  .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0) || String(a.data.date).localeCompare(String(b.data.date))) // 추가 순번(order)만 본다 — 새 항목은 항상 맨 아래(작가 규칙) // 오래된 것부터 — 최신이 아래에 쌓인다
 const latest = all.slice(-3) // 최신 3개, 목록과 같은 방향(오래된 것이 위)
 ---
 

@@ -154,6 +154,8 @@ const sounds = defineCollection({
     backdrop: z.string().optional().default(""), // 해당 트랙 재생 시 보여 줄 배경 영상
     // 좁은 화면용 경량본 — 백드롭은 전체화면이라 폰에서 부담이 가장 크다
     backdropMobile: z.string().optional().default(""),
+    // "score": 스코어 영상처럼 전체가 읽혀야 하는 백드롭 — 어둡게 깔지 않고 잘리지 않게(contain) 보인다
+    backdropStyle: z.enum(["cover", "score"]).default("cover"),
     cover: z.string().optional().default(""), // 그리드 커버 이미지
     size: z.enum(["1col", "2col", "3col"]).default("2col"), // 그리드 카드 폭
     order: z.number().default(0),
