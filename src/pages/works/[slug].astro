@@ -712,6 +712,8 @@ function toParagraphs(text: string): string {
       })
 
       document.querySelectorAll(".video-preview video").forEach(function (video) {
+        // 포스터가 지정된 영상은 이동하지 않는다 — 시크하면 브라우저가 포스터 대신 그 프레임을 그린다
+        if (video.hasAttribute("poster")) return
         video.addEventListener("loadedmetadata", function () {
           if (video.duration > 0.12) video.currentTime = 0.12
         }, { once: true })
