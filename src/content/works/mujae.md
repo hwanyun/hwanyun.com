@@ -140,12 +140,14 @@ media:
   # Ableton 전시 세트에서 그룹별 클립을 같은 스텝 시각에 발사해 녹음한 소리를 붙였다 (2026-09-12).
   - type: video
     src: "/videos/mujae/mujae-cycle-flyer.mp4"
+    poster: "/images/mujae/cycle-poster-flyer.jpg"
     width: half
     ratio: "9:16"
     caption: "전단지 버전 — 한 사이클 (21초). 벽·바닥 동기, 그룹 1 사운드"
     captionEn: "Flyer version — one cycle (21 s). Wall and floor in sync, group 1 sound"
   - type: video
     src: "/videos/mujae/mujae-cycle-sign.mp4"
+    poster: "/images/mujae/cycle-poster-sign.jpg"
     width: half
     ratio: "9:16"
     caption: "간판 버전 — 한 사이클 (20초). 벽·바닥 동기, 그룹 2 사운드"

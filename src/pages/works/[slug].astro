@@ -366,7 +366,7 @@ function toParagraphs(text: string): string {
                         {embedURL(m.src).kind === "iframe" ? (
                           <iframe src={embedURL(m.src).src} allow="autoplay; fullscreen; picture-in-picture" allowfullscreen frameborder="0" loading="lazy" tabindex={useImmersiveMedia ? "-1" : undefined} />
                         ) : (
-                          <video src={embedURL(m.src).src} data-src-sm={m.srcMobile ? embedURL(m.srcMobile).src : undefined} controls={!useImmersiveMedia} preload={useImmersiveMedia ? "metadata" : undefined} muted={useImmersiveMedia} playsinline />
+                          <video src={embedURL(m.src).src} data-src-sm={m.srcMobile ? embedURL(m.srcMobile).src : undefined} poster={m.poster || undefined} controls={!useImmersiveMedia} preload={useImmersiveMedia ? "metadata" : undefined} muted={useImmersiveMedia} playsinline />
                         )}
                         {useImmersiveMedia && <button class="video-play" type="button" aria-label={`Play ${m.captionEn || m.caption || tEn(data)}`}><span aria-hidden="true"></span></button>}
                       </div>
