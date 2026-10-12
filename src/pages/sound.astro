@@ -12,7 +12,7 @@ const sounds = (await getCollection("sounds", ({ data }) => !data.draft)).sort(
    성격은 필터로 고르게 한다 — Works 페이지의 재료 필터와 같은 어휘다. */
 const FILTERS = [
   { id: "works", en: "Work soundtracks", ko: "작품 사운드" },
-  { id: "scores", en: "Commissions", ko: "커미션" },
+  { id: "scores", en: "Scores & studies", ko: "스코어·스터디" },
   { id: "archive", en: "Independent recordings", ko: "독립 녹음" },
 ]
 
@@ -100,7 +100,7 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
                   <span class="track-meta">
                     {sound.data.duration > 0 && <span class="track-len">{clock(sound.data.duration)}</span>}
                   </span>
-                  {sound.data.audio && <button class="track-control" type="button" data-audio={sound.data.audio} data-backdrop={sound.data.backdrop} data-backdrop-sm={sound.data.backdropMobile} aria-label={`Play ${tEn(sound.data)}`}><span aria-hidden="true"></span></button>}
+                  {sound.data.audio && <button class="track-control" type="button" data-audio={sound.data.audio} data-backdrop={sound.data.backdrop} data-backdrop-sm={sound.data.backdropMobile} data-backdrop-style={sound.data.backdropStyle} aria-label={`Play ${tEn(sound.data)}`}><span aria-hidden="true"></span></button>}
                 </li>
               ))}
             </ol>
@@ -188,7 +188,7 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
       button.setAttribute("aria-label", (state === "playing" ? "Pause " : "Play ") + row.dataset.title)
     }
     const resetActive = () => { setButton(activeButton, "stopped"); activeButton = null }
-    const clearBackdrop = () => { backdrop.pause(); backdrop.removeAttribute("src"); backdropTitle.textContent = ""; document.body.classList.remove("has-backdrop") }
+    const clearBackdrop = () => { backdrop.pause(); backdrop.removeAttribute("src"); backdropTitle.textContent = ""; document.body.classList.remove("has-backdrop", "backdrop-score") }
     /* 무제의 두 화면(바닥 원형·벽면 파노라마)은 사운드와 같은 3분을 지난다.
        영상을 제 클럭으로 흘려보내면 몇 초 만에 어긋나므로 오디오를 기준 시계로 삼는다. */
     const followAudio = () => {
@@ -225,6 +225,7 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
            있으면 그쪽을 쓴다 — 표시 폭이 작아 해상도 차이는 보이지 않는다. */
         var narrow = window.matchMedia("(max-width: 700px)").matches
         backdrop.src = (narrow && button.dataset.backdropSm) || button.dataset.backdrop
+        document.body.classList.toggle("backdrop-score", button.dataset.backdropStyle === "score")
         backdrop.currentTime = 0
         backdrop.play().catch(() => {})
         backdropTitle.textContent = rowTitle(button.closest(".track"))
@@ -264,6 +265,9 @@ const counts = FILTERS.map((f) => ({ ...f, n: releases.filter((r) => r.section =
   <style>
     #listening-backdrop { position: fixed; z-index: 0; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; pointer-events: none; filter: brightness(.42) saturate(.75); transition: opacity var(--dur-slow) ease; }
     :global(body.has-backdrop) #listening-backdrop { opacity: 1; }
+    /* 스코어 백드롭: 영상 전체가 읽혀야 한다 — 흰 바탕 위에 contain, 필터 없음. 제목은 어두운 글자로 아래쪽에 */
+    :global(body.backdrop-score) #listening-backdrop { object-fit: contain; background: var(--surface); filter: none; }
+    :global(body.backdrop-score) #backdrop-title { top: auto; bottom: 88px; transform: translateX(-50%); color: var(--text); text-shadow: none; font-size: var(--fs-sm); font-weight: 400; }
     #backdrop-title { position: fixed; z-index: 2; left: 50%; top: 50%; width: min(88vw, 780px); transform: translate(-50%, -50%); color: var(--surface); font-size: clamp(24px, 4vw, 52px); font-weight: 300; line-height: 1.12; text-align: center; text-shadow: 0 2px 20px rgba(0,0,0,.45); opacity: 0; pointer-events: none; transition: opacity var(--dur-slow) ease; }
     :global(body.has-backdrop) #backdrop-title { opacity: 1; }
     #sound-archive { position: relative; z-index: 1; max-width: var(--content-w); margin: calc(var(--desktop-header-clearance) + 64px) 40px 100px var(--desktop-content-x); transition: color var(--dur-slow) ease; }

@@ -101,6 +101,7 @@ const works = defineCollection({
           // 24:5는 360° 벽면을 한 줄로 편 파노라마(4.8:1). 21:9로 담으면 위아래에
           // 검은 띠가 남는데, 그 띠가 작품의 여백처럼 읽혀 버린다.
           ratio: z.enum(["16:9", "4:3", "1:1", "21:9", "24:5", "9:16"]).default("16:9"), // 영상 비율
+          poster: z.string().optional().default(""), // 영상 시작 전 화면(정지 프레임). 없으면 첫 프레임
           span: z.number().optional(), // 사진 모듈 그리드에서 차지할 칸 수(1~3). 없으면 비율로 자동
           // 도록의 부록. true면 본문 흐름에서 빠지고 하단 "Archive"에 작게 접힌다.
           // 본문은 역할이 있는 5–8장만 남긴다 — 장수가 늘수록 한 장의 무게가 준다.
@@ -154,6 +155,8 @@ const sounds = defineCollection({
     backdrop: z.string().optional().default(""), // 해당 트랙 재생 시 보여 줄 배경 영상
     // 좁은 화면용 경량본 — 백드롭은 전체화면이라 폰에서 부담이 가장 크다
     backdropMobile: z.string().optional().default(""),
+    // "score": 스코어 영상처럼 전체가 읽혀야 하는 백드롭 — 어둡게 깔지 않고 잘리지 않게(contain) 보인다
+    backdropStyle: z.enum(["cover", "score"]).default("cover"),
     cover: z.string().optional().default(""), // 그리드 커버 이미지
     size: z.enum(["1col", "2col", "3col"]).default("2col"), // 그리드 카드 폭
     order: z.number().default(0),
@@ -168,6 +171,7 @@ const prototypes = defineCollection({
   schema: z.object({
     title: z.string(),
     date: z.string(), // "2026-09" — 월 단위. 얼마나 최근인지가 정보다.
+    order: z.number().optional().default(0), // 같은 달 안의 게재 순번. 목록은 오래된 것부터, 최신이 아래에 쌓인다(작가 확정 2026-09-11).
     summary: z.string().optional().default(""),
     summaryKo: z.string().optional().default(""),
     tools: z.array(z.string()).optional().default([]), // Ableton, TouchDesigner, 센서, 열화상 …
