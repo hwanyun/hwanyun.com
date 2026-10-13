@@ -3,6 +3,7 @@ import { getCollection } from "astro:content"
 import Base from "../../layouts/Base.astro"
 import LangText from "../../components/LangText.astro"
 import { tEn, tKo } from "../../lib/titles"
+import { fmtRange } from "../../lib/eventDates"
 
 export async function getStaticPaths() {
   const events = await getCollection("events", ({ data }) => !data.draft)
@@ -14,17 +15,6 @@ const { data } = event
 const { Content } = await event.render()
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-function fmt(start: string, end: string) {
-  const s = start.split("-").map(Number)
-  if (!s[0]) return start
-  const sd = `${s[2]} ${MONTHS[s[1] - 1]}`
-  if (end) {
-    const e = end.split("-").map(Number)
-    if (e[1] === s[1] && e[0] === s[0]) return `${s[2]}–${e[2]} ${MONTHS[s[1] - 1]} ${s[0]}`
-    return `${sd} – ${e[2]} ${MONTHS[e[1] - 1]} ${e[0]}`
-  }
-  return `${sd} ${s[0]}`
-}
 // 영문 값이 비어 있으면 국문 값을 그대로 쓴다 — 두 언어를 나란히 찍지 않는다
 const whereKr = [data.venue, data.city].filter(Boolean).join(", ")
 const whereEn = [data.venueEn || data.venue, data.cityEn || data.city].filter(Boolean).join(", ")
@@ -55,7 +45,7 @@ const fmtDate = (d: string) => {
     <a class="back" href="/events/">← Events</a>
     <h1><LangText en={tEn(data)} ko={tKo(data)} /></h1>
     <p class="meta">
-      <span class="d">{fmt(data.dateStart, data.dateEnd)}</span>
+      <span class="d">{fmtRange(data.dateStart, data.dateEnd)}</span>
       {data.timeNote && (
         <span class="tn">
           <span data-language-content="en">{timeEn}</span>
@@ -109,6 +99,36 @@ const fmtDate = (d: string) => {
 
     {/* 마크다운 본문은 프론트매터로 담기 어려운 보충 설명용으로 남겨 둔다 */}
     <div class="body body-md"><Content /></div>
+
+    {/* 출품작 — 아래 보도 목록과 같은 줄 문법. 자리는 왼쪽 단, 작품명은 본문 단. */}
+    {
+      data.pieces.length > 0 && (
+        <section class="ev-pieces" aria-label="Works">
+          <h2 class="ev-lh">
+            <span data-language-content="en">Works</span>
+            <span data-language-content="ko">출품작</span>
+          </h2>
+          <ul>
+            {data.pieces.map((p) => {
+              const Row = p.work ? "a" : "div"
+              return (
+                <li>
+                  <Row class="pc-row" href={p.work ? `/works/${p.work}/` : undefined}>
+                    <span class="pc-place"><LangText en={p.placeEn || p.place} ko={p.place} /></span>
+                    <span class="pc-main">
+                      <span class="pc-title"><LangText en={p.titleEn || p.title} ko={p.title} /></span>
+                      {p.note && (
+                        <span class="pc-note"><LangText en={p.noteEn || p.note} ko={p.note} /></span>
+                      )}
+                    </span>
+                  </Row>
+                </li>
+              )
+            })}
+          </ul>
+        </section>
+      )
+    }
 
     {/* 작품 페이지와 같은 판형 — 번호 붙은 도판. 사이트 어디서든
         사진은 같은 규율로 걸린다. */}
@@ -209,6 +229,21 @@ const fmtDate = (d: string) => {
     /* 보도·안내 — 작업 목록과 같은 규칙(얇은 선, 색 하나로만 반응)을 따른다.
        버튼을 여러 개 세우면 페이지의 조용함이 깨진다. */
     .ev-links { margin-top: 54px; }
+    .ev-pieces { margin-top: 40px; }
+    .ev-pieces ul { list-style: none; margin: 0; padding: 0; }
+    .ev-pieces li { border-top: 1px solid var(--line); }
+    .ev-pieces li:last-child { border-bottom: 1px solid var(--line); }
+    .pc-row {
+      display: grid; grid-template-columns: 118px 1fr; gap: 16px;
+      align-items: baseline; padding: 16px 2px;
+      color: var(--text); text-decoration: none;
+      transition: color var(--dur-fast) var(--ease);
+    }
+    a.pc-row:hover, a.pc-row:hover .pc-place, a.pc-row:hover .pc-note { color: var(--hover); }
+    .pc-place { font-size: var(--fs-sm); color: var(--text-3); }
+    .pc-main { display: flex; flex-direction: column; gap: 5px; }
+    .pc-title { font-size: var(--fs-body); line-height: 1.35; }
+    .pc-note { font-size: var(--fs-sm); line-height: 1.6; color: var(--text-3); }
     .ev-lh {
       font-size: var(--fs-xs); letter-spacing: .08em; text-transform: uppercase;
       color: var(--text-4); font-weight: 500; margin: 0 0 4px;
@@ -241,6 +276,7 @@ const fmtDate = (d: string) => {
       .role { margin: -8px 0 16px; }
       .rule { margin: 20px 0 20px; }
       .summary { margin-bottom: 22px; }
+      .pc-row { grid-template-columns: 1fr; gap: 4px; padding: 14px 2px; }
       .ev-links a { grid-template-columns: 1fr auto; gap: 3px 12px; padding: 14px 2px; }
       .lk-pub { grid-column: 1; }
       .lk-date { grid-column: 2; grid-row: 1; }

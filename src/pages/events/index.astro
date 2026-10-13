@@ -3,28 +3,12 @@ import { getCollection } from "astro:content"
 import Base from "../../layouts/Base.astro"
 import LangText from "../../components/LangText.astro"
 import { tEn, tKo } from "../../lib/titles"
+import { fmtOne, fmtRange, firstDay, lastDay, isMonthOnly } from "../../lib/eventDates"
 
 const events = (await getCollection("events", ({ data }) => !data.draft)).sort(
   (a, b) => a.data.dateStart.localeCompare(b.data.dateStart) || (a.data.order ?? 0) - (b.data.order ?? 0)
 )
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-function fmtOne(date: string) {
-  const d = date.split("-").map(Number)
-  if (!d[0]) return date
-  return `${d[2]} ${MONTHS[d[1] - 1]} ${d[0]}`
-}
-function fmt(start: string, end: string) {
-  const s = start.split("-").map(Number)
-  if (!s[0]) return start
-  const sd = `${s[2]} ${MONTHS[s[1] - 1]}`
-  if (end) {
-    const e = end.split("-").map(Number)
-    if (e[1] === s[1] && e[0] === s[0]) return `${s[2]}–${e[2]} ${MONTHS[s[1] - 1]} ${s[0]}`
-    return `${sd} – ${e[2]} ${MONTHS[e[1] - 1]} ${e[0]}`
-  }
-  return `${sd} ${s[0]}`
-}
 ---
 
 <Base title="HWANYUN — Events" current="events">
@@ -46,12 +30,12 @@ function fmt(start: string, end: string) {
         events.map((e) => (
           <li
             class="ev"
-            data-start={e.data.dateStart}
-            data-end={e.data.dateEnd || e.data.dateStart}
-            data-until={e.data.dateEnd ? `Until ${fmtOne(e.data.dateEnd)}` : ""}
+            data-start={firstDay(e.data.dateStart)}
+            data-end={lastDay(e.data.dateEnd || e.data.dateStart)}
+            data-until={e.data.dateEnd && !isMonthOnly(e.data.dateEnd) ? `Until ${fmtOne(e.data.dateEnd)}` : ""}
           >
             <a class="ev-link" href={`/events/${e.slug}/`}>
-              <span class="ev-date">{fmt(e.data.dateStart, e.data.dateEnd)}</span>
+              <span class="ev-date">{fmtRange(e.data.dateStart, e.data.dateEnd)}</span>
               <span class="ev-main">
                 <span class="ev-title"><LangText en={tEn(e.data)} ko={tKo(e.data)} /></span>
                 {(e.data.venue || e.data.city) && (

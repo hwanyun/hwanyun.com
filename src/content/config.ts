@@ -194,7 +194,7 @@ const events = defineCollection({
     // 작품을 훼손하는 경우가 있어 작가가 영문 제목을 두지 않기로 했다.
     title: z.string(),
     titleEn: z.string().optional().default(""), // 영문 화면용. 규칙은 src/lib/titles.ts
-    dateStart: z.string(), // "2026-09-10" (필수)
+    dateStart: z.string(), // "2026-09-10" (필수). 달까지만 정해졌으면 "2026-12" — 규칙은 src/lib/eventDates.ts
     dateEnd: z.string().optional().default(""), // 종료일(기간 전시)
     // 시간·장소는 언어별로 갈린다. 비워 두면 한국어 값을 그대로 쓴다.
     timeNote: z.string().optional().default(""), // 예: "19:00 오프닝"
@@ -240,6 +240,22 @@ const events = defineCollection({
           src: z.string(),
           caption: z.string().optional().default(""),
           captionEn: z.string().optional().default(""),
+        })
+      )
+      .optional()
+      .default([]),
+    // 출품작 — 한 행사에 여러 작업이 나갈 때 자리(외벽, 3관 …)와 작품명을 짝지어 적는다.
+    // 소개문 안에 작품명을 섞어 쓰면 무엇이 제목이고 무엇이 설명인지 읽히지 않는다.
+    pieces: z
+      .array(
+        z.object({
+          place: z.string().optional().default(""), // 예: "외벽", "3관"
+          placeEn: z.string().optional().default(""),
+          title: z.string(),
+          titleEn: z.string().optional().default(""),
+          note: z.string().optional().default(""), // 한 줄 설명(선택)
+          noteEn: z.string().optional().default(""),
+          work: z.string().optional().default(""), // 작품 상세가 있으면 slug — 행이 링크가 된다
         })
       )
       .optional()

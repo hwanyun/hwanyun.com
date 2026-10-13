@@ -3,6 +3,7 @@ import Base from "../layouts/Base.astro"
 import SiteMenu from "../components/SiteMenu.astro"
 import { getCollection } from "astro:content"
 import { THESIS } from "../data/axes"
+import { firstDay, lastDay, isMonthOnly } from "../lib/eventDates"
 
 // 홈 하이라이트용 이벤트 데이터 (가장 가까운 미래 일정은 클라이언트에서 오늘 기준으로 선택)
 const upEvents = (await getCollection("events", ({ data }) => !data.draft))
@@ -10,8 +11,10 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
     slug: e.slug,
     title: e.data.title,
     titleEn: e.data.titleEn || e.data.title,
-    start: e.data.dateStart,
-    end: e.data.dateEnd || e.data.dateStart,
+    start: firstDay(e.data.dateStart),
+    end: lastDay(e.data.dateEnd || e.data.dateStart),
+    // 달까지만 정해진 일정 — 티커가 "1 Dec"가 아니라 "Dec 2026"으로 찍는다
+    monthOnly: isMonthOnly(e.data.dateStart),
     venue: e.data.venue,
     city: e.data.city,
     // 이 줄은 스크립트가 만들기 때문에 언어 전환 CSS가 닿지 않는다.
@@ -344,7 +347,7 @@ const upEvents = (await getCollection("events", ({ data }) => !data.draft))
         if (isNaN(end) || end < today) continue
         var start = new Date(evs[i].start + "T00:00:00")
         var s = evs[i].start.split("-").map(Number)
-        var date = s[2] + " " + M[s[1] - 1]
+        var date = evs[i].monthOnly ? M[s[1] - 1] + " " + s[0] : s[2] + " " + M[s[1] - 1]
         var ko = document.documentElement.getAttribute("data-lang") === "ko"
         var where = (ko ? [evs[i].venue, evs[i].city] : [evs[i].venueEn, evs[i].cityEn])
           .filter(Boolean).join(", ")
